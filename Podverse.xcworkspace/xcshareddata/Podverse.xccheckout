@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>5957BE0F-3D78-4ABF-AABE-A11098EE0241</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Podverse</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>BFEC094C058921C690E98C0CCA86E1B9227E6E07</key>
+		<string>https://github.com/podverse/podverse.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Podverse.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>BFEC094C058921C690E98C0CCA86E1B9227E6E07</key>
+		<string>..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/podverse/podverse.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>BFEC094C058921C690E98C0CCA86E1B9227E6E07</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>BFEC094C058921C690E98C0CCA86E1B9227E6E07</string>
+			<key>IDESourceControlWCCName</key>
+			<string>Podverse</string>
+		</dict>
+	</array>
+</dict>
+</plist>

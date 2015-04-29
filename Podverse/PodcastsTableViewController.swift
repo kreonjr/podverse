@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate {
+class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate, MWFeedParserDelegate {
     
     var parser: NSXMLParser = NSXMLParser()
     
@@ -18,12 +18,15 @@ class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate {
     var podcastTitle: String = String()
     var podcastSummary: String = String()
     
+    var podcastImage: String = String()
+    var parsingImage: Bool = false
+    
     var episodeTitle: String = String()
     var episodeSummary: String = String()
     var episodePubDate: String = String()
     
     var parsingChannel: Bool = false
-    var parsingImage: Bool = false
+    var parsingImg: Bool = false
     var eName: String = String()
     
     var podcasts: [PodcastModel] = []
@@ -31,6 +34,19 @@ class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        var feedURL = NSURL(string: "http:/images.apple.com/main/rss/hotnews/hotnews.rss")
+        
+        let feedParser: MWFeedParser = MWFeedParser(feedURL: feedURL)
+        println(feedParser)
+        feedParser.delegate = self
+        
+        feedParser.feedParseType = ParseTypeFull
+        
+        feedParser.connectionType = ConnectionTypeAsynchronously
+        
+        feedParser.parse()
+        
+        println(feedParser)
         
         for var i = 0; i < podcastUrls.count; i++ {
             podcastUrl = podcastUrls[i] as! String
@@ -47,6 +63,30 @@ class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    func feedParserDidStart(parser: MWFeedParser!) {
+        println("feedParserDidStart")
+    }
+    
+    func feedParserDidFinish(parser: MWFeedParser!) {
+        println("feedParserDidFinish")
+    }
+    
+    func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
+        println("didParseFeedInfo")
+        println(info.title)
+    }
+    
+    func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
+        println("didParseFeedItem")
+        println(item.title)
+    }
+    
+    func feedParser(parser: MWFeedParser!, didFailWithError error: NSError!) {
+        println("didFailWithError")
+        println(NSError)
+        println(error)
     }
     
     func parser(parser: NSXMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [NSObject : AnyObject]) {
@@ -76,6 +116,7 @@ class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate {
                     parsingImage = true
                 } else if eName == "description" {
                     podcastSummary += data!
+                } else if eName == "image" {
                 }
             } else {
                 if eName == "title" {
@@ -173,10 +214,7 @@ class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate {
         if segue.identifier == "ShowEpisodes" {
             let viewController: EpisodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
             let indexPath = self.tableView.indexPathForSelectedRow()!
-            println(indexPath)
             let podcast = podcasts[indexPath.row]
-            println(podcast)
-            println(podcasts)
             
             viewController.episodes = podcast.episodes
         }

@@ -14,5 +14,6 @@ class PodcastModel: NSObject {
     var summary: String = String()
     var url: String = String()
     var episodes: [EpisodeModel] = [EpisodeModel]()
+    var image: String = String()
     
 }
