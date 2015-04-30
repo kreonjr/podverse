@@ -34,7 +34,7 @@ class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate, M
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        var feedURL = NSURL(string: "http:/images.apple.com/main/rss/hotnews/hotnews.rss")
+        var feedURL = NSURL(string: "http://joeroganexp.joerogan.libsynpro.com/rss")
         
         let feedParser: MWFeedParser = MWFeedParser(feedURL: feedURL)
         println(feedParser)
@@ -75,12 +75,14 @@ class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate, M
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
         println("didParseFeedInfo")
-        println(info.title)
+        println(info.image)
+        
     }
     
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
         println("didParseFeedItem")
         println(item.title)
+        // println(item.image)
     }
     
     func feedParser(parser: MWFeedParser!, didFailWithError error: NSError!) {
