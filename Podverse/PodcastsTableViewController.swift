@@ -12,166 +12,129 @@ class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate, M
     
     var parser: NSXMLParser = NSXMLParser()
     
-    var podcastUrls: NSArray = ["http://joeroganexp.joerogan.libsynpro.com/rss", "http://lavenderhour.libsyn.com/rss", "http://feeds.feedburner.com/dancarlin/history", "http://yourmomshousepodcast.libsyn.com/rss", "http://theartofcharmpodcast.theartofcharm.libsynpro.com/rss", "http://feeds.feedburner.com/PointlessWithKevenPereira", "http://feeds.feedburner.com/TheDrunkenTaoistPodcast"]
+    var feedURLs: [NSURL] = []
     
-    var podcastUrl: String = String()
-    var podcastTitle: String = String()
-    var podcastSummary: String = String()
-    
-    var podcastImage: String = String()
-    var parsingImage: Bool = false
-    
-    var episodeTitle: String = String()
-    var episodeSummary: String = String()
-    var episodePubDate: String = String()
-    
-    var parsingChannel: Bool = false
-    var parsingImg: Bool = false
-    var eName: String = String()
+    var podcast: PodcastModel = PodcastModel()
+    var episode: EpisodeModel = EpisodeModel()
     
     var podcasts: [PodcastModel] = []
     var episodes: [EpisodeModel] = []
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
-        var feedURL = NSURL(string: "http://joeroganexp.joerogan.libsynpro.com/rss")
         
-        let feedParser: MWFeedParser = MWFeedParser(feedURL: feedURL)
-        println(feedParser)
-        feedParser.delegate = self
+        // Convert an array full of Strings into NSURLs. I'm not sure why or if using NSURL would be
+        // preferable than using Strings for the RSS URLs...
+        var feedURLsStringsArray = ["http://joeroganexp.joerogan.libsynpro.com/rss", "http://lavenderhour.libsyn.com/rss", "http://feeds.feedburner.com/dancarlin/history", "http://yourmomshousepodcast.libsyn.com/rss", "http://theartofcharmpodcast.theartofcharm.libsynpro.com/rss", "http://feeds.feedburner.com/PointlessWithKevenPereira", "http://feeds.feedburner.com/TheDrunkenTaoistPodcast"] as [String]?
         
-        feedParser.feedParseType = ParseTypeFull
-        
-        feedParser.connectionType = ConnectionTypeAsynchronously
-        
-        feedParser.parse()
-        
-        println(feedParser)
-        
-        for var i = 0; i < podcastUrls.count; i++ {
-            podcastUrl = podcastUrls[i] as! String
-            let url: NSURL = NSURL(string: podcastUrl)!
+        if let array = feedURLsStringsArray {
             
-            parser = NSXMLParser(contentsOfURL: url)!
-            println(parser)
-            parser.delegate = self
-            parser.parse()
+            for string in array {
+                var feedURL = NSURL(string: string)
+                feedURLs.append(feedURL!)
+            }
+            
+        }
+        
+        for var i = 0; i < feedURLs.count; i++ {
+         
+            var feedParser: MWFeedParser = MWFeedParser(feedURL: feedURLs[i] as NSURL)
+            feedParser.delegate = self
+            feedParser.feedParseType = ParseTypeFull
+            feedParser.connectionType = ConnectionTypeAsynchronously
+            feedParser.parse()
+            
         }
         
     }
 
     override func didReceiveMemoryWarning() {
+        
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        
     }
     
     func feedParserDidStart(parser: MWFeedParser!) {
-        println("feedParserDidStart")
-    }
-    
-    func feedParserDidFinish(parser: MWFeedParser!) {
-        println("feedParserDidFinish")
+        
+        episodes = []
+        
     }
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
-        println("didParseFeedInfo")
-        println(info.image)
         
+        podcast = PodcastModel()
+        
+        if info.title != nil {
+            podcast.title = info.title
+        }
+        if info.summary != nil {
+            podcast.summary = info.summary
+        }
+        if info.url != nil {
+            podcast.feedURL = info.url
+        }
+
     }
     
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
-        println("didParseFeedItem")
-        println(item.title)
-        // println(item.image)
+        
+        episode = EpisodeModel()
+        
+        if item.title != nil {
+            episode.title = item.title
+        }
+        if item.summary != nil {
+            episode.summary = item.summary
+        }
+        if item.date != nil {
+            episode.pubDate = item.date
+        }
+        
+        episodes.append(episode)
+        
+    }
+    
+    func feedParserDidFinish(parser: MWFeedParser!) {
+        
+        podcast.episodes.extend(episodes)
+        
+        podcasts.append(podcast)
+        
+        // dispatch_async is necessary to reload the tableView with new data
+        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            self.tableView.reloadData()
+        })
+        
     }
     
     func feedParser(parser: MWFeedParser!, didFailWithError error: NSError!) {
-        println("didFailWithError")
-        println(NSError)
-        println(error)
-    }
-    
-    func parser(parser: NSXMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [NSObject : AnyObject]) {
-        
-        eName = elementName
-        if elementName == "channel" {
-            podcastTitle = String()
-            podcastSummary = String()
-            parsingChannel = true
-            parsingImage = false
-            episodes = []
-        } else if elementName == "item" {
-            episodeTitle = String()
-            episodeSummary = String()
-            episodePubDate = String()
-            parsingChannel = false
-        }
         
     }
-    
-    func parser(parser: NSXMLParser, foundCharacters string: String?) {
-        let data = string?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-        if (!data!.isEmpty) {
-            if parsingChannel {
-                if eName == "title" && parsingImage == false {
-                    podcastTitle += data!
-                    parsingImage = true
-                } else if eName == "description" {
-                    podcastSummary += data!
-                } else if eName == "image" {
-                }
-            } else {
-                if eName == "title" {
-                    episodeTitle += data!
-                } else if eName == "description" {
-                    episodeSummary += data!
-                } else if eName == "pubDate" {
-                    episodePubDate += data!
-                }
-            }
-        }
-    }
-    
-    func parser(parser: NSXMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-        if elementName == "channel" {
-            let podcast: PodcastModel = PodcastModel()
-            podcast.title = podcastTitle
-            podcast.summary = podcastSummary
-            podcast.episodes = episodes
-            podcasts.append(podcast)
-        } else if elementName == "item" {
-            let episode: EpisodeModel = EpisodeModel()
-            episode.title = episodeTitle
-            episode.summary = episodeSummary
-            episode.pubDate = episodePubDate
-            episodes.append(episode)
-        }
-    }
-
     
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        // #warning Potentially incomplete method implementation.
-        // Return the number of sections.
+        
         return 1
+
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
+        
         return podcasts.count
+        
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("podcastCell", forIndexPath: indexPath) as! UITableViewCell
-        
-        let podcast: PodcastModel = podcasts[indexPath.row]
 
+        let cell = tableView.dequeueReusableCellWithIdentifier("podcastCell", forIndexPath: indexPath) as! UITableViewCell
+        let podcast: PodcastModel = podcasts[indexPath.row]
         var currentPodcast = podcasts[indexPath.row]
         cell.textLabel!.text = currentPodcast.title
-
+        
         return cell
+        
     }
 
     /*
@@ -217,7 +180,6 @@ class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate, M
             let viewController: EpisodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
             let indexPath = self.tableView.indexPathForSelectedRow()!
             let podcast = podcasts[indexPath.row]
-            
             viewController.episodes = podcast.episodes
         }
     }

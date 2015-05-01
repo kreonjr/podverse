@@ -10,6 +10,7 @@ import UIKit
 
 class EpisodesTableViewController: UITableViewController {
     
+    var podcast: [PodcastModel] = []
     var episodes: [EpisodeModel] = []
     
     override func viewDidLoad() {
