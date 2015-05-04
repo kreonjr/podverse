@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		816032281AF4479B00CAA54E /* kevin.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 816032271AF4479B00CAA54E /* kevin.jpg */; };
+		81DC6A8C1AF6F6F70030433A /* PVFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DC6A8B1AF6F6F70030433A /* PVFeedParser.swift */; };
 		81DE1F2A1AF09D200098B22B /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 81DE1F291AF09D200098B22B /* Podfile */; };
 		81DE1F2C1AF09D5D0098B22B /* Podfile.lock in Resources */ = {isa = PBXBuildFile; fileRef = 81DE1F2B1AF09D5D0098B22B /* Podfile.lock */; };
 		81F8634D1AEDFA45009FFDD7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81F8634C1AEDFA45009FFDD7 /* AppDelegate.swift */; };
@@ -33,6 +35,8 @@
 
 /* Begin PBXFileReference section */
 		3C3DF9114777C42E9188A86F /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		816032271AF4479B00CAA54E /* kevin.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = kevin.jpg; path = ../../../Pictures/kevin.jpg; sourceTree = "<group>"; };
+		81DC6A8B1AF6F6F70030433A /* PVFeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVFeedParser.swift; sourceTree = "<group>"; };
 		81DE1F291AF09D200098B22B /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = "<group>"; };
 		81DE1F2B1AF09D5D0098B22B /* Podfile.lock */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile.lock; sourceTree = "<group>"; };
 		81DE1F6D1AF0A4810098B22B /* Podverse-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Podverse-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -106,6 +110,7 @@
 			children = (
 				81DE1F291AF09D200098B22B /* Podfile */,
 				81DE1F2B1AF09D5D0098B22B /* Podfile.lock */,
+				81DC6A8B1AF6F6F70030433A /* PVFeedParser.swift */,
 				81F8634C1AEDFA45009FFDD7 /* AppDelegate.swift */,
 				81F863501AEDFA45009FFDD7 /* Main.storyboard */,
 				81F863531AEDFA45009FFDD7 /* Images.xcassets */,
@@ -123,6 +128,7 @@
 		81F8634A1AEDFA45009FFDD7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				816032271AF4479B00CAA54E /* kevin.jpg */,
 				81F8634B1AEDFA45009FFDD7 /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -240,6 +246,7 @@
 				81F863521AEDFA45009FFDD7 /* Main.storyboard in Resources */,
 				81F863571AEDFA45009FFDD7 /* LaunchScreen.xib in Resources */,
 				81F863541AEDFA45009FFDD7 /* Images.xcassets in Resources */,
+				816032281AF4479B00CAA54E /* kevin.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,6 +297,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81DC6A8C1AF6F6F70030433A /* PVFeedParser.swift in Sources */,
 				81F863711AEDFD1C009FFDD7 /* PodcastModel.swift in Sources */,
 				81F8636F1AEDFB9D009FFDD7 /* EpisodesTableViewController.swift in Sources */,
 				81F8636D1AEDFB28009FFDD7 /* PodcastsTableViewController.swift in Sources */,

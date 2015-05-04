@@ -14,6 +14,9 @@ class PodcastModel: NSObject {
     var summary: String = String()
     var feedURL: NSURL = NSURL()
     var episodes: [EpisodeModel] = [EpisodeModel]()
-    var image: String = String()
+    var imageURL: NSURL = NSURL()
+    var image: UIImage = UIImage()
+    var itunesImageURL: NSURL = NSURL()
+    var itunesImage: UIImage = UIImage()
     
 }

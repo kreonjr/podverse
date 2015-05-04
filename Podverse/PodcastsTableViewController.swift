@@ -8,9 +8,11 @@
 
 import UIKit
 
-class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate, MWFeedParserDelegate {
+class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     
-    var parser: NSXMLParser = NSXMLParser()
+    @IBOutlet var myPodcastsTableView: UITableView!
+    
+    var parser: PVFeedParser = PVFeedParser()
     
     var feedURLs: [NSURL] = []
     
@@ -18,33 +20,34 @@ class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate, M
     var episode: EpisodeModel = EpisodeModel()
     
     var podcasts: [PodcastModel] = []
-    var episodes: [EpisodeModel] = []
+    
+    func didReceiveFeedResults(results: PodcastModel) {
+        dispatch_async(dispatch_get_main_queue(), {
+            self.podcasts.append(results)
+            println(results)
+            self.myPodcastsTableView!.reloadData()
+        })
+    }
     
     override func viewDidLoad() {
         
         super.viewDidLoad()
+        
+        parser.delegate = self
         
         // Convert an array full of Strings into NSURLs. I'm not sure why or if using NSURL would be
         // preferable than using Strings for the RSS URLs...
         var feedURLsStringsArray = ["http://joeroganexp.joerogan.libsynpro.com/rss", "http://lavenderhour.libsyn.com/rss", "http://feeds.feedburner.com/dancarlin/history", "http://yourmomshousepodcast.libsyn.com/rss", "http://theartofcharmpodcast.theartofcharm.libsynpro.com/rss", "http://feeds.feedburner.com/PointlessWithKevenPereira", "http://feeds.feedburner.com/TheDrunkenTaoistPodcast"] as [String]?
         
         if let array = feedURLsStringsArray {
-            
             for string in array {
                 var feedURL = NSURL(string: string)
                 feedURLs.append(feedURL!)
             }
-            
         }
         
         for var i = 0; i < feedURLs.count; i++ {
-         
-            var feedParser: MWFeedParser = MWFeedParser(feedURL: feedURLs[i] as NSURL)
-            feedParser.delegate = self
-            feedParser.feedParseType = ParseTypeFull
-            feedParser.connectionType = ConnectionTypeAsynchronously
-            feedParser.parse()
-            
+            parser.parsePodcastFeed(feedURLs[i])
         }
         
     }
@@ -55,75 +58,14 @@ class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate, M
         
     }
     
-    func feedParserDidStart(parser: MWFeedParser!) {
-        
-        episodes = []
-        
-    }
-    
-    func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
-        
-        podcast = PodcastModel()
-        
-        if info.title != nil {
-            podcast.title = info.title
-        }
-        if info.summary != nil {
-            podcast.summary = info.summary
-        }
-        if info.url != nil {
-            podcast.feedURL = info.url
-        }
-
-    }
-    
-    func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
-        
-        episode = EpisodeModel()
-        
-        if item.title != nil {
-            episode.title = item.title
-        }
-        if item.summary != nil {
-            episode.summary = item.summary
-        }
-        if item.date != nil {
-            episode.pubDate = item.date
-        }
-        
-        episodes.append(episode)
-        
-    }
-    
-    func feedParserDidFinish(parser: MWFeedParser!) {
-        
-        podcast.episodes.extend(episodes)
-        
-        podcasts.append(podcast)
-        
-        // dispatch_async is necessary to reload the tableView with new data
-        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-            self.tableView.reloadData()
-        })
-        
-    }
-    
-    func feedParser(parser: MWFeedParser!, didFailWithError error: NSError!) {
-        
-    }
-    
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        
         return 1
-
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
         return podcasts.count
-        
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -132,7 +74,12 @@ class PodcastsTableViewController: UITableViewController, NSXMLParserDelegate, M
         let podcast: PodcastModel = podcasts[indexPath.row]
         var currentPodcast = podcasts[indexPath.row]
         cell.textLabel!.text = currentPodcast.title
-        
+
+        cell.imageView?.image = UIImage(named: "Blank52")
+        if let image = currentPodcast.image as UIImage! {
+            cell.imageView!.image = currentPodcast.image
+        }
+
         return cell
         
     }
