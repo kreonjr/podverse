@@ -10,17 +10,13 @@ import UIKit
 
 class EpisodesTableViewController: UITableViewController {
     
-    var podcast: [PodcastModel] = []
+    var podcast: PodcastModel = PodcastModel()
     var episodes: [EpisodeModel] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        self.title = podcast.title
     }
 
     override func didReceiveMemoryWarning() {

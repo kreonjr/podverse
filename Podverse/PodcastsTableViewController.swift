@@ -34,6 +34,10 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         
         parser.delegate = self
         
+        self.title = "My Podcasts"
+        
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        
         // Convert an array full of Strings into NSURLs. I'm not sure why or if using NSURL would be
         // preferable than using Strings for the RSS URLs...
         var feedURLsStringsArray = ["http://joeroganexp.joerogan.libsynpro.com/rss", "http://lavenderhour.libsyn.com/rss", "http://feeds.feedburner.com/dancarlin/history", "http://yourmomshousepodcast.libsyn.com/rss", "http://theartofcharmpodcast.theartofcharm.libsynpro.com/rss", "http://feeds.feedburner.com/PointlessWithKevenPereira", "http://feeds.feedburner.com/TheDrunkenTaoistPodcast"] as [String]?
@@ -69,12 +73,19 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
 
-        let cell = tableView.dequeueReusableCellWithIdentifier("podcastCell", forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("podcastCell", forIndexPath: indexPath) as! myPodcastTableCell
         let podcast: PodcastModel = podcasts[indexPath.row]
         var currentPodcast = podcasts[indexPath.row]
-        cell.textLabel!.text = currentPodcast.title
-
-        cell.imageView?.image = UIImage(named: "Blank52")
+        cell.layoutMargins = UIEdgeInsetsZero
+        cell.preservesSuperviewLayoutMargins = false
+        cell.PVtitle?.text = currentPodcast.title
+        
+        var dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = "M/d/yy"
+        let dateString = dateFormatter.stringFromDate(currentPodcast.lastPubDate)
+        cell.PVlastPubDate?.text = dateString
+        
+        cell.PVimage?.image = UIImage(named: "Blank52")
         
         var image: UIImage? = podcast.image
         
@@ -90,11 +101,11 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         
         if image!.size.height != 0.0 {
 
-            cell.imageView?.image = image
+            cell.PVimage?.image = image
         } else {
             var itunesImage: UIImage? = podcast.itunesImage
             if itunesImage!.size.height != 0.0 {
-                cell.imageView?.image = itunesImage
+                cell.PVimage?.image = itunesImage
             }
 
         }
@@ -146,6 +157,8 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
             let viewController: EpisodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
             let indexPath = self.tableView.indexPathForSelectedRow()!
             let podcast = podcasts[indexPath.row]
+            println(podcast.title)
+            viewController.podcast = podcast
             viewController.episodes = podcast.episodes
         }
     }

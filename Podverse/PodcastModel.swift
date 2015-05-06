@@ -12,9 +12,11 @@ class PodcastModel: NSObject {
     var title: String = String()
     var summary: String? = String()
     var feedURL: NSURL? = NSURL()
+    var lastPubDate: NSDate = NSDate()
     var episodes: [EpisodeModel] = [EpisodeModel]()
     var imageURL: NSURL? = NSURL()
     var image: UIImage? = UIImage()
     var itunesImageURL: NSURL? = NSURL()
     var itunesImage: UIImage? = UIImage()
+    
 }

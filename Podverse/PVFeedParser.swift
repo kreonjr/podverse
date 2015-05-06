@@ -104,6 +104,7 @@ class PVFeedParser : NSObject, MWFeedParserDelegate {
     
     func feedParserDidFinish(parser: MWFeedParser!) {
         podcast.episodes.extend(episodes)
+        podcast.lastPubDate = episodes[0].pubDate
         self.delegate?.didReceiveFeedResults(podcast)
     }
     

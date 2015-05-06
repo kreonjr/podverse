@@ -2,31 +2,59 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7702" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="OGD-QM-aIg">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Podcasts-->
         <scene sceneID="7rg-PG-J7D">
             <objects>
                 <tableViewController id="ktn-Wy-3P9" customClass="PodcastsTableViewController" customModule="Podverse" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="Bdm-et-eGe">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="100" sectionHeaderHeight="22" sectionFooterHeight="22" id="Bdm-et-eGe">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="podcastCell" textLabel="Wvl-tq-PB6" style="IBUITableViewCellStyleDefault" id="nJW-UE-ntZ">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="0.0" reuseIdentifier="podcastCell" rowHeight="100" id="nJW-UE-ntZ" customClass="myPodcastTableCell" customModule="Podverse" customModuleProvider="target">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nJW-UE-ntZ" id="g1q-1W-2Lh">
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Wvl-tq-PB6">
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uJT-Rk-a4H">
+                                            <rect key="frame" x="99" y="8" width="493" height="20"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="TkW-ju-kRa">
+                                            <rect key="frame" x="8" y="8" width="83" height="83"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="83" id="UbG-Kb-VSX"/>
+                                                <constraint firstAttribute="width" constant="83" id="eSW-kq-6sL"/>
+                                            </constraints>
+                                        </imageView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="caB-Kv-EsM">
+                                            <rect key="frame" x="99" y="73" width="493" height="18"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                            <color key="textColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="caB-Kv-EsM" firstAttribute="trailing" secondItem="g1q-1W-2Lh" secondAttribute="trailingMargin" id="4tT-ZH-nJq"/>
+                                        <constraint firstItem="caB-Kv-EsM" firstAttribute="bottom" secondItem="g1q-1W-2Lh" secondAttribute="bottomMargin" id="B6y-Mc-jeD"/>
+                                        <constraint firstItem="TkW-ju-kRa" firstAttribute="leading" secondItem="g1q-1W-2Lh" secondAttribute="leadingMargin" id="CFX-JU-AKq"/>
+                                        <constraint firstItem="uJT-Rk-a4H" firstAttribute="leading" secondItem="TkW-ju-kRa" secondAttribute="trailing" constant="8" id="F5d-U3-NBT"/>
+                                        <constraint firstItem="caB-Kv-EsM" firstAttribute="leading" secondItem="TkW-ju-kRa" secondAttribute="trailing" constant="8" id="Mew-4R-bbC"/>
+                                        <constraint firstItem="TkW-ju-kRa" firstAttribute="top" secondItem="g1q-1W-2Lh" secondAttribute="topMargin" id="Ogv-c3-ZWp"/>
+                                        <constraint firstItem="uJT-Rk-a4H" firstAttribute="top" secondItem="g1q-1W-2Lh" secondAttribute="topMargin" id="pLp-pI-Xy5"/>
+                                        <constraint firstItem="uJT-Rk-a4H" firstAttribute="trailing" secondItem="g1q-1W-2Lh" secondAttribute="trailingMargin" id="zmH-dX-qkO"/>
+                                    </constraints>
                                 </tableViewCellContentView>
+                                <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 <connections>
+                                    <outlet property="PVimage" destination="TkW-ju-kRa" id="xcV-3i-Wc4"/>
+                                    <outlet property="PVlastPubDate" destination="caB-Kv-EsM" id="zR2-jQ-RAD"/>
+                                    <outlet property="PVtitle" destination="uJT-Rk-a4H" id="UcV-c1-WRt"/>
                                     <segue destination="azn-l0-3Pa" kind="show" identifier="ShowEpisodes" id="qn3-tY-fdK"/>
                                 </connections>
                             </tableViewCell>
@@ -72,10 +100,10 @@
             </objects>
             <point key="canvasLocation" x="2370" y="-28"/>
         </scene>
-        <!--Navigation Controller-->
+        <!-- -->
         <scene sceneID="3rj-pA-Jpn">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="OGD-QM-aIg" sceneMemberID="viewController">
+                <navigationController title=" " automaticallyAdjustsScrollViewInsets="NO" id="OGD-QM-aIg" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="omc-LE-Rep">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>

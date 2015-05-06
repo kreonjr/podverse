@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		81376B9B1AF9CA4A00E6C9C5 /* myPodcastTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81376B9A1AF9CA4A00E6C9C5 /* myPodcastTableCell.swift */; };
 		816032281AF4479B00CAA54E /* kevin.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 816032271AF4479B00CAA54E /* kevin.jpg */; };
 		81DC6A8C1AF6F6F70030433A /* PVFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DC6A8B1AF6F6F70030433A /* PVFeedParser.swift */; };
 		81DE1F2A1AF09D200098B22B /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 81DE1F291AF09D200098B22B /* Podfile */; };
@@ -35,6 +36,7 @@
 
 /* Begin PBXFileReference section */
 		3C3DF9114777C42E9188A86F /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		81376B9A1AF9CA4A00E6C9C5 /* myPodcastTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = myPodcastTableCell.swift; sourceTree = "<group>"; };
 		816032271AF4479B00CAA54E /* kevin.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = kevin.jpg; path = ../../../Pictures/kevin.jpg; sourceTree = "<group>"; };
 		81DC6A8B1AF6F6F70030433A /* PVFeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVFeedParser.swift; sourceTree = "<group>"; };
 		81DE1F291AF09D200098B22B /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = "<group>"; };
@@ -113,6 +115,7 @@
 				81DC6A8B1AF6F6F70030433A /* PVFeedParser.swift */,
 				81F8634C1AEDFA45009FFDD7 /* AppDelegate.swift */,
 				81F863501AEDFA45009FFDD7 /* Main.storyboard */,
+				81376B9A1AF9CA4A00E6C9C5 /* myPodcastTableCell.swift */,
 				81F863531AEDFA45009FFDD7 /* Images.xcassets */,
 				81F863551AEDFA45009FFDD7 /* LaunchScreen.xib */,
 				81F8634A1AEDFA45009FFDD7 /* Supporting Files */,
@@ -303,6 +306,7 @@
 				81F8636D1AEDFB28009FFDD7 /* PodcastsTableViewController.swift in Sources */,
 				81F8634D1AEDFA45009FFDD7 /* AppDelegate.swift in Sources */,
 				81F863731AEDFDA3009FFDD7 /* EpisodeModel.swift in Sources */,
+				81376B9B1AF9CA4A00E6C9C5 /* myPodcastTableCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
