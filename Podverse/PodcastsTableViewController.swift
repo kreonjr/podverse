@@ -24,7 +24,6 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     func didReceiveFeedResults(results: PodcastModel) {
         dispatch_async(dispatch_get_main_queue(), {
             self.podcasts.append(results)
-            println(results)
             self.myPodcastsTableView!.reloadData()
         })
     }
@@ -76,8 +75,28 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         cell.textLabel!.text = currentPodcast.title
 
         cell.imageView?.image = UIImage(named: "Blank52")
-        if let image = currentPodcast.image as UIImage! {
-            cell.imageView!.image = currentPodcast.image
+        
+        var image: UIImage? = podcast.image
+        
+        // TODO: this definitely is not the proper way to check for a null value for an image,
+        // but I've spent about 10 hours trying to figure out how to check if UIImage is nil or not, and no success.
+        // There is something about Swift classes and optionals that I must not be understanding.
+        // The Problem: When the info.image not nil conditional runs in PVFeedParser, info.image is ALWAYS not nil,
+        // even when there is no imageURL for that image. Also, the if let imgData NSData condition is always passing,
+        // even when there is no imageURL for that image. Images without a URL are still producing a UIImage,
+        // except their UIImage's have a height/width of 0,0. I know there must be a more proper way to check for nil,
+        // but until one of us figures it out, I'll check if the UIImage has no height, and if it has no height,
+        // then we know there isn't an image for that podcast.
+        
+        if image!.size.height != 0.0 {
+
+            cell.imageView?.image = image
+        } else {
+            var itunesImage: UIImage? = podcast.itunesImage
+            if itunesImage!.size.height != 0.0 {
+                cell.imageView?.image = itunesImage
+            }
+
         }
 
         return cell

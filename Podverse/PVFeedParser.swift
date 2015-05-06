@@ -22,7 +22,6 @@ class PVFeedParser : NSObject, MWFeedParserDelegate {
     var episodes: [EpisodeModel] = []
 
     func parsePodcastFeed(feedURL: NSURL) {
-        println("hello")
         var feedParser: MWFeedParser = MWFeedParser(feedURL: feedURL)
         feedParser.delegate = self
         feedParser.feedParseType = ParseTypeFull
@@ -49,19 +48,42 @@ class PVFeedParser : NSObject, MWFeedParserDelegate {
         }
         if info.image != nil {
             let imageURLString: String = info.image
-            let url = NSURL(fileURLWithPath: imageURLString)
+            let url : NSURL? = NSURL(string: imageURLString)
             podcast.imageURL = url!
             if let imgData = NSData(contentsOfURL: url!) {
                 podcast.image = UIImage(data: imgData)!
             }
+        } else {
+            podcast.image =  UIImage()
+            podcast.imageURL = NSURL()
         }
         if info.itunesImage != nil {
-            let itunesImageURLString:String = info.itunesImage
-            let itunesURL:NSURL = NSURL(string: itunesImageURLString)!
-            podcast.itunesImageURL = itunesURL
-            let itunesImgData = NSData(contentsOfURL: itunesURL)
-            podcast.itunesImage = UIImage(data: itunesImgData!)!
+            let itunesImageURLString: String = info.itunesImage
+            let itunesURL : NSURL? = NSURL(string: itunesImageURLString)
+            podcast.itunesImageURL = itunesURL!
+            if let itunesImgData = NSData(contentsOfURL: itunesURL!) {
+                podcast.image = UIImage(data: itunesImgData)!
+            }
+        } else {
+            podcast.itunesImage =  UIImage()
+            podcast.itunesImageURL = NSURL()
         }
+        
+//        var itunesImageURLString: String? = info.itunesImage
+//        var itunesImage: UIImage? = UIImage(contentsOfFile: itunesImageURLString!)
+//        println(itunesImage)
+//        if info.itunesImage != nil {
+//            
+//            let itunesURL : NSURL? = NSURL(string: itunesImageURLString)
+//            podcast.itunesImageURL = itunesURL!
+//            if let imgData = NSData(contentsOfURL: itunesURL!) {
+//                podcast.itunesImage = UIImage(data: imgData)!
+//            }
+//        } else {
+//            var image: UIImage? = podcast.image
+//            podcast.itunesImage = UIImage()
+//            podcast.itunesImageURL = NSURL()
+//        }
     }
     
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
