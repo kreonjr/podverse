@@ -82,9 +82,45 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="episodeCell" id="bLd-ye-A9O">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="PodcastHeaderCell" rowHeight="100" id="bLd-ye-A9O" customClass="PodcastHeaderCell" customModule="Podverse" customModuleProvider="target">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bLd-ye-A9O" id="Wzu-gP-78z">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gyX-tB-Kv5">
+                                            <rect key="frame" x="8" y="8" width="83" height="83"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="83" id="B6p-En-SFV"/>
+                                                <constraint firstAttribute="height" constant="83" id="ROI-Fr-93I"/>
+                                            </constraints>
+                                        </imageView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E43-nA-paE">
+                                            <rect key="frame" x="99" y="8" width="493" height="83"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="83" id="sef-UD-Nb7"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="E43-nA-paE" firstAttribute="trailing" secondItem="Wzu-gP-78z" secondAttribute="trailingMargin" id="Ny9-2W-K3t"/>
+                                        <constraint firstItem="gyX-tB-Kv5" firstAttribute="leading" secondItem="Wzu-gP-78z" secondAttribute="leadingMargin" id="Phs-KX-Qg0"/>
+                                        <constraint firstItem="gyX-tB-Kv5" firstAttribute="top" secondItem="Wzu-gP-78z" secondAttribute="topMargin" id="Q5p-pg-DFf"/>
+                                        <constraint firstItem="E43-nA-paE" firstAttribute="top" secondItem="Wzu-gP-78z" secondAttribute="topMargin" id="la4-Wd-pPd"/>
+                                        <constraint firstItem="E43-nA-paE" firstAttribute="leading" secondItem="gyX-tB-Kv5" secondAttribute="trailing" constant="8" id="vlT-j7-f8E"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="PVimage" destination="gyX-tB-Kv5" id="2W1-d6-5yz"/>
+                                    <outlet property="PVsummary" destination="E43-nA-paE" id="HCu-LC-KJI"/>
+                                </connections>
+                            </tableViewCell>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="episodeCell" id="Y9T-oi-EEc">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Y9T-oi-EEc" id="U27-RP-x6v">
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                             </tableViewCell>

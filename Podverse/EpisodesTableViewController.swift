@@ -15,7 +15,6 @@ class EpisodesTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         self.title = podcast.title
     }
 
@@ -46,6 +45,17 @@ class EpisodesTableViewController: UITableViewController {
         cell.detailTextLabel?.text = episode.summary
 
         return cell
+    }
+    
+    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let podcastHeaderCell = tableView.dequeueReusableCellWithIdentifier("PodcastHeaderCell") as! PodcastHeaderCell
+        podcastHeaderCell.PVimage!.image = podcast.image
+        podcastHeaderCell.PVsummary!.text = podcast.summary
+        return podcastHeaderCell
+    }
+    
+    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 100
     }
 
     /*
