@@ -13,5 +13,6 @@ class EpisodeModel: NSObject {
     var title: String = String()
     var summary: String = String()
     var pubDate: NSDate = NSDate()
+    var duration: NSTimeInterval = NSTimeInterval()
     
 }

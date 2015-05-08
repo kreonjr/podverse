@@ -10,6 +10,8 @@ import UIKit
 
 class EpisodesTableViewController: UITableViewController {
     
+    var utility: PVUtility = PVUtility()
+    
     var podcast: PodcastModel = PodcastModel()
     var episodes: [EpisodeModel] = []
     
@@ -37,14 +39,23 @@ class EpisodesTableViewController: UITableViewController {
         return episodes.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("episodeCell", forIndexPath: indexPath) as! UITableViewCell
+    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> EpisodeTableCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("episodeTableCell", forIndexPath: indexPath) as! EpisodeTableCell
 
         let episode: EpisodeModel = episodes[indexPath.row]
-        cell.textLabel!.text = episode.title
-        cell.detailTextLabel?.text = episode.summary
+//        cell.textLabel!.text = episode.title
+//        cell.detailTextLabel?.text = episode.summary
+        cell.title?.text = episode.title
+        cell.summary?.text = utility.removeHTMLFromString(episode.summary)
+        println (episode.duration)
+        println(utility.convertNSTimeIntervalToHHMMSSString(episode.duration))
+        cell.duration?.text = utility.convertNSTimeIntervalToHHMMSSString(episode.duration) as String
 
         return cell
+    }
+    
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return 120
     }
     
     override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {

@@ -16,6 +16,8 @@ protocol PVFeedParserProtocol {
 class PVFeedParser : NSObject, MWFeedParserDelegate {
     var delegate: PVFeedParserProtocol?
     
+    var utility: PVUtility = PVUtility()
+    
     var podcast: PodcastModel = PodcastModel()
 
     var episode: EpisodeModel = EpisodeModel()
@@ -97,6 +99,12 @@ class PVFeedParser : NSObject, MWFeedParserDelegate {
         }
         if item.date != nil {
             episode.pubDate = item.date
+        }
+        if item.duration != nil {
+            let durationString = item.duration
+            let duration = utility.convertStringToNSTimeInterval(durationString)
+            println(duration)
+            episode.duration = duration
         }
         
         episodes.append(episode)

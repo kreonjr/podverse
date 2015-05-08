@@ -19,7 +19,7 @@
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="nJW-UE-ntZ" id="g1q-1W-2Lh">
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uJT-Rk-a4H">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Title" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uJT-Rk-a4H">
                                             <rect key="frame" x="99" y="8" width="493" height="20"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -32,7 +32,7 @@
                                                 <constraint firstAttribute="width" constant="83" id="eSW-kq-6sL"/>
                                             </constraints>
                                         </imageView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="caB-Kv-EsM">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Last Episode Published Date" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="caB-Kv-EsM">
                                             <rect key="frame" x="99" y="73" width="493" height="18"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                             <color key="textColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
@@ -94,7 +94,7 @@
                                                 <constraint firstAttribute="height" constant="83" id="ROI-Fr-93I"/>
                                             </constraints>
                                         </imageView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E43-nA-paE">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Summary" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="E43-nA-paE">
                                             <rect key="frame" x="99" y="8" width="493" height="83"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="83" id="sef-UD-Nb7"/>
@@ -118,11 +118,78 @@
                                     <outlet property="PVsummary" destination="E43-nA-paE" id="HCu-LC-KJI"/>
                                 </connections>
                             </tableViewCell>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="episodeCell" id="Y9T-oi-EEc">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="episodeTableCell" rowHeight="130" id="Y9T-oi-EEc" customClass="EpisodeTableCell" customModule="Podverse" customModuleProvider="target">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Y9T-oi-EEc" id="U27-RP-x6v">
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Episode Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Cwe-XG-7wG">
+                                            <rect key="frame" x="8" y="8" width="584" height="21"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="21" id="oUL-sB-ken"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Episode Summary" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="7Vc-an-QrS">
+                                            <rect key="frame" x="8" y="37" width="584" height="17"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Episode Total Time" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0g9-0b-TnB">
+                                            <rect key="frame" x="469" y="100" width="123" height="21"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="250" id="6yk-eA-ZCh"/>
+                                                <constraint firstAttribute="height" constant="21" id="xeC-QD-TMV"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Episode Listened Time/" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Cm0-2D-uqY">
+                                            <rect key="frame" x="317" y="102" width="152" height="17"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="17" id="Uvs-Ny-3KV"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Episode Published Date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YLF-mj-Rij">
+                                            <rect key="frame" x="8" y="100" width="200" height="21"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="21" id="S1I-Fj-yH3"/>
+                                                <constraint firstAttribute="width" constant="200" id="hXQ-by-buc"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="Cwe-XG-7wG" firstAttribute="trailing" secondItem="U27-RP-x6v" secondAttribute="trailingMargin" id="0br-Jd-JMe"/>
+                                        <constraint firstItem="7Vc-an-QrS" firstAttribute="leading" secondItem="U27-RP-x6v" secondAttribute="leadingMargin" id="1lz-cd-NFB"/>
+                                        <constraint firstItem="Cwe-XG-7wG" firstAttribute="leading" secondItem="U27-RP-x6v" secondAttribute="leadingMargin" id="4GE-UX-aeW"/>
+                                        <constraint firstItem="0g9-0b-TnB" firstAttribute="bottom" secondItem="U27-RP-x6v" secondAttribute="bottomMargin" id="KSz-Qw-K7p"/>
+                                        <constraint firstItem="0g9-0b-TnB" firstAttribute="leading" secondItem="Cm0-2D-uqY" secondAttribute="trailing" id="PaK-V9-z2P"/>
+                                        <constraint firstItem="7Vc-an-QrS" firstAttribute="trailing" secondItem="U27-RP-x6v" secondAttribute="trailingMargin" id="PoG-xl-OpL"/>
+                                        <constraint firstItem="Cwe-XG-7wG" firstAttribute="top" secondItem="U27-RP-x6v" secondAttribute="topMargin" id="VMZ-fe-cSE"/>
+                                        <constraint firstItem="YLF-mj-Rij" firstAttribute="leading" secondItem="U27-RP-x6v" secondAttribute="leadingMargin" id="eMF-z0-kWC"/>
+                                        <constraint firstItem="0g9-0b-TnB" firstAttribute="trailing" secondItem="U27-RP-x6v" secondAttribute="trailingMargin" id="jQQ-1q-dvU"/>
+                                        <constraint firstItem="7Vc-an-QrS" firstAttribute="top" secondItem="Cwe-XG-7wG" secondAttribute="bottom" constant="8" id="p8h-WK-2P0"/>
+                                        <constraint firstItem="YLF-mj-Rij" firstAttribute="bottom" secondItem="U27-RP-x6v" secondAttribute="bottomMargin" id="pRK-cp-STN"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="Cm0-2D-uqY" secondAttribute="bottom" constant="2" id="zDw-1N-nqy"/>
+                                    </constraints>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="duration" destination="0g9-0b-TnB" id="Qz0-gk-gOd"/>
+                                    <outlet property="listenedTime" destination="Cm0-2D-uqY" id="iTY-ux-Pvc"/>
+                                    <outlet property="pubDate" destination="YLF-mj-Rij" id="xRO-Ef-ntd"/>
+                                    <outlet property="summary" destination="7Vc-an-QrS" id="aR3-fo-ZbV"/>
+                                    <outlet property="title" destination="Cwe-XG-7wG" id="Vj7-I9-WrU"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>

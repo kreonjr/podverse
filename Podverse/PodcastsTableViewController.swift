@@ -157,7 +157,6 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
             let viewController: EpisodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
             let indexPath = self.tableView.indexPathForSelectedRow()!
             let podcast = podcasts[indexPath.row]
-            println(podcast.title)
             viewController.podcast = podcast
             viewController.episodes = podcast.episodes
         }
