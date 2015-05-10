@@ -48,6 +48,10 @@ class PVFeedParser : NSObject, MWFeedParserDelegate {
         if info.url != nil {
             podcast.feedURL = info.url
         }
+        if info.itunesAuthor != nil {
+            podcast.itunesAuthor = info.itunesAuthor
+        }
+        println(podcast.itunesAuthor)
         if info.image != nil {
             let imageURLString: String = info.image
             let url : NSURL? = NSURL(string: imageURLString)
@@ -103,7 +107,6 @@ class PVFeedParser : NSObject, MWFeedParserDelegate {
         if item.duration != nil {
             let durationString = item.duration
             let duration = utility.convertStringToNSTimeInterval(durationString)
-            println(duration)
             episode.duration = duration
         }
         

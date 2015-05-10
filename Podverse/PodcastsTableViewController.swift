@@ -82,7 +82,7 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         
         var dateFormatter = NSDateFormatter()
         dateFormatter.dateFormat = "M/d/yy"
-        let dateString = dateFormatter.stringFromDate(currentPodcast.lastPubDate)
+        let dateString = dateFormatter.stringFromDate(currentPodcast.lastPubDate!)
         cell.PVlastPubDate?.text = dateString
         
         cell.PVimage?.image = UIImage(named: "Blank52")

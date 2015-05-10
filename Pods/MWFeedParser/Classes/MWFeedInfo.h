@@ -37,6 +37,7 @@
 	NSURL *url; // Feed url
     NSString *image; // image for the feed
     NSString *itunesImage; // itunes image for the feed
+    NSString *itunesAuthor; // itunes author for the feed
 	
 }
 
@@ -46,5 +47,6 @@
 @property (nonatomic, copy) NSURL *url;
 @property (nonatomic, copy) NSString *image;
 @property (nonatomic, copy) NSString *itunesImage;
+@property (nonatomic, copy) NSString *itunesAuthor;
 
 @end

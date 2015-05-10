@@ -13,6 +13,9 @@ class PodcastHeaderCell: UITableViewCell {
 
     @IBOutlet weak var PVimage: UIImageView!
     @IBOutlet weak var PVsummary: UILabel!
+    @IBOutlet weak var totalClips: UILabel!
+    @IBOutlet weak var author: UILabel!
+    
     
     override func awakeFromNib() {
         super.awakeFromNib()

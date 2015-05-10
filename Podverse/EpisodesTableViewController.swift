@@ -47,10 +47,16 @@ class EpisodesTableViewController: UITableViewController {
 //        cell.detailTextLabel?.text = episode.summary
         cell.title?.text = episode.title
         cell.summary?.text = utility.removeHTMLFromString(episode.summary)
-        println (episode.duration)
-        println(utility.convertNSTimeIntervalToHHMMSSString(episode.duration))
         cell.duration?.text = utility.convertNSTimeIntervalToHHMMSSString(episode.duration) as String
-
+        
+        let pubDateFormatter = NSDateFormatter()
+        pubDateFormatter.dateStyle = NSDateFormatterStyle.ShortStyle
+        let pubDateString = pubDateFormatter.stringFromDate(episode.pubDate)
+        cell.pubDate?.text = pubDateString
+        
+        let clips: String = String("10 clips")
+        cell.clips?.text = clips
+        
         return cell
     }
     

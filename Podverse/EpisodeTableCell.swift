@@ -13,8 +13,8 @@ class EpisodeTableCell: UITableViewCell {
     @IBOutlet weak var title: UILabel!
     @IBOutlet weak var summary: UILabel!
     @IBOutlet weak var pubDate: UILabel!
-    @IBOutlet weak var listenedTime: UILabel!
     @IBOutlet weak var duration: UILabel!
+    @IBOutlet weak var clips: UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()
