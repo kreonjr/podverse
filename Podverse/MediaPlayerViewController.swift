@@ -43,15 +43,10 @@ class MediaPlayerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        println(episode.title)
         
         let url = episode.mediaURL
         avPlayer = AVPlayer(URL: url)
-        
-//        let mediaURL = episode.mediaURL
-//        avPlayer = AVPlayer(contentsOfURL: mediaURL, error: nil)
 
-        // Do any additional setup after loading the view.
     }
 
     override func didReceiveMemoryWarning() {

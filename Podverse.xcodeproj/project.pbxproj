@@ -14,9 +14,7 @@
 		81D3C7B01AF9E6EE00CA93C2 /* PodcastHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D3C7AF1AF9E6EE00CA93C2 /* PodcastHeaderCell.swift */; };
 		81D422171B0020030082F178 /* Podverse.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 81D422151B0020030082F178 /* Podverse.xcdatamodeld */; };
 		81D4221D1B004F790082F178 /* MediaPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D4221C1B004F790082F178 /* MediaPlayerViewController.swift */; };
-		81D4221F1B00523E0082F178 /* king_nonviolence.wav in Resources */ = {isa = PBXBuildFile; fileRef = 81D4221E1B00523E0082F178 /* king_nonviolence.wav */; };
 		81D422211B00533F0082F178 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81D422201B00533F0082F178 /* AVFoundation.framework */; };
-		81D422231B0058260082F178 /* french-coffee-shop.wav in Resources */ = {isa = PBXBuildFile; fileRef = 81D422221B0058260082F178 /* french-coffee-shop.wav */; };
 		81DC6A8C1AF6F6F70030433A /* PVFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DC6A8B1AF6F6F70030433A /* PVFeedParser.swift */; };
 		81DE1F2A1AF09D200098B22B /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 81DE1F291AF09D200098B22B /* Podfile */; };
 		81DE1F2C1AF09D5D0098B22B /* Podfile.lock in Resources */ = {isa = PBXBuildFile; fileRef = 81DE1F2B1AF09D5D0098B22B /* Podfile.lock */; };
@@ -51,9 +49,7 @@
 		81D3C7AF1AF9E6EE00CA93C2 /* PodcastHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodcastHeaderCell.swift; sourceTree = "<group>"; };
 		81D422161B0020030082F178 /* Podverse.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Podverse.xcdatamodel; sourceTree = "<group>"; };
 		81D4221C1B004F790082F178 /* MediaPlayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaPlayerViewController.swift; sourceTree = "<group>"; };
-		81D4221E1B00523E0082F178 /* king_nonviolence.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = king_nonviolence.wav; sourceTree = "<group>"; };
 		81D422201B00533F0082F178 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		81D422221B0058260082F178 /* french-coffee-shop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "french-coffee-shop.wav"; sourceTree = "<group>"; };
 		81DC6A8B1AF6F6F70030433A /* PVFeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVFeedParser.swift; sourceTree = "<group>"; };
 		81DE1F291AF09D200098B22B /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = "<group>"; };
 		81DE1F2B1AF09D5D0098B22B /* Podfile.lock */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile.lock; sourceTree = "<group>"; };
@@ -153,8 +149,6 @@
 		81F8634A1AEDFA45009FFDD7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				81D422221B0058260082F178 /* french-coffee-shop.wav */,
-				81D4221E1B00523E0082F178 /* king_nonviolence.wav */,
 				816032271AF4479B00CAA54E /* kevin.jpg */,
 				81F8634B1AEDFA45009FFDD7 /* Info.plist */,
 			);
@@ -269,11 +263,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				81D4221F1B00523E0082F178 /* king_nonviolence.wav in Resources */,
 				81DE1F2C1AF09D5D0098B22B /* Podfile.lock in Resources */,
 				81DE1F2A1AF09D200098B22B /* Podfile in Resources */,
 				81F863521AEDFA45009FFDD7 /* Main.storyboard in Resources */,
-				81D422231B0058260082F178 /* french-coffee-shop.wav in Resources */,
 				81F863571AEDFA45009FFDD7 /* LaunchScreen.xib in Resources */,
 				81F863541AEDFA45009FFDD7 /* Images.xcassets in Resources */,
 				816032281AF4479B00CAA54E /* kevin.jpg in Resources */,
