@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CoreData
 
 protocol PVFeedParserProtocol {
     func didReceiveFeedResults(results: PodcastModel)
@@ -51,7 +52,6 @@ class PVFeedParser : NSObject, MWFeedParserDelegate {
         if info.itunesAuthor != nil {
             podcast.itunesAuthor = info.itunesAuthor
         }
-        println(podcast.itunesAuthor)
         if info.image != nil {
             let imageURLString: String = info.image
             let url : NSURL? = NSURL(string: imageURLString)
@@ -74,22 +74,44 @@ class PVFeedParser : NSObject, MWFeedParserDelegate {
             podcast.itunesImage =  UIImage()
             podcast.itunesImageURL = NSURL()
         }
-        
-//        var itunesImageURLString: String? = info.itunesImage
-//        var itunesImage: UIImage? = UIImage(contentsOfFile: itunesImageURLString!)
-//        println(itunesImage)
-//        if info.itunesImage != nil {
-//            
-//            let itunesURL : NSURL? = NSURL(string: itunesImageURLString)
-//            podcast.itunesImageURL = itunesURL!
-//            if let imgData = NSData(contentsOfURL: itunesURL!) {
-//                podcast.itunesImage = UIImage(data: imgData)!
+
+//        TODO: mitch's foray with Core Data below
+//        let appDel: AppDelegate = (UIApplication.sharedApplication().delegate as! AppDelegate)
+//        let context: NSManagedObjectContext = appDel.managedObjectContext!
+//        let podcastData: NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName("Podcasts", inManagedObjectContext: context) as! NSManagedObject
+//
+//        println(podcastData)
+//        
+//        podcastData.setValue(podcast.title, forKey: "title")
+//        podcastData.setValue(podcast.summary, forKey: "summary")
+//        podcastData.setValue(podcast.feedURL?.absoluteString, forKey: "feedURL")
+//        podcastData.setValue(podcast.itunesAuthor, forKey: "itunesAuthor")
+//        podcastData.setValue(UIImageJPEGRepresentation(podcast.image, 1), forKey: "image")
+//        podcastData.setValue(podcast.imageURL?.absoluteString, forKey: "imageURL")
+//        podcastData.setValue(UIImageJPEGRepresentation(podcast.itunesImage, 1), forKey: "itunesImage")
+//        podcastData.setValue(podcast.itunesImageURL?.absoluteString, forKey: "itunesImageURL")
+//        
+//        println(podcastData)
+//        
+//        let request = NSFetchRequest(entityName: "Podcasts")
+//        request.returnsObjectsAsFaults = false
+//        
+//        var results: NSArray = context.executeFetchRequest(request, error: nil)!
+//        
+//        if results.count > 0 {
+//            for res in results {
+//                println(res)
+//                println("woohoo")
 //            }
 //        } else {
-//            var image: UIImage? = podcast.image
-//            podcast.itunesImage = UIImage()
-//            podcast.itunesImageURL = NSURL()
+//            println("No results returned")
 //        }
+        
+//        newPodcast.setValue("Test Title", forkey: "title")
+//        newPodcast.setValue("Test Summary", forKey: "summary")
+//        
+//        context.save(nil)
+
     }
     
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
@@ -103,6 +125,20 @@ class PVFeedParser : NSObject, MWFeedParserDelegate {
         }
         if item.date != nil {
             episode.pubDate = item.date
+        }
+        if item.link != nil {
+            episode.link = NSURL(string: item.link)
+        }
+        if item.enclosures != nil {
+            var mediaURLString = item.enclosures[0]["url"] as! String
+            var mediaURL: NSURL = NSURL(string: mediaURLString)!
+            episode.mediaURL = mediaURL
+            
+            var mediaType = item.enclosures[0]["type"] as! String
+            episode.mediaType = mediaType
+            
+            var mediaBytes = item.enclosures[0]["length"] as! Int
+            episode.mediaBytes = mediaBytes
         }
         if item.duration != nil {
             let durationString = item.duration

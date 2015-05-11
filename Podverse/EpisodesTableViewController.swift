@@ -46,12 +46,12 @@ class EpisodesTableViewController: UITableViewController {
 //        cell.textLabel!.text = episode.title
 //        cell.detailTextLabel?.text = episode.summary
         cell.title?.text = episode.title
-        cell.summary?.text = utility.removeHTMLFromString(episode.summary)
-        cell.duration?.text = utility.convertNSTimeIntervalToHHMMSSString(episode.duration) as String
+        cell.summary?.text = utility.removeHTMLFromString(episode.summary!)
+        cell.duration?.text = utility.convertNSTimeIntervalToHHMMSSString(episode.duration!) as String
         
         let pubDateFormatter = NSDateFormatter()
         pubDateFormatter.dateStyle = NSDateFormatterStyle.ShortStyle
-        let pubDateString = pubDateFormatter.stringFromDate(episode.pubDate)
+        let pubDateString = pubDateFormatter.stringFromDate(episode.pubDate!)
         cell.pubDate?.text = pubDateString
         
         let clips: String = String("10 clips")
@@ -110,14 +110,17 @@ class EpisodesTableViewController: UITableViewController {
     }
     */
 
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "MediaPlayer" {
+            let viewController: MediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            let indexPath = self.tableView.indexPathForSelectedRow()!
+            let episode = episodes[indexPath.row]
+            viewController.episode = episode
+        }
     }
-    */
+
 
 }

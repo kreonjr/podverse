@@ -12,6 +12,11 @@
 		81C768CB1AFC240600CE715B /* EpisodeTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C768CA1AFC240600CE715B /* EpisodeTableCell.swift */; };
 		81C768CD1AFC4FC300CE715B /* PVUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C768CC1AFC4FC300CE715B /* PVUtility.swift */; };
 		81D3C7B01AF9E6EE00CA93C2 /* PodcastHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D3C7AF1AF9E6EE00CA93C2 /* PodcastHeaderCell.swift */; };
+		81D422171B0020030082F178 /* Podverse.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 81D422151B0020030082F178 /* Podverse.xcdatamodeld */; };
+		81D4221D1B004F790082F178 /* MediaPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D4221C1B004F790082F178 /* MediaPlayerViewController.swift */; };
+		81D4221F1B00523E0082F178 /* king_nonviolence.wav in Resources */ = {isa = PBXBuildFile; fileRef = 81D4221E1B00523E0082F178 /* king_nonviolence.wav */; };
+		81D422211B00533F0082F178 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 81D422201B00533F0082F178 /* AVFoundation.framework */; };
+		81D422231B0058260082F178 /* french-coffee-shop.wav in Resources */ = {isa = PBXBuildFile; fileRef = 81D422221B0058260082F178 /* french-coffee-shop.wav */; };
 		81DC6A8C1AF6F6F70030433A /* PVFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DC6A8B1AF6F6F70030433A /* PVFeedParser.swift */; };
 		81DE1F2A1AF09D200098B22B /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 81DE1F291AF09D200098B22B /* Podfile */; };
 		81DE1F2C1AF09D5D0098B22B /* Podfile.lock in Resources */ = {isa = PBXBuildFile; fileRef = 81DE1F2B1AF09D5D0098B22B /* Podfile.lock */; };
@@ -44,6 +49,11 @@
 		81C768CA1AFC240600CE715B /* EpisodeTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EpisodeTableCell.swift; sourceTree = "<group>"; };
 		81C768CC1AFC4FC300CE715B /* PVUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVUtility.swift; sourceTree = "<group>"; };
 		81D3C7AF1AF9E6EE00CA93C2 /* PodcastHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodcastHeaderCell.swift; sourceTree = "<group>"; };
+		81D422161B0020030082F178 /* Podverse.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Podverse.xcdatamodel; sourceTree = "<group>"; };
+		81D4221C1B004F790082F178 /* MediaPlayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaPlayerViewController.swift; sourceTree = "<group>"; };
+		81D4221E1B00523E0082F178 /* king_nonviolence.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = king_nonviolence.wav; sourceTree = "<group>"; };
+		81D422201B00533F0082F178 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		81D422221B0058260082F178 /* french-coffee-shop.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "french-coffee-shop.wav"; sourceTree = "<group>"; };
 		81DC6A8B1AF6F6F70030433A /* PVFeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVFeedParser.swift; sourceTree = "<group>"; };
 		81DE1F291AF09D200098B22B /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = "<group>"; };
 		81DE1F2B1AF09D5D0098B22B /* Podfile.lock */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile.lock; sourceTree = "<group>"; };
@@ -70,6 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81D422211B00533F0082F178 /* AVFoundation.framework in Frameworks */,
 				DBFE3BF5022A0AE91EF761D3 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -121,6 +132,7 @@
 				81DC6A8B1AF6F6F70030433A /* PVFeedParser.swift */,
 				81C768CC1AFC4FC300CE715B /* PVUtility.swift */,
 				81F8634C1AEDFA45009FFDD7 /* AppDelegate.swift */,
+				81D422151B0020030082F178 /* Podverse.xcdatamodeld */,
 				81F863501AEDFA45009FFDD7 /* Main.storyboard */,
 				81376B9A1AF9CA4A00E6C9C5 /* myPodcastTableCell.swift */,
 				81D3C7AF1AF9E6EE00CA93C2 /* PodcastHeaderCell.swift */,
@@ -129,6 +141,7 @@
 				81F863551AEDFA45009FFDD7 /* LaunchScreen.xib */,
 				81F8634A1AEDFA45009FFDD7 /* Supporting Files */,
 				81F8636E1AEDFB9D009FFDD7 /* EpisodesTableViewController.swift */,
+				81D4221C1B004F790082F178 /* MediaPlayerViewController.swift */,
 				81DE1F6D1AF0A4810098B22B /* Podverse-Bridging-Header.h */,
 				81F863701AEDFD1C009FFDD7 /* PodcastModel.swift */,
 				81F863721AEDFDA3009FFDD7 /* EpisodeModel.swift */,
@@ -140,6 +153,8 @@
 		81F8634A1AEDFA45009FFDD7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				81D422221B0058260082F178 /* french-coffee-shop.wav */,
+				81D4221E1B00523E0082F178 /* king_nonviolence.wav */,
 				816032271AF4479B00CAA54E /* kevin.jpg */,
 				81F8634B1AEDFA45009FFDD7 /* Info.plist */,
 			);
@@ -166,6 +181,7 @@
 		B4344CAFFA584CFD986CC7E0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				81D422201B00533F0082F178 /* AVFoundation.framework */,
 				ABA65E50FBD6BF479427DA57 /* libPods.a */,
 			);
 			name = Frameworks;
@@ -253,9 +269,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81D4221F1B00523E0082F178 /* king_nonviolence.wav in Resources */,
 				81DE1F2C1AF09D5D0098B22B /* Podfile.lock in Resources */,
 				81DE1F2A1AF09D200098B22B /* Podfile in Resources */,
 				81F863521AEDFA45009FFDD7 /* Main.storyboard in Resources */,
+				81D422231B0058260082F178 /* french-coffee-shop.wav in Resources */,
 				81F863571AEDFA45009FFDD7 /* LaunchScreen.xib in Resources */,
 				81F863541AEDFA45009FFDD7 /* Images.xcassets in Resources */,
 				816032281AF4479B00CAA54E /* kevin.jpg in Resources */,
@@ -310,9 +328,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				81DC6A8C1AF6F6F70030433A /* PVFeedParser.swift in Sources */,
+				81D422171B0020030082F178 /* Podverse.xcdatamodeld in Sources */,
 				81D3C7B01AF9E6EE00CA93C2 /* PodcastHeaderCell.swift in Sources */,
 				81C768CD1AFC4FC300CE715B /* PVUtility.swift in Sources */,
 				81F863711AEDFD1C009FFDD7 /* PodcastModel.swift in Sources */,
+				81D4221D1B004F790082F178 /* MediaPlayerViewController.swift in Sources */,
 				81F8636F1AEDFB9D009FFDD7 /* EpisodesTableViewController.swift in Sources */,
 				81F8636D1AEDFB28009FFDD7 /* PodcastsTableViewController.swift in Sources */,
 				81F8634D1AEDFA45009FFDD7 /* AppDelegate.swift in Sources */,
@@ -534,6 +554,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		81D422151B0020030082F178 /* Podverse.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				81D422161B0020030082F178 /* Podverse.xcdatamodel */,
+			);
+			currentVersion = 81D422161B0020030082F178 /* Podverse.xcdatamodel */;
+			path = Podverse.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 81F8633F1AEDFA45009FFDD7 /* Project object */;
 }

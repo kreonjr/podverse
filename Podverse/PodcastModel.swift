@@ -18,5 +18,5 @@ class PodcastModel: NSObject {
     var imageURL: NSURL? = NSURL()
     var image: UIImage? = UIImage()
     var itunesImageURL: NSURL? = NSURL()
-    var itunesImage: UIImage? = UIImage()
+    var itunesImage: UIImage? = UIImage()   
 }

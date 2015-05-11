@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     
@@ -38,8 +39,29 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
+        //--- Add Custom Left Bar Button Item/s --//
+        // thanks to Naveen Sharma
+        // http://iostechsolutions.blogspot.com/2014/11/swift-add-custom-right-bar-button-item.html
+        func addLeftNavItemOnView() {
+            let buttonAdd: UIButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
+            buttonAdd.frame = CGRectMake(0, 0, 40, 40)
+            buttonAdd.setTitle("Add", forState: UIControlState.Normal)
+            var leftBarButtonPodcastAdd: UIBarButtonItem = UIBarButtonItem(customView: buttonAdd)
+            
+            let buttonEdit: UIButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
+            buttonEdit.frame = CGRectMake(0, 0, 40, 40)
+            buttonEdit.setTitle("Edit", forState: UIControlState.Normal)
+            var leftBarButtonPodcastEdit: UIBarButtonItem = UIBarButtonItem(customView: buttonEdit)
+            
+            self.navigationItem.setLeftBarButtonItems([leftBarButtonPodcastAdd, leftBarButtonPodcastEdit], animated: true)
+        }
+        addLeftNavItemOnView()
+        
         // Convert an array full of Strings into NSURLs. I'm not sure why or if using NSURL would be
         // preferable than using Strings for the RSS URLs...
+        
+//        var feedURLsStringsArray = ["http://feeds.feedburner.com/PointlessWithKevenPereira", "http://feeds.feedburner.com/TheDrunkenTaoistPodcast", "http://feeds.feedburner.com/dancarlin/history"] as [String]?
+        
         var feedURLsStringsArray = ["http://joeroganexp.joerogan.libsynpro.com/rss", "http://lavenderhour.libsyn.com/rss", "http://feeds.feedburner.com/dancarlin/history", "http://yourmomshousepodcast.libsyn.com/rss", "http://theartofcharmpodcast.theartofcharm.libsynpro.com/rss", "http://feeds.feedburner.com/PointlessWithKevenPereira", "http://feeds.feedburner.com/TheDrunkenTaoistPodcast"] as [String]?
         
         if let array = feedURLsStringsArray {
@@ -53,6 +75,12 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
             parser.parsePodcastFeed(feedURLs[i])
         }
         
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        var nav = self.navigationController?.navigationBar
+        nav?.barStyle = UIBarStyle.Black
+        nav?.tintColor = UIColor.whiteColor()
     }
 
     override func didReceiveMemoryWarning() {

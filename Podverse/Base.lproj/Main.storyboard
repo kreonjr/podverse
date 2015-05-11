@@ -185,6 +185,7 @@
                                     <outlet property="pubDate" destination="YLF-mj-Rij" id="xRO-Ef-ntd"/>
                                     <outlet property="summary" destination="7Vc-an-QrS" id="aR3-fo-ZbV"/>
                                     <outlet property="title" destination="Cwe-XG-7wG" id="Vj7-I9-WrU"/>
+                                    <segue destination="952-5T-0Iy" kind="show" identifier="MediaPlayer" id="0RQ-19-VNb"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -198,6 +199,59 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OQf-VZ-b6Y" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2370" y="-28"/>
+        </scene>
+        <!--Media Player View Controller-->
+        <scene sceneID="xnN-0g-KBZ">
+            <objects>
+                <viewController id="952-5T-0Iy" customClass="MediaPlayerViewController" customModule="Podverse" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="cDx-9M-vJc"/>
+                        <viewControllerLayoutGuide type="bottom" id="V0E-r8-17N"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="iGt-Ch-R7b">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="B3b-V8-rxA">
+                                <rect key="frame" x="91" y="224" width="42" height="36"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="Stop">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="stop:" destination="952-5T-0Iy" eventType="touchUpInside" id="c3F-VQ-7mI"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="scW-34-XBg">
+                                <rect key="frame" x="168" y="224" width="64" height="36"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="Restart">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="restart:" destination="952-5T-0Iy" eventType="touchUpInside" id="2g6-cw-5Ws"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZHa-SZ-lwB">
+                                <rect key="frame" x="16" y="224" width="60" height="36"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <state key="normal" title="Play">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="pausePlay:" destination="952-5T-0Iy" eventType="touchUpInside" id="E4g-DW-rzo"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <outlet property="pausePlay" destination="ZHa-SZ-lwB" id="Gka-NM-O7L"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="xut-Gf-qEH" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3094" y="-28"/>
         </scene>
         <!-- -->
         <scene sceneID="3rj-pA-Jpn">
