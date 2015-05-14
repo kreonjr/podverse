@@ -119,6 +119,7 @@ class EpisodesTableViewController: UITableViewController {
             let indexPath = self.tableView.indexPathForSelectedRow()!
             let episode = episodes[indexPath.row]
             viewController.episode = episode
+            viewController.podcast = podcast
         }
     }
 

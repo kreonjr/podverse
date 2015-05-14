@@ -11,9 +11,18 @@ import AVFoundation
 
 class MediaPlayerViewController: UIViewController {
     
+    var utility: PVUtility = PVUtility()
+    
+    var podcast: PodcastModel = PodcastModel()
     var episode: EpisodeModel = EpisodeModel()
     
     var playerPosition = CMTimeMake(5, 1)
+    
+    @IBOutlet weak var image: UIImageView!
+    @IBOutlet weak var podcastTitle: UILabel!
+    @IBOutlet weak var episodeTitle: UILabel!
+    @IBOutlet weak var duration: UILabel!
+    @IBOutlet weak var summary: UITextView!
     
     @IBOutlet weak var pausePlay: UIButton!
     
@@ -46,7 +55,27 @@ class MediaPlayerViewController: UIViewController {
         
         let url = episode.mediaURL
         avPlayer = AVPlayer(URL: url)
-
+        
+        image?.image = podcast.image
+        podcastTitle?.text = podcast.title
+        episodeTitle?.text = episode.title
+        duration?.text = utility.convertNSTimeIntervalToHHMMSSString(episode.duration!) as String
+        summary?.text = utility.removeHTMLFromString(episode.summary!)
+        
+        
+        //--- Add Custom Left Bar Button Item/s --//
+        // thanks to Naveen Sharma
+        // http://iostechsolutions.blogspot.com/2014/11/swift-add-custom-right-bar-button-item.html
+        func addRightNavItemOnView() {
+            let buttonMakeClip: UIButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
+            buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
+            buttonMakeClip.setTitle("Make Clip", forState: UIControlState.Normal)
+            var rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
+            
+            self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
+        }
+        addRightNavItemOnView()
+        
     }
 
     override func didReceiveMemoryWarning() {

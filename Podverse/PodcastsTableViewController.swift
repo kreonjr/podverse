@@ -60,9 +60,9 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         // Convert an array full of Strings into NSURLs. I'm not sure why or if using NSURL would be
         // preferable than using Strings for the RSS URLs...
         
-//        var feedURLsStringsArray = ["http://feeds.feedburner.com/PointlessWithKevenPereira", "http://feeds.feedburner.com/TheDrunkenTaoistPodcast", "http://feeds.feedburner.com/dancarlin/history"] as [String]?
+        var feedURLsStringsArray = ["http://feeds.feedburner.com/PointlessWithKevenPereira", "http://feeds.feedburner.com/TheDrunkenTaoistPodcast", "http://feeds.feedburner.com/dancarlin/history"] as [String]?
         
-        var feedURLsStringsArray = ["http://joeroganexp.joerogan.libsynpro.com/rss", "http://lavenderhour.libsyn.com/rss", "http://feeds.feedburner.com/dancarlin/history", "http://yourmomshousepodcast.libsyn.com/rss", "http://theartofcharmpodcast.theartofcharm.libsynpro.com/rss", "http://feeds.feedburner.com/PointlessWithKevenPereira", "http://feeds.feedburner.com/TheDrunkenTaoistPodcast"] as [String]?
+//        var feedURLsStringsArray = ["http://joeroganexp.joerogan.libsynpro.com/rss", "http://lavenderhour.libsyn.com/rss", "http://feeds.feedburner.com/dancarlin/history", "http://yourmomshousepodcast.libsyn.com/rss", "http://theartofcharmpodcast.theartofcharm.libsynpro.com/rss", "http://feeds.feedburner.com/PointlessWithKevenPereira", "http://feeds.feedburner.com/TheDrunkenTaoistPodcast"] as [String]?
         
         if let array = feedURLsStringsArray {
             for string in array {
