@@ -16,6 +16,8 @@ class MediaPlayerViewController: UIViewController {
     var podcast: PodcastModel = PodcastModel()
     var episode: EpisodeModel = EpisodeModel()
     
+    var newClip: ClipModel = ClipModel()
+    
     var playerPosition = CMTimeMake(5, 1)
     
     @IBOutlet weak var image: UIImageView!
@@ -76,10 +78,14 @@ class MediaPlayerViewController: UIViewController {
             displayMakeClipViewTitle(sender as! UIButton)
             makeClipButtonNextSaveDone.setTitle("Save", forState: .Normal)
             makeClipButtonCancelBackEdit.setTitle("Back", forState: .Normal)
+            println(makeClipViewTimeStart.text)
+            println(makeClipViewTimeEnd.text)
         } else if makeClipButtonState == 3 {
+            saveClip(sender as! UIButton)
             displayMakeClipViewShare(sender as! UIButton)
             makeClipButtonNextSaveDone.setTitle("Done", forState: .Normal)
             makeClipButtonCancelBackEdit.setTitle("Edit", forState: .Normal)
+            println(makeClipViewTitleField.text)
         } else if makeClipButtonState == 4 {
             closeMakeClipView(sender as! UIButton)
             makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
@@ -119,6 +125,7 @@ class MediaPlayerViewController: UIViewController {
     }
     
     func closeMakeClipView(sender: UIButton!) {
+        newClip = ClipModel()
         makeClipViewTime.hidden = true
         makeClipViewTitle.hidden = true
         makeClipViewShare.hidden = true
@@ -142,8 +149,10 @@ class MediaPlayerViewController: UIViewController {
         makeClipViewShare.hidden = true
     }
     
-    func saveClipTime(sender: UIButton!) {
-        
+    func saveClip(sender: UIButton!) {
+        newClip.startTime = makeClipViewTimeStart.text
+        newClip.endTime = makeClipViewTimeEnd.text
+        newClip.title = makeClipViewTitleField.text
     }
     
     func displayMakeClipViewTitle(sender: UIButton!) {
@@ -152,20 +161,11 @@ class MediaPlayerViewController: UIViewController {
         makeClipViewShare.hidden = true
     }
     
-    func saveClipTitle(sender: UIButton!) {
-        
-    }
-    
     func displayMakeClipViewShare(sender: UIButton!) {
         makeClipViewTime.hidden = false
         makeClipViewTitle.hidden = false
         makeClipViewShare.hidden = false
     }
-    
-    func saveClipShare(sender: UIButton!) {
-        
-    }
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()

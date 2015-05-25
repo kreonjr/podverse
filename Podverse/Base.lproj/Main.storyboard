@@ -445,7 +445,7 @@
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tlq-Mn-vD3" customClass="MakeClipViewController" customModule="Podverse" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="600" height="86"/>
                                                 <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="TopLeft" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title of clip goes here title of clip goes here title of clip" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tht-Lm-FQi">
+                                                    <label opaque="NO" contentMode="TopLeft" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title of clip goes here title of clip goes here title of clip" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tht-Lm-FQi">
                                                         <rect key="frame" x="8" y="8" width="510" height="47"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="47" id="wpj-fX-sYn"/>
@@ -454,7 +454,7 @@
                                                         <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Length: 1:37" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9xM-Gj-xx5">
+                                                    <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Length: 1:37" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9xM-Gj-xx5">
                                                         <rect key="frame" x="8" y="59" width="510" height="27"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="27" id="B4w-fJ-5dZ"/>

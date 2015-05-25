@@ -6,7 +6,7 @@
 //  Copyright (c) 2015 Mitchell Downey. All rights reserved.
 //
 
-import UIKit
+import Foundation
 
 class EpisodeModel: NSObject {
 
