@@ -40,7 +40,7 @@ class MediaPlayerViewController: UIViewController {
     @IBOutlet weak var makeClipViewShareButton: UIButton!
     
     @IBOutlet weak var makeClipButtonNextSaveDone: UIButton!
-    var makeClipButtonState: Int = 1
+    var makeClipButtonState: Int = 0
     
     @IBOutlet weak var makeClipButtonCancelBackEdit: UIButton!
     
@@ -81,18 +81,17 @@ class MediaPlayerViewController: UIViewController {
             makeClipButtonNextSaveDone.setTitle("Done", forState: .Normal)
             makeClipButtonCancelBackEdit.setTitle("Edit", forState: .Normal)
         } else if makeClipButtonState == 4 {
-            hideMakeClipView(sender as! UIButton)
+            closeMakeClipView(sender as! UIButton)
             makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
             makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
-            makeClipButtonState = 1
+            makeClipButtonState = 0
         }
     }
     
     @IBAction func makeClipCancelBackEdit(sender: AnyObject) {
         makeClipButtonState--
         if makeClipButtonState == 0 {
-            hideMakeClipView(sender as! UIButton)
-            makeClipButtonState = 1
+            closeMakeClipView(sender as! UIButton)
         } else if makeClipButtonState == 1 {
             displayMakeClipViewTime(sender as! UIButton)
             makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
@@ -113,20 +112,31 @@ class MediaPlayerViewController: UIViewController {
         let buttonMakeClip: UIButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
         buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
         buttonMakeClip.setTitle("Make Clip", forState: UIControlState.Normal)
-        buttonMakeClip.addTarget(self, action: "displayMakeClipViewTime:", forControlEvents: .TouchUpInside)
+        buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
         var rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
         
         self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
     }
     
-    func hideMakeClipView(sender: UIButton!) {
+    func closeMakeClipView(sender: UIButton!) {
         makeClipViewTime.hidden = true
         makeClipViewTitle.hidden = true
         makeClipViewShare.hidden = true
     }
     
+    func toggleMakeClipView(sender: UIButton!) {
+        if makeClipButtonState == 0 {
+            makeClipButtonState = 1
+            displayMakeClipViewTime(sender as UIButton!)
+        } else if makeClipButtonState == 1 || makeClipButtonState == 2 || makeClipButtonState == 3 {
+            closeMakeClipView(sender as UIButton!)
+            makeClipButtonState = 0
+            makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
+            makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
+        }
+    }
+    
     func displayMakeClipViewTime(sender: UIButton!) {
-        makeClipButtonState = 1
         makeClipViewTime.hidden = false
         makeClipViewTitle.hidden = true
         makeClipViewShare.hidden = true
@@ -137,7 +147,6 @@ class MediaPlayerViewController: UIViewController {
     }
     
     func displayMakeClipViewTitle(sender: UIButton!) {
-        makeClipButtonState = 2
         makeClipViewTime.hidden = false
         makeClipViewTitle.hidden = false
         makeClipViewShare.hidden = true
@@ -148,7 +157,6 @@ class MediaPlayerViewController: UIViewController {
     }
     
     func displayMakeClipViewShare(sender: UIButton!) {
-        makeClipButtonState = 3
         makeClipViewTime.hidden = false
         makeClipViewTitle.hidden = false
         makeClipViewShare.hidden = false
