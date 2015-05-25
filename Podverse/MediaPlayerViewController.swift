@@ -23,7 +23,26 @@ class MediaPlayerViewController: UIViewController {
     @IBOutlet weak var episodeTitle: UILabel!
     @IBOutlet weak var duration: UILabel!
     @IBOutlet weak var summary: UITextView!
-    @IBOutlet weak var makeClipView: MakeClipViewController!
+    
+    @IBOutlet weak var makeClipViewTime: MakeClipViewController!
+    @IBOutlet weak var makeClipViewTitle: MakeClipViewController!
+    @IBOutlet weak var makeClipViewShare: MakeClipViewController!
+    
+    @IBOutlet weak var makeClipViewTimeStart: UITextField!
+    @IBOutlet weak var makeClipViewTimeEnd: UITextField!
+    
+    @IBOutlet weak var makeClipViewTitleField: UITextView!
+    
+    @IBOutlet weak var makeClipViewShareTitle: UILabel!
+    
+    @IBOutlet weak var makeClipViewShareDuration: UILabel!
+
+    @IBOutlet weak var makeClipViewShareButton: UIButton!
+    
+    @IBOutlet weak var makeClipButtonNextSaveDone: UIButton!
+    var makeClipButtonState: Int = 1
+    
+    @IBOutlet weak var makeClipButtonCancelBackEdit: UIButton!
     
     @IBOutlet weak var pausePlay: UIButton!
     
@@ -51,6 +70,41 @@ class MediaPlayerViewController: UIViewController {
         }
     }
     
+    @IBAction func makeClipNextSaveDone(sender: AnyObject) {
+        makeClipButtonState++
+        if makeClipButtonState == 2 {
+            displayMakeClipViewTitle(sender as! UIButton)
+            makeClipButtonNextSaveDone.setTitle("Save", forState: .Normal)
+            makeClipButtonCancelBackEdit.setTitle("Back", forState: .Normal)
+        } else if makeClipButtonState == 3 {
+            displayMakeClipViewShare(sender as! UIButton)
+            makeClipButtonNextSaveDone.setTitle("Done", forState: .Normal)
+            makeClipButtonCancelBackEdit.setTitle("Edit", forState: .Normal)
+        } else if makeClipButtonState == 4 {
+            hideMakeClipView(sender as! UIButton)
+            makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
+            makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
+            makeClipButtonState = 1
+        }
+    }
+    
+    @IBAction func makeClipCancelBackEdit(sender: AnyObject) {
+        makeClipButtonState--
+        if makeClipButtonState == 0 {
+            hideMakeClipView(sender as! UIButton)
+            makeClipButtonState = 1
+        } else if makeClipButtonState == 1 {
+            displayMakeClipViewTime(sender as! UIButton)
+            makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
+            makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
+        } else if makeClipButtonState == 2 {
+            displayMakeClipViewTime(sender as! UIButton)
+            makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
+            makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
+            makeClipButtonState = 1
+        }
+    }
+    
     func createMakeClipButton () {
         //--- Add Custom Left Bar Button Item/s --//
         // thanks to Naveen Sharma
@@ -59,45 +113,58 @@ class MediaPlayerViewController: UIViewController {
         let buttonMakeClip: UIButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
         buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
         buttonMakeClip.setTitle("Make Clip", forState: UIControlState.Normal)
-        buttonMakeClip.addTarget(self, action: "displayMakeClip:", forControlEvents: .TouchUpInside)
+        buttonMakeClip.addTarget(self, action: "displayMakeClipViewTime:", forControlEvents: .TouchUpInside)
         var rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
         
         self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
     }
     
-    func displayMakeClip(sender: UIButton!) {
-//        performSegueWithIdentifier("Make Clip", sender: sender)
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        makeClipView.hidden = false
-        
-//        vc.backgroundColor = UIColor.clearColor()
-        
-//        vc.preferredContentSize = CGSizeMake(50, 100)
-////        vc.popoverPresentationController?.backgroundColor = UIColor.clearColor()
-////        vc.popoverPresentationController?.passthroughViews = [self]
-//        
-//        self.presentViewController(vc, animated: true, completion: nil)
+    func hideMakeClipView(sender: UIButton!) {
+        makeClipViewTime.hidden = true
+        makeClipViewTitle.hidden = true
+        makeClipViewShare.hidden = true
+    }
+    
+    func displayMakeClipViewTime(sender: UIButton!) {
+        makeClipButtonState = 1
+        makeClipViewTime.hidden = false
+        makeClipViewTitle.hidden = true
+        makeClipViewShare.hidden = true
+    }
+    
+    func saveClipTime(sender: UIButton!) {
         
     }
     
+    func displayMakeClipViewTitle(sender: UIButton!) {
+        makeClipButtonState = 2
+        makeClipViewTime.hidden = false
+        makeClipViewTitle.hidden = false
+        makeClipViewShare.hidden = true
+    }
     
-//    func displayMakeClip(sender: UIButton!) {
-//        //        performSegueWithIdentifier("Make Clip", sender: sender)
-//        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-//        
-//        let vc = storyboard.instantiateViewControllerWithIdentifier("Make Clip") as! MakeClipViewController
-//        vc.modalPresentationStyle = UIModalPresentationStyle.CurrentContext
-//        //        vc.presentingViewController?.popoverPresentationController?.backgroundColor = UIColor.clearColor()
-//        //        vc.presentingViewController?.popoverPresentationController?.passthroughViews = [self]
-//        self.presentViewController(vc, animated: true, completion: nil)
-//        
-//    }
+    func saveClipTitle(sender: UIButton!) {
+        
+    }
+    
+    func displayMakeClipViewShare(sender: UIButton!) {
+        makeClipButtonState = 3
+        makeClipViewTime.hidden = false
+        makeClipViewTitle.hidden = false
+        makeClipViewShare.hidden = false
+    }
+    
+    func saveClipShare(sender: UIButton!) {
+        
+    }
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        makeClipView.hidden = true
+        makeClipViewTime.hidden = true
+        makeClipViewTitle.hidden = true
+        makeClipViewShare.hidden = true
         
         let url = episode.mediaURL
         avPlayer = AVPlayer(URL: url)
