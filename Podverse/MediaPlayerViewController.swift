@@ -26,9 +26,9 @@ class MediaPlayerViewController: UIViewController {
     @IBOutlet weak var duration: UILabel!
     @IBOutlet weak var summary: UITextView!
     
-    @IBOutlet weak var makeClipViewTime: MakeClipViewController!
-    @IBOutlet weak var makeClipViewTitle: MakeClipViewController!
-    @IBOutlet weak var makeClipViewShare: MakeClipViewController!
+    @IBOutlet weak var makeClipViewTime: UIView!
+    @IBOutlet weak var makeClipViewTitle: UIView!
+    @IBOutlet weak var makeClipViewShare: UIView!
     
     @IBOutlet weak var makeClipViewTimeStart: UITextField!
     @IBOutlet weak var makeClipViewTimeEnd: UITextField!

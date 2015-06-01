@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		8123871A1B13B50900530908 /* ClipModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 812387191B13B50900530908 /* ClipModel.swift */; };
 		81376B9B1AF9CA4A00E6C9C5 /* myPodcastTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81376B9A1AF9CA4A00E6C9C5 /* myPodcastTableCell.swift */; };
-		8159A0E41B096B1000A87574 /* MakeClipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8159A0E31B096B1000A87574 /* MakeClipViewController.swift */; };
 		816032281AF4479B00CAA54E /* kevin.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 816032271AF4479B00CAA54E /* kevin.jpg */; };
 		81C768CB1AFC240600CE715B /* EpisodeTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C768CA1AFC240600CE715B /* EpisodeTableCell.swift */; };
 		81C768CD1AFC4FC300CE715B /* PVUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81C768CC1AFC4FC300CE715B /* PVUtility.swift */; };
@@ -46,7 +45,6 @@
 		3C3DF9114777C42E9188A86F /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		812387191B13B50900530908 /* ClipModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipModel.swift; sourceTree = "<group>"; };
 		81376B9A1AF9CA4A00E6C9C5 /* myPodcastTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = myPodcastTableCell.swift; sourceTree = "<group>"; };
-		8159A0E31B096B1000A87574 /* MakeClipViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MakeClipViewController.swift; sourceTree = "<group>"; };
 		816032271AF4479B00CAA54E /* kevin.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = kevin.jpg; path = ../../../Pictures/kevin.jpg; sourceTree = "<group>"; };
 		81C768CA1AFC240600CE715B /* EpisodeTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EpisodeTableCell.swift; sourceTree = "<group>"; };
 		81C768CC1AFC4FC300CE715B /* PVUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVUtility.swift; sourceTree = "<group>"; };
@@ -144,7 +142,6 @@
 				81F8636C1AEDFB28009FFDD7 /* PodcastsTableViewController.swift */,
 				81F8636E1AEDFB9D009FFDD7 /* EpisodesTableViewController.swift */,
 				81D4221C1B004F790082F178 /* MediaPlayerViewController.swift */,
-				8159A0E31B096B1000A87574 /* MakeClipViewController.swift */,
 				81F863531AEDFA45009FFDD7 /* Images.xcassets */,
 				81F8634A1AEDFA45009FFDD7 /* Supporting Files */,
 				81D422151B0020030082F178 /* Podverse.xcdatamodeld */,
@@ -338,7 +335,6 @@
 				81F863731AEDFDA3009FFDD7 /* EpisodeModel.swift in Sources */,
 				81376B9B1AF9CA4A00E6C9C5 /* myPodcastTableCell.swift in Sources */,
 				81C768CB1AFC240600CE715B /* EpisodeTableCell.swift in Sources */,
-				8159A0E41B096B1000A87574 /* MakeClipViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

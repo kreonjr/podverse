@@ -359,7 +359,7 @@
                                     </button>
                                 </subviews>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dh9-y9-mfA" customClass="MakeClipViewController" customModule="Podverse" customModuleProvider="target">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dh9-y9-mfA" userLabel="Make Clip View Time">
                                 <rect key="frame" x="0.0" y="110" width="600" height="131"/>
                                 <subviews>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="dpL-ga-Tz9">
@@ -418,7 +418,7 @@
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                     </button>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="g7U-eX-lbI" customClass="MakeClipViewController" customModule="Podverse" customModuleProvider="target">
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="g7U-eX-lbI" userLabel="Make Clip View Title">
                                         <rect key="frame" x="0.0" y="0.0" width="600" height="80"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WZc-eK-MAQ">
@@ -442,7 +442,7 @@
                                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                             </textView>
-                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tlq-Mn-vD3" customClass="MakeClipViewController" customModule="Podverse" customModuleProvider="target">
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tlq-Mn-vD3" userLabel="Make Clip View Share">
                                                 <rect key="frame" x="0.0" y="0.0" width="600" height="86"/>
                                                 <subviews>
                                                     <label opaque="NO" contentMode="TopLeft" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title of clip goes here title of clip goes here title of clip" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tht-Lm-FQi">
@@ -577,14 +577,14 @@
                         <outlet property="image" destination="48X-At-gFK" id="vwP-mj-UMf"/>
                         <outlet property="makeClipButtonCancelBackEdit" destination="lks-eN-cI7" id="idS-sb-rCA"/>
                         <outlet property="makeClipButtonNextSaveDone" destination="R9i-PY-WgK" id="1Vb-HT-tTs"/>
-                        <outlet property="makeClipViewShare" destination="tlq-Mn-vD3" id="tao-wn-BEG"/>
+                        <outlet property="makeClipViewShare" destination="tlq-Mn-vD3" id="AQn-93-fjt"/>
                         <outlet property="makeClipViewShareButton" destination="cLL-cR-q3t" id="MhM-Lo-vzd"/>
                         <outlet property="makeClipViewShareDuration" destination="9xM-Gj-xx5" id="dY8-Hc-Ico"/>
                         <outlet property="makeClipViewShareTitle" destination="tht-Lm-FQi" id="YTu-cV-Wl7"/>
-                        <outlet property="makeClipViewTime" destination="dh9-y9-mfA" id="TT9-2E-Dzz"/>
+                        <outlet property="makeClipViewTime" destination="dh9-y9-mfA" id="PNL-F0-298"/>
                         <outlet property="makeClipViewTimeEnd" destination="GFe-zc-upi" id="8en-bZ-lNm"/>
                         <outlet property="makeClipViewTimeStart" destination="dpL-ga-Tz9" id="7MQ-Le-15L"/>
-                        <outlet property="makeClipViewTitle" destination="g7U-eX-lbI" id="pQC-vi-sPT"/>
+                        <outlet property="makeClipViewTitle" destination="g7U-eX-lbI" id="U64-vB-HXa"/>
                         <outlet property="makeClipViewTitleField" destination="Fmj-ZR-foy" id="FoM-Np-SF1"/>
                         <outlet property="pausePlay" destination="ZHa-SZ-lwB" id="Gka-NM-O7L"/>
                         <outlet property="podcastTitle" destination="yUM-0t-qGi" id="hqJ-9f-T0w"/>
