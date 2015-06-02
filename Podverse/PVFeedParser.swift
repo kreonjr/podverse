@@ -11,7 +11,7 @@ import UIKit
 import CoreData
 
 protocol PVFeedParserProtocol {
-    func didReceiveFeedResults(results: PodcastModel)
+    func didReceiveFeedResults(results: Podcast)
 }
 
 class PVFeedParser : NSObject, MWFeedParserDelegate {
@@ -19,10 +19,10 @@ class PVFeedParser : NSObject, MWFeedParserDelegate {
     
     var utility: PVUtility = PVUtility()
     
-    var podcast: PodcastModel = PodcastModel()
+    var podcast: Podcast = Podcast()
 
-    var episode: EpisodeModel = EpisodeModel()
-    var episodes: [EpisodeModel] = []
+    var episode: Episode = Episode()
+    var episodes: [Episode] = []
 
     func parsePodcastFeed(feedURL: NSURL) {
         var feedParser: MWFeedParser = MWFeedParser(feedURL: feedURL)
@@ -38,7 +38,7 @@ class PVFeedParser : NSObject, MWFeedParserDelegate {
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
         
-        podcast = PodcastModel()
+        podcast = Podcast()
 
         if info.title != nil {
             podcast.title = info.title
@@ -115,7 +115,7 @@ class PVFeedParser : NSObject, MWFeedParserDelegate {
     }
     
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
-        episode = EpisodeModel()
+        episode = Episode()
         
         if item.title != nil {
             episode.title = item.title

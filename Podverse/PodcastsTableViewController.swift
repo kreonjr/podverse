@@ -17,12 +17,12 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     
     var feedURLs: [NSURL] = []
     
-    var podcast: PodcastModel = PodcastModel()
-    var episode: EpisodeModel = EpisodeModel()
+    var podcast: Podcast = Podcast()
+    var episode: Episode = Episode()
     
-    var podcasts: [PodcastModel] = []
+    var podcasts: [Podcast] = []
     
-    func didReceiveFeedResults(results: PodcastModel) {
+    func didReceiveFeedResults(results: Podcast) {
         dispatch_async(dispatch_get_main_queue(), {
             self.podcasts.append(results)
             self.myPodcastsTableView!.reloadData()
@@ -102,7 +102,7 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
 
         let cell = tableView.dequeueReusableCellWithIdentifier("podcastCell", forIndexPath: indexPath) as! myPodcastTableCell
-        let podcast: PodcastModel = podcasts[indexPath.row]
+        let podcast: Podcast = podcasts[indexPath.row]
         var currentPodcast = podcasts[indexPath.row]
         cell.layoutMargins = UIEdgeInsetsZero
         cell.preservesSuperviewLayoutMargins = false

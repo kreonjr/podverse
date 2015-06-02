@@ -13,10 +13,10 @@ class MediaPlayerViewController: UIViewController {
     
     var utility: PVUtility = PVUtility()
     
-    var podcast: PodcastModel = PodcastModel()
-    var episode: EpisodeModel = EpisodeModel()
+    var podcast: Podcast = Podcast()
+    var episode: Episode = Episode()
     
-    var newClip: ClipModel = ClipModel()
+    var newClip: Clip = Clip()
     
     var playerPosition = CMTimeMake(5, 1)
     
@@ -125,7 +125,7 @@ class MediaPlayerViewController: UIViewController {
     }
     
     func closeMakeClipView(sender: UIButton!) {
-        newClip = ClipModel()
+        newClip = Clip()
         makeClipViewTime.hidden = true
         makeClipViewTitle.hidden = true
         makeClipViewShare.hidden = true

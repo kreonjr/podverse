@@ -12,8 +12,8 @@ class EpisodesTableViewController: UITableViewController {
     
     var utility: PVUtility = PVUtility()
     
-    var podcast: PodcastModel = PodcastModel()
-    var episodes: [EpisodeModel] = []
+    var podcast: Podcast = Podcast()
+    var episodes: [Episode] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,7 +42,7 @@ class EpisodesTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> EpisodeTableCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("episodeTableCell", forIndexPath: indexPath) as! EpisodeTableCell
 
-        let episode: EpisodeModel = episodes[indexPath.row]
+        let episode: Episode = episodes[indexPath.row]
 //        cell.textLabel!.text = episode.title
 //        cell.detailTextLabel?.text = episode.summary
         cell.title?.text = episode.title

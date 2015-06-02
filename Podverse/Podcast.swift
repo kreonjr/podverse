@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class PodcastModel: NSObject {
+class Podcast: NSObject {
     
     var title: String = String()
     var summary: String? = String()
@@ -22,6 +22,6 @@ class PodcastModel: NSObject {
     var itunesImageURL: NSURL? = NSURL()
     var itunesImage: UIImage? = UIImage()
     
-    var episodes: [EpisodeModel] = [EpisodeModel]()
+    var episodes: [Episode] = [Episode]()
     
 }

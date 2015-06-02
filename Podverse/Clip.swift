@@ -8,10 +8,10 @@
 
 import Foundation
 
-class ClipModel: NSObject {
+class Clip: NSObject {
     
-    var podcast: PodcastModel = PodcastModel()
-    var episode: EpisodeModel = EpisodeModel()
+    var podcast: Podcast = Podcast()
+    var episode: Episode = Episode()
     
     var startTime: String = String()
     var endTime: String = String()

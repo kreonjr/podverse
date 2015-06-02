@@ -8,7 +8,7 @@
 
 import Foundation
 
-class EpisodeModel: NSObject {
+class Episode: NSObject {
 
     var title: String = String()
     var summary: String? = String()
