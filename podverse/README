@@ -8,6 +8,8 @@ All you need to remember is to open the podverse.xcworkspace file (which is inte
 
 If these instructions do not work, then (we need to fix them!) the information you need to successfully set up the project can be found here: http://swiftalicio.us/2014/11/using-cocoapods-from-swift/
 
+testing
+
 ---
 
 You will need to install CocoaPods to manage dependencies for Podverse. Installation can be as simple as running the following command in your terminal:
