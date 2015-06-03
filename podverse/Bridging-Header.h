@@ -13,4 +13,13 @@
 #import "MWFeedItem.h"
 #import "MWFeedParser.h"
 
+#import "Podcast.h"
+#import "Podcast.m"
+
+#import "Episode.h"
+#import "Episode.m"
+
+#import "Clip.h"
+#import "Clip.m"
+
 #endif

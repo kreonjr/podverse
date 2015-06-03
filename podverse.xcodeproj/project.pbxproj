@@ -9,13 +9,20 @@
 /* Begin PBXBuildFile section */
 		818615961B1E84CE006C9731 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
 		818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 818615971B1E84CE006C9731 /* podverse.xcdatamodeld */; };
-		8186159B1B1E84CF006C9731 /* PodcastsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8186159A1B1E84CF006C9731 /* PodcastsTableViewController.swift */; };
 		8186159E1B1E84CF006C9731 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8186159C1B1E84CF006C9731 /* Main.storyboard */; };
 		818615A01B1E84CF006C9731 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8186159F1B1E84CF006C9731 /* Images.xcassets */; };
 		818615A31B1E84CF006C9731 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 818615A11B1E84CF006C9731 /* LaunchScreen.xib */; };
 		818615AF1B1E84CF006C9731 /* podverseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615AE1B1E84CF006C9731 /* podverseTests.swift */; };
 		818615B91B1E85F6006C9731 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 818615B81B1E85F6006C9731 /* README */; };
 		818615BD1B1E8927006C9731 /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 818615BC1B1E8927006C9731 /* Podfile */; };
+		818615C01B1E950D006C9731 /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615BF1B1E950D006C9731 /* CoreDataHelper.swift */; };
+		818615CC1B1EB10E006C9731 /* EpisodesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615CB1B1EB10E006C9731 /* EpisodesTableViewController.swift */; };
+		818615CE1B1EB12C006C9731 /* PodcastsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615CD1B1EB12C006C9731 /* PodcastsTableViewController.swift */; };
+		818615D01B1EB144006C9731 /* ClipsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615CF1B1EB144006C9731 /* ClipsTableViewController.swift */; };
+		818615D21B1EB206006C9731 /* MediaPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615D11B1EB206006C9731 /* MediaPlayerViewController.swift */; };
+		818615D91B1EBC76006C9731 /* Episode.m in Sources */ = {isa = PBXBuildFile; fileRef = 818615D41B1EBC76006C9731 /* Episode.m */; };
+		818615DA1B1EBC76006C9731 /* Clip.m in Sources */ = {isa = PBXBuildFile; fileRef = 818615D61B1EBC76006C9731 /* Clip.m */; };
+		818615DB1B1EBC76006C9731 /* Podcast.m in Sources */ = {isa = PBXBuildFile; fileRef = 818615D81B1EBC76006C9731 /* Podcast.m */; };
 		BF0D6DB83D35A9AC9F60886C /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 91EBE45FBA5BB3BC622668AA /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -35,7 +42,6 @@
 		818615941B1E84CE006C9731 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		818615951B1E84CE006C9731 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		818615981B1E84CE006C9731 /* podverse.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = podverse.xcdatamodel; sourceTree = "<group>"; };
-		8186159A1B1E84CF006C9731 /* PodcastsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PodcastsTableViewController.swift; sourceTree = "<group>"; };
 		8186159D1B1E84CF006C9731 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		8186159F1B1E84CF006C9731 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		818615A21B1E84CF006C9731 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -45,6 +51,17 @@
 		818615B81B1E85F6006C9731 /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		818615BC1B1E8927006C9731 /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Podfile; path = podverse.xcodeproj/../Podfile; sourceTree = SOURCE_ROOT; };
 		818615BE1B1E8B03006C9731 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
+		818615BF1B1E950D006C9731 /* CoreDataHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataHelper.swift; sourceTree = "<group>"; };
+		818615CB1B1EB10E006C9731 /* EpisodesTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EpisodesTableViewController.swift; sourceTree = "<group>"; };
+		818615CD1B1EB12C006C9731 /* PodcastsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PodcastsTableViewController.swift; path = ../PodcastsTableViewController.swift; sourceTree = "<group>"; };
+		818615CF1B1EB144006C9731 /* ClipsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipsTableViewController.swift; sourceTree = "<group>"; };
+		818615D11B1EB206006C9731 /* MediaPlayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaPlayerViewController.swift; sourceTree = "<group>"; };
+		818615D31B1EBC76006C9731 /* Episode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Episode.h; sourceTree = "<group>"; };
+		818615D41B1EBC76006C9731 /* Episode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Episode.m; sourceTree = "<group>"; };
+		818615D51B1EBC76006C9731 /* Clip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Clip.h; sourceTree = "<group>"; };
+		818615D61B1EBC76006C9731 /* Clip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Clip.m; sourceTree = "<group>"; };
+		818615D71B1EBC76006C9731 /* Podcast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Podcast.h; sourceTree = "<group>"; };
+		818615D81B1EBC76006C9731 /* Podcast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Podcast.m; sourceTree = "<group>"; };
 		91EBE45FBA5BB3BC622668AA /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B31276F33CB9962F14309BFA /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -108,15 +125,20 @@
 		818615921B1E84CE006C9731 /* podverse */ = {
 			isa = PBXGroup;
 			children = (
-				818615BC1B1E8927006C9731 /* Podfile */,
-				818615BE1B1E8B03006C9731 /* Bridging-Header.h */,
 				8186159C1B1E84CF006C9731 /* Main.storyboard */,
 				818615951B1E84CE006C9731 /* AppDelegate.swift */,
-				8186159A1B1E84CF006C9731 /* PodcastsTableViewController.swift */,
+				818615BF1B1E950D006C9731 /* CoreDataHelper.swift */,
+				818615CD1B1EB12C006C9731 /* PodcastsTableViewController.swift */,
+				818615CB1B1EB10E006C9731 /* EpisodesTableViewController.swift */,
+				818615CF1B1EB144006C9731 /* ClipsTableViewController.swift */,
+				818615D11B1EB206006C9731 /* MediaPlayerViewController.swift */,
 				8186159F1B1E84CF006C9731 /* Images.xcassets */,
 				818615A11B1E84CF006C9731 /* LaunchScreen.xib */,
-				818615971B1E84CE006C9731 /* podverse.xcdatamodeld */,
 				818615931B1E84CE006C9731 /* Supporting Files */,
+				818615CA1B1EA355006C9731 /* Datamodel */,
+				818615BC1B1E8927006C9731 /* Podfile */,
+				818615BE1B1E8B03006C9731 /* Bridging-Header.h */,
+				818615971B1E84CE006C9731 /* podverse.xcdatamodeld */,
 			);
 			path = podverse;
 			sourceTree = "<group>";
@@ -145,6 +167,19 @@
 				818615AD1B1E84CF006C9731 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		818615CA1B1EA355006C9731 /* Datamodel */ = {
+			isa = PBXGroup;
+			children = (
+				818615D31B1EBC76006C9731 /* Episode.h */,
+				818615D41B1EBC76006C9731 /* Episode.m */,
+				818615D51B1EBC76006C9731 /* Clip.h */,
+				818615D61B1EBC76006C9731 /* Clip.m */,
+				818615D71B1EBC76006C9731 /* Podcast.h */,
+				818615D81B1EBC76006C9731 /* Podcast.m */,
+			);
+			name = Datamodel;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -284,8 +319,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8186159B1B1E84CF006C9731 /* PodcastsTableViewController.swift in Sources */,
+				818615DB1B1EBC76006C9731 /* Podcast.m in Sources */,
+				818615DA1B1EBC76006C9731 /* Clip.m in Sources */,
 				818615961B1E84CE006C9731 /* AppDelegate.swift in Sources */,
+				818615D21B1EB206006C9731 /* MediaPlayerViewController.swift in Sources */,
+				818615D01B1EB144006C9731 /* ClipsTableViewController.swift in Sources */,
+				818615CE1B1EB12C006C9731 /* PodcastsTableViewController.swift in Sources */,
+				818615CC1B1EB10E006C9731 /* EpisodesTableViewController.swift in Sources */,
+				818615D91B1EBC76006C9731 /* Episode.m in Sources */,
+				818615C01B1E950D006C9731 /* CoreDataHelper.swift in Sources */,
 				818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
