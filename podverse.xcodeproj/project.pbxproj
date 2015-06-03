@@ -1,0 +1,441 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		818615961B1E84CE006C9731 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
+		818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 818615971B1E84CE006C9731 /* podverse.xcdatamodeld */; };
+		8186159B1B1E84CF006C9731 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8186159A1B1E84CF006C9731 /* ViewController.swift */; };
+		8186159E1B1E84CF006C9731 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8186159C1B1E84CF006C9731 /* Main.storyboard */; };
+		818615A01B1E84CF006C9731 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8186159F1B1E84CF006C9731 /* Images.xcassets */; };
+		818615A31B1E84CF006C9731 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 818615A11B1E84CF006C9731 /* LaunchScreen.xib */; };
+		818615AF1B1E84CF006C9731 /* podverseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615AE1B1E84CF006C9731 /* podverseTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		818615A91B1E84CF006C9731 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 818615881B1E84CE006C9731 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8186158F1B1E84CE006C9731;
+			remoteInfo = podverse;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		818615901B1E84CE006C9731 /* podverse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = podverse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		818615941B1E84CE006C9731 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		818615951B1E84CE006C9731 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		818615981B1E84CE006C9731 /* podverse.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = podverse.xcdatamodel; sourceTree = "<group>"; };
+		8186159A1B1E84CF006C9731 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		8186159D1B1E84CF006C9731 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		8186159F1B1E84CF006C9731 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		818615A21B1E84CF006C9731 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		818615A81B1E84CF006C9731 /* podverseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = podverseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		818615AD1B1E84CF006C9731 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		818615AE1B1E84CF006C9731 /* podverseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = podverseTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8186158D1B1E84CE006C9731 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		818615A51B1E84CF006C9731 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		818615871B1E84CE006C9731 = {
+			isa = PBXGroup;
+			children = (
+				818615921B1E84CE006C9731 /* podverse */,
+				818615AB1B1E84CF006C9731 /* podverseTests */,
+				818615911B1E84CE006C9731 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		818615911B1E84CE006C9731 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				818615901B1E84CE006C9731 /* podverse.app */,
+				818615A81B1E84CF006C9731 /* podverseTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		818615921B1E84CE006C9731 /* podverse */ = {
+			isa = PBXGroup;
+			children = (
+				818615951B1E84CE006C9731 /* AppDelegate.swift */,
+				8186159A1B1E84CF006C9731 /* ViewController.swift */,
+				8186159C1B1E84CF006C9731 /* Main.storyboard */,
+				8186159F1B1E84CF006C9731 /* Images.xcassets */,
+				818615A11B1E84CF006C9731 /* LaunchScreen.xib */,
+				818615971B1E84CE006C9731 /* podverse.xcdatamodeld */,
+				818615931B1E84CE006C9731 /* Supporting Files */,
+			);
+			path = podverse;
+			sourceTree = "<group>";
+		};
+		818615931B1E84CE006C9731 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				818615941B1E84CE006C9731 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		818615AB1B1E84CF006C9731 /* podverseTests */ = {
+			isa = PBXGroup;
+			children = (
+				818615AE1B1E84CF006C9731 /* podverseTests.swift */,
+				818615AC1B1E84CF006C9731 /* Supporting Files */,
+			);
+			path = podverseTests;
+			sourceTree = "<group>";
+		};
+		818615AC1B1E84CF006C9731 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				818615AD1B1E84CF006C9731 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8186158F1B1E84CE006C9731 /* podverse */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 818615B21B1E84CF006C9731 /* Build configuration list for PBXNativeTarget "podverse" */;
+			buildPhases = (
+				8186158C1B1E84CE006C9731 /* Sources */,
+				8186158D1B1E84CE006C9731 /* Frameworks */,
+				8186158E1B1E84CE006C9731 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = podverse;
+			productName = podverse;
+			productReference = 818615901B1E84CE006C9731 /* podverse.app */;
+			productType = "com.apple.product-type.application";
+		};
+		818615A71B1E84CF006C9731 /* podverseTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 818615B51B1E84CF006C9731 /* Build configuration list for PBXNativeTarget "podverseTests" */;
+			buildPhases = (
+				818615A41B1E84CF006C9731 /* Sources */,
+				818615A51B1E84CF006C9731 /* Frameworks */,
+				818615A61B1E84CF006C9731 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				818615AA1B1E84CF006C9731 /* PBXTargetDependency */,
+			);
+			name = podverseTests;
+			productName = podverseTests;
+			productReference = 818615A81B1E84CF006C9731 /* podverseTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		818615881B1E84CE006C9731 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0630;
+				ORGANIZATIONNAME = "Mitchell Downey";
+				TargetAttributes = {
+					8186158F1B1E84CE006C9731 = {
+						CreatedOnToolsVersion = 6.3.2;
+					};
+					818615A71B1E84CF006C9731 = {
+						CreatedOnToolsVersion = 6.3.2;
+						TestTargetID = 8186158F1B1E84CE006C9731;
+					};
+				};
+			};
+			buildConfigurationList = 8186158B1B1E84CE006C9731 /* Build configuration list for PBXProject "podverse" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 818615871B1E84CE006C9731;
+			productRefGroup = 818615911B1E84CE006C9731 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8186158F1B1E84CE006C9731 /* podverse */,
+				818615A71B1E84CF006C9731 /* podverseTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8186158E1B1E84CE006C9731 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8186159E1B1E84CF006C9731 /* Main.storyboard in Resources */,
+				818615A31B1E84CF006C9731 /* LaunchScreen.xib in Resources */,
+				818615A01B1E84CF006C9731 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		818615A61B1E84CF006C9731 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8186158C1B1E84CE006C9731 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8186159B1B1E84CF006C9731 /* ViewController.swift in Sources */,
+				818615961B1E84CE006C9731 /* AppDelegate.swift in Sources */,
+				818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		818615A41B1E84CF006C9731 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				818615AF1B1E84CF006C9731 /* podverseTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		818615AA1B1E84CF006C9731 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8186158F1B1E84CE006C9731 /* podverse */;
+			targetProxy = 818615A91B1E84CF006C9731 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		8186159C1B1E84CF006C9731 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				8186159D1B1E84CF006C9731 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		818615A11B1E84CF006C9731 /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				818615A21B1E84CF006C9731 /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		818615B01B1E84CF006C9731 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		818615B11B1E84CF006C9731 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		818615B31B1E84CF006C9731 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = podverse/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		818615B41B1E84CF006C9731 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = podverse/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		818615B61B1E84CF006C9731 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = podverseTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/podverse.app/podverse";
+			};
+			name = Debug;
+		};
+		818615B71B1E84CF006C9731 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = podverseTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/podverse.app/podverse";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		8186158B1B1E84CE006C9731 /* Build configuration list for PBXProject "podverse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				818615B01B1E84CF006C9731 /* Debug */,
+				818615B11B1E84CF006C9731 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		818615B21B1E84CF006C9731 /* Build configuration list for PBXNativeTarget "podverse" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				818615B31B1E84CF006C9731 /* Debug */,
+				818615B41B1E84CF006C9731 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		818615B51B1E84CF006C9731 /* Build configuration list for PBXNativeTarget "podverseTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				818615B61B1E84CF006C9731 /* Debug */,
+				818615B71B1E84CF006C9731 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		818615971B1E84CE006C9731 /* podverse.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				818615981B1E84CE006C9731 /* podverse.xcdatamodel */,
+			);
+			currentVersion = 818615981B1E84CE006C9731 /* podverse.xcdatamodel */;
+			path = podverse.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 818615881B1E84CE006C9731 /* Project object */;
+}
