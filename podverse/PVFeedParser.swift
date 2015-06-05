@@ -24,20 +24,40 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     var episodeArray: [Episode] = [Episode]()
     
-    func parsePodcastFeed(feedURL: NSURL) {
-        var feedParser = MWFeedParser(feedURL: feedURL)
-        feedParser.delegate = self
-        feedParser.feedParseType = ParseTypeFull
-        feedParser.connectionType = ConnectionTypeAsynchronously
-        feedParser.parse()
+    func parsePodcastFeed(feedURL: NSURL, resolve: () -> (), reject: () -> ()) {
+        moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
+        
+        let predicate = NSPredicate(format: "feedURL == %@", feedURL)
+        
+        let checkIfPodcastAlreadyExists = CoreDataHelper.fetchEntities(NSStringFromClass(Podcast), managedObjectContext: moc, predicate: predicate)
+        
+        if checkIfPodcastAlreadyExists.count < 1 {
+            var feedParser = MWFeedParser(feedURL: feedURL)
+            feedParser.delegate = self
+            feedParser.feedParseType = ParseTypeFull
+            feedParser.connectionType = ConnectionTypeAsynchronously
+            feedParser.parse()
+            
+            // I'm not entirely sure how this Callback/Promise below works
+            // but I got it working after reading Mirco Zeiss's post at
+            // http://www.mircozeiss.com/swift-for-javascript-developers/
+            var delta: Int64 = 1 * Int64(NSEC_PER_SEC)
+            var time = dispatch_time(DISPATCH_TIME_NOW, delta)
+            dispatch_after(time, dispatch_get_main_queue(), {
+                resolve()
+            })
+        } else {
+            println("that podcast is already added!")
+        }
+
     }
     
     func feedParserDidStart(parser: MWFeedParser!) {
-        moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
+        
     }
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
-        
+
         podcast = CoreDataHelper.insertManagedObject(NSStringFromClass(Podcast), managedObjectContext: moc) as! Podcast
         
         if info.title != nil {
@@ -104,6 +124,8 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
             episode.duration = utility.convertStringToNSTimeInterval(item.duration)
         }
         
+        podcast.addEpisodesObject(episode)
+        
         episodeArray.append(episode)
 //        println(episodeArray)
         
@@ -113,7 +135,8 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         
         // TODO: I have no idea what's going on with this double as statement...
 //        podcast.episodes = episodes as NSObject as! Set<NSObject>
-//        podcast.lastPubDate = episodes[0].pubDate
+        podcast.lastPubDate = episodeArray[0].pubDate
+        moc.save(nil)
         self.delegate?.didReceiveFeedResults(podcast)
     
     }

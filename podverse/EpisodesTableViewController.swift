@@ -14,7 +14,7 @@ class EpisodesTableViewController: UITableViewController {
     var selectedPodcast: Podcast!
     
     var moc: NSManagedObjectContext!
-    var episodeArray = [Episode]()
+    var episodesArray = [Episode]()
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -22,9 +22,6 @@ class EpisodesTableViewController: UITableViewController {
         if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
             moc = context
         }
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "persistentStoreDidChange", name: NSPersistentStoreCoordinatorStoresDidChangeNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "persistentStoreWillChange:", name: NSPersistentStoreCoordinatorStoresWillChangeNotification, object: moc.persistentStoreCoordinator)
         
         loadData()
         
@@ -38,42 +35,23 @@ class EpisodesTableViewController: UITableViewController {
     }
     
     override func viewWillDisappear(animated: Bool) {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: NSPersistentStoreCoordinatorStoresDidChangeNotification, object: moc.persistentStoreCoordinator)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: NSPersistentStoreCoordinatorStoresWillChangeNotification, object: moc.persistentStoreCoordinator)
-    }
-    
-    func persistentStoreDidChange() {
-        // reenable UI and fetch data
-//        self.navigationItem.title = "iCloud ready"
-        self.navigationItem.leftBarButtonItem?.enabled = true
-        
-        loadData()
-    }
-    
-    func persistentStoreWillChange(notification: NSNotification) {
-        self.navigationItem.title = "Changes in progress"
-        
-        // disable the UI
-        self.navigationItem.leftBarButtonItem?.enabled = false
-        
-        moc.performBlock { () -> Void in
-            if self.moc.hasChanges {
-                var error: NSError? = nil
-                self.moc.save(&error)
-                if error != nil {
-                    println("Save error: \(error)")
-                } else {
-                    // drop any managed object references
-                    self.moc.reset()
-                }
-            }
-            
-        }
+
     }
     
     func loadData() {
-        episodeArray = [Episode]()
-        episodeArray = CoreDataHelper.fetchEntities(NSStringFromClass(Episode), managedObjectContext: moc, predicate: nil) as! [Episode]
+        episodesArray = [Episode]()
+        episodesArray = CoreDataHelper.fetchEntities(NSStringFromClass(Episode), managedObjectContext: moc, predicate: nil) as! [Episode]
+        
+        var unsortedEpisodes = NSMutableArray()
+        
+        for singleEpisode in selectedPodcast.episodes {
+            let loopEpisode = singleEpisode as! Episode
+            unsortedEpisodes.addObject(loopEpisode)
+        }
+        
+        let sortDescriptor = NSSortDescriptor(key: "pubDate", ascending: false)
+        
+        episodesArray = unsortedEpisodes.sortedArrayUsingDescriptors([sortDescriptor]) as! [Episode]
         
         self.tableView.reloadData()
     }
@@ -88,24 +66,20 @@ class EpisodesTableViewController: UITableViewController {
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         // #warning Potentially incomplete method implementation.
         // Return the number of sections.
-        return 0
+        return 1
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete method implementation.
         // Return the number of rows in the section.
-        return 0
+        return episodesArray.count
     }
 
-    /*
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath) as! UITableViewCell
-
-        // Configure the cell...
-
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
+        cell.textLabel?.text = episodesArray[indexPath.row].title
         return cell
     }
-    */
 
     /*
     // Override to support conditional editing of the table view.

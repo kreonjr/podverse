@@ -20,86 +20,30 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     
     func didReceiveFeedResults(results: Podcast) {
         dispatch_async(dispatch_get_main_queue(), {
-            println(results)
-            println("yoooo")
             self.podcastArray.append(results)
-            self.myPodcastsTableView!.reloadData()
         })
     }
     
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-                
-        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
-            moc = context
-        }
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "persistentStoreDidChange", name: NSPersistentStoreCoordinatorStoresDidChangeNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "persistentStoreWillChange:", name: NSPersistentStoreCoordinatorStoresWillChangeNotification, object: moc.persistentStoreCoordinator)
-        
-        loadData()
-        
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        self.title = "Podverse"
-        
-        parser.delegate = self
-        
-        let feedURL = NSURL(string: "http://feeds.feedburner.com/dancarlin/history")
-        
-        parser.parsePodcastFeed(feedURL!)
-        
-        
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: NSPersistentStoreCoordinatorStoresDidChangeNotification, object: moc.persistentStoreCoordinator)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: NSPersistentStoreCoordinatorStoresWillChangeNotification, object: moc.persistentStoreCoordinator)
-    }
-    
-    func persistentStoreDidChange() {
-        // reenable UI and fetch data
-//        self.navigationItem.title = "iCloud ready"
-        self.navigationItem.leftBarButtonItem?.enabled = true
-        
-        loadData()
-    }
-    
-    func persistentStoreWillChange(notification: NSNotification) {
-        self.navigationItem.title = "Changes in progress"
-        
-        // disable the UI
-        self.navigationItem.leftBarButtonItem?.enabled = false
-        
-        moc.performBlock { () -> Void in
-            if self.moc.hasChanges {
-                var error: NSError? = nil
-                self.moc.save(&error)
-                if error != nil {
-                    println("Save error: \(error)")
-                } else {
-                    // drop any managed object references
-                    self.moc.reset()
-                }
-            }
-            
-        }
-    }
-
     @IBAction func addPodcast(sender: UIButton) {
-        let addPodcastAlert = UIAlertController(title: "New Notebook", message: "Enter notebook title", preferredStyle: UIAlertControllerStyle.Alert)
+        let addPodcastAlert = UIAlertController(title: "New Podcast", message: "Enter podcast feed URL", preferredStyle: UIAlertControllerStyle.Alert)
         addPodcastAlert.addTextFieldWithConfigurationHandler(nil)
-        addPodcastAlert.addAction(UIAlertAction(title: "Save Notebook", style: UIAlertActionStyle.Default, handler: { (alertAction: UIAlertAction!) -> Void in
+        addPodcastAlert.addAction(UIAlertAction(title: "Save", style: UIAlertActionStyle.Default, handler: { (alertAction: UIAlertAction!) -> Void in
             let textField = addPodcastAlert.textFields?.last as! UITextField
             if textField.text != "" {
-                let podcast = CoreDataHelper.insertManagedObject(NSStringFromClass(Podcast), managedObjectContext: self.moc) as! Podcast
-                podcast.title = textField.text
-                self.moc.save(nil)
+                var feedURLString = textField.text
+                var feedURL = NSURL(string: feedURLString)
                 
-                self.loadData()
+                // Uses Callback/Promise to make sure table data is refreshed
+                // after parsePodcastFeed() finishes
+                self.parser.parsePodcastFeed(feedURL!,
+                    resolve: {
+                        self.loadData()
+                    },
+                    reject: {
+                        // do nothing
+                    }
+                )
+                
             }
         }))
         
@@ -110,10 +54,30 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     }
     
     func loadData() {
-        podcastArray = [Podcast]()
         podcastArray = CoreDataHelper.fetchEntities(NSStringFromClass(Podcast), managedObjectContext: moc, predicate: nil) as! [Podcast]
         
         self.tableView.reloadData()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+                
+        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
+            moc = context
+        }
+        
+        loadData()
+        
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        self.title = "Podverse"
+        
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
     }
 
     override func didReceiveMemoryWarning() {
@@ -185,7 +149,6 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showEpisodes" {
             let episodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
-            
             if let index = self.tableView.indexPathForSelectedRow() {
                 episodesTableViewController.selectedPodcast = podcastArray[index.row]
             }
