@@ -9,14 +9,27 @@
 import UIKit
 import CoreData
 
-class PodcastsTableViewController: UITableViewController {
+class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
+
+    @IBOutlet var myPodcastsTableView: UITableView!
+
+    var parser = PVFeedParser()
     
     var moc: NSManagedObjectContext!
     var podcastArray = [Podcast]()
     
+    func didReceiveFeedResults(results: Podcast) {
+        dispatch_async(dispatch_get_main_queue(), {
+            println(results)
+            println("yoooo")
+            self.podcastArray.append(results)
+            self.myPodcastsTableView!.reloadData()
+        })
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
+                
         if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
             moc = context
         }
@@ -30,8 +43,15 @@ class PodcastsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         self.title = "Podverse"
+        
+        parser.delegate = self
+        
+        let feedURL = NSURL(string: "http://feeds.feedburner.com/dancarlin/history")
+        
+        parser.parsePodcastFeed(feedURL!)
+        
         
     }
     

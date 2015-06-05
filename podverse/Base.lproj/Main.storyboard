@@ -41,6 +41,9 @@
                             </button>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="myPodcastsTableView" destination="TWZ-nK-tJj" id="rAf-P0-bPn"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="st4-2m-82d" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

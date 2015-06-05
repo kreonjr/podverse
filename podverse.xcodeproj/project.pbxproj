@@ -23,6 +23,8 @@
 		818615D91B1EBC76006C9731 /* Episode.m in Sources */ = {isa = PBXBuildFile; fileRef = 818615D41B1EBC76006C9731 /* Episode.m */; };
 		818615DA1B1EBC76006C9731 /* Clip.m in Sources */ = {isa = PBXBuildFile; fileRef = 818615D61B1EBC76006C9731 /* Clip.m */; };
 		818615DB1B1EBC76006C9731 /* Podcast.m in Sources */ = {isa = PBXBuildFile; fileRef = 818615D81B1EBC76006C9731 /* Podcast.m */; };
+		81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578D1B21619F00D67634 /* PVFeedParser.swift */; };
+		81E357901B21624500D67634 /* PVUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578F1B21624500D67634 /* PVUtility.swift */; };
 		BF0D6DB83D35A9AC9F60886C /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 91EBE45FBA5BB3BC622668AA /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +64,8 @@
 		818615D61B1EBC76006C9731 /* Clip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Clip.m; sourceTree = "<group>"; };
 		818615D71B1EBC76006C9731 /* Podcast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Podcast.h; sourceTree = "<group>"; };
 		818615D81B1EBC76006C9731 /* Podcast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Podcast.m; sourceTree = "<group>"; };
+		81E3578D1B21619F00D67634 /* PVFeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVFeedParser.swift; sourceTree = "<group>"; };
+		81E3578F1B21624500D67634 /* PVUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVUtility.swift; sourceTree = "<group>"; };
 		91EBE45FBA5BB3BC622668AA /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B31276F33CB9962F14309BFA /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -128,6 +132,8 @@
 				8186159C1B1E84CF006C9731 /* Main.storyboard */,
 				818615951B1E84CE006C9731 /* AppDelegate.swift */,
 				818615BF1B1E950D006C9731 /* CoreDataHelper.swift */,
+				81E3578F1B21624500D67634 /* PVUtility.swift */,
+				81E3578D1B21619F00D67634 /* PVFeedParser.swift */,
 				818615CD1B1EB12C006C9731 /* PodcastsTableViewController.swift */,
 				818615CB1B1EB10E006C9731 /* EpisodesTableViewController.swift */,
 				818615CF1B1EB144006C9731 /* ClipsTableViewController.swift */,
@@ -327,8 +333,10 @@
 				818615CE1B1EB12C006C9731 /* PodcastsTableViewController.swift in Sources */,
 				818615CC1B1EB10E006C9731 /* EpisodesTableViewController.swift in Sources */,
 				818615D91B1EBC76006C9731 /* Episode.m in Sources */,
+				81E357901B21624500D67634 /* PVUtility.swift in Sources */,
 				818615C01B1E950D006C9731 /* CoreDataHelper.swift in Sources */,
 				818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */,
+				81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
