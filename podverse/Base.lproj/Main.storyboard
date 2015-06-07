@@ -64,7 +64,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <segue destination="1sm-H6-8sL" kind="show" id="Ywu-bS-IQP"/>
+                                    <segue destination="1sm-H6-8sL" kind="show" identifier="showClips" id="Ywu-bS-IQP"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -93,7 +93,7 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <segue destination="jDs-me-457" kind="show" id="Z32-jb-bcd"/>
+                                    <segue destination="jDs-me-457" kind="show" identifier="playClip" id="Z32-jb-bcd"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>

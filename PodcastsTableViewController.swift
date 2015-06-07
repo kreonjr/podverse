@@ -73,7 +73,7 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        self.title = "Podverse"
+        self.title = "podverse"
         
     }
     

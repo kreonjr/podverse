@@ -10,9 +10,16 @@ import UIKit
 
 class MediaPlayerViewController: UIViewController {
 
+    var selectedEpisode: Episode!
+    var selectedClip: Clip!
+    
+    var moc: NSManagedObjectContext!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        println(selectedClip)
+        
         // Do any additional setup after loading the view.
     }
 

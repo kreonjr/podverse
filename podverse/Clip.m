@@ -2,7 +2,7 @@
 //  Clip.m
 //  
 //
-//  Created by Mitchell Downey on 6/2/15.
+//  Created by Mitchell Downey on 6/7/15.
 //
 //
 
@@ -13,8 +13,8 @@
 
 @implementation Clip
 
-@dynamic startTime;
 @dynamic endTime;
+@dynamic startTime;
 @dynamic title;
 @dynamic episode;
 @dynamic podcast;

@@ -2,7 +2,7 @@
 //  Podcast.m
 //  
 //
-//  Created by Mitchell Downey on 6/2/15.
+//  Created by Mitchell Downey on 6/7/15.
 //
 //
 
@@ -13,16 +13,16 @@
 
 @implementation Podcast
 
-@dynamic title;
-@dynamic summary;
 @dynamic feedURL;
-@dynamic itunesAuthor;
-@dynamic lastPubDate;
-@dynamic imageURL;
 @dynamic image;
-@dynamic itunesImageURL;
+@dynamic imageURL;
+@dynamic itunesAuthor;
 @dynamic itunesImage;
+@dynamic itunesImageURL;
+@dynamic lastPubDate;
+@dynamic summary;
+@dynamic title;
+@dynamic clips;
 @dynamic episodes;
-@dynamic clip;
 
 @end

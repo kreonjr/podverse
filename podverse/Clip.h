@@ -2,7 +2,7 @@
 //  Clip.h
 //  
 //
-//  Created by Mitchell Downey on 6/2/15.
+//  Created by Mitchell Downey on 6/7/15.
 //
 //
 
@@ -13,8 +13,8 @@
 
 @interface Clip : NSManagedObject
 
-@property (nonatomic, retain) NSNumber * startTime;
 @property (nonatomic, retain) NSNumber * endTime;
+@property (nonatomic, retain) NSNumber * startTime;
 @property (nonatomic, retain) NSString * title;
 @property (nonatomic, retain) Episode *episode;
 @property (nonatomic, retain) Podcast *podcast;

@@ -14,7 +14,25 @@ class EpisodesTableViewController: UITableViewController {
     var selectedPodcast: Podcast!
     
     var moc: NSManagedObjectContext!
-    var episodesArray = [Episode]()
+    var episodeArray = [Episode]()
+    
+    func loadData() {
+        episodeArray = [Episode]()
+        episodeArray = CoreDataHelper.fetchEntities(NSStringFromClass(Episode), managedObjectContext: moc, predicate: nil) as! [Episode]
+        
+        var unsortedEpisodes = NSMutableArray()
+        
+        for singleEpisode in selectedPodcast.episodes {
+            let loopEpisode = singleEpisode as! Episode
+            unsortedEpisodes.addObject(loopEpisode)
+        }
+        
+        let sortDescriptor = NSSortDescriptor(key: "pubDate", ascending: false)
+        
+        episodeArray = unsortedEpisodes.sortedArrayUsingDescriptors([sortDescriptor]) as! [Episode]
+        
+        self.tableView.reloadData()
+    }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -35,25 +53,7 @@ class EpisodesTableViewController: UITableViewController {
     }
     
     override func viewWillDisappear(animated: Bool) {
-
-    }
-    
-    func loadData() {
-        episodesArray = [Episode]()
-        episodesArray = CoreDataHelper.fetchEntities(NSStringFromClass(Episode), managedObjectContext: moc, predicate: nil) as! [Episode]
         
-        var unsortedEpisodes = NSMutableArray()
-        
-        for singleEpisode in selectedPodcast.episodes {
-            let loopEpisode = singleEpisode as! Episode
-            unsortedEpisodes.addObject(loopEpisode)
-        }
-        
-        let sortDescriptor = NSSortDescriptor(key: "pubDate", ascending: false)
-        
-        episodesArray = unsortedEpisodes.sortedArrayUsingDescriptors([sortDescriptor]) as! [Episode]
-        
-        self.tableView.reloadData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -72,12 +72,12 @@ class EpisodesTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete method implementation.
         // Return the number of rows in the section.
-        return episodesArray.count
+        return episodeArray.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
-        cell.textLabel?.text = episodesArray[indexPath.row].title
+        cell.textLabel?.text = episodeArray[indexPath.row].title
         return cell
     }
 
@@ -116,14 +116,17 @@ class EpisodesTableViewController: UITableViewController {
     }
     */
 
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "showClips" {
+            let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
+            if let index = self.tableView.indexPathForSelectedRow() {
+                clipsTableViewController.selectedEpisode = episodeArray[index.row]
+            }
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        }
     }
-    */
 
 }

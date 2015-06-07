@@ -2,7 +2,7 @@
 //  Podcast.h
 //  
 //
-//  Created by Mitchell Downey on 6/2/15.
+//  Created by Mitchell Downey on 6/7/15.
 //
 //
 
@@ -13,20 +13,25 @@
 
 @interface Podcast : NSManagedObject
 
-@property (nonatomic, retain) NSString * title;
-@property (nonatomic, retain) NSString * summary;
 @property (nonatomic, retain) NSString * feedURL;
-@property (nonatomic, retain) NSString * itunesAuthor;
-@property (nonatomic, retain) NSDate * lastPubDate;
-@property (nonatomic, retain) NSString * imageURL;
 @property (nonatomic, retain) NSData * image;
-@property (nonatomic, retain) NSString * itunesImageURL;
+@property (nonatomic, retain) NSString * imageURL;
+@property (nonatomic, retain) NSString * itunesAuthor;
 @property (nonatomic, retain) NSData * itunesImage;
+@property (nonatomic, retain) NSString * itunesImageURL;
+@property (nonatomic, retain) NSDate * lastPubDate;
+@property (nonatomic, retain) NSString * summary;
+@property (nonatomic, retain) NSString * title;
+@property (nonatomic, retain) NSSet *clips;
 @property (nonatomic, retain) NSSet *episodes;
-@property (nonatomic, retain) Clip *clip;
 @end
 
 @interface Podcast (CoreDataGeneratedAccessors)
+
+- (void)addClipsObject:(Clip *)value;
+- (void)removeClipsObject:(Clip *)value;
+- (void)addClips:(NSSet *)values;
+- (void)removeClips:(NSSet *)values;
 
 - (void)addEpisodesObject:(Episode *)value;
 - (void)removeEpisodesObject:(Episode *)value;
