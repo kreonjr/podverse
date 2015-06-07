@@ -43,8 +43,8 @@ class PVUtility: NSObject {
         
         return NSTimeInterval(hoursMinutesSecondsToSeconds(hours: hours, minutes: minutes, seconds: seconds))
     }
-    func convertNSTimeIntervalToHHMMSSString (durationNSTimeInterval : NSTimeInterval) -> (NSString) {
-        var duration: Int = Int(durationNSTimeInterval)
+    func convertNSNumberToHHMMSSString (durationNSNumber : NSNumber) -> (String) {
+        var duration: Int = Int(durationNSNumber)
         var hours = String(duration / 3600) + ":"
         if hours == "0:" {
             hours = ""
@@ -64,6 +64,14 @@ class PVUtility: NSObject {
     func removeHTMLFromString (string: String) -> (String) {
         let str = string.stringByReplacingOccurrencesOfString("<[^>]+>", withString: "", options: .RegularExpressionSearch, range: nil)
         return str
+    }
+    
+    func formatDateToString (date: NSDate) -> String {
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.dateStyle = NSDateFormatterStyle.ShortStyle
+        let dateString = dateFormatter.stringFromDate(date)
+        
+        return dateString
     }
     
 }

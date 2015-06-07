@@ -11,6 +11,8 @@ import CoreData
 
 class EpisodesTableViewController: UITableViewController {
     
+    var utility = PVUtility()
+    
     var selectedPodcast: Podcast!
     
     var moc: NSManagedObjectContext!
@@ -63,6 +65,21 @@ class EpisodesTableViewController: UITableViewController {
 
     // MARK: - Table view data source
 
+    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell") as! EpisodesTableHeaderCell
+        
+        var imageData = selectedPodcast.image
+        var image = UIImage(data: imageData)
+        
+        headerCell.pvImage!.image = image
+        headerCell.summary!.text = selectedPodcast.summary
+        return headerCell
+    }
+    
+    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 100
+    }
+    
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         // #warning Potentially incomplete method implementation.
         // Return the number of sections.
@@ -76,9 +93,25 @@ class EpisodesTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
-        cell.textLabel?.text = episodeArray[indexPath.row].title
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
+        
+        let episode = episodeArray[indexPath.row]
+        
+        cell.title?.text = episode.title
+        
+        cell.summary?.text = utility.removeHTMLFromString(episode.summary)
+        
+        cell.totalClips?.text = String("123 clips")
+        
+        cell.totalTimeLeft?.text = utility.convertNSNumberToHHMMSSString(episode.duration)
+        
+        cell.pubDate?.text = utility.formatDateToString(episode.pubDate)
+        
         return cell
+    }
+    
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return 100
     }
 
     /*

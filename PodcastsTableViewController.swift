@@ -100,9 +100,30 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
-
-        cell.textLabel?.text = podcastArray[indexPath.row].title
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
+        
+        let podcast = podcastArray[indexPath.row]
+        
+        cell.title?.text = podcast.title
+        cell.pvImage?.image = UIImage(named: "Blank52")
+        
+        var imageData = podcast.image
+        var image = UIImage(data: imageData)
+        
+        // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
+        
+        if image!.size.height != 0.0 {
+            cell.pvImage?.image = image
+        } else {
+            var itunesImageData = podcast.itunesImage
+            var itunesImage = UIImage(data: itunesImageData)
+            
+            if itunesImage!.size.height != 0.0 {
+                cell.pvImage?.image = itunesImage
+            }
+        }
+        
+        // ENDTODO
 
         return cell
     }
