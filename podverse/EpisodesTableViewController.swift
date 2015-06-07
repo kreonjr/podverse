@@ -99,7 +99,9 @@ class EpisodesTableViewController: UITableViewController {
         
         cell.title?.text = episode.title
         
-        cell.summary?.text = utility.removeHTMLFromString(episode.summary)
+        if episode.summary != nil {
+            cell.summary?.text = utility.removeHTMLFromString(episode.summary)
+        }
         
         cell.totalClips?.text = String("123 clips")
         
@@ -108,6 +110,19 @@ class EpisodesTableViewController: UITableViewController {
         cell.pubDate?.text = utility.formatDateToString(episode.pubDate)
         
         return cell
+    }
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        var episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
+        episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: nil))
+        let totalClips = "(123)"
+        episodeActions.addAction(UIAlertAction(title: "Show Clips \(totalClips)", style: .Default, handler: nil))
+        episodeActions.addAction(UIAlertAction (title: "Episode Info", style: .Default, handler: nil))
+        episodeActions.addAction(UIAlertAction (title: "Stream Episode", style: .Default, handler: nil))
+        
+        episodeActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        
+        self.presentViewController(episodeActions, animated: true, completion: nil)
     }
     
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
