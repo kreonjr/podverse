@@ -9,7 +9,9 @@
 import UIKit
 
 class ClipsTableViewController: UITableViewController {
-
+    
+    var utility = PVUtility()
+    
     var selectedEpisode: Episode!
     
     var moc: NSManagedObjectContext!
@@ -27,6 +29,12 @@ class ClipsTableViewController: UITableViewController {
         }
         
         let sortDescriptor = NSSortDescriptor(key: "startTime", ascending: false)
+        
+//        var fullEpisodeClip = CoreDataHelper.insertManagedObject(NSStringFromClass(Clip), managedObjectContext: self.moc) as! Clip
+//        
+//        fullEpisodeClip.title = "Play Full Episode"
+//        fullEpisodeClip.startTime = "0:00"
+//        fullEpisodeClip.endTime = "12:34:56"
         
         clipArray = unsortedClips.sortedArrayUsingDescriptors([sortDescriptor]) as! [Clip]
         
@@ -56,22 +64,51 @@ class ClipsTableViewController: UITableViewController {
 
     // MARK: - Table view data source
 
+    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell") as! ClipsTableHeaderCell
+        
+        var imageData = selectedEpisode.podcast.image
+        var image = UIImage(data: imageData)
+        
+        headerCell.pvImage!.image = image
+        headerCell.summary!.text = utility.removeHTMLFromString(selectedEpisode.summary)
+        
+        return headerCell
+    }
+    
+    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 100
+    }
+    
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        // #warning Potentially incomplete method implementation.
-        // Return the number of sections.
         return 1
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
-        return clipArray.count
+        return clipArray.count + 1
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
-        cell.textLabel?.text = clipArray[indexPath.row].title
+
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! ClipsTableCell
+        
+        if indexPath.row == 0 {
+            cell.title?.text = "PLAY FULL EPISODE"
+            cell.startTimeEndTime?.text = "2:34:56"
+            cell.totalTime?.text = ""
+            cell.score?.text = "1234"
+        } else {
+            cell.title?.text = clipArray[indexPath.row].title
+            cell.startTimeEndTime?.text = "1:12:34 - 1:23:45"
+            cell.totalTime?.text = "10m 11s"
+            cell.score?.text = "1234"
+        }
+        
         return cell
+    }
+    
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return 90
     }
 
     /*
@@ -113,22 +150,15 @@ class ClipsTableViewController: UITableViewController {
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "playEpisode" {
+        if segue.identifier == "Play" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            
-            mediaPlayerViewController.selectedEpisode? = selectedEpisode
-
-            mediaPlayerViewController.selectedClip = nil
-            
-            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
-        }
-        if segue.identifier == "playClip" {
-            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            
-            mediaPlayerViewController.selectedEpisode? = selectedEpisode
             
             if let index = self.tableView.indexPathForSelectedRow() {
-                mediaPlayerViewController.selectedClip? = clipArray[index.row]
+                if index.row == 0 {
+                    mediaPlayerViewController.selectedEpisode? = selectedEpisode
+                } else {
+                    mediaPlayerViewController.selectedClip? = clipArray[index.row]
+                }
             }
             
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)

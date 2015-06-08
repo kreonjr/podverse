@@ -26,6 +26,8 @@
 		81DDBE5B1B2423F900EF3B9C /* EpisodesTableHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE5A1B2423F900EF3B9C /* EpisodesTableHeaderCell.swift */; };
 		81DDBE5D1B24AC8100EF3B9C /* PodcastsTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE5C1B24AC8100EF3B9C /* PodcastsTableCell.swift */; };
 		81DDBE5F1B24BAF300EF3B9C /* EpisodesTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE5E1B24BAF300EF3B9C /* EpisodesTableCell.swift */; };
+		81DDBE611B253C7000EF3B9C /* ClipsTableHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE601B253C7000EF3B9C /* ClipsTableHeaderCell.swift */; };
+		81DDBE631B253C9200EF3B9C /* ClipsTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE621B253C9200EF3B9C /* ClipsTableCell.swift */; };
 		81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578D1B21619F00D67634 /* PVFeedParser.swift */; };
 		81E357901B21624500D67634 /* PVUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578F1B21624500D67634 /* PVUtility.swift */; };
 		BF0D6DB83D35A9AC9F60886C /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 91EBE45FBA5BB3BC622668AA /* libPods.a */; };
@@ -70,6 +72,8 @@
 		81DDBE5A1B2423F900EF3B9C /* EpisodesTableHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EpisodesTableHeaderCell.swift; sourceTree = "<group>"; };
 		81DDBE5C1B24AC8100EF3B9C /* PodcastsTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodcastsTableCell.swift; sourceTree = "<group>"; };
 		81DDBE5E1B24BAF300EF3B9C /* EpisodesTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EpisodesTableCell.swift; sourceTree = "<group>"; };
+		81DDBE601B253C7000EF3B9C /* ClipsTableHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipsTableHeaderCell.swift; sourceTree = "<group>"; };
+		81DDBE621B253C9200EF3B9C /* ClipsTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipsTableCell.swift; sourceTree = "<group>"; };
 		81E3578D1B21619F00D67634 /* PVFeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVFeedParser.swift; sourceTree = "<group>"; };
 		81E3578F1B21624500D67634 /* PVUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVUtility.swift; sourceTree = "<group>"; };
 		91EBE45FBA5BB3BC622668AA /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -146,6 +150,8 @@
 				81DDBE5A1B2423F900EF3B9C /* EpisodesTableHeaderCell.swift */,
 				81DDBE5E1B24BAF300EF3B9C /* EpisodesTableCell.swift */,
 				818615CF1B1EB144006C9731 /* ClipsTableViewController.swift */,
+				81DDBE601B253C7000EF3B9C /* ClipsTableHeaderCell.swift */,
+				81DDBE621B253C9200EF3B9C /* ClipsTableCell.swift */,
 				818615D11B1EB206006C9731 /* MediaPlayerViewController.swift */,
 				8186159F1B1E84CF006C9731 /* Images.xcassets */,
 				818615A11B1E84CF006C9731 /* LaunchScreen.xib */,
@@ -335,8 +341,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				818615961B1E84CE006C9731 /* AppDelegate.swift in Sources */,
+				81DDBE611B253C7000EF3B9C /* ClipsTableHeaderCell.swift in Sources */,
 				818615D21B1EB206006C9731 /* MediaPlayerViewController.swift in Sources */,
 				818615D01B1EB144006C9731 /* ClipsTableViewController.swift in Sources */,
+				81DDBE631B253C9200EF3B9C /* ClipsTableCell.swift in Sources */,
 				81DDBE5F1B24BAF300EF3B9C /* EpisodesTableCell.swift in Sources */,
 				818615CE1B1EB12C006C9731 /* PodcastsTableViewController.swift in Sources */,
 				81DDBE581B241F2200EF3B9C /* Podcast.m in Sources */,

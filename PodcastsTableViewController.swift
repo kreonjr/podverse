@@ -68,13 +68,15 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         
         loadData()
         
+        self.title = "podverse"
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
+        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
+        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        self.title = "podverse"
-        
     }
     
     override func viewWillDisappear(animated: Bool) {

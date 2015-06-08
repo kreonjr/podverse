@@ -47,6 +47,10 @@ class EpisodesTableViewController: UITableViewController {
         
         self.title = selectedPodcast.title
         
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        
+        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
+        
     }
     
     override func viewDidLoad() {
@@ -112,12 +116,22 @@ class EpisodesTableViewController: UITableViewController {
         return cell
     }
     
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return 120
+    }
+    
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         var episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
+        
         episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: nil))
+        
         let totalClips = "(123)"
-        episodeActions.addAction(UIAlertAction(title: "Show Clips \(totalClips)", style: .Default, handler: nil))
+        episodeActions.addAction(UIAlertAction(title: "Show Clips \(totalClips)", style: .Default, handler: { action in
+                self.performSegueWithIdentifier("showClips", sender: self)
+        }))
+        
         episodeActions.addAction(UIAlertAction (title: "Episode Info", style: .Default, handler: nil))
+        
         episodeActions.addAction(UIAlertAction (title: "Stream Episode", style: .Default, handler: nil))
         
         episodeActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
@@ -125,10 +139,6 @@ class EpisodesTableViewController: UITableViewController {
         self.presentViewController(episodeActions, animated: true, completion: nil)
     }
     
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 100
-    }
-
     /*
     // Override to support conditional editing of the table view.
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
