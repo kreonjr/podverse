@@ -121,7 +121,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         }
         
         if item.duration != nil {
-            episode.duration = utility.convertStringToNSTimeInterval(item.duration)
+            episode.duration = utility.convertStringToNSNumber(item.duration)
         }
         
         podcast.addEpisodesObject(episode)

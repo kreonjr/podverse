@@ -9,11 +9,68 @@
 import UIKit
 
 class MediaPlayerViewController: UIViewController {
-
+    
+    var utility = PVUtility()
+    
+    var moc: NSManagedObjectContext!
+    
     var selectedEpisode: Episode!
     var selectedClip: Clip!
     
-    var moc: NSManagedObjectContext!
+    var newClip: Clip!
+    
+    @IBOutlet weak var makeClipViewTime: UIView!
+    @IBOutlet weak var makeClipViewTimeStartButton: UIButton!
+    @IBOutlet weak var makeClipViewTimeStart: UITextField!
+    @IBOutlet weak var makeClipViewTimeEndButton: UIButton!
+    @IBOutlet weak var makeClipViewTimeEnd: UITextField!
+    
+    @IBOutlet weak var makeClipViewTitle: UIView!
+    @IBOutlet weak var makeClipViewTitleField: UITextView!
+    
+    @IBOutlet weak var makeClipViewShare: UIView!
+    @IBOutlet weak var makeClipViewShareTitle: UILabel!
+    @IBOutlet weak var makeClipViewShareDuration: UILabel!
+    @IBOutlet weak var makeClipViewShareButton: UIButton!
+    
+    var makeClipButtonState: Int = 0
+    @IBOutlet weak var makeClipButtonNextSaveDone: UIButton!
+    @IBOutlet weak var makeClipButtonCancelBackEdit: UIButton!
+    
+    @IBAction func makeClipNextSaveDone(sender: AnyObject) {
+        makeClipButtonState++
+        if makeClipButtonState == 2 {
+            displayMakeClipViewTitle(sender as! UIButton)
+            makeClipButtonNextSaveDone.setTitle("Save", forState: .Normal)
+            makeClipButtonCancelBackEdit.setTitle("Back", forState: .Normal)
+        } else if makeClipButtonState == 3 {
+            saveClip(sender as! UIButton)
+            displayMakeClipViewShare(sender as! UIButton)
+            makeClipButtonNextSaveDone.setTitle("Done", forState: .Normal)
+            makeClipButtonCancelBackEdit.setTitle("Edit", forState: .Normal)
+        } else if makeClipButtonState == 4 {
+            closeMakeClipView(sender as! UIButton)
+            makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
+            makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
+            makeClipButtonState = 0
+        }
+    }
+    
+    @IBAction func makeClipCancelBackEdit(sender: AnyObject) {
+        makeClipButtonState--
+        if makeClipButtonState == 0 {
+            closeMakeClipView(sender as! UIButton)
+        } else if makeClipButtonState == 1 {
+            displayMakeClipViewTime(sender as! UIButton)
+            makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
+            makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
+        } else if makeClipButtonState == 2 {
+            displayMakeClipViewTime(sender as! UIButton)
+            makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
+            makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
+            makeClipButtonState = 1
+        }
+    }
     
     func createMakeClipButton () {
         //--- Add Custom Left Bar Button Item/s --//
@@ -28,14 +85,69 @@ class MediaPlayerViewController: UIViewController {
         
         self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
     }
-
+    
+    func closeMakeClipView(sender: UIButton!) {
+        newClip = CoreDataHelper.insertManagedObject(NSStringFromClass(Clip), managedObjectContext: self.moc) as! Clip
+        
+        makeClipViewTime.hidden = true
+        makeClipViewTitle.hidden = true
+        makeClipViewShare.hidden = true
+    }
+    
+    func toggleMakeClipView(sender: UIButton!) {
+        if makeClipButtonState == 0 {
+            makeClipButtonState = 1
+            displayMakeClipViewTime(sender as UIButton!)
+        } else if makeClipButtonState == 1 || makeClipButtonState == 2 || makeClipButtonState == 3 {
+            closeMakeClipView(sender as UIButton!)
+            makeClipButtonState = 0
+            makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
+            makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
+        }
+    }
+    
+    func displayMakeClipViewTime(sender: UIButton!) {
+        makeClipViewTime.hidden = false
+        makeClipViewTitle.hidden = true
+        makeClipViewShare.hidden = true
+    }
+    
+    func saveClip(sender: UIButton!) {
+        newClip.startTime = utility.convertStringToNSNumber(makeClipViewTimeStart.text)
+        newClip.endTime = utility.convertStringToNSNumber(makeClipViewTimeEnd.text)
+        newClip.title = makeClipViewTitleField.text
+    }
+    
+    func displayMakeClipViewTitle(sender: UIButton!) {
+        makeClipViewTime.hidden = false
+        makeClipViewTitle.hidden = false
+        makeClipViewShare.hidden = true
+    }
+    
+    func displayMakeClipViewShare(sender: UIButton!) {
+        makeClipViewTime.hidden = false
+        makeClipViewTitle.hidden = false
+        makeClipViewShare.hidden = false
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        createMakeClipButton()
+        makeClipViewTime.hidden = true
+        makeClipViewTitle.hidden = true
+        makeClipViewShare.hidden = true
         
-        // Do any additional setup after loading the view.
+        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
+            moc = context
+        }
+        
+        var newClip = CoreDataHelper.insertManagedObject(NSStringFromClass(Clip), managedObjectContext: self.moc) as! Clip
+        
+        createMakeClipButton()
     }
 
     override func didReceiveMemoryWarning() {
