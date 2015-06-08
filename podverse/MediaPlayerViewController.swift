@@ -15,10 +15,25 @@ class MediaPlayerViewController: UIViewController {
     
     var moc: NSManagedObjectContext!
     
+    func createMakeClipButton () {
+        //--- Add Custom Left Bar Button Item/s --//
+        // thanks to Naveen Sharma
+        // http://iostechsolutions.blogspot.com/2014/11/swift-add-custom-right-bar-button-item.html
+        
+        let buttonMakeClip: UIButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
+        buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
+        buttonMakeClip.setTitle("Make Clip", forState: UIControlState.Normal)
+        buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
+        var rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
+        
+        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
+    }
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        println(selectedClip)
+        createMakeClipButton()
         
         // Do any additional setup after loading the view.
     }
@@ -28,7 +43,6 @@ class MediaPlayerViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-
     /*
     // MARK: - Navigation
 
