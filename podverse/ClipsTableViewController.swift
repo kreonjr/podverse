@@ -108,7 +108,7 @@ class ClipsTableViewController: UITableViewController {
     }
     
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 90
+        return 100
     }
 
     /*
