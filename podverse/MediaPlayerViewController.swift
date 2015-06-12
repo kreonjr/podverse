@@ -19,6 +19,13 @@ class MediaPlayerViewController: UIViewController {
     
     var newClip: Clip!
     
+    @IBOutlet weak var image: UIImageView!
+    @IBOutlet weak var podcastTitle: UILabel!
+    @IBOutlet weak var episodeTitle: UILabel!
+    @IBOutlet weak var currentTime: UILabel!
+    @IBOutlet weak var totalTime: UILabel!
+    @IBOutlet weak var summary: UITextView!
+    
     @IBOutlet weak var makeClipViewTime: UIView!
     @IBOutlet weak var makeClipViewTimeStartButton: UIButton!
     @IBOutlet weak var makeClipViewTimeStart: UITextField!
@@ -113,9 +120,9 @@ class MediaPlayerViewController: UIViewController {
     }
     
     func saveClip(sender: UIButton!) {
-        newClip.startTime = utility.convertStringToNSNumber(makeClipViewTimeStart.text)
-        newClip.endTime = utility.convertStringToNSNumber(makeClipViewTimeEnd.text)
-        newClip.title = makeClipViewTitleField.text
+//        newClip.startTime = utility.convertStringToNSNumber(makeClipViewTimeStart.text)
+//        newClip.endTime = utility.convertStringToNSNumber(makeClipViewTimeEnd.text)
+//        newClip.title = makeClipViewTitleField.text
     }
     
     func displayMakeClipViewTitle(sender: UIButton!) {
@@ -137,10 +144,6 @@ class MediaPlayerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        makeClipViewTime.hidden = true
-        makeClipViewTitle.hidden = true
-        makeClipViewShare.hidden = true
-        
         if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
             moc = context
         }
@@ -148,6 +151,23 @@ class MediaPlayerViewController: UIViewController {
         var newClip = CoreDataHelper.insertManagedObject(NSStringFromClass(Clip), managedObjectContext: self.moc) as! Clip
         
         createMakeClipButton()
+        
+        makeClipViewTime.hidden = true
+        makeClipViewTitle.hidden = true
+        makeClipViewShare.hidden = true
+        
+        var imageData = selectedEpisode.podcast.image
+        var imageFile = UIImage(data: imageData)
+        image?.image = imageFile
+        
+        podcastTitle?.text = selectedEpisode.podcast.title
+        
+        episodeTitle?.text = selectedEpisode.title
+        
+        totalTime?.text = utility.convertNSNumberToHHMMSSString(selectedEpisode.duration!) as String
+        
+        summary?.text = utility.removeHTMLFromString(selectedEpisode.summary!)
+        
     }
 
     override func didReceiveMemoryWarning() {

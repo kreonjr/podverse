@@ -155,12 +155,11 @@ class ClipsTableViewController: UITableViewController {
             
             if let index = self.tableView.indexPathForSelectedRow() {
                 if index.row == 0 {
-                    mediaPlayerViewController.selectedEpisode? = selectedEpisode
+                    mediaPlayerViewController.selectedEpisode = selectedEpisode
                 } else {
-                    mediaPlayerViewController.selectedClip? = clipArray[index.row]
+                    mediaPlayerViewController.selectedClip = clipArray[index.row]
                 }
             }
-            
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
     }
