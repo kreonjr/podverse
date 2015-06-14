@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import AVFoundation
 
 class MediaPlayerViewController: UIViewController {
     
@@ -18,6 +19,8 @@ class MediaPlayerViewController: UIViewController {
     var selectedClip: Clip!
     
     var newClip: Clip!
+    
+    var avPlayer = AVPlayer()
     
     @IBOutlet weak var image: UIImageView!
     @IBOutlet weak var podcastTitle: UILabel!
@@ -50,8 +53,15 @@ class MediaPlayerViewController: UIViewController {
     @IBOutlet weak var makeClipButtonNextSaveDone: UIButton!
     @IBOutlet weak var makeClipButtonCancelBackEdit: UIButton!
     
-    @IBAction func play(sender: AnyObject) {
 
+    @IBAction func playPause(sender: AnyObject) {
+        if avPlayer.rate == 0 {
+            avPlayer.play()
+            playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+        } else {
+            avPlayer.pause()
+            playPauseButton.setTitle("\u{f04b}", forState: .Normal)
+        }
     }
     
     @IBAction func skip(sender: AnyObject) {
@@ -68,6 +78,34 @@ class MediaPlayerViewController: UIViewController {
     
     @IBAction func audio(sender: AnyObject) {
 
+    }
+    
+    @IBAction func skip1minute(sender: AnyObject) {
+        let currentTime = avPlayer.currentTime()
+        let timeAdjust = CMTimeMakeWithSeconds(60, 1)
+        let resultTime = CMTimeAdd(currentTime, timeAdjust)
+        avPlayer.seekToTime(resultTime)
+    }
+
+    @IBAction func skip15seconds(sender: AnyObject) {
+        let currentTime = avPlayer.currentTime()
+        let timeAdjust = CMTimeMakeWithSeconds(15, 1)
+        let resultTime = CMTimeAdd(currentTime, timeAdjust)
+        avPlayer.seekToTime(resultTime)
+    }
+    
+    @IBAction func previous15seconds(sender: AnyObject) {
+        let currentTime = avPlayer.currentTime()
+        let timeAdjust = CMTimeMakeWithSeconds(15, 1)
+        let resultTime = CMTimeSubtract(currentTime, timeAdjust)
+        avPlayer.seekToTime(resultTime)
+    }
+    
+    @IBAction func previous1minute(sender: AnyObject) {
+        let currentTime = avPlayer.currentTime()
+        let timeAdjust = CMTimeMakeWithSeconds(60, 1)
+        let resultTime = CMTimeSubtract(currentTime, timeAdjust)
+        avPlayer.seekToTime(resultTime)
     }
     
     @IBAction func makeClipNextSaveDone(sender: AnyObject) {
@@ -193,6 +231,9 @@ class MediaPlayerViewController: UIViewController {
         totalTime?.text = utility.convertNSNumberToHHMMSSString(selectedEpisode.duration!) as String
         
         summary?.text = utility.removeHTMLFromString(selectedEpisode.summary!)
+        
+        let url = NSURL(string: selectedEpisode.mediaURL)
+        avPlayer = AVPlayer(URL: url)
         
     }
 

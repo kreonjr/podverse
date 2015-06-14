@@ -403,7 +403,7 @@
                                     <constraint firstAttribute="height" constant="30" id="k6a-pe-zEA"/>
                                 </constraints>
                             </slider>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="b3j-as-jbT">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b3j-as-jbT">
                                 <rect key="frame" x="16" y="208" width="568" height="276"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                 <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
@@ -411,80 +411,6 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Q0k-LP-hIb">
-                                <rect key="frame" x="168" y="492" width="264" height="40"/>
-                                <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8hZ-se-BnP">
-                                        <rect key="frame" x="136" y="0.0" width="60" height="40"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="60" id="R9o-FQ-d9f"/>
-                                            <constraint firstAttribute="height" constant="40" id="z6P-VM-DF9"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="15"/>
-                                        <inset key="contentEdgeInsets" minX="10" minY="15" maxX="10" maxY="15"/>
-                                        <state key="normal" title="15s ">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7Ed-Wd-M4c">
-                                        <rect key="frame" x="68" y="0.0" width="60" height="40"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="40" id="myt-mx-84D"/>
-                                            <constraint firstAttribute="width" constant="60" id="rbl-s0-9A1"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="15"/>
-                                        <inset key="contentEdgeInsets" minX="10" minY="15" maxX="10" maxY="15"/>
-                                        <state key="normal" title=" 10s">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tf8-2O-yfB">
-                                        <rect key="frame" x="0.0" y="0.0" width="60" height="40"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="40" id="Daw-Nu-xfa"/>
-                                            <constraint firstAttribute="width" constant="60" id="ZNp-Bb-Dbw"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="15"/>
-                                        <inset key="contentEdgeInsets" minX="10" minY="15" maxX="10" maxY="15"/>
-                                        <state key="normal" title=" 1m">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="a7L-0d-sAL">
-                                        <rect key="frame" x="204" y="0.0" width="60" height="40"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="40" id="H7k-NN-lQ4"/>
-                                            <constraint firstAttribute="width" constant="60" id="bda-Ep-2yv"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="15"/>
-                                        <inset key="contentEdgeInsets" minX="10" minY="15" maxX="10" maxY="15"/>
-                                        <state key="normal" title="2m ">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                    </button>
-                                </subviews>
-                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                <constraints>
-                                    <constraint firstItem="a7L-0d-sAL" firstAttribute="leading" secondItem="8hZ-se-BnP" secondAttribute="trailing" constant="8" id="1o7-vc-Be8"/>
-                                    <constraint firstAttribute="bottom" secondItem="a7L-0d-sAL" secondAttribute="bottom" id="6bC-TJ-Pvo"/>
-                                    <constraint firstItem="7Ed-Wd-M4c" firstAttribute="leading" secondItem="Tf8-2O-yfB" secondAttribute="trailing" constant="8" id="AgZ-Ef-nmX"/>
-                                    <constraint firstAttribute="height" constant="40" id="IYP-2I-mk5"/>
-                                    <constraint firstAttribute="trailing" secondItem="a7L-0d-sAL" secondAttribute="trailing" id="J8B-hf-eez"/>
-                                    <constraint firstItem="a7L-0d-sAL" firstAttribute="leading" secondItem="8hZ-se-BnP" secondAttribute="trailing" constant="8" id="LGB-cd-roC"/>
-                                    <constraint firstAttribute="bottom" secondItem="8hZ-se-BnP" secondAttribute="bottom" id="RRE-fa-AZ5"/>
-                                    <constraint firstAttribute="bottom" secondItem="7Ed-Wd-M4c" secondAttribute="bottom" id="YBE-A2-Q2Z"/>
-                                    <constraint firstItem="7Ed-Wd-M4c" firstAttribute="leading" secondItem="Tf8-2O-yfB" secondAttribute="trailing" constant="8" id="ebP-iT-IgD"/>
-                                    <constraint firstItem="a7L-0d-sAL" firstAttribute="top" secondItem="Q0k-LP-hIb" secondAttribute="top" id="kbO-D3-dFz"/>
-                                    <constraint firstAttribute="bottom" secondItem="Tf8-2O-yfB" secondAttribute="bottom" id="kp3-Bc-QQd"/>
-                                    <constraint firstItem="8hZ-se-BnP" firstAttribute="leading" secondItem="7Ed-Wd-M4c" secondAttribute="trailing" constant="8" id="lk8-Xk-frB"/>
-                                    <constraint firstItem="Tf8-2O-yfB" firstAttribute="leading" secondItem="Q0k-LP-hIb" secondAttribute="leading" id="nzq-tT-6DI"/>
-                                    <constraint firstItem="8hZ-se-BnP" firstAttribute="top" secondItem="Q0k-LP-hIb" secondAttribute="top" id="qPO-3m-5t8"/>
-                                    <constraint firstAttribute="width" constant="264" id="rMY-W9-rrU"/>
-                                    <constraint firstItem="Tf8-2O-yfB" firstAttribute="top" secondItem="Q0k-LP-hIb" secondAttribute="top" id="xdj-Ql-6e2"/>
-                                    <constraint firstItem="7Ed-Wd-M4c" firstAttribute="top" secondItem="Q0k-LP-hIb" secondAttribute="top" id="yVE-xB-vjF"/>
-                                    <constraint firstItem="8hZ-se-BnP" firstAttribute="leading" secondItem="7Ed-Wd-M4c" secondAttribute="trailing" constant="8" id="zGb-m5-vlB"/>
-                                </constraints>
-                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HuG-Be-hwC">
                                 <rect key="frame" x="0.0" y="540" width="600" height="60"/>
                                 <subviews>
@@ -544,7 +470,7 @@
                                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                 </state>
                                                 <connections>
-                                                    <action selector="play:" destination="jDs-me-457" eventType="touchUpInside" id="TY5-qE-X7Z"/>
+                                                    <action selector="playPause:" destination="jDs-me-457" eventType="touchUpInside" id="uI7-qH-3Mg"/>
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Lv-Ej-qy8">
@@ -780,6 +706,92 @@
                                     <constraint firstAttribute="height" constant="128" id="u68-sp-ODh"/>
                                     <constraint firstItem="dPz-5g-zd2" firstAttribute="leading" secondItem="Gd2-ZN-rbx" secondAttribute="trailing" id="utn-FY-W43"/>
                                     <constraint firstItem="Gd2-ZN-rbx" firstAttribute="leading" secondItem="hH8-iu-J6h" secondAttribute="leading" constant="8" id="wNj-xn-Fgx"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Q0k-LP-hIb">
+                                <rect key="frame" x="168" y="492" width="264" height="40"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7Ed-Wd-M4c">
+                                        <rect key="frame" x="68" y="0.0" width="60" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="40" id="myt-mx-84D"/>
+                                            <constraint firstAttribute="width" constant="60" id="rbl-s0-9A1"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="15"/>
+                                        <inset key="contentEdgeInsets" minX="10" minY="15" maxX="10" maxY="15"/>
+                                        <state key="normal" title=" 15s">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="previous15seconds:" destination="jDs-me-457" eventType="touchUpInside" id="dan-gP-WfU"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tf8-2O-yfB">
+                                        <rect key="frame" x="0.0" y="0.0" width="60" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="40" id="Daw-Nu-xfa"/>
+                                            <constraint firstAttribute="width" constant="60" id="ZNp-Bb-Dbw"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="15"/>
+                                        <inset key="contentEdgeInsets" minX="10" minY="15" maxX="10" maxY="15"/>
+                                        <state key="normal" title=" 1m">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="previous1minute:" destination="jDs-me-457" eventType="touchUpInside" id="Zjg-fC-kJT"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="a7L-0d-sAL">
+                                        <rect key="frame" x="204" y="0.0" width="60" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="40" id="H7k-NN-lQ4"/>
+                                            <constraint firstAttribute="width" constant="60" id="bda-Ep-2yv"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="15"/>
+                                        <inset key="contentEdgeInsets" minX="10" minY="15" maxX="10" maxY="15"/>
+                                        <state key="normal" title="1m ">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="skip1minute:" destination="jDs-me-457" eventType="touchUpInside" id="oHF-s0-Y91"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8hZ-se-BnP">
+                                        <rect key="frame" x="136" y="0.0" width="60" height="40"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="60" id="R9o-FQ-d9f"/>
+                                            <constraint firstAttribute="height" constant="40" id="z6P-VM-DF9"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="15"/>
+                                        <inset key="contentEdgeInsets" minX="10" minY="15" maxX="10" maxY="15"/>
+                                        <state key="normal" title="15s ">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="skip15seconds:" destination="jDs-me-457" eventType="touchUpInside" id="ZSy-gO-SRB"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="a7L-0d-sAL" firstAttribute="leading" secondItem="8hZ-se-BnP" secondAttribute="trailing" constant="8" id="1o7-vc-Be8"/>
+                                    <constraint firstAttribute="bottom" secondItem="a7L-0d-sAL" secondAttribute="bottom" id="6bC-TJ-Pvo"/>
+                                    <constraint firstItem="7Ed-Wd-M4c" firstAttribute="leading" secondItem="Tf8-2O-yfB" secondAttribute="trailing" constant="8" id="AgZ-Ef-nmX"/>
+                                    <constraint firstAttribute="height" constant="40" id="IYP-2I-mk5"/>
+                                    <constraint firstAttribute="trailing" secondItem="a7L-0d-sAL" secondAttribute="trailing" id="J8B-hf-eez"/>
+                                    <constraint firstItem="a7L-0d-sAL" firstAttribute="leading" secondItem="8hZ-se-BnP" secondAttribute="trailing" constant="8" id="LGB-cd-roC"/>
+                                    <constraint firstAttribute="bottom" secondItem="8hZ-se-BnP" secondAttribute="bottom" id="RRE-fa-AZ5"/>
+                                    <constraint firstAttribute="bottom" secondItem="7Ed-Wd-M4c" secondAttribute="bottom" id="YBE-A2-Q2Z"/>
+                                    <constraint firstItem="7Ed-Wd-M4c" firstAttribute="leading" secondItem="Tf8-2O-yfB" secondAttribute="trailing" constant="8" id="ebP-iT-IgD"/>
+                                    <constraint firstItem="a7L-0d-sAL" firstAttribute="top" secondItem="Q0k-LP-hIb" secondAttribute="top" id="kbO-D3-dFz"/>
+                                    <constraint firstAttribute="bottom" secondItem="Tf8-2O-yfB" secondAttribute="bottom" id="kp3-Bc-QQd"/>
+                                    <constraint firstItem="8hZ-se-BnP" firstAttribute="leading" secondItem="7Ed-Wd-M4c" secondAttribute="trailing" constant="8" id="lk8-Xk-frB"/>
+                                    <constraint firstItem="Tf8-2O-yfB" firstAttribute="leading" secondItem="Q0k-LP-hIb" secondAttribute="leading" id="nzq-tT-6DI"/>
+                                    <constraint firstItem="8hZ-se-BnP" firstAttribute="top" secondItem="Q0k-LP-hIb" secondAttribute="top" id="qPO-3m-5t8"/>
+                                    <constraint firstAttribute="width" constant="264" id="rMY-W9-rrU"/>
+                                    <constraint firstItem="Tf8-2O-yfB" firstAttribute="top" secondItem="Q0k-LP-hIb" secondAttribute="top" id="xdj-Ql-6e2"/>
+                                    <constraint firstItem="7Ed-Wd-M4c" firstAttribute="top" secondItem="Q0k-LP-hIb" secondAttribute="top" id="yVE-xB-vjF"/>
+                                    <constraint firstItem="8hZ-se-BnP" firstAttribute="leading" secondItem="7Ed-Wd-M4c" secondAttribute="trailing" constant="8" id="zGb-m5-vlB"/>
                                 </constraints>
                             </view>
                         </subviews>
