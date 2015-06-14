@@ -26,6 +26,12 @@ class MediaPlayerViewController: UIViewController {
     @IBOutlet weak var totalTime: UILabel!
     @IBOutlet weak var summary: UITextView!
     
+    @IBOutlet weak var playPauseButton: UIButton!
+    @IBOutlet weak var skipButton: UIButton!
+    @IBOutlet weak var previousButton: UIButton!
+    @IBOutlet weak var speedButton: UIButton!
+    @IBOutlet weak var audioButton: UIButton!
+    
     @IBOutlet weak var makeClipViewTime: UIView!
     @IBOutlet weak var makeClipViewTimeStartButton: UIButton!
     @IBOutlet weak var makeClipViewTimeStart: UITextField!
@@ -43,6 +49,26 @@ class MediaPlayerViewController: UIViewController {
     var makeClipButtonState: Int = 0
     @IBOutlet weak var makeClipButtonNextSaveDone: UIButton!
     @IBOutlet weak var makeClipButtonCancelBackEdit: UIButton!
+    
+    @IBAction func play(sender: AnyObject) {
+
+    }
+    
+    @IBAction func skip(sender: AnyObject) {
+
+    }
+    
+    @IBAction func previous(sender: AnyObject) {
+
+    }
+    
+    @IBAction func speed(sender: AnyObject) {
+
+    }
+    
+    @IBAction func audio(sender: AnyObject) {
+
+    }
     
     @IBAction func makeClipNextSaveDone(sender: AnyObject) {
         makeClipButtonState++

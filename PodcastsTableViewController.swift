@@ -24,7 +24,7 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         })
     }
     
-    @IBAction func addPodcast(sender: UIButton) {
+    @IBAction func addPodcast(sender: AnyObject) {
         let addPodcastAlert = UIAlertController(title: "New Podcast", message: "Enter podcast feed URL", preferredStyle: UIAlertControllerStyle.Alert)
         addPodcastAlert.addTextFieldWithConfigurationHandler(nil)
         addPodcastAlert.addAction(UIAlertAction(title: "Save", style: UIAlertActionStyle.Default, handler: { (alertAction: UIAlertAction!) -> Void in
@@ -50,7 +50,6 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         addPodcastAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
         
         self.presentViewController(addPodcastAlert, animated: true, completion: nil)
-        
     }
     
     func loadData() {
@@ -68,7 +67,7 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         
         loadData()
         
-        self.title = "podverse"
+        self.navigationItem.title = "Podverse"
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]

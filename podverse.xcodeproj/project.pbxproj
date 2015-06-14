@@ -30,6 +30,7 @@
 		81DDBE631B253C9200EF3B9C /* ClipsTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE621B253C9200EF3B9C /* ClipsTableCell.swift */; };
 		81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578D1B21619F00D67634 /* PVFeedParser.swift */; };
 		81E357901B21624500D67634 /* PVUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578F1B21624500D67634 /* PVUtility.swift */; };
+		81E4FE671B2E11D600A10A77 /* fontawesome-webfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */; };
 		BF0D6DB83D35A9AC9F60886C /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 91EBE45FBA5BB3BC622668AA /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -76,6 +77,7 @@
 		81DDBE621B253C9200EF3B9C /* ClipsTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipsTableCell.swift; sourceTree = "<group>"; };
 		81E3578D1B21619F00D67634 /* PVFeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVFeedParser.swift; sourceTree = "<group>"; };
 		81E3578F1B21624500D67634 /* PVUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVUtility.swift; sourceTree = "<group>"; };
+		81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fontawesome-webfont.ttf"; sourceTree = "<group>"; };
 		91EBE45FBA5BB3BC622668AA /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B31276F33CB9962F14309BFA /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -167,6 +169,7 @@
 		818615931B1E84CE006C9731 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */,
 				818615B81B1E85F6006C9731 /* README */,
 				818615941B1E84CE006C9731 /* Info.plist */,
 			);
@@ -288,6 +291,7 @@
 				818615BD1B1E8927006C9731 /* Podfile in Resources */,
 				818615B91B1E85F6006C9731 /* README in Resources */,
 				8186159E1B1E84CF006C9731 /* Main.storyboard in Resources */,
+				81E4FE671B2E11D600A10A77 /* fontawesome-webfont.ttf in Resources */,
 				818615A31B1E84CF006C9731 /* LaunchScreen.xib in Resources */,
 				818615A01B1E84CF006C9731 /* Images.xcassets in Resources */,
 			);
