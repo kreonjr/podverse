@@ -143,6 +143,11 @@ class MediaPlayerViewController: UIViewController {
         }
     }
     
+    func updateCurrentTimeLabel() {
+        let time = NSNumber(double: CMTimeGetSeconds(avPlayer.currentTime()))
+        currentTime?.text = utility.convertNSNumberToHHMMSSString(time)
+    }
+    
     func createMakeClipButton () {
         //--- Add Custom Left Bar Button Item/s --//
         // thanks to Naveen Sharma
@@ -234,7 +239,10 @@ class MediaPlayerViewController: UIViewController {
         
         let url = NSURL(string: selectedEpisode.mediaURL)
         avPlayer = AVPlayer(URL: url)
-        
+
+        avPlayer.addPeriodicTimeObserverForInterval(CMTimeMakeWithSeconds(1,1), queue: dispatch_get_main_queue()) { (CMTime) -> Void in
+            self.updateCurrentTimeLabel()
+        }
     }
 
     override func didReceiveMemoryWarning() {
