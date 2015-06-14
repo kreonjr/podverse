@@ -35,6 +35,8 @@ class MediaPlayerViewController: UIViewController {
     @IBOutlet weak var speedButton: UIButton!
     @IBOutlet weak var audioButton: UIButton!
     
+    @IBOutlet weak var nowPlayingSlider: UISlider!
+    
     @IBOutlet weak var makeClipViewTime: UIView!
     @IBOutlet weak var makeClipViewTimeStartButton: UIButton!
     @IBOutlet weak var makeClipViewTimeStart: UITextField!
@@ -53,6 +55,21 @@ class MediaPlayerViewController: UIViewController {
     @IBOutlet weak var makeClipButtonNextSaveDone: UIButton!
     @IBOutlet weak var makeClipButtonCancelBackEdit: UIButton!
     
+    @IBAction func sliderTimeChange(sender: UISlider) {
+        let currentSliderValue = Float64(sender.value)
+        let totalTime = Float64(selectedEpisode.duration)
+        let resultTime = CMTimeMakeWithSeconds(totalTime * currentSliderValue, 1)
+        avPlayer.seekToTime(resultTime, completionHandler: { (result: Bool) -> Void in
+            // forcing avPlayer to play() regardless of result value
+                self.avPlayer.play()
+            // if avPlayer is not playing for some reason,
+            // change playPauseButton to pause icon
+            if self.avPlayer.rate == 0 {
+                self.playPauseButton.setTitle("\u{f04b}", forState: .Normal)
+            }
+
+        })
+    }
 
     @IBAction func playPause(sender: AnyObject) {
         if avPlayer.rate == 0 {
@@ -143,9 +160,15 @@ class MediaPlayerViewController: UIViewController {
         }
     }
     
-    func updateCurrentTimeLabel() {
+    func updateCurrentTimeDisplay() {
         let time = NSNumber(double: CMTimeGetSeconds(avPlayer.currentTime()))
+        
         currentTime?.text = utility.convertNSNumberToHHMMSSString(time)
+        
+        let floatCurrentTime = Float(time)
+        let floatTotalTime = Float(selectedEpisode.duration)
+        
+        nowPlayingSlider.value = floatCurrentTime / floatTotalTime
     }
     
     func createMakeClipButton () {
@@ -241,8 +264,9 @@ class MediaPlayerViewController: UIViewController {
         avPlayer = AVPlayer(URL: url)
 
         avPlayer.addPeriodicTimeObserverForInterval(CMTimeMakeWithSeconds(1,1), queue: dispatch_get_main_queue()) { (CMTime) -> Void in
-            self.updateCurrentTimeLabel()
+            self.updateCurrentTimeDisplay()
         }
+        
     }
 
     override func didReceiveMemoryWarning() {
