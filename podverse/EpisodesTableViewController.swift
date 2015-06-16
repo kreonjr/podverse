@@ -132,7 +132,9 @@ class EpisodesTableViewController: UITableViewController {
         
         episodeActions.addAction(UIAlertAction (title: "Episode Info", style: .Default, handler: nil))
         
-        episodeActions.addAction(UIAlertAction (title: "Stream Episode", style: .Default, handler: nil))
+        episodeActions.addAction(UIAlertAction (title: "Stream Episode", style: .Default, handler: { action in
+            self.performSegueWithIdentifier("streamEpisode", sender: self)
+        }))
         
         episodeActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
         
@@ -183,8 +185,19 @@ class EpisodesTableViewController: UITableViewController {
             if let index = self.tableView.indexPathForSelectedRow() {
                 clipsTableViewController.selectedEpisode = episodeArray[index.row]
             }
+            
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        } else if segue.identifier == "streamEpisode" {
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            
+            if let index = self.tableView.indexPathForSelectedRow() {
+                mediaPlayerViewController.selectedEpisode = episodeArray[index.row]
+            }
+            
+            mediaPlayerViewController.startStreamingEpisode = true
+            
         }
+        // navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
     }
-
+    
 }

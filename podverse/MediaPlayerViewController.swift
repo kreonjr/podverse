@@ -18,6 +18,8 @@ class MediaPlayerViewController: UIViewController {
     var selectedEpisode: Episode!
     var selectedClip: Clip!
     
+    var startStreamingEpisode: Bool! = false
+    
     var newClip: Clip!
     
     var avPlayer = AVPlayer()
@@ -265,6 +267,11 @@ class MediaPlayerViewController: UIViewController {
 
         avPlayer.addPeriodicTimeObserverForInterval(CMTimeMakeWithSeconds(1,1), queue: dispatch_get_main_queue()) { (CMTime) -> Void in
             self.updateCurrentTimeDisplay()
+        }
+        
+        if startStreamingEpisode == true {
+            avPlayer.play()
+            playPauseButton.setTitle("\u{f04c}", forState: .Normal)
         }
         
     }

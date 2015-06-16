@@ -236,6 +236,9 @@
                             <outlet property="delegate" destination="NWE-H6-dq6" id="sbD-Gk-upO"/>
                         </connections>
                     </tableView>
+                    <connections>
+                        <segue destination="jDs-me-457" kind="show" identifier="streamEpisode" id="lCl-f5-kXp"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pac-iN-5QY" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -861,7 +864,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gtd-Og-dc0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3731" y="1021"/>
+            <point key="canvasLocation" x="3676" y="1021"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="5tA-ZO-gLh">
@@ -882,4 +885,7 @@
             <point key="canvasLocation" x="812" y="1021"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="lCl-f5-kXp"/>
+    </inferredMetricsTieBreakers>
 </document>
