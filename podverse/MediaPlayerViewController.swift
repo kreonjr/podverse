@@ -13,6 +13,10 @@ class MediaPlayerViewController: UIViewController {
     
     var utility = PVUtility()
     
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
+    var avPlayer: AVPlayer!
+    
     var moc: NSManagedObjectContext!
     
     var selectedEpisode: Episode!
@@ -21,8 +25,6 @@ class MediaPlayerViewController: UIViewController {
     var startStreamingEpisode: Bool! = false
     
     var newClip: Clip!
-    
-    var avPlayer = AVPlayer()
     
     @IBOutlet weak var image: UIImageView!
     @IBOutlet weak var podcastTitle: UILabel!
@@ -237,7 +239,7 @@ class MediaPlayerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
             moc = context
         }
@@ -263,7 +265,24 @@ class MediaPlayerViewController: UIViewController {
         summary?.text = utility.removeHTMLFromString(selectedEpisode.summary!)
         
         let url = NSURL(string: selectedEpisode.mediaURL)
-        avPlayer = AVPlayer(URL: url)
+        
+        if appDelegate.avPlayer != nil {
+            println("if")
+            avPlayer = appDelegate.avPlayer!
+            
+            if avPlayer.rate == 1 {
+                playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+            } else {
+                playPauseButton.setTitle("\u{f04b}", forState: .Normal)
+            }
+            
+        } else {
+            println("else")
+            appDelegate.avPlayer = AVPlayer(URL: url)
+            avPlayer = appDelegate.avPlayer!
+        }
+        
+        println(avPlayer)
 
         avPlayer.addPeriodicTimeObserverForInterval(CMTimeMakeWithSeconds(1,1), queue: dispatch_get_main_queue()) { (CMTime) -> Void in
             self.updateCurrentTimeDisplay()
@@ -279,6 +298,10 @@ class MediaPlayerViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
     }
     
     /*
