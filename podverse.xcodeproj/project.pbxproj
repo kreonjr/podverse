@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		81623C291B35D3A100E906FE /* PVDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81623C281B35D3A100E906FE /* PVDownloader.swift */; };
+		81623C301B35EDA900E906FE /* Podcast.m in Sources */ = {isa = PBXBuildFile; fileRef = 81623C2B1B35EDA900E906FE /* Podcast.m */; };
+		81623C311B35EDA900E906FE /* Episode.m in Sources */ = {isa = PBXBuildFile; fileRef = 81623C2D1B35EDA900E906FE /* Episode.m */; };
+		81623C321B35EDA900E906FE /* Clip.m in Sources */ = {isa = PBXBuildFile; fileRef = 81623C2F1B35EDA900E906FE /* Clip.m */; };
 		818615961B1E84CE006C9731 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
 		818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 818615971B1E84CE006C9731 /* podverse.xcdatamodeld */; };
 		8186159E1B1E84CF006C9731 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8186159C1B1E84CF006C9731 /* Main.storyboard */; };
@@ -20,9 +24,6 @@
 		818615CE1B1EB12C006C9731 /* PodcastsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615CD1B1EB12C006C9731 /* PodcastsTableViewController.swift */; };
 		818615D01B1EB144006C9731 /* ClipsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615CF1B1EB144006C9731 /* ClipsTableViewController.swift */; };
 		818615D21B1EB206006C9731 /* MediaPlayerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615D11B1EB206006C9731 /* MediaPlayerViewController.swift */; };
-		81DDBE571B241F2200EF3B9C /* Clip.m in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE521B241F2200EF3B9C /* Clip.m */; };
-		81DDBE581B241F2200EF3B9C /* Podcast.m in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE541B241F2200EF3B9C /* Podcast.m */; };
-		81DDBE591B241F2200EF3B9C /* Episode.m in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE561B241F2200EF3B9C /* Episode.m */; };
 		81DDBE5B1B2423F900EF3B9C /* EpisodesTableHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE5A1B2423F900EF3B9C /* EpisodesTableHeaderCell.swift */; };
 		81DDBE5D1B24AC8100EF3B9C /* PodcastsTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE5C1B24AC8100EF3B9C /* PodcastsTableCell.swift */; };
 		81DDBE5F1B24BAF300EF3B9C /* EpisodesTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE5E1B24BAF300EF3B9C /* EpisodesTableCell.swift */; };
@@ -46,6 +47,13 @@
 
 /* Begin PBXFileReference section */
 		390CD96442FFFCCC0740C384 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
+		81623C281B35D3A100E906FE /* PVDownloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVDownloader.swift; sourceTree = "<group>"; };
+		81623C2A1B35EDA900E906FE /* Podcast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Podcast.h; sourceTree = "<group>"; };
+		81623C2B1B35EDA900E906FE /* Podcast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Podcast.m; sourceTree = "<group>"; };
+		81623C2C1B35EDA900E906FE /* Episode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Episode.h; sourceTree = "<group>"; };
+		81623C2D1B35EDA900E906FE /* Episode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Episode.m; sourceTree = "<group>"; };
+		81623C2E1B35EDA900E906FE /* Clip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Clip.h; sourceTree = "<group>"; };
+		81623C2F1B35EDA900E906FE /* Clip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Clip.m; sourceTree = "<group>"; };
 		818615901B1E84CE006C9731 /* podverse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = podverse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		818615941B1E84CE006C9731 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		818615951B1E84CE006C9731 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -64,12 +72,6 @@
 		818615CD1B1EB12C006C9731 /* PodcastsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PodcastsTableViewController.swift; path = ../PodcastsTableViewController.swift; sourceTree = "<group>"; };
 		818615CF1B1EB144006C9731 /* ClipsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipsTableViewController.swift; sourceTree = "<group>"; };
 		818615D11B1EB206006C9731 /* MediaPlayerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MediaPlayerViewController.swift; sourceTree = "<group>"; };
-		81DDBE511B241F2200EF3B9C /* Clip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Clip.h; sourceTree = "<group>"; };
-		81DDBE521B241F2200EF3B9C /* Clip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Clip.m; sourceTree = "<group>"; };
-		81DDBE531B241F2200EF3B9C /* Podcast.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Podcast.h; sourceTree = "<group>"; };
-		81DDBE541B241F2200EF3B9C /* Podcast.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Podcast.m; sourceTree = "<group>"; };
-		81DDBE551B241F2200EF3B9C /* Episode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Episode.h; sourceTree = "<group>"; };
-		81DDBE561B241F2200EF3B9C /* Episode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Episode.m; sourceTree = "<group>"; };
 		81DDBE5A1B2423F900EF3B9C /* EpisodesTableHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EpisodesTableHeaderCell.swift; sourceTree = "<group>"; };
 		81DDBE5C1B24AC8100EF3B9C /* PodcastsTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodcastsTableCell.swift; sourceTree = "<group>"; };
 		81DDBE5E1B24BAF300EF3B9C /* EpisodesTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EpisodesTableCell.swift; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 				8186159C1B1E84CF006C9731 /* Main.storyboard */,
 				818615951B1E84CE006C9731 /* AppDelegate.swift */,
 				818615BF1B1E950D006C9731 /* CoreDataHelper.swift */,
+				81623C281B35D3A100E906FE /* PVDownloader.swift */,
 				81E3578F1B21624500D67634 /* PVUtility.swift */,
 				81E3578D1B21619F00D67634 /* PVFeedParser.swift */,
 				818615CD1B1EB12C006C9731 /* PodcastsTableViewController.swift */,
@@ -196,12 +199,12 @@
 		818615CA1B1EA355006C9731 /* Datamodel */ = {
 			isa = PBXGroup;
 			children = (
-				81DDBE511B241F2200EF3B9C /* Clip.h */,
-				81DDBE521B241F2200EF3B9C /* Clip.m */,
-				81DDBE531B241F2200EF3B9C /* Podcast.h */,
-				81DDBE541B241F2200EF3B9C /* Podcast.m */,
-				81DDBE551B241F2200EF3B9C /* Episode.h */,
-				81DDBE561B241F2200EF3B9C /* Episode.m */,
+				81623C2A1B35EDA900E906FE /* Podcast.h */,
+				81623C2B1B35EDA900E906FE /* Podcast.m */,
+				81623C2C1B35EDA900E906FE /* Episode.h */,
+				81623C2D1B35EDA900E906FE /* Episode.m */,
+				81623C2E1B35EDA900E906FE /* Clip.h */,
+				81623C2F1B35EDA900E906FE /* Clip.m */,
 			);
 			name = Datamodel;
 			sourceTree = "<group>";
@@ -257,6 +260,7 @@
 				TargetAttributes = {
 					8186158F1B1E84CE006C9731 = {
 						CreatedOnToolsVersion = 6.3.2;
+						DevelopmentTeam = VRUTXA3F6E;
 					};
 					818615A71B1E84CF006C9731 = {
 						CreatedOnToolsVersion = 6.3.2;
@@ -346,19 +350,20 @@
 			files = (
 				818615961B1E84CE006C9731 /* AppDelegate.swift in Sources */,
 				81DDBE611B253C7000EF3B9C /* ClipsTableHeaderCell.swift in Sources */,
+				81623C311B35EDA900E906FE /* Episode.m in Sources */,
+				81623C301B35EDA900E906FE /* Podcast.m in Sources */,
 				818615D21B1EB206006C9731 /* MediaPlayerViewController.swift in Sources */,
 				818615D01B1EB144006C9731 /* ClipsTableViewController.swift in Sources */,
 				81DDBE631B253C9200EF3B9C /* ClipsTableCell.swift in Sources */,
 				81DDBE5F1B24BAF300EF3B9C /* EpisodesTableCell.swift in Sources */,
 				818615CE1B1EB12C006C9731 /* PodcastsTableViewController.swift in Sources */,
-				81DDBE581B241F2200EF3B9C /* Podcast.m in Sources */,
+				81623C321B35EDA900E906FE /* Clip.m in Sources */,
 				81DDBE5B1B2423F900EF3B9C /* EpisodesTableHeaderCell.swift in Sources */,
 				818615CC1B1EB10E006C9731 /* EpisodesTableViewController.swift in Sources */,
-				81DDBE571B241F2200EF3B9C /* Clip.m in Sources */,
 				81E357901B21624500D67634 /* PVUtility.swift in Sources */,
+				81623C291B35D3A100E906FE /* PVDownloader.swift in Sources */,
 				81DDBE5D1B24AC8100EF3B9C /* PodcastsTableCell.swift in Sources */,
 				818615C01B1E950D006C9731 /* CoreDataHelper.swift in Sources */,
-				81DDBE591B241F2200EF3B9C /* Episode.m in Sources */,
 				818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */,
 				81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */,
 			);
@@ -492,9 +497,12 @@
 			baseConfigurationReference = B31276F33CB9962F14309BFA /* Pods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = podverse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -503,9 +511,12 @@
 			baseConfigurationReference = 390CD96442FFFCCC0740C384 /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = podverse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};

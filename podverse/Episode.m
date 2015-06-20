@@ -2,7 +2,7 @@
 //  Episode.m
 //  
 //
-//  Created by Mitchell Downey on 6/7/15.
+//  Created by Mitchell Downey on 6/20/15.
 //
 //
 
@@ -21,7 +21,9 @@
 @dynamic pubDate;
 @dynamic summary;
 @dynamic title;
+@dynamic downloadedMediaFileURL;
 @dynamic clips;
 @dynamic podcast;
+@dynamic guid;
 
 @end

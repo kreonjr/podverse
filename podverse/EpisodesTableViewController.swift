@@ -13,6 +13,8 @@ class EpisodesTableViewController: UITableViewController {
     
     var utility = PVUtility()
     
+    var downloader = PVDownloader()
+    
     var selectedPodcast: Podcast!
     
     var moc: NSManagedObjectContext!
@@ -36,6 +38,14 @@ class EpisodesTableViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
+//    func downloadEpisode(audioURL: NSURL) {
+//        
+//    }
+    
+    func downloadEpisode() {
+        
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -55,7 +65,6 @@ class EpisodesTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -123,11 +132,21 @@ class EpisodesTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         var episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
         
-        episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: nil))
+        let selectedEpisode = episodeArray[indexPath.row]
+        
+        if selectedEpisode.downloadedMediaFileURL != nil {
+            episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
+                self.performSegueWithIdentifier("playDownloadedEpisode", sender: nil)
+            }))
+        } else {
+            episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
+                self.downloader.downloadEpisode(selectedEpisode, completion: nil)
+            }))
+        }
         
         let totalClips = "(123)"
         episodeActions.addAction(UIAlertAction(title: "Show Clips \(totalClips)", style: .Default, handler: { action in
-                self.performSegueWithIdentifier("showClips", sender: self)
+            self.performSegueWithIdentifier("showClips", sender: self)
         }))
         
         episodeActions.addAction(UIAlertAction (title: "Episode Info", style: .Default, handler: nil))
@@ -180,8 +199,18 @@ class EpisodesTableViewController: UITableViewController {
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "showClips" {
+        if segue.identifier == "playDownloadedEpisode" {
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            
+            if let index = self.tableView.indexPathForSelectedRow() {
+                mediaPlayerViewController.selectedEpisode = episodeArray[index.row]
+            }
+            
+            mediaPlayerViewController.startDownloadedEpisode = true
+            
+        } else if segue.identifier == "showClips" {
             let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
+            
             if let index = self.tableView.indexPathForSelectedRow() {
                 clipsTableViewController.selectedEpisode = episodeArray[index.row]
             }

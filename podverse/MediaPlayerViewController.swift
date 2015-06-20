@@ -22,6 +22,7 @@ class MediaPlayerViewController: UIViewController {
     var selectedEpisode: Episode!
     var selectedClip: Clip!
     
+    var startDownloadedEpisode: Bool! = false
     var startStreamingEpisode: Bool! = false
     
     var newClip: Clip!
@@ -278,7 +279,12 @@ class MediaPlayerViewController: UIViewController {
             
         } else {
             println("else")
-            appDelegate.avPlayer = AVPlayer(URL: url)
+            if selectedEpisode.downloadedMediaFileURL != nil {
+                println("play downloaded episode...")
+            } else {
+                appDelegate.avPlayer = AVPlayer(URL: url)
+            }
+
             avPlayer = appDelegate.avPlayer!
         }
         

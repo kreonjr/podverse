@@ -39,8 +39,9 @@
     NSString *summary; // Description of item
     NSString *content; // More detailed content (if available)
     NSString *author; // Item author
-    NSString *image; // image for the feed
-    NSString *duration; // duration for the feed
+    NSString *image; // image for the item
+    NSString *duration; // duration for the item
+    NSString *guid; // GUID for the item
     
     // Enclosures: Holds 1 or more item enclosures (i.e. podcasts, mp3. pdf, etc)
     //  - NSArray of NSDictionaries with the following keys:
@@ -62,4 +63,5 @@
 @property (nonatomic, copy) NSArray *enclosures;
 @property (nonatomic, copy) NSString *image;
 @property (nonatomic, copy) NSString *duration;
+@property (nonatomic, copy) NSString *guid;
 @end

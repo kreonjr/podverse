@@ -8,7 +8,9 @@
         <relationship name="podcast" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Podcast" inverseName="clips" inverseEntity="Podcast" syncable="YES"/>
     </entity>
     <entity name="Episode" representedClassName="Episode" syncable="YES">
+        <attribute name="downloadedMediaFileURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="duration" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="guid" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="link" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="mediaBytes" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="mediaType" optional="YES" attributeType="String" syncable="YES"/>
@@ -34,7 +36,7 @@
     </entity>
     <elements>
         <element name="Clip" positionX="-20" positionY="-387" width="128" height="118"/>
-        <element name="Episode" positionX="-207" positionY="-526" width="128" height="193"/>
+        <element name="Episode" positionX="-207" positionY="-526" width="128" height="225"/>
         <element name="Podcast" positionX="-398" positionY="-541" width="128" height="208"/>
     </elements>
 </model>

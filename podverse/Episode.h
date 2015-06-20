@@ -2,7 +2,7 @@
 //  Episode.h
 //  
 //
-//  Created by Mitchell Downey on 6/7/15.
+//  Created by Mitchell Downey on 6/20/15.
 //
 //
 
@@ -21,8 +21,10 @@
 @property (nonatomic, retain) NSDate * pubDate;
 @property (nonatomic, retain) NSString * summary;
 @property (nonatomic, retain) NSString * title;
+@property (nonatomic, retain) NSString * downloadedMediaFileURL;
 @property (nonatomic, retain) NSSet *clips;
 @property (nonatomic, retain) Podcast *podcast;
+@property (nonatomic, retain) NSString * guid;
 @end
 
 @interface Episode (CoreDataGeneratedAccessors)
