@@ -84,6 +84,7 @@ class MediaPlayerViewController: UIViewController {
             avPlayer.pause()
             playPauseButton.setTitle("\u{f04b}", forState: .Normal)
         }
+        appDelegate.nowPlayingEpisode = selectedEpisode
     }
     
     @IBAction func skip(sender: AnyObject) {
@@ -245,6 +246,8 @@ class MediaPlayerViewController: UIViewController {
             moc = context
         }
         
+        var dirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String
+        
         var newClip = CoreDataHelper.insertManagedObject(NSStringFromClass(Clip), managedObjectContext: self.moc) as! Clip
         
         createMakeClipButton()
@@ -265,10 +268,7 @@ class MediaPlayerViewController: UIViewController {
         
         summary?.text = utility.removeHTMLFromString(selectedEpisode.summary!)
         
-        let url = NSURL(string: selectedEpisode.mediaURL)
-        
-        if appDelegate.avPlayer != nil {
-            println("if")
+        if appDelegate.avPlayer != nil && appDelegate.nowPlayingEpisode == selectedEpisode {
             avPlayer = appDelegate.avPlayer!
             
             if avPlayer.rate == 1 {
@@ -278,17 +278,31 @@ class MediaPlayerViewController: UIViewController {
             }
             
         } else {
-            println("else")
-            if selectedEpisode.downloadedMediaFileURL != nil {
-                println("play downloaded episode...")
-            } else {
-                appDelegate.avPlayer = AVPlayer(URL: url)
+            
+            // if the player is playing in the background, but a different episode was selected, reinit the player
+            if appDelegate.avPlayer != nil {
+                // TODO: I am worried this may be causing memory leak, with appDelegate.avPlayers not actually
+                // being removed with the = nil, and resulting in multiple avPlayers being instantiated and
+                // staying in the background
+                appDelegate.avPlayer!.pause()
+                appDelegate.avPlayer = nil
             }
-
-            avPlayer = appDelegate.avPlayer!
+            
+            let url: NSURL!
+            
+            if selectedEpisode.downloadedMediaFileURL != nil {
+                var fileWithPathString = dirPath.stringByAppendingPathComponent(selectedEpisode.downloadedMediaFileURL)
+                var playerItem = AVPlayerItem(URL: NSURL(fileURLWithPath: fileWithPathString)!)
+                url = NSURL(string: fileWithPathString)
+                appDelegate.avPlayer = AVPlayer(playerItem: playerItem)
+                avPlayer = appDelegate.avPlayer
+            } else {
+                url = NSURL(string: selectedEpisode.mediaURL)
+                appDelegate.avPlayer = AVPlayer(URL: url)
+                avPlayer = appDelegate.avPlayer
+            }
+            
         }
-        
-        println(avPlayer)
 
         avPlayer.addPeriodicTimeObserverForInterval(CMTimeMakeWithSeconds(1,1), queue: dispatch_get_main_queue()) { (CMTime) -> Void in
             self.updateCurrentTimeDisplay()
