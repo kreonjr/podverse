@@ -49,8 +49,6 @@ class PVDownloader: NSObject {
                 println("episode has been downloaded")
             }
         })
-            
-//        moc.save(nil)
         
         task.resume()
         

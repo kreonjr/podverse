@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="JYh-k0-k2Q">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="sUY-eK-6Ig">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
@@ -105,7 +105,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="st4-2m-82d" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1540" y="1021"/>
+            <point key="canvasLocation" x="2352" y="1021"/>
         </scene>
         <!--Episodes Table View Controller-->
         <scene sceneID="Fi4-Z2-J4f">
@@ -243,7 +243,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pac-iN-5QY" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2258" y="1021"/>
+            <point key="canvasLocation" x="3070" y="1021"/>
         </scene>
         <!--Clips Table View Controller-->
         <scene sceneID="Iz8-4L-jcX">
@@ -350,7 +350,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="h1D-eF-CLA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2995" y="1021"/>
+            <point key="canvasLocation" x="3807" y="1021"/>
         </scene>
         <!--Media Player View Controller-->
         <scene sceneID="zvE-gH-g90">
@@ -865,12 +865,13 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gtd-Og-dc0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3732" y="1021"/>
+            <point key="canvasLocation" x="4544" y="1021"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--Podcasts-->
         <scene sceneID="5tA-ZO-gLh">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="JYh-k0-k2Q" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Podcasts" id="74w-dz-FnV"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="RGS-U0-Agr">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -883,10 +884,56 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="e8Q-uF-czM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="812" y="1021"/>
+            <point key="canvasLocation" x="1624" y="1021"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="nJd-FY-VEa">
+            <objects>
+                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="sUY-eK-6Ig" sceneMemberID="viewController">
+                    <toolbarItems/>
+                    <nil key="simulatedBottomBarMetrics"/>
+                    <tabBar key="tabBar" contentMode="scaleToFill" id="QnW-y5-HaF">
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="JYh-k0-k2Q" kind="relationship" relationship="viewControllers" id="gT7-y3-vPo"/>
+                        <segue destination="V2T-75-ASR" kind="relationship" relationship="viewControllers" id="TZl-Bl-Ohs"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="8oA-3P-bJ5" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="909" y="1021"/>
+        </scene>
+        <!--Downloads-->
+        <scene sceneID="ueb-ch-wZO">
+            <objects>
+                <tableViewController id="V2T-75-ASR" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="swe-LP-mxy">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="downloadCell" id="kaM-Od-SRg">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="kaM-Od-SRg" id="CtH-yK-kQM">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="V2T-75-ASR" id="8g9-id-fSb"/>
+                            <outlet property="delegate" destination="V2T-75-ASR" id="Est-qW-nvN"/>
+                        </connections>
+                    </tableView>
+                    <tabBarItem key="tabBarItem" title="Downloads" id="roJ-2I-y5k"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="RED-61-AXE" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="909" y="1718"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="zDb-Gw-nok"/>
+        <segue reference="wWz-oO-jVg"/>
     </inferredMetricsTieBreakers>
 </document>
