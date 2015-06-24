@@ -208,6 +208,8 @@ class EpisodesTableViewController: UITableViewController {
             
             mediaPlayerViewController.startDownloadedEpisode = true
             
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
+            
         } else if segue.identifier == "showClips" {
             let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
             
@@ -224,6 +226,8 @@ class EpisodesTableViewController: UITableViewController {
             }
             
             mediaPlayerViewController.startStreamingEpisode = true
+            
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
             
         }
         // navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)

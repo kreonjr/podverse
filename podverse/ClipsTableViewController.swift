@@ -160,7 +160,10 @@ class ClipsTableViewController: UITableViewController {
                     mediaPlayerViewController.selectedClip = clipArray[index.row]
                 }
             }
+            
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+            
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }
 }

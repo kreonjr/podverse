@@ -241,7 +241,7 @@ class MediaPlayerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
             moc = context
         }
@@ -308,7 +308,7 @@ class MediaPlayerViewController: UIViewController {
             self.updateCurrentTimeDisplay()
         }
         
-        if startStreamingEpisode == true {
+        if startStreamingEpisode == true || startDownloadedEpisode == true {
             avPlayer.play()
             playPauseButton.setTitle("\u{f04c}", forState: .Normal)
         }
