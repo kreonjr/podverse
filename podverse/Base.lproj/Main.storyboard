@@ -93,7 +93,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Podverse" id="KYR-Xa-7ve">
-                        <barButtonItem key="leftBarButtonItem" title="Add" style="done" id="ByJ-eV-sTa">
+                        <barButtonItem key="leftBarButtonItem" title="Add" style="plain" id="ByJ-eV-sTa">
                             <connections>
                                 <action selector="addPodcast:" destination="E8r-Op-yJY" id="DNT-MR-dDw"/>
                             </connections>
@@ -101,11 +101,12 @@
                     </navigationItem>
                     <connections>
                         <outlet property="myPodcastsTableView" destination="TWZ-nK-tJj" id="rAf-P0-bPn"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="Podcasts to Now Playing" id="4Uo-DI-SEB"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="st4-2m-82d" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2352" y="1021"/>
+            <point key="canvasLocation" x="2386" y="898"/>
         </scene>
         <!--Episodes Table View Controller-->
         <scene sceneID="Fi4-Z2-J4f">
@@ -239,6 +240,7 @@
                     <connections>
                         <segue destination="jDs-me-457" kind="show" identifier="streamEpisode" id="lCl-f5-kXp"/>
                         <segue destination="jDs-me-457" kind="show" identifier="playDownloadedEpisode" id="zDb-Gw-nok"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="Episodes to Now Playing" id="Nyj-Xn-7Cp"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pac-iN-5QY" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -347,6 +349,9 @@
                             <outlet property="delegate" destination="1sm-H6-8sL" id="UZl-V8-uXD"/>
                         </connections>
                     </tableView>
+                    <connections>
+                        <segue destination="jDs-me-457" kind="show" identifier="Clips to Now Playing" id="8b0-de-4oz"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="h1D-eF-CLA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -865,7 +870,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gtd-Og-dc0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4544" y="1021"/>
+            <point key="canvasLocation" x="4510" y="884"/>
         </scene>
         <!--Podcasts-->
         <scene sceneID="5tA-ZO-gLh">
@@ -934,6 +939,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="wWz-oO-jVg"/>
+        <segue reference="8b0-de-4oz"/>
     </inferredMetricsTieBreakers>
 </document>

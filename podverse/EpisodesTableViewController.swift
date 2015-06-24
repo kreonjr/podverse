@@ -13,6 +13,8 @@ class EpisodesTableViewController: UITableViewController {
     
     var utility = PVUtility()
     
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
     var downloader = PVDownloader()
     
     var selectedPodcast: Podcast!
@@ -46,6 +48,10 @@ class EpisodesTableViewController: UITableViewController {
         
     }
     
+    func segueToNowPlaying(sender: UIBarButtonItem) {
+        self.performSegueWithIdentifier("Episodes to Now Playing", sender: nil)
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -61,6 +67,9 @@ class EpisodesTableViewController: UITableViewController {
         
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
+        if ((appDelegate.nowPlayingEpisode) != nil) {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+        }
     }
     
     override func viewDidLoad() {
@@ -68,7 +77,7 @@ class EpisodesTableViewController: UITableViewController {
     }
     
     override func viewWillDisappear(animated: Bool) {
-        
+
     }
 
     override func didReceiveMemoryWarning() {
@@ -194,7 +203,7 @@ class EpisodesTableViewController: UITableViewController {
         return true
     }
     */
-
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -229,6 +238,12 @@ class EpisodesTableViewController: UITableViewController {
             
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
             
+        } else if segue.identifier == "Episodes to Now Playing" {
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            
+            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
+            
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
         // navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
     }

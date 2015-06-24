@@ -15,6 +15,8 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
 
     var parser = PVFeedParser()
     
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
     var moc: NSManagedObjectContext!
     var podcastArray = [Podcast]()
     
@@ -58,6 +60,10 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         self.tableView.reloadData()
     }
     
+    func segueToNowPlaying(sender: UIBarButtonItem) {
+        self.performSegueWithIdentifier("Podcasts to Now Playing", sender: nil)
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
                 
@@ -72,6 +78,13 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
+//        if (self.isMovingToParentViewController() == false) {
+//            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+//        }
+        
+        if ((appDelegate.nowPlayingEpisode) != nil) {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+        }
     }
     
     override func viewDidLoad() {
@@ -164,7 +177,6 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     }
     */
 
-
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -176,6 +188,12 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
             }
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
             
+        } else if segue.identifier == "Podcasts to Now Playing" {
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+
+            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
+            
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }
 

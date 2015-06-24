@@ -12,6 +12,8 @@ class ClipsTableViewController: UITableViewController {
     
     var utility = PVUtility()
     
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
     var selectedEpisode: Episode!
     
     var moc: NSManagedObjectContext!
@@ -41,6 +43,10 @@ class ClipsTableViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
+    func segueToNowPlaying(sender: UIBarButtonItem) {
+        self.performSegueWithIdentifier("Clips to Now Playing", sender: nil)
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -52,6 +58,9 @@ class ClipsTableViewController: UITableViewController {
         
         self.title = selectedEpisode.title
         
+        if ((appDelegate.nowPlayingEpisode) != nil) {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+        }
     }
     
     override func viewDidLoad() {
@@ -162,6 +171,12 @@ class ClipsTableViewController: UITableViewController {
             }
             
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+            
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
+        } else if segue.identifier == "Clips to Now Playing" {
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            
+            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
             
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
