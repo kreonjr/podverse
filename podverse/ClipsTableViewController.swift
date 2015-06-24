@@ -165,6 +165,12 @@ class ClipsTableViewController: UITableViewController {
             if let index = self.tableView.indexPathForSelectedRow() {
                 if index.row == 0 {
                     mediaPlayerViewController.selectedEpisode = selectedEpisode
+                    if selectedEpisode.downloadedMediaFileURL != nil {
+                        mediaPlayerViewController.startDownloadedEpisode = true
+                    } else {
+                        mediaPlayerViewController.startStreamingEpisode = true
+                    }
+                    
                 } else {
                     mediaPlayerViewController.selectedClip = clipArray[index.row]
                 }

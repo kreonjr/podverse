@@ -277,6 +277,7 @@ class MediaPlayerViewController: UIViewController {
                 playPauseButton.setTitle("\u{f04b}", forState: .Normal)
             }
             
+            appDelegate.nowPlayingEpisode = selectedEpisode
         } else {
             
             // if the player is playing in the background, but a different episode was selected, reinit the player
@@ -302,6 +303,8 @@ class MediaPlayerViewController: UIViewController {
                 avPlayer = appDelegate.avPlayer
             }
             
+            appDelegate.nowPlayingEpisode = selectedEpisode
+            
         }
 
         avPlayer.addPeriodicTimeObserverForInterval(CMTimeMakeWithSeconds(1,1), queue: dispatch_get_main_queue()) { (CMTime) -> Void in
@@ -311,6 +314,13 @@ class MediaPlayerViewController: UIViewController {
         if startStreamingEpisode == true || startDownloadedEpisode == true {
             avPlayer.play()
             playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+        }
+        
+        var error: NSError?
+        var success = AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord, withOptions: .DefaultToSpeaker, error: &error)
+        
+        if !success {
+            NSLog("Failed to set audio session category. Error: \(error)")
         }
         
     }

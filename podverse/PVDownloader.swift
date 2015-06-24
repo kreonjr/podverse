@@ -17,10 +17,8 @@ class PVDownloader: NSObject {
         
         let episodeMediaURLString = episode.mediaURL
         
-        let session = NSURLSession.sharedSession()
+        let session = NSURLSession()
         let episodeURL = NSURL(string: episodeMediaURLString)
-        
-        
 
         let task = session.dataTaskWithURL(episodeURL!, completionHandler: {(data, response, error) -> Void in
             println("download began")

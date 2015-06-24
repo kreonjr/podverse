@@ -93,7 +93,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Podverse" id="KYR-Xa-7ve">
-                        <barButtonItem key="leftBarButtonItem" title="Add" style="plain" id="ByJ-eV-sTa">
+                        <barButtonItem key="leftBarButtonItem" title="Add" id="ByJ-eV-sTa">
                             <connections>
                                 <action selector="addPodcast:" destination="E8r-Op-yJY" id="DNT-MR-dDw"/>
                             </connections>
@@ -106,7 +106,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="st4-2m-82d" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2386" y="898"/>
+            <point key="canvasLocation" x="2382" y="1021"/>
         </scene>
         <!--Episodes Table View Controller-->
         <scene sceneID="Fi4-Z2-J4f">
@@ -245,7 +245,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pac-iN-5QY" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3070" y="1021"/>
+            <point key="canvasLocation" x="3087" y="1021"/>
         </scene>
         <!--Clips Table View Controller-->
         <scene sceneID="Iz8-4L-jcX">
@@ -870,7 +870,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gtd-Og-dc0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4510" y="884"/>
+            <point key="canvasLocation" x="4524" y="1021"/>
         </scene>
         <!--Podcasts-->
         <scene sceneID="5tA-ZO-gLh">
@@ -889,7 +889,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="e8Q-uF-czM" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1624" y="1021"/>
+            <point key="canvasLocation" x="1669" y="1021"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="nJd-FY-VEa">
@@ -908,22 +908,41 @@
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8oA-3P-bJ5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="909" y="1021"/>
+            <point key="canvasLocation" x="950" y="1021"/>
         </scene>
         <!--Downloads-->
         <scene sceneID="ueb-ch-wZO">
             <objects>
                 <tableViewController id="V2T-75-ASR" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="swe-LP-mxy">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="69" sectionHeaderHeight="22" sectionFooterHeight="22" id="swe-LP-mxy">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="downloadCell" id="kaM-Od-SRg">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="downloadCell" rowHeight="100" id="kaM-Od-SRg" customClass="DownloadsTableViewCell" customModule="podverse" customModuleProvider="target">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="kaM-Od-SRg" id="CtH-yK-kQM">
                                     <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5vt-cC-gaV">
+                                            <rect key="frame" x="99" y="8" width="493" height="20"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" fixedFrame="YES" progress="1" translatesAutoresizingMaskIntoConstraints="NO" id="zHJ-ze-47l">
+                                            <rect key="frame" x="99" y="65" width="493" height="2"/>
+                                        </progressView>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DUq-Gs-qVD">
+                                            <rect key="frame" x="8" y="8" width="83" height="83"/>
+                                        </imageView>
+                                    </subviews>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="image" destination="CtH-yK-kQM" id="bZd-w7-mq0"/>
+                                    <outlet property="progress" destination="zHJ-ze-47l" id="Qrs-Gk-BNH"/>
+                                    <outlet property="pvImage" destination="DUq-Gs-qVD" id="EOH-2H-X6Q"/>
+                                    <outlet property="title" destination="5vt-cC-gaV" id="bw5-ID-gyP"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -935,10 +954,10 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RED-61-AXE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="909" y="1750"/>
+            <point key="canvasLocation" x="950" y="1756"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="8b0-de-4oz"/>
+        <segue reference="4Uo-DI-SEB"/>
     </inferredMetricsTieBreakers>
 </document>
