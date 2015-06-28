@@ -40,14 +40,6 @@ class EpisodesTableViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
-//    func downloadEpisode(audioURL: NSURL) {
-//        
-//    }
-    
-    func downloadEpisode() {
-        
-    }
-    
     func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Episodes to Now Playing", sender: nil)
     }
@@ -149,7 +141,7 @@ class EpisodesTableViewController: UITableViewController {
             }))
         } else {
             episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
-                self.downloader.downloadEpisode(selectedEpisode, completion: nil)
+                self.downloader.startOrPauseDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
             }))
         }
         
