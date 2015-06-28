@@ -131,18 +131,13 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         podcast.addEpisodesObject(episode)
         
         episodeArray.append(episode)
-//        println(episodeArray)
         
     }
     
     func feedParserDidFinish(parser: MWFeedParser!) {
-        
-        // TODO: I have no idea what's going on with this double as statement...
-//        podcast.episodes = episodes as NSObject as! Set<NSObject>
         podcast.lastPubDate = episodeArray[0].pubDate
         moc.save(nil)
         self.delegate?.didReceiveFeedResults(podcast)
-    
     }
     
     func feedParser(parser: MWFeedParser!, didFailWithError error: NSError!) {

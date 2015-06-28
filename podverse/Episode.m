@@ -2,7 +2,7 @@
 //  Episode.m
 //  
 //
-//  Created by Mitchell Downey on 6/20/15.
+//  Created by Mitchell Downey on 6/28/15.
 //
 //
 
@@ -13,7 +13,9 @@
 
 @implementation Episode
 
+@dynamic downloadedMediaFileURL;
 @dynamic duration;
+@dynamic guid;
 @dynamic link;
 @dynamic mediaBytes;
 @dynamic mediaType;
@@ -21,9 +23,14 @@
 @dynamic pubDate;
 @dynamic summary;
 @dynamic title;
-@dynamic downloadedMediaFileURL;
+@dynamic fileName;
+@dynamic downloadTask;
+@dynamic taskResumeData;
+@dynamic downloadProgress;
+@dynamic isDownloading;
+@dynamic downloadComplete;
+@dynamic taskIdentifier;
 @dynamic clips;
 @dynamic podcast;
-@dynamic guid;
 
 @end

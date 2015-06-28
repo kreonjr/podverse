@@ -10,6 +10,12 @@ import UIKit
 
 class DownloadsTableViewController: UITableViewController {
 
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
+    var session: NSURLSession?
+    var episodeDownloadArray = [Episode]()
+    var docDirectoryURL: NSURL?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 

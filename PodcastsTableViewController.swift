@@ -66,7 +66,14 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-                
+        
+        // Alert the user to enable background notifications
+        let registerUserNotificationSettings = UIApplication.instancesRespondToSelector("registerUserNotificationSettings:")
+        if registerUserNotificationSettings {
+            var types: UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Sound
+            UIApplication.sharedApplication().registerUserNotificationSettings(UIUserNotificationSettings(forTypes: types, categories: nil))
+        }
+        
         if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
             moc = context
         }

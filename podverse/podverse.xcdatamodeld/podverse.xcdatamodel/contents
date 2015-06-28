@@ -8,15 +8,22 @@
         <relationship name="podcast" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Podcast" inverseName="clips" inverseEntity="Podcast" syncable="YES"/>
     </entity>
     <entity name="Episode" representedClassName="Episode" syncable="YES">
+        <attribute name="downloadComplete" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="downloadedMediaFileURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="downloadProgress" optional="YES" attributeType="Float" defaultValueString="0" syncable="YES"/>
+        <attribute name="downloadTask" optional="YES" attributeType="Transformable" valueTransformerName="NSURLSessionDownloadTask" syncable="YES"/>
         <attribute name="duration" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="fileName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="guid" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isDownloading" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="link" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="mediaBytes" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="mediaType" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="mediaURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="pubDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="summary" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="taskIdentifier" optional="YES" attributeType="Integer 32" defaultValueString="-1" syncable="YES"/>
+        <attribute name="taskResumeData" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="clips" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Clip" inverseName="episode" inverseEntity="Clip" syncable="YES"/>
         <relationship name="podcast" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Podcast" inverseName="episodes" inverseEntity="Podcast" syncable="YES"/>
@@ -36,7 +43,7 @@
     </entity>
     <elements>
         <element name="Clip" positionX="-20" positionY="-387" width="128" height="118"/>
-        <element name="Episode" positionX="-207" positionY="-526" width="128" height="225"/>
+        <element name="Episode" positionX="-207" positionY="-526" width="128" height="330"/>
         <element name="Podcast" positionX="-398" positionY="-541" width="128" height="208"/>
     </elements>
 </model>
