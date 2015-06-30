@@ -55,7 +55,7 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     }
     
     func loadData() {
-        podcastArray = CoreDataHelper.fetchEntities(NSStringFromClass(Podcast), managedObjectContext: moc, predicate: nil) as! [Podcast]
+        podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: moc, predicate: nil) as! [Podcast]
         
         self.tableView.reloadData()
     }
@@ -125,7 +125,7 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         cell.pvImage?.image = UIImage(named: "Blank52")
         
         var imageData = podcast.image
-        var image = UIImage(data: imageData)
+        var image = UIImage(data: imageData!)
         
         // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
         
@@ -133,7 +133,7 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
             cell.pvImage?.image = image
         } else {
             var itunesImageData = podcast.itunesImage
-            var itunesImage = UIImage(data: itunesImageData)
+            var itunesImage = UIImage(data: itunesImageData!)
             
             if itunesImage!.size.height != 0.0 {
                 cell.pvImage?.image = itunesImage

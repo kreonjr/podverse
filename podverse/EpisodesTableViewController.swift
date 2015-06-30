@@ -24,7 +24,7 @@ class EpisodesTableViewController: UITableViewController {
     
     func loadData() {
         episodeArray = [Episode]()
-        episodeArray = CoreDataHelper.fetchEntities(NSStringFromClass(Episode), managedObjectContext: moc, predicate: nil) as! [Episode]
+        episodeArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: nil) as! [Episode]
         
         var unsortedEpisodes = NSMutableArray()
         
@@ -83,7 +83,7 @@ class EpisodesTableViewController: UITableViewController {
         let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell") as! EpisodesTableHeaderCell
         
         var imageData = selectedPodcast.image
-        var image = UIImage(data: imageData)
+        var image = UIImage(data: imageData!)
         
         headerCell.pvImage!.image = image
         headerCell.summary!.text = selectedPodcast.summary
@@ -114,14 +114,14 @@ class EpisodesTableViewController: UITableViewController {
         cell.title?.text = episode.title
         
         if episode.summary != nil {
-            cell.summary?.text = utility.removeHTMLFromString(episode.summary)
+            cell.summary?.text = utility.removeHTMLFromString(episode.summary!)
         }
         
         cell.totalClips?.text = String("123 clips")
         
-        cell.totalTimeLeft?.text = utility.convertNSNumberToHHMMSSString(episode.duration)
+        cell.totalTimeLeft?.text = utility.convertNSNumberToHHMMSSString(episode.duration!)
         
-        cell.pubDate?.text = utility.formatDateToString(episode.pubDate)
+        cell.pubDate?.text = utility.formatDateToString(episode.pubDate!)
         
         return cell
     }
@@ -135,12 +135,13 @@ class EpisodesTableViewController: UITableViewController {
         
         let selectedEpisode = episodeArray[indexPath.row]
         
-        if selectedEpisode.downloadedMediaFileURL != nil {
+        if selectedEpisode.fileName != nil {
             episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
                 self.performSegueWithIdentifier("playDownloadedEpisode", sender: nil)
             }))
         } else {
             episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
+//                self.downloader.startOrPauseDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
                 self.downloader.startOrPauseDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
             }))
         }

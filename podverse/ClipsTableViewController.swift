@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class ClipsTableViewController: UITableViewController {
     
@@ -21,7 +22,7 @@ class ClipsTableViewController: UITableViewController {
     
     func loadData() {
         clipArray = [Clip]()
-        clipArray = CoreDataHelper.fetchEntities(NSStringFromClass(Clip), managedObjectContext: moc, predicate: nil) as! [Clip]
+        clipArray = CoreDataHelper.fetchEntities("Clip", managedObjectContext: moc, predicate: nil) as! [Clip]
         
         var unsortedClips = NSMutableArray()
 
@@ -77,10 +78,10 @@ class ClipsTableViewController: UITableViewController {
         let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell") as! ClipsTableHeaderCell
         
         var imageData = selectedEpisode.podcast.image
-        var image = UIImage(data: imageData)
+        var image = UIImage(data: imageData!)
         
         headerCell.pvImage!.image = image
-        headerCell.summary!.text = utility.removeHTMLFromString(selectedEpisode.summary)
+        headerCell.summary!.text = utility.removeHTMLFromString(selectedEpisode.summary!)
         
         return headerCell
     }
@@ -165,7 +166,7 @@ class ClipsTableViewController: UITableViewController {
             if let index = self.tableView.indexPathForSelectedRow() {
                 if index.row == 0 {
                     mediaPlayerViewController.selectedEpisode = selectedEpisode
-                    if selectedEpisode.downloadedMediaFileURL != nil {
+                    if selectedEpisode.downloadedMediaFileDestination != nil {
                         mediaPlayerViewController.startDownloadedEpisode = true
                     } else {
                         mediaPlayerViewController.startStreamingEpisode = true

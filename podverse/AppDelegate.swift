@@ -18,7 +18,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var avPlayer: AVPlayer?
     
     var nowPlayingEpisode: Episode?
+    
+    var episodeDownloadArray = [Episode]()
+    
+    var backgroundTransferCompletionHandler: (() -> Void)?
 
+    func application(application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: () -> Void) {
+        self.backgroundTransferCompletionHandler = completionHandler
+    }
+    
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         return true

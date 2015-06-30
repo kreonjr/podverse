@@ -9,8 +9,5 @@
 #ifndef _Bridging_Header_h
 #define _Bridging_Header_h
 
-#import "MWFeedInfo.h"
-#import "MWFeedItem.h"
-#import "MWFeedParser.h"
 
 #endif

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 protocol PVFeedParserProtocol {
     func didReceiveFeedResults(results: Podcast)
@@ -29,7 +30,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         
         let predicate = NSPredicate(format: "feedURL == %@", feedURL)
         
-        let checkIfPodcastAlreadyExists = CoreDataHelper.fetchEntities(NSStringFromClass(Podcast), managedObjectContext: moc, predicate: predicate)
+        let checkIfPodcastAlreadyExists = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: moc, predicate: predicate)
         
         if checkIfPodcastAlreadyExists.count < 1 {
             var feedParser = MWFeedParser(feedURL: feedURL)
@@ -58,7 +59,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
 
-        podcast = CoreDataHelper.insertManagedObject(NSStringFromClass(Podcast), managedObjectContext: moc) as! Podcast
+        podcast = CoreDataHelper.insertManagedObject("Podcast", managedObjectContext: moc) as! Podcast
         
         if info.title != nil {
             podcast.title = info.title
@@ -69,7 +70,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         }
         
         if info.url != nil {
-            podcast.feedURL = info.url.absoluteString
+            podcast.feedURL = info.url.absoluteString!
         }
         
         if info.itunesAuthor != nil {
@@ -96,7 +97,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
         
-        let episode = CoreDataHelper.insertManagedObject(NSStringFromClass(Episode), managedObjectContext: self.moc) as! Episode
+        let episode = CoreDataHelper.insertManagedObject("Episode", managedObjectContext: self.moc) as! Episode
         
         if item.title != nil {
             episode.title = item.title
@@ -115,8 +116,8 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         }
         
         if item.enclosures != nil {
-            episode.mediaURL = item.enclosures[0]["url"] as! String
-            episode.mediaType = item.enclosures[0]["type"] as! String
+            episode.mediaURL = item.enclosures[0]["url"] as? String
+            episode.mediaType = item.enclosures[0]["type"] as? String
             episode.mediaBytes = item.enclosures[0]["length"] as! Int
         }
         
@@ -128,7 +129,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
             episode.guid = item.guid
         }
         
-        podcast.addEpisodesObject(episode)
+        podcast.addEpisodeObject(episode)
         
         episodeArray.append(episode)
         

@@ -10,10 +10,11 @@ import UIKit
 
 class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
    
-    var moc: NSManagedObjectContext!
+    var moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+    
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
     var session: NSURLSession?
-    var episodeDownloadArray = [Episode]()
     var docDirectoryURL: NSURL?
     
     func initializeEpisodeDownloadSession() {
@@ -28,100 +29,144 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     }
     
     func startOrPauseDownloadingEpisode(episode: Episode, tblViewController: UITableViewController, completion: ((AnyObject) -> Void)!) {
-        initializeEpisodeDownloadSession()
         
-        // If episode is not currently downloading, start or resume the download
-        if (episode.isDownloading == false) {
-            var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
+        // If the session does not already exist, initialize the session
+        if (self.session?.configuration.identifier != "fm.podverse") {
+            initializeEpisodeDownloadSession()
+        }
+        
+        // If the episode is not already downloaded, then start, resume, or pause the download
+        if (episode.fileName == nil) {
+            appDelegate.episodeDownloadArray.append(episode)
             
-            // If download has not been previously started, start the download
-            if (episode.taskIdentifier == -1) {
-                episode.downloadTask = self.session?.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
-                episode.taskIdentifier = episode.downloadTask?.taskIdentifier
-                episode.downloadTask!.resume()
-                episode.isDownloading = true
-            }
+            // If episode is not currently downloading, start or resume the download
+            if (episode.isDownloading == false) {
+                var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
                 
-            // If download was previously started, then was paused, resume the download
-            else {
-                if (episode.taskResumeData != nil) {
-                    episode.downloadTask = self.session?.downloadTaskWithResumeData(episode.taskResumeData!)
-                    episode.downloadTask!.resume()
-                    episode.taskIdentifier = episode.downloadTask?.taskIdentifier
+                // If download has not been previously started, start the download
+                if (episode.taskIdentifier == -1) {
+                    var downloadTask = self.session?.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
+                    episode.taskIdentifier = downloadTask!.taskIdentifier
+                    downloadTask!.resume()
                     episode.isDownloading = true
                 }
-            }
-            
-        // If episode is currently downloading, pause the download, and save resume data for later
-        }
-        else {
-            episode.downloadTask?.cancelByProducingResumeData() { resumeData in
-                if (resumeData != nil) {
-                    episode.taskResumeData = resumeData
+                    
+                // If download was previously started, then was paused, resume the download
+                else {
+                    if (episode.taskResumeData != nil) {
+                        var downloadTask = self.session?.downloadTaskWithResumeData(episode.taskResumeData!)
+                        downloadTask!.resume()
+                        episode.taskIdentifier = episode.downloadTask?.taskIdentifier
+                        episode.isDownloading = true
+                    }
                 }
-                episode.isDownloading = false
             }
-            tblViewController.tableView.reloadData()
+                
+            // If episode is currently downloading, pause the download, and save resume data for later
+            else {
+                episode.downloadTask?.cancelByProducingResumeData() { resumeData in
+                    if (resumeData != nil) {
+                        episode.taskResumeData = resumeData
+                    }
+                    episode.isDownloading = false
+                }
+                tblViewController.tableView.reloadData()
+            }
         }
     }
     
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        println("yoohoo")
         if (totalBytesExpectedToWrite == NSURLSessionTransferSizeUnknown) {
             println("Unknown transfer size")
         }
         else {
             NSOperationQueue.mainQueue().addOperationWithBlock() { () in
                 var totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
-                println(totalProgress)
-                println("NSOperation")
             }
         }
     }
     
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
-        println("done!")
+        var error: NSError?
+        var fileManager = NSFileManager.defaultManager()
+        
+        // Get the corresponding episode object by its taskIdentifier value
+        var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier)
+        var episode = appDelegate.episodeDownloadArray[episodeDownloadIndex]
+        
+        // If file is already downloaded for this episode, remove the old file before saving the new one
+        if (episode.fileName != nil) {
+            var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
+            self.docDirectoryURL = URLs[0] as? NSURL
+            var destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(episode.fileName!)
+            fileManager.removeItemAtPath(destinationURL!.path!, error: &error)
+        }
+        
+        // Specify a unique file name and path where the file will stored permanently
+        var currentDateTime = NSDate()
+        var formatter = NSDateFormatter()
+        formatter.dateFormat = "ddMMyyyy-HHmmss"
+        var destinationFilename = formatter.stringFromDate(currentDateTime)
+        var destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(destinationFilename)
+        
+        var success = fileManager.copyItemAtURL(location, toURL: destinationURL!, error: &error)
+
+        if (success) {
+            episode.isDownloading = false
+            episode.downloadComplete = true
+            episode.taskIdentifier = -1
+            episode.taskResumeData = nil
+            
+            // Add the file destination to the episode object for playback and retrieval
+            episode.fileName = destinationFilename
+
+            // Reset the episode.download to nil before saving, or the app will crash
+            episode.downloadTask = nil
+            
+            // Save the downloadedMediaFileDestination with the object
+            self.moc.save(&error)
+            
+            println("done!")
+        }
+        
+
     }
     
+    func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
+        self.session?.getTasksWithCompletionHandler { (dataTasks, uploadTasks, downloadTasks) -> Void in
+            println("something")
+            if (downloadTasks.count == 0) {
+                println("no more tasks")
+                if (self.appDelegate.backgroundTransferCompletionHandler != nil) {
+                    println("not nil")
+                    var completionHandler: (() -> Void)? = self.appDelegate.backgroundTransferCompletionHandler
+                    
+                    self.appDelegate.backgroundTransferCompletionHandler = nil
+                    
+                    NSOperationQueue.mainQueue().addOperationWithBlock() {
+                        completionHandler?()
+                        
+                        var localNotification = UILocalNotification()
+                        localNotification.alertBody = "All files have been downloaded!"
+                        
+                        UIApplication.sharedApplication().presentLocalNotificationNow(localNotification)
+                    }
+                }
+            }
+            
+        }
+    }
     
-//    func downloadEpisode(episode: Episode, completion: ((AnyObject) -> Void)!) {
-//        moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
-//        
-//        let episodeMediaURLString = episode.mediaURL
-//        
-//        let session = NSURLSession()
-//        let episodeURL = NSURL(string: episodeMediaURLString)
-//
-//        let task = session.dataTaskWithURL(episodeURL!, completionHandler: {(data, response, error) -> Void in
-//            println("download began")
-//            if error != nil {
-//                println(error.localizedDescription)
-//            } else {
-//                if data != nil {
-//                    // Get the place to store the downloaded file in app's local memory
-//                    let dirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String
-//                    
-//                    // Name the file with date/time to be unique
-//                    var currentDateTime = NSDate()
-//                    var formatter = NSDateFormatter()
-//                    formatter.dateFormat = "ddMMyyyy-HHmmss"
-//                    // TODO: hardcoding .mp3 here would cause a problem for .ogg or other file formats
-//                    var fileName = formatter.stringFromDate(currentDateTime) + ".mp3"
-//                    var filePath = dirPath.stringByAppendingPathComponent(fileName)
-//                    
-//                    // Save the file locally with the unique file name as the URL path
-//                    let fileManager = NSFileManager.defaultManager()
-//                    fileManager.createFileAtPath(filePath, contents: data, attributes: nil)
-//                    
-//                    episode.downloadedMediaFileURL = fileName
-//                    self.moc.save(nil)
-//                }
-//                println("episode has been downloaded")
-//            }
-//        })
-//        
-//        task.resume()
-//        
-//    }
+    func getDownloadingEpisodeIndexWithTaskIdentifier(taskIdentifier: Int) -> Int {
+        var index = 0
+        for (var i = 0; i < appDelegate.episodeDownloadArray.count; i++) {
+            var episode = appDelegate.episodeDownloadArray[i]
+            if (episode.taskIdentifier! == taskIdentifier) {
+                index = i
+                break
+            }
+        }
+        return index
+    }
     
 }

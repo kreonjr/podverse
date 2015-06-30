@@ -8,6 +8,7 @@
 
 import UIKit
 import AVFoundation
+import CoreData
 
 class MediaPlayerViewController: UIViewController {
     
@@ -24,6 +25,8 @@ class MediaPlayerViewController: UIViewController {
     
     var startDownloadedEpisode: Bool! = false
     var startStreamingEpisode: Bool! = false
+    
+    var docDirectoryURL: NSURL?
     
     var newClip: Clip!
     
@@ -62,7 +65,7 @@ class MediaPlayerViewController: UIViewController {
     
     @IBAction func sliderTimeChange(sender: UISlider) {
         let currentSliderValue = Float64(sender.value)
-        let totalTime = Float64(selectedEpisode.duration)
+        let totalTime = Float64(selectedEpisode.duration!)
         let resultTime = CMTimeMakeWithSeconds(totalTime * currentSliderValue, 1)
         avPlayer.seekToTime(resultTime, completionHandler: { (result: Bool) -> Void in
             // forcing avPlayer to play() regardless of result value
@@ -172,7 +175,7 @@ class MediaPlayerViewController: UIViewController {
         currentTime?.text = utility.convertNSNumberToHHMMSSString(time)
         
         let floatCurrentTime = Float(time)
-        let floatTotalTime = Float(selectedEpisode.duration)
+        let floatTotalTime = Float(selectedEpisode.duration!)
         
         nowPlayingSlider.value = floatCurrentTime / floatTotalTime
     }
@@ -192,7 +195,7 @@ class MediaPlayerViewController: UIViewController {
     }
     
     func closeMakeClipView(sender: UIButton!) {
-        newClip = CoreDataHelper.insertManagedObject(NSStringFromClass(Clip), managedObjectContext: self.moc) as! Clip
+        newClip = CoreDataHelper.insertManagedObject("Clip", managedObjectContext: self.moc) as! Clip
         
         makeClipViewTime.hidden = true
         makeClipViewTitle.hidden = true
@@ -257,7 +260,7 @@ class MediaPlayerViewController: UIViewController {
         makeClipViewShare.hidden = true
         
         var imageData = selectedEpisode.podcast.image
-        var imageFile = UIImage(data: imageData)
+        var imageFile = UIImage(data: imageData!)
         image?.image = imageFile
         
         podcastTitle?.text = selectedEpisode.podcast.title
@@ -291,14 +294,21 @@ class MediaPlayerViewController: UIViewController {
             
             let url: NSURL!
             
-            if selectedEpisode.downloadedMediaFileURL != nil {
-                var fileWithPathString = dirPath.stringByAppendingPathComponent(selectedEpisode.downloadedMediaFileURL)
-                var playerItem = AVPlayerItem(URL: NSURL(fileURLWithPath: fileWithPathString)!)
-                url = NSURL(string: fileWithPathString)
+            if selectedEpisode.downloadedMediaFileDestination != nil {
+                var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
+                self.docDirectoryURL = URLs[0] as? NSURL
+                var destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(selectedEpisode.fileName!)
+                
+                var checkValidation = NSFileManager.defaultManager()
+                println(destinationURL!)
+//                println(checkValidation.fileExistsAtPath(destinationURL?.absoluteString!))
+                
+                var playerItem = AVPlayerItem(URL: destinationURL!)
+                url = destinationURL
                 appDelegate.avPlayer = AVPlayer(playerItem: playerItem)
                 avPlayer = appDelegate.avPlayer
             } else {
-                url = NSURL(string: selectedEpisode.mediaURL)
+                url = NSURL(string: selectedEpisode.mediaURL!)
                 appDelegate.avPlayer = AVPlayer(URL: url)
                 avPlayer = appDelegate.avPlayer
             }
