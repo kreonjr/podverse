@@ -9,17 +9,41 @@
 import UIKit
 
 class DownloadsTableViewController: UITableViewController {
-
+    
+    var utility = PVUtility()
+    
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
+    var episodeDownloadArray = [Episode]()
+    
+    func segueToNowPlaying(sender: UIBarButtonItem) {
+        self.performSegueWithIdentifier("Downloads to Now Playing", sender: nil)
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
+        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
+        
+        if ((appDelegate.nowPlayingEpisode) != nil) {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+        }
+        
+        NSOperationQueue.mainQueue().addOperationWithBlock() {
+            self.tableView.reloadData()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem()
+        
+        let delay = 1.0 * Double(NSEC_PER_SEC)
+        var time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+        
+        dispatch_after(time, dispatch_get_main_queue()) {
+            self.episodeDownloadArray = self.appDelegate.episodeDownloadArray
+            self.tableView.reloadData()
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -32,24 +56,48 @@ class DownloadsTableViewController: UITableViewController {
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         // #warning Potentially incomplete method implementation.
         // Return the number of sections.
-        return 0
+        return 1
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete method implementation.
         // Return the number of rows in the section.
-        return 0
+        
+        let delay = 1.0 * Double(NSEC_PER_SEC)
+        var time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+        
+        dispatch_after(time, dispatch_get_main_queue()) {
+            self.episodeDownloadArray = self.appDelegate.episodeDownloadArray
+        }
+        
+        return self.episodeDownloadArray.count
     }
 
-    /*
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath) as! UITableViewCell
-
-        // Configure the cell...
-
+        let cell: DownloadsTableViewCell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! DownloadsTableViewCell
+        let episode = episodeDownloadArray[indexPath.row]
+        
+        cell.title!.text = episode.title
+        
+        var imageData = episode.podcast.image
+        var image = UIImage(data: imageData!)
+        
+        cell.pvImage!.image = image
+        
+        let delay = 1.0 * Double(NSEC_PER_SEC)
+        var time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
+        
+        dispatch_after(time, dispatch_get_main_queue()) {
+            cell.progress.progress = Float(episode.downloadProgress!)
+            self.tableView.reloadData()
+        }
+        
         return cell
     }
-    */
+    
+    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return 100
+    }
 
     /*
     // Override to support conditional editing of the table view.
@@ -86,14 +134,18 @@ class DownloadsTableViewController: UITableViewController {
     }
     */
 
-    /*
+
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
-    }
-    */
+        if segue.identifier == "Downloads to Now Playing" {
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            
+            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
+            
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
+        }    }
+
 
 }

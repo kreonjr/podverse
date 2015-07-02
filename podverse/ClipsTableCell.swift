@@ -11,11 +11,8 @@ import UIKit
 class ClipsTableCell: UITableViewCell {
 
     @IBOutlet weak var title: UILabel!
-    
     @IBOutlet weak var startTimeEndTime: UILabel!
-    
     @IBOutlet weak var totalTime: UILabel!
-    
     @IBOutlet weak var score: UILabel!
     
     override func awakeFromNib() {

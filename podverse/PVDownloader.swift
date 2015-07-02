@@ -47,6 +47,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 if (episode.taskIdentifier == -1) {
                     var downloadTask = self.session?.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
                     episode.taskIdentifier = downloadTask!.taskIdentifier
+                    println("taskIdentifier # =")
+                    println(episode.taskIdentifier)
                     downloadTask!.resume()
                     episode.isDownloading = true
                 }
@@ -76,12 +78,18 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     }
     
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
+        
+        // Get the corresponding episode object by its taskIdentifier value
+        var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier)
+        var episode = appDelegate.episodeDownloadArray[episodeDownloadIndex]
+        
         if (totalBytesExpectedToWrite == NSURLSessionTransferSizeUnknown) {
             println("Unknown transfer size")
         }
         else {
             NSOperationQueue.mainQueue().addOperationWithBlock() { () in
                 var totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
+                episode.downloadProgress = Float(totalProgress)
             }
         }
     }
@@ -134,7 +142,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     
     func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
         self.session?.getTasksWithCompletionHandler { (dataTasks, uploadTasks, downloadTasks) -> Void in
-            println("something")
             if (downloadTasks.count == 0) {
                 println("no more tasks")
                 if (self.appDelegate.backgroundTransferCompletionHandler != nil) {

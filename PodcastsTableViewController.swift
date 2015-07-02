@@ -118,9 +118,7 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
-        
         let podcast = podcastArray[indexPath.row]
-        
         cell.title?.text = podcast.title
         cell.pvImage?.image = UIImage(named: "Blank52")
         

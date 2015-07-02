@@ -891,11 +891,29 @@
             </objects>
             <point key="canvasLocation" x="1669" y="1021"/>
         </scene>
+        <!--Downloads-->
+        <scene sceneID="KUR-Gd-fjn">
+            <objects>
+                <navigationController id="VYu-72-9Dh" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Downloads" id="y2j-wL-P7W"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="R8Q-WV-47P">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="V2T-75-ASR" kind="relationship" relationship="rootViewController" id="Fyj-o8-TgF"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gLk-BA-Sdh" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="950" y="1733"/>
+        </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="nJd-FY-VEa">
             <objects>
                 <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="sUY-eK-6Ig" sceneMemberID="viewController">
                     <toolbarItems/>
+                    <navigationItem key="navigationItem" id="LR5-RO-onA"/>
                     <nil key="simulatedBottomBarMetrics"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" id="QnW-y5-HaF">
                         <autoresizingMask key="autoresizingMask"/>
@@ -903,7 +921,7 @@
                     </tabBar>
                     <connections>
                         <segue destination="JYh-k0-k2Q" kind="relationship" relationship="viewControllers" id="gT7-y3-vPo"/>
-                        <segue destination="V2T-75-ASR" kind="relationship" relationship="viewControllers" id="TZl-Bl-Ohs"/>
+                        <segue destination="VYu-72-9Dh" kind="relationship" relationship="viewControllers" id="8eg-GJ-qSm"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="8oA-3P-bJ5" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -913,34 +931,47 @@
         <!--Downloads-->
         <scene sceneID="ueb-ch-wZO">
             <objects>
-                <tableViewController id="V2T-75-ASR" sceneMemberID="viewController">
+                <tableViewController id="V2T-75-ASR" customClass="DownloadsTableViewController" customModule="podverse" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="69" sectionHeaderHeight="22" sectionFooterHeight="22" id="swe-LP-mxy">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="downloadCell" rowHeight="100" id="kaM-Od-SRg" customClass="DownloadsTableViewCell" customModule="podverse" customModuleProvider="target">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" rowHeight="100" id="kaM-Od-SRg" customClass="DownloadsTableViewCell" customModule="podverse" customModuleProvider="target">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="kaM-Od-SRg" id="CtH-yK-kQM">
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5vt-cC-gaV">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5vt-cC-gaV">
                                             <rect key="frame" x="99" y="8" width="493" height="20"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <nil key="highlightedColor"/>
                                         </label>
-                                        <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" fixedFrame="YES" progress="1" translatesAutoresizingMaskIntoConstraints="NO" id="zHJ-ze-47l">
+                                        <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zHJ-ze-47l">
                                             <rect key="frame" x="99" y="65" width="493" height="2"/>
                                         </progressView>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DUq-Gs-qVD">
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="DUq-Gs-qVD">
                                             <rect key="frame" x="8" y="8" width="83" height="83"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="83" id="4yO-DQ-OHG"/>
+                                                <constraint firstAttribute="width" constant="83" id="RUM-gk-ozd"/>
+                                            </constraints>
                                         </imageView>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstItem="5vt-cC-gaV" firstAttribute="leading" secondItem="DUq-Gs-qVD" secondAttribute="trailing" constant="8" id="4Jl-y7-uUI"/>
+                                        <constraint firstItem="DUq-Gs-qVD" firstAttribute="leading" secondItem="CtH-yK-kQM" secondAttribute="leadingMargin" id="Fqs-9f-tE6"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="zHJ-ze-47l" secondAttribute="bottom" constant="24.5" id="NZ7-oJ-tJL"/>
+                                        <constraint firstItem="zHJ-ze-47l" firstAttribute="trailing" secondItem="CtH-yK-kQM" secondAttribute="trailingMargin" id="NoN-uu-SfM"/>
+                                        <constraint firstItem="5vt-cC-gaV" firstAttribute="top" secondItem="CtH-yK-kQM" secondAttribute="topMargin" id="USl-RT-jRu"/>
+                                        <constraint firstItem="DUq-Gs-qVD" firstAttribute="top" secondItem="CtH-yK-kQM" secondAttribute="topMargin" id="UVi-Nh-sDF"/>
+                                        <constraint firstItem="5vt-cC-gaV" firstAttribute="trailing" secondItem="CtH-yK-kQM" secondAttribute="trailingMargin" id="n2i-FD-Viy"/>
+                                        <constraint firstItem="zHJ-ze-47l" firstAttribute="leading" secondItem="CtH-yK-kQM" secondAttribute="leadingMargin" constant="91" id="tlO-R2-rmo"/>
+                                    </constraints>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <outlet property="image" destination="CtH-yK-kQM" id="bZd-w7-mq0"/>
                                     <outlet property="progress" destination="zHJ-ze-47l" id="Qrs-Gk-BNH"/>
-                                    <outlet property="pvImage" destination="DUq-Gs-qVD" id="EOH-2H-X6Q"/>
+                                    <outlet property="pvImage" destination="DUq-Gs-qVD" id="TlU-QZ-YRG"/>
                                     <outlet property="title" destination="5vt-cC-gaV" id="bw5-ID-gyP"/>
                                 </connections>
                             </tableViewCell>
@@ -951,13 +982,20 @@
                         </connections>
                     </tableView>
                     <tabBarItem key="tabBarItem" title="Downloads" id="roJ-2I-y5k"/>
+                    <navigationItem key="navigationItem" title="Downloads" id="z17-gZ-Hsb"/>
+                    <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="b6Q-um-mYo">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </refreshControl>
+                    <connections>
+                        <segue destination="jDs-me-457" kind="show" identifier="Downloads to Now Playing" id="Xc1-wE-NTg"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RED-61-AXE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="950" y="1756"/>
+            <point key="canvasLocation" x="950" y="2467"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="4Uo-DI-SEB"/>
+        <segue reference="Xc1-wE-NTg"/>
     </inferredMetricsTieBreakers>
 </document>
