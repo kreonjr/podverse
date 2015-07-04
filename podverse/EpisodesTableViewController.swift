@@ -123,6 +123,13 @@ class EpisodesTableViewController: UITableViewController {
         
         cell.pubDate?.text = utility.formatDateToString(episode.pubDate!)
         
+        if episode.fileName != nil {
+            cell.downloadPlayButton.setTitle("\u{f04b}", forState: .Normal)
+        }
+        else {
+            cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
+        }
+        
         return cell
     }
     
@@ -141,7 +148,6 @@ class EpisodesTableViewController: UITableViewController {
             }))
         } else {
             episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
-//                self.downloader.startOrPauseDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
                 self.downloader.startOrPauseDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
             }))
         }

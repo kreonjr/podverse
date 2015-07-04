@@ -15,6 +15,7 @@ class EpisodesTableCell: UITableViewCell {
     @IBOutlet weak var totalClips: UILabel!
     @IBOutlet weak var totalTimeLeft: UILabel!
     @IBOutlet weak var pubDate: UILabel!
+    @IBOutlet weak var downloadPlayButton: UIButton!
 
     override func awakeFromNib() {
         super.awakeFromNib()
