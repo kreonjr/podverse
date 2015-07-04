@@ -9,7 +9,13 @@
 import UIKit
 
 class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
-   
+    
+    // TODO: DOWNLOAD RESUME FEATURE IS CURRENTLY NOT WORKING :(
+
+    // TODO: WHAT IF I HIT DOWNLOAD SEVERAL TIMES RAPIDLY?
+    
+    // TODO: DOWNLOAD/PLAY ICON DOES NOT REFRESH AFTER DOWNLOAD FINISHED
+    
     var moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -29,7 +35,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     }
     
     func startOrPauseDownloadingEpisode(episode: Episode, tblViewController: UITableViewController, completion: ((AnyObject) -> Void)!) {
-        
         // If the session does not already exist, initialize the session
         if (self.session?.configuration.identifier != "fm.podverse") {
             initializeEpisodeDownloadSession()
@@ -42,13 +47,10 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             // If episode is not currently downloading, start or resume the download
             if (episode.isDownloading == false) {
                 var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
-                
                 // If download has not been previously started, start the download
                 if (episode.taskIdentifier == -1) {
                     var downloadTask = self.session?.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
                     episode.taskIdentifier = downloadTask!.taskIdentifier
-                    println("taskIdentifier # =")
-                    println(episode.taskIdentifier)
                     downloadTask!.resume()
                     episode.isDownloading = true
                 }

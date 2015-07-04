@@ -44,6 +44,25 @@ class EpisodesTableViewController: UITableViewController {
         self.performSegueWithIdentifier("Episodes to Now Playing", sender: nil)
     }
     
+    func downloadPlay(sender: UIButton) {
+        let view = sender.superview!
+        let cell = view.superview as! EpisodesTableCell
+        let indexPath = self.tableView.indexPathForCell(cell)
+        
+        if let indexPath = self.tableView.indexPathForCell(cell) {
+            var selectedEpisode = episodeArray[indexPath.row]
+            if selectedEpisode.fileName != nil {
+                self.performSegueWithIdentifier("Quick Play Downloaded Episode", sender: selectedEpisode)
+            } else {
+                self.downloader.startOrPauseDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
+                if (selectedEpisode.isDownloading == true) {
+                    cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
+                }
+            }
+        }
+        
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -65,7 +84,7 @@ class EpisodesTableViewController: UITableViewController {
     }
     
     override func viewDidLoad() {
-        super.viewDidLoad()
+        super.viewDidLoad()        
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -127,8 +146,14 @@ class EpisodesTableViewController: UITableViewController {
             cell.downloadPlayButton.setTitle("\u{f04b}", forState: .Normal)
         }
         else {
-            cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
+            if (episode.isDownloading == true) {
+                cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
+            } else {
+                cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
+            }
         }
+        
+        cell.downloadPlayButton.addTarget(self, action: "downloadPlay:", forControlEvents: .TouchUpInside)
         
         return cell
     }
@@ -208,6 +233,7 @@ class EpisodesTableViewController: UITableViewController {
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "playDownloadedEpisode" {
+            
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             
             if let index = self.tableView.indexPathForSelectedRow() {
@@ -215,7 +241,13 @@ class EpisodesTableViewController: UITableViewController {
             }
             
             mediaPlayerViewController.startDownloadedEpisode = true
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
             
+        } else if segue.identifier == "Quick Play Downloaded Episode" {
+            
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            mediaPlayerViewController.selectedEpisode = sender as! Episode
+            mediaPlayerViewController.startDownloadedEpisode = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
             
         } else if segue.identifier == "showClips" {

@@ -244,6 +244,7 @@
                         <segue destination="jDs-me-457" kind="show" identifier="streamEpisode" id="lCl-f5-kXp"/>
                         <segue destination="jDs-me-457" kind="show" identifier="playDownloadedEpisode" id="zDb-Gw-nok"/>
                         <segue destination="jDs-me-457" kind="show" identifier="Episodes to Now Playing" id="Nyj-Xn-7Cp"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="Quick Play Downloaded Episode" id="Ihp-fJ-pRz"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pac-iN-5QY" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -873,7 +874,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gtd-Og-dc0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4524" y="1021"/>
+            <point key="canvasLocation" x="4499" y="1021"/>
         </scene>
         <!--Podcasts-->
         <scene sceneID="5tA-ZO-gLh">
@@ -999,6 +1000,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="zDb-Gw-nok"/>
+        <segue reference="Ihp-fJ-pRz"/>
     </inferredMetricsTieBreakers>
 </document>
