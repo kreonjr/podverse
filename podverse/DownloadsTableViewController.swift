@@ -28,22 +28,13 @@ class DownloadsTableViewController: UITableViewController {
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
-        
-        NSOperationQueue.mainQueue().addOperationWithBlock() {
-            self.tableView.reloadData()
-        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let delay = 1.0 * Double(NSEC_PER_SEC)
-        var time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
-        
-        dispatch_after(time, dispatch_get_main_queue()) {
-            self.episodeDownloadArray = self.appDelegate.episodeDownloadArray
-            self.tableView.reloadData()
-        }
+        self.episodeDownloadArray = self.appDelegate.episodeDownloadArray
+        self.tableView.reloadData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -63,12 +54,7 @@ class DownloadsTableViewController: UITableViewController {
         // #warning Incomplete method implementation.
         // Return the number of rows in the section.
         
-        let delay = 1.0 * Double(NSEC_PER_SEC)
-        var time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
-        
-        dispatch_after(time, dispatch_get_main_queue()) {
-            self.episodeDownloadArray = self.appDelegate.episodeDownloadArray
-        }
+        self.episodeDownloadArray = self.appDelegate.episodeDownloadArray
         
         return self.episodeDownloadArray.count
     }
@@ -83,14 +69,8 @@ class DownloadsTableViewController: UITableViewController {
         var image = UIImage(data: imageData!)
         
         cell.pvImage!.image = image
-        
-        let delay = 1.0 * Double(NSEC_PER_SEC)
-        var time = dispatch_time(DISPATCH_TIME_NOW, Int64(delay))
-        
-        dispatch_after(time, dispatch_get_main_queue()) {
-            cell.progress.progress = Float(episode.downloadProgress!)
-            self.tableView.reloadData()
-        }
+
+        cell.progress.progress = Float(episode.downloadProgress!)
         
         return cell
     }

@@ -69,7 +69,7 @@ class EpisodesTableViewController: UITableViewController {
         if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
             moc = context
         }
-        
+
         loadData()
         
         self.title = selectedPodcast.title
@@ -84,7 +84,8 @@ class EpisodesTableViewController: UITableViewController {
     }
     
     override func viewDidLoad() {
-        super.viewDidLoad()        
+        super.viewDidLoad()
+
     }
     
     override func viewWillDisappear(animated: Bool) {

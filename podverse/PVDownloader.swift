@@ -81,18 +81,17 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         
-        // Get the corresponding episode object by its taskIdentifier value
-        var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier)
-        var episode = appDelegate.episodeDownloadArray[episodeDownloadIndex]
-        
         if (totalBytesExpectedToWrite == NSURLSessionTransferSizeUnknown) {
             println("Unknown transfer size")
         }
         else {
-            NSOperationQueue.mainQueue().addOperationWithBlock() { () in
-                var totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
-                episode.downloadProgress = Float(totalProgress)
-            }
+            // Get the corresponding episode object by its taskIdentifier value
+            var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier)
+            var episode = appDelegate.episodeDownloadArray[episodeDownloadIndex]
+            
+            var totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
+            episode.downloadProgress = Float(totalProgress)
+
         }
     }
     
@@ -145,9 +144,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
         self.session?.getTasksWithCompletionHandler { (dataTasks, uploadTasks, downloadTasks) -> Void in
             if (downloadTasks.count == 0) {
-                println("no more tasks")
                 if (self.appDelegate.backgroundTransferCompletionHandler != nil) {
-                    println("not nil")
                     var completionHandler: (() -> Void)? = self.appDelegate.backgroundTransferCompletionHandler
                     
                     self.appDelegate.backgroundTransferCompletionHandler = nil

@@ -20,9 +20,13 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     var moc: NSManagedObjectContext!
     var podcastArray = [Podcast]()
     
+    var counter = 0
+    
+    // TODO: THIS APPARENTLY DOES NOTHING, BUT IT NEEDS TO BE HERE
+    // TO CONFORM TO THE PVFEEDPARSERPROTOCOL
     func didReceiveFeedResults(results: Podcast) {
         dispatch_async(dispatch_get_main_queue(), {
-            self.podcastArray.append(results)
+//            self.podcastArray.append(results)
         })
     }
     
@@ -137,8 +141,6 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
                 cell.pvImage?.image = itunesImage
             }
         }
-        
-        // ENDTODO
 
         return cell
     }
