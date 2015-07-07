@@ -187,12 +187,29 @@ class EpisodesTableViewController: UITableViewController {
         let selectedEpisode = episodeArray[indexPath.row]
         
         if selectedEpisode.fileName != nil {
+            
             episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
                 self.performSegueWithIdentifier("playDownloadedEpisode", sender: nil)
             }))
+            
         } else {
+           
             episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
+                
                 self.downloader.startOrPauseDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
+                
+                let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
+                
+                if (selectedEpisode.isDownloading == true) {
+                    cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
+                } else {
+                    cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
+                }
+                
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.tableView.reloadData()
+                }
+                
             }))
         }
         

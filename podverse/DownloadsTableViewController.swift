@@ -20,30 +20,18 @@ class DownloadsTableViewController: UITableViewController {
         self.performSegueWithIdentifier("Downloads to Now Playing", sender: nil)
     }
     
-    var counter : Int = 0
-    
     func updateDownloadProgressBar(notification: NSNotification) {
+        
         let userInfo : Dictionary<String,Episode> = notification.userInfo as! Dictionary<String,Episode>
         let episode = userInfo["episode"]
         
         dispatch_async(dispatch_get_main_queue()) {
             self.tableView.reloadData()
         }
+        
     }
     
     override func viewWillAppear(animated: Bool) {
-        dispatch_async(dispatch_get_main_queue()) {
-            self.tableView.reloadData()
-        }
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        // Style the navigation bar
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
-        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
         // Add the Player button if an episode is loaded in the media player
         if ((appDelegate.nowPlayingEpisode) != nil) {
@@ -53,6 +41,20 @@ class DownloadsTableViewController: UITableViewController {
         self.episodeDownloadArray = self.appDelegate.episodeDownloadArray
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadProgressBar:", name: kDownloadHasProgressed, object: nil)
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            self.tableView.reloadData()
+        }
+        
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // Style the navigation bar
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
+        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
     }
     
