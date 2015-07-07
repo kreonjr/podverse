@@ -20,26 +20,54 @@ class DownloadsTableViewController: UITableViewController {
         self.performSegueWithIdentifier("Downloads to Now Playing", sender: nil)
     }
     
-    override func viewWillAppear(animated: Bool) {
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
-        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
+    var counter : Int = 0
+    
+    func updateDownloadProgressBar(notification: NSNotification) {
+        let userInfo : Dictionary<String,Episode> = notification.userInfo as! Dictionary<String,Episode>
+        let episode = userInfo["episode"]
         
-        if ((appDelegate.nowPlayingEpisode) != nil) {
-            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+        dispatch_async(dispatch_get_main_queue()) {
+            self.tableView.reloadData()
+        }
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.tableView.reloadData()
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Style the navigation bar
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
+        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
+        
+        // Add the Player button if an episode is loaded in the media player
+        if ((appDelegate.nowPlayingEpisode) != nil) {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+        }
+        
         self.episodeDownloadArray = self.appDelegate.episodeDownloadArray
-        self.tableView.reloadData()
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadProgressBar:", name: kDownloadHasProgressed, object: nil)
+        
+    }
+    
+    override func viewDidDisappear(animated: Bool) {
+        
+        //  TOASK: What if I had two different observers in one view controller?
+        //  Would we pass in something other than self?
+        NSNotificationCenter.defaultCenter().removeObserver(self)
+        
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+        
     }
 
     // MARK: - Table view data source

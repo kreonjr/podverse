@@ -44,6 +44,17 @@ class EpisodesTableViewController: UITableViewController {
         self.performSegueWithIdentifier("Episodes to Now Playing", sender: nil)
     }
     
+    func updateDownloadFinishedButton(notification: NSNotification) {
+        let userInfo : Dictionary<String,Episode> = notification.userInfo as! Dictionary<String,Episode>
+        let episode = userInfo["episode"]
+        
+        //  TOASK: Could this be more efficient? Should we only reload the proper cell, and not all with reloadData?
+        dispatch_async(dispatch_get_main_queue()) {
+            self.tableView.reloadData()
+        }
+
+    }
+    
     func downloadPlay(sender: UIButton) {
         let view = sender.superview!
         let cell = view.superview as! EpisodesTableCell
@@ -81,10 +92,17 @@ class EpisodesTableViewController: UITableViewController {
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            self.tableView.reloadData()
+        }
+        
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: kDownloadHasFinished, object: nil)
 
     }
     

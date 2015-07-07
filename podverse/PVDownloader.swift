@@ -91,6 +91,10 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             
             var totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
             episode.downloadProgress = Float(totalProgress)
+            
+            let downloadHasProgressedUserInfo = ["episode":episode]
+            
+            NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
 
         }
     }
@@ -135,7 +139,11 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             // Save the downloadedMediaFileDestination with the object
             self.moc.save(&error)
             
-            println("done!")
+            //
+            let downloadHasFinishedUserInfo = ["episode":episode]
+            
+            NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
+
         }
         
 
