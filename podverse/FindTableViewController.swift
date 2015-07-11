@@ -1,18 +1,18 @@
 //
-//  SearchMainTableViewController.swift
-//  podverse
+//  FindTableViewController.swift
+//  
 //
-//  Created by Mitchell Downey on 7/5/15.
-//  Copyright (c) 2015 Mitchell Downey. All rights reserved.
+//  Created by Mitchell Downey on 7/10/15.
+//
 //
 
 import UIKit
 
-class FindMainTableViewController: UITableViewController {
+class FindTableViewController: UITableViewController {
     
-    var searchSections = ["Search Podcasts", "Browse Podcasts"]
+    var findSearchArray = ["Search for Podcasts", "Add Podcast by RSS"]
     
-    var number = ["one", "two", "three", "four", "five"]
+    var findBrowseArray = ["All", "ABC", "DEF", "GHI"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,26 +32,47 @@ class FindMainTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        // #warning Potentially incomplete method implementation.
-        // Return the number of sections.
-        return 0
+        return 2
+    }
+    
+    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if (section == 0) {
+            return ""
+        }
+        else {
+            return "Browse"
+        }
+    }
+    
+    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 40
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
-        return 0
+        if (section == 0) {
+            return findSearchArray.count
+        }
+        else {
+            return findBrowseArray.count
+        }
     }
 
-    /*
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("reuseIdentifier", forIndexPath: indexPath) as! UITableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
 
-        // Configure the cell...
+        if (indexPath.section == 0) {
+            let title = findSearchArray[indexPath.row]
+            cell.textLabel!.text = title
+            println(title)
+        }
+        else {
+            let title = findBrowseArray[indexPath.row]
+            cell.textLabel!.text = title
+            println(title)
+        }
 
         return cell
     }
-    */
 
     /*
     // Override to support conditional editing of the table view.

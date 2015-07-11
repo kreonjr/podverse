@@ -876,11 +876,11 @@
             </objects>
             <point key="canvasLocation" x="4499" y="1021"/>
         </scene>
-        <!--Navigation Controller-->
+        <!--Find-->
         <scene sceneID="sBP-OA-kTq">
             <objects>
                 <navigationController id="fce-JR-16z" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" systemItem="search" id="Ieb-ox-1uL"/>
+                    <tabBarItem key="tabBarItem" title="Find" id="Ieb-ox-1uL"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="7G0-uk-jgh">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -893,16 +893,16 @@
             </objects>
             <point key="canvasLocation" x="1669" y="1765"/>
         </scene>
-        <!--Table View Controller-->
+        <!--Find-->
         <scene sceneID="u1R-KO-9d9">
             <objects>
-                <tableViewController id="0Ln-wQ-P7d" sceneMemberID="viewController">
+                <tableViewController id="0Ln-wQ-P7d" customClass="FindTableViewController" customModule="podverse" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="d4x-gi-4ZL">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="cxo-zF-8p1">
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="Cell" id="cxo-zF-8p1">
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxo-zF-8p1" id="0Dd-Zc-UFQ">
                                     <autoresizingMask key="autoresizingMask"/>
@@ -914,7 +914,7 @@
                             <outlet property="delegate" destination="0Ln-wQ-P7d" id="5G4-Ac-0Az"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="qvo-Gc-WRM"/>
+                    <navigationItem key="navigationItem" title="Find" id="qvo-Gc-WRM"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sKU-bf-j6c" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
