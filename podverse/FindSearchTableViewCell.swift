@@ -8,7 +8,7 @@
 
 import UIKit
 
-class FindTableViewCell: UITableViewCell {
+class FindSearchTableViewCell: UITableViewCell {
 
     @IBOutlet weak var pvImage: UIImageView!
     @IBOutlet weak var title: UILabel!

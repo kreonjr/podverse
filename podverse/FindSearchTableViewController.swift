@@ -1,5 +1,5 @@
 //
-//  FindTableViewController.swift
+//  FindSearchTableViewController.swift
 //  
 //
 //  Created by Mitchell Downey on 7/10/15.
@@ -8,16 +8,19 @@
 
 import UIKit
 
-class FindTableViewController: UITableViewController {
+class FindSearchTableViewController: UITableViewController, UISearchBarDelegate {
     
-    var findSearchArray = ["Search for Podcasts", "Add Podcast by RSS"]
+    @IBOutlet weak var searchBar: UISearchBar!
     
-    var findBrowseArray = ["All", "ABC", "DEF", "GHI"]
-    
-    
+    var podcastArray = [Podcast]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+    }
+    
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        println("yo")
     }
 
     override func didReceiveMemoryWarning() {
@@ -28,60 +31,40 @@ class FindTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 2
-    }
-    
-    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        
-        if (section == 0) {
-            return ""
-        }
-        else {
-            return "Browse"
-        }
-        
-    }
-    
-    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 40
+        return 1
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if (section == 0) {
-            return findSearchArray.count
-        }
-        else {
-            return findBrowseArray.count
-        }
+        return podcastArray.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
-
-        if indexPath.section == 0 {
-            let title = findSearchArray[indexPath.row]
-            cell.textLabel!.text = title
-        }
-        else {
-            let title = findBrowseArray[indexPath.row]
-            cell.textLabel!.text = title
+        
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! FindSearchTableViewCell
+        
+        let podcast = podcastArray[indexPath.row]
+        
+        cell.title?.text = podcast.title
+        cell.pvImage?.image = UIImage(named: "Blank52")
+        
+        var imageData = podcast.image
+        var image = UIImage(data: imageData!)
+        
+        // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
+        
+        if image!.size.height != 0.0 {
+            cell.pvImage?.image = image
+        } else {
+            var itunesImageData = podcast.itunesImage
+            var itunesImage = UIImage(data: itunesImageData!)
+            
+            if itunesImage!.size.height != 0.0 {
+                cell.pvImage?.image = itunesImage
+            }
         }
 
         return cell
-    }
-    
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.section == 0 {
-            if indexPath.row == 0 {
-                self.performSegueWithIdentifier("Search for Podcasts", sender: tableView)
-            }
-            else {
-                self.performSegueWithIdentifier("Add Podcast by RSS", sender: tableView)
-            }
-        }
-        else {
-            // perform segue based on dynamic itunes API data
-        }
+        
     }
 
     /*
@@ -119,13 +102,14 @@ class FindTableViewController: UITableViewController {
     }
     */
 
+    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "Search For Podcasts" {
-            
-        }
+        // Get the new view controller using [segue destinationViewController].
+        // Pass the selected object to the new view controller.
     }
+    */
 
 }
