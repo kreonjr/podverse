@@ -60,18 +60,30 @@ class FindTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
 
-        if (indexPath.section == 0) {
+        if indexPath.section == 0 {
             let title = findSearchArray[indexPath.row]
             cell.textLabel!.text = title
-            println(title)
         }
         else {
             let title = findBrowseArray[indexPath.row]
             cell.textLabel!.text = title
-            println(title)
         }
 
         return cell
+    }
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if indexPath.section == 0 {
+            if indexPath.row == 0 {
+                self.performSegueWithIdentifier("Search for Podcasts", sender: tableView)
+            }
+            else {
+                self.performSegueWithIdentifier("Add Podcast by RSS", sender: tableView)
+            }
+        }
+        else {
+            // perform segue based on dynamic itunes API data
+        }
     }
 
     /*
@@ -109,14 +121,13 @@ class FindTableViewController: UITableViewController {
     }
     */
 
-    /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "Search For Podcasts" {
+            
+        }
     }
-    */
 
 }

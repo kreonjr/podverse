@@ -13,6 +13,7 @@
 		812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
 		812A094F1B42375F00E8F070 /* podverse.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 818615971B1E84CE006C9731 /* podverse.xcdatamodeld */; };
 		815A2E311B50C099002A21A7 /* FindTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 815A2E301B50C099002A21A7 /* FindTableViewController.swift */; };
+		815A2E331B50D002002A21A7 /* FindTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 815A2E321B50D002002A21A7 /* FindTableViewCell.swift */; };
 		81623C291B35D3A100E906FE /* PVDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81623C281B35D3A100E906FE /* PVDownloader.swift */; };
 		817C54081B4B6976007258F8 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817C54071B4B6976007258F8 /* Constants.swift */; };
 		818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 818615971B1E84CE006C9731 /* podverse.xcdatamodeld */; };
@@ -57,6 +58,7 @@
 		812A09481B42269300E8F070 /* Episode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Episode.swift; sourceTree = "<group>"; };
 		812A094E1B422AB300E8F070 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
 		815A2E301B50C099002A21A7 /* FindTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindTableViewController.swift; sourceTree = "<group>"; };
+		815A2E321B50D002002A21A7 /* FindTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindTableViewCell.swift; sourceTree = "<group>"; };
 		81623C281B35D3A100E906FE /* PVDownloader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVDownloader.swift; sourceTree = "<group>"; };
 		817C54071B4B6976007258F8 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		818615901B1E84CE006C9731 /* podverse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = podverse.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -168,6 +170,7 @@
 				81A3B5151B3A60F5007D9A96 /* DownloadsTableViewController.swift */,
 				81A3B5171B3A614B007D9A96 /* DownloadsTableViewCell.swift */,
 				815A2E301B50C099002A21A7 /* FindTableViewController.swift */,
+				815A2E321B50D002002A21A7 /* FindTableViewCell.swift */,
 				8186159F1B1E84CF006C9731 /* Images.xcassets */,
 				818615A11B1E84CF006C9731 /* LaunchScreen.xib */,
 				818615931B1E84CE006C9731 /* Supporting Files */,
@@ -377,6 +380,7 @@
 				81DDBE5B1B2423F900EF3B9C /* EpisodesTableHeaderCell.swift in Sources */,
 				818615CC1B1EB10E006C9731 /* EpisodesTableViewController.swift in Sources */,
 				812A094B1B42269300E8F070 /* Episode.swift in Sources */,
+				815A2E331B50D002002A21A7 /* FindTableViewCell.swift in Sources */,
 				81E357901B21624500D67634 /* PVUtility.swift in Sources */,
 				81623C291B35D3A100E906FE /* PVDownloader.swift in Sources */,
 				81DDBE5D1B24AC8100EF3B9C /* PodcastsTableCell.swift in Sources */,
