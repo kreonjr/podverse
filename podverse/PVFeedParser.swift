@@ -22,15 +22,15 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     var episodeArray: [Episode] = [Episode]()
     
-    var isItunesSearch: Bool = false
+    var willSave: Bool = false
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    func parsePodcastFeed(feedURL: NSURL, isItunesSearch: Bool, resolve: () -> (), reject: () -> ()) {
+    func parsePodcastFeed(feedURL: NSURL, willSave: Bool, resolve: () -> (), reject: () -> ()) {
         
-        if (isItunesSearch == true) {
-            println("Is iTunes Search")
-            self.isItunesSearch = isItunesSearch
+        if (willSave == false) {
+            
+            self.willSave = willSave
             var feedParser = MWFeedParser(feedURL: feedURL)
             feedParser.delegate = self
             feedParser.feedParseType = ParseTypeInfoOnly
@@ -83,7 +83,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
         
-        if isItunesSearch == false {
+        if willSave == true {
             podcast = CoreDataHelper.insertManagedObject("Podcast", managedObjectContext: moc) as! Podcast
             
             if info.title != nil {
@@ -185,7 +185,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
         
-        if isItunesSearch == false {
+        if willSave == true {
             let episode = CoreDataHelper.insertManagedObject("Episode", managedObjectContext: self.moc) as! Episode
             
             if item.title != nil {
@@ -228,7 +228,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     func feedParserDidFinish(parser: MWFeedParser!) {
         println("hey")
-        if isItunesSearch == false {
+        if willSave == true {
             podcast.lastPubDate = episodeArray[0].pubDate
             moc.save(nil)
         } else {

@@ -54,6 +54,9 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                             
                             let searchResultPodcast = SearchResultPodcast()
                             
+                            let feedURLString = podcastJSON["feedUrl"] as? String
+                            searchResultPodcast.feedURL = NSURL(string: feedURLString!)
+                            
                             searchResultPodcast.title = podcastJSON["collectionName"] as? String
                             
                             searchResultPodcast.summary = podcastJSON["artistName"] as? String
@@ -179,14 +182,21 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     }
     */
 
-    /*
+
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
+        if segue.identifier == "Show Podcast Profile" {
+            
+            let podcastProfileViewController = segue.destinationViewController as! PodcastProfileViewController
+            
+            if let index = self.tableView.indexPathForSelectedRow() {
+                podcastProfileViewController.searchResultPodcast = self.appDelegate.iTunesSearchPodcastArray[index.row]
+            }
+            
+        }
     }
-    */
+
 
 }

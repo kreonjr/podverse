@@ -10,6 +10,7 @@ import UIKit
 
 class SearchResultPodcast: NSObject {
     
+    var feedURL: NSURL?
     var title: String?
     var artistName: String?
     var summary: String?

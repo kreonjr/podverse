@@ -33,7 +33,7 @@ class PodcastsTableViewController: UITableViewController {
                 
                 // Uses Callback/Promise to make sure table data is refreshed
                 // after parsePodcastFeed() finishes
-                self.parser.parsePodcastFeed(feedURL!, isItunesSearch: false,
+                self.parser.parsePodcastFeed(feedURL!, willSave: true,
                     resolve: {
                         self.loadData()
                     },

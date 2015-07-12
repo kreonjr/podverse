@@ -40,15 +40,6 @@
                                                 <constraint firstAttribute="width" constant="83" id="oZN-Qj-jmW"/>
                                             </constraints>
                                         </imageView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Total Clips" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mhx-A8-Vu9">
-                                            <rect key="frame" x="99" y="74" width="68" height="17"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="17" id="omn-bs-99y"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <color key="textColor" red="0.43529411764705883" green="0.44313725490196076" blue="0.47450980392156861" alpha="1" colorSpace="calibratedRGB"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Last Published Date" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gpB-7I-dQJ">
                                             <rect key="frame" x="462" y="74" width="130" height="17"/>
                                             <constraints>
@@ -62,6 +53,15 @@
                                             <rect key="frame" x="99" y="8" width="493" height="20"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Total Clips" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mhx-A8-Vu9">
+                                            <rect key="frame" x="99" y="74" width="68" height="17"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="17" id="omn-bs-99y"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" red="0.43529411764705883" green="0.44313725490196076" blue="0.47450980392156861" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                     </subviews>
@@ -360,6 +360,79 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="h1D-eF-CLA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3807" y="1021"/>
+        </scene>
+        <!--Podcast Profile View Controller-->
+        <scene sceneID="y16-z7-1CX">
+            <objects>
+                <viewController id="pXc-eT-gZd" customClass="PodcastProfileViewController" customModule="podverse" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="WaR-nL-HHy"/>
+                        <viewControllerLayoutGuide type="bottom" id="MBa-hB-lQR"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="DFl-a8-Srv">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wvL-Kr-4fR">
+                                <rect key="frame" x="0.0" y="64" width="600" height="100"/>
+                                <subviews>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="jLr-Uc-VGB">
+                                        <rect key="frame" x="8" y="8" width="83" height="83"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="83" id="Umj-16-psF"/>
+                                            <constraint firstAttribute="height" constant="83" id="uM3-LN-5UP"/>
+                                        </constraints>
+                                    </imageView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Total Clips" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pkn-xr-VEB">
+                                        <rect key="frame" x="99" y="74" width="68" height="17"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <color key="textColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Last Published Date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s4V-14-Nae">
+                                        <rect key="frame" x="462" y="75" width="130" height="17"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <color key="textColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u79-QB-ZoZ">
+                                        <rect key="frame" x="99" y="8" width="493" height="20"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="pkn-xr-VEB" secondAttribute="bottom" constant="9" id="1zy-1F-CzH"/>
+                                    <constraint firstItem="jLr-Uc-VGB" firstAttribute="top" secondItem="wvL-Kr-4fR" secondAttribute="top" constant="8" id="6Pp-4H-dWY"/>
+                                    <constraint firstItem="pkn-xr-VEB" firstAttribute="leading" secondItem="jLr-Uc-VGB" secondAttribute="trailing" constant="8" id="8px-Rc-J6z"/>
+                                    <constraint firstItem="jLr-Uc-VGB" firstAttribute="leading" secondItem="wvL-Kr-4fR" secondAttribute="leading" constant="8" id="Mjt-c8-jxf"/>
+                                    <constraint firstAttribute="trailing" secondItem="s4V-14-Nae" secondAttribute="trailing" constant="8" id="Pu1-VT-3LL"/>
+                                    <constraint firstItem="u79-QB-ZoZ" firstAttribute="top" secondItem="wvL-Kr-4fR" secondAttribute="top" constant="8" id="ZGZ-p0-ghj"/>
+                                    <constraint firstAttribute="bottom" secondItem="s4V-14-Nae" secondAttribute="bottom" constant="8" id="qlO-HY-N1J"/>
+                                    <constraint firstItem="u79-QB-ZoZ" firstAttribute="leading" secondItem="jLr-Uc-VGB" secondAttribute="trailing" constant="8" id="rx7-vw-pVc"/>
+                                    <constraint firstAttribute="height" constant="100" id="taI-mA-bYD"/>
+                                    <constraint firstAttribute="trailing" secondItem="u79-QB-ZoZ" secondAttribute="trailing" constant="8" id="wT9-fQ-6ds"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="trailingMargin" secondItem="wvL-Kr-4fR" secondAttribute="trailing" constant="-16" id="70t-qD-sZh"/>
+                            <constraint firstItem="wvL-Kr-4fR" firstAttribute="leading" secondItem="DFl-a8-Srv" secondAttribute="leadingMargin" constant="-16" id="U1R-CJ-Vnp"/>
+                            <constraint firstItem="wvL-Kr-4fR" firstAttribute="top" secondItem="WaR-nL-HHy" secondAttribute="bottom" id="i3T-dT-FUq"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="searchResultImage" destination="jLr-Uc-VGB" id="6m6-rg-eIM"/>
+                        <outlet property="searchResultLastPublishedDate" destination="s4V-14-Nae" id="zPP-Ur-wly"/>
+                        <outlet property="searchResultTitle" destination="u79-QB-ZoZ" id="ZFj-ys-XoX"/>
+                        <outlet property="searchResultTotalClips" destination="pkn-xr-VEB" id="THc-1d-OWa"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6ph-Hb-Sfz" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3807" y="1765"/>
         </scene>
         <!--Media Player View Controller-->
         <scene sceneID="zvE-gH-g90">
@@ -926,7 +999,6 @@
         <!--Search for Podcasts-->
         <scene sceneID="u37-jq-EDV">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="0A6-As-5s1" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <tableViewController title="Search for Podcasts" id="Zus-al-Nm1" customClass="FindSearchTableViewController" customModule="podverse" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="100" sectionHeaderHeight="22" sectionFooterHeight="22" id="TFW-Dg-W6k">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
@@ -946,13 +1018,6 @@
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Dgi-ob-iwI" id="0kH-gH-62x">
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dHC-hP-IBU">
-                                            <rect key="frame" x="8" y="8" width="83" height="83"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="83" id="ijd-43-gor"/>
-                                                <constraint firstAttribute="width" constant="83" id="w7l-6e-bqG"/>
-                                            </constraints>
-                                        </imageView>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Title" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f7t-2z-hmL">
                                             <rect key="frame" x="99" y="8" width="493" height="20"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
@@ -965,6 +1030,13 @@
                                             <color key="textColor" cocoaTouchSystemColor="scrollViewTexturedBackgroundColor"/>
                                             <nil key="highlightedColor"/>
                                         </label>
+                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dHC-hP-IBU">
+                                            <rect key="frame" x="8" y="8" width="83" height="83"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="83" id="ijd-43-gor"/>
+                                                <constraint firstAttribute="width" constant="83" id="w7l-6e-bqG"/>
+                                            </constraints>
+                                        </imageView>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="dHC-hP-IBU" firstAttribute="top" secondItem="0kH-gH-62x" secondAttribute="topMargin" id="A3F-ui-phL"/>
@@ -981,6 +1053,7 @@
                                     <outlet property="pvImage" destination="dHC-hP-IBU" id="goM-yh-2H7"/>
                                     <outlet property="summary" destination="b1O-KZ-htg" id="C7F-bT-xI2"/>
                                     <outlet property="title" destination="f7t-2z-hmL" id="MVt-YB-8g6"/>
+                                    <segue destination="pXc-eT-gZd" kind="show" identifier="Show Podcast Profile" id="p7s-Kf-TEk"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -993,6 +1066,7 @@
                         <outlet property="searchBar" destination="fUv-R6-hrd" id="g1k-PY-voe"/>
                     </connections>
                 </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0A6-As-5s1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3087" y="1765"/>
         </scene>
@@ -1121,6 +1195,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="zDb-Gw-nok"/>
+        <segue reference="4Uo-DI-SEB"/>
     </inferredMetricsTieBreakers>
 </document>
