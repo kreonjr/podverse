@@ -53,13 +53,11 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                             let podcastJSON: AnyObject = results[i]
                             
                             let searchResultPodcast = SearchResultPodcast()
+
+                            searchResultPodcast.artistName = podcastJSON["artistName"] as? String
                             
                             let feedURLString = podcastJSON["feedUrl"] as? String
                             searchResultPodcast.feedURL = NSURL(string: feedURLString!)
-                            
-                            searchResultPodcast.title = podcastJSON["collectionName"] as? String
-                            
-                            searchResultPodcast.summary = podcastJSON["artistName"] as? String
                             
                             let imageURLString = podcastJSON["artworkUrl100"] as? String
                             var imgURL: NSURL = NSURL(string: imageURLString!)!
@@ -74,7 +72,24 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                                         println(error)
                                     }
                             })
+
+                            // Grab the releaseDate, then convert into NSDate
+                            var lastPubDateString = podcastJSON["releaseDate"] as? String
+                            println(lastPubDateString)
+                            lastPubDateString = lastPubDateString?.stringByReplacingOccurrencesOfString("T", withString: " ", options: NSStringCompareOptions.LiteralSearch, range: nil)
+                            lastPubDateString = lastPubDateString?.stringByReplacingOccurrencesOfString("Z", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+                            let dateFormatter = NSDateFormatter()
+                            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+                            println(dateFormatter.dateFromString(lastPubDateString!))
+                            searchResultPodcast.lastPubDate = dateFormatter.dateFromString(lastPubDateString!)
                             
+                            searchResultPodcast.primaryGenreName = podcastJSON["primaryGenreName"] as? String
+                            
+                            searchResultPodcast.title = podcastJSON["collectionName"] as? String
+                            
+//                            searchResultPodcast.episodesTotal = podcastJSON["trackCount"] as? Int
+//                            println(podcastJSON["trackCount"] as? String)
+//                            println("there it is")
                             self.appDelegate.iTunesSearchPodcastArray.append(searchResultPodcast)
                             self.tableView.reloadData()
                             

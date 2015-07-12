@@ -10,6 +10,8 @@ import UIKit
 
 class PodcastProfileViewController: UIViewController {
     
+    var utility = PVUtility()
+    
     var searchResultPodcast: SearchResultPodcast!
     
     @IBOutlet weak var searchResultImage: UIImageView!
@@ -19,22 +21,20 @@ class PodcastProfileViewController: UIViewController {
     
     @IBOutlet weak var searchResultHeaderView: UIView!
     
+    @IBOutlet weak var searchResultPrimaryGenreName: UILabel!
+    @IBOutlet weak var searchResultEpisodesTotal: UILabel!
+    @IBOutlet weak var searchResultFeedURL: UILabel!
+    
+    @IBOutlet weak var searchResultSummary: UITextView!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        println(searchResultPodcast)
-        
-        
-        searchResultTitle.text = searchResultPodcast.title
-        
-        searchResultTotalClips.text = "123 clips"
-        
-        searchResultLastPublishedDate.text = "01/01/1999"
         
         searchResultHeaderView.layer.borderColor = UIColor.lightGrayColor().CGColor
         searchResultHeaderView.layer.borderWidth = 0.5
         
-        
+        searchResultTitle.text = searchResultPodcast.title
         
         var imageData = searchResultPodcast.image
         if imageData != nil {
@@ -51,6 +51,18 @@ class PodcastProfileViewController: UIViewController {
                 }
             }
         }
+        
+        searchResultTotalClips.text = "123 clips"
+        
+        searchResultLastPublishedDate.text = utility.formatDateToString(searchResultPodcast.lastPubDate!)
+
+        searchResultPrimaryGenreName.text = "Genre: " + searchResultPodcast.primaryGenreName!
+//
+////        searchResultEpisodesTotal.text = "Episodes Available: " + String(searchResultPodcast.episodesTotal!)
+        
+        searchResultFeedURL.text = "RSS Feed: " + searchResultPodcast.feedURL!.absoluteString!
+
+        searchResultSummary.text = searchResultPodcast.artistName!
         
         // Do any additional setup after loading the view.
     }

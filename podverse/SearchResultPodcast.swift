@@ -9,12 +9,15 @@
 import UIKit
 
 class SearchResultPodcast: NSObject {
-    
-    var feedURL: NSURL?
-    var title: String?
+
     var artistName: String?
-    var summary: String?
+    var episodesTotal: Int?
+    var feedURL: NSURL?
     var image: NSData?
     var itunesImage: NSData?
+    var lastPubDate: NSDate?
+    var primaryGenreName: String?
+    var summary: String?
+    var title: String?
     
 }
