@@ -17,6 +17,9 @@ class PodcastProfileViewController: UIViewController {
     @IBOutlet weak var searchResultTotalClips: UILabel!
     @IBOutlet weak var searchResultLastPublishedDate: UILabel!
     
+    @IBOutlet weak var searchResultHeaderView: UIView!
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         println(searchResultPodcast)
@@ -27,6 +30,11 @@ class PodcastProfileViewController: UIViewController {
         searchResultTotalClips.text = "123 clips"
         
         searchResultLastPublishedDate.text = "01/01/1999"
+        
+        searchResultHeaderView.layer.borderColor = UIColor.lightGrayColor().CGColor
+        searchResultHeaderView.layer.borderWidth = 0.5
+        
+        
         
         var imageData = searchResultPodcast.image
         if imageData != nil {
