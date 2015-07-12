@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
+class PodcastsTableViewController: UITableViewController {
 
     @IBOutlet var myPodcastsTableView: UITableView!
 
@@ -22,14 +22,6 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
     
     var counter = 0
     
-    // TODO: THIS APPARENTLY DOES NOTHING, BUT IT NEEDS TO BE HERE
-    // TO CONFORM TO THE PVFEEDPARSERPROTOCOL
-    func didReceiveFeedResults(results: Podcast) {
-        dispatch_async(dispatch_get_main_queue(), {
-//            self.podcastArray.append(results)
-        })
-    }
-    
     @IBAction func addPodcast(sender: AnyObject) {
         let addPodcastAlert = UIAlertController(title: "New Podcast", message: "Enter podcast feed URL", preferredStyle: UIAlertControllerStyle.Alert)
         addPodcastAlert.addTextFieldWithConfigurationHandler(nil)
@@ -41,7 +33,7 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
                 
                 // Uses Callback/Promise to make sure table data is refreshed
                 // after parsePodcastFeed() finishes
-                self.parser.parsePodcastFeed(feedURL!,
+                self.parser.parsePodcastFeed(feedURL!, isItunesSearch: false,
                     resolve: {
                         self.loadData()
                     },
@@ -127,18 +119,19 @@ class PodcastsTableViewController: UITableViewController, PVFeedParserProtocol {
         cell.pvImage?.image = UIImage(named: "Blank52")
         
         var imageData = podcast.image
-        var image = UIImage(data: imageData!)
-        
-        // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
-        
-        if image!.size.height != 0.0 {
-            cell.pvImage?.image = image
-        } else {
-            var itunesImageData = podcast.itunesImage
-            var itunesImage = UIImage(data: itunesImageData!)
-            
-            if itunesImage!.size.height != 0.0 {
-                cell.pvImage?.image = itunesImage
+
+        if imageData != nil {
+            var image = UIImage(data: imageData!)
+            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
+            if image!.size.height != 0.0 {
+                cell.pvImage?.image = image
+            } else {
+                var itunesImageData = podcast.itunesImage
+                var itunesImage = UIImage(data: itunesImageData!)
+                
+                if itunesImage!.size.height != 0.0 {
+                    cell.pvImage?.image = itunesImage
+                }
             }
         }
 

@@ -21,6 +21,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var episodeDownloadArray = [Episode]()
     
+    var iTunesSearchPodcastArray = [SearchResultPodcast]()
+    
+    var iTunesSearchPodcastFeedURLArray: [NSURL] = []
+    
     var backgroundTransferCompletionHandler: (() -> Void)?
 
     func application(application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: () -> Void) {

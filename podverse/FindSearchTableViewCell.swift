@@ -11,10 +11,12 @@ import UIKit
 class FindSearchTableViewCell: UITableViewCell {
 
     @IBOutlet weak var pvImage: UIImageView!
+
     @IBOutlet weak var title: UILabel!
     @IBOutlet weak var summary: UILabel!
-    @IBOutlet weak var totalClips: UILabel!
-    @IBOutlet weak var lastPublishedDate: UILabel!
+    
+//    @IBOutlet weak var totalClips: UILabel!
+//    @IBOutlet weak var lastPublishedDate: UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()

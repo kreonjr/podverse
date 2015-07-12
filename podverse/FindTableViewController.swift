@@ -14,8 +14,6 @@ class FindTableViewController: UITableViewController {
     
     var findBrowseArray = ["All", "ABC", "DEF", "GHI"]
     
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
