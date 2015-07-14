@@ -138,7 +138,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         let podcast = self.appDelegate.iTunesSearchPodcastArray[indexPath.row]
         
         cell.title?.text = podcast.title
-        cell.summary?.text = podcast.summary
+        cell.summary?.text = podcast.artistName
         cell.pvImage?.image = UIImage(named: "Blank52")
 
         var imageData = podcast.image

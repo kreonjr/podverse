@@ -120,10 +120,25 @@ class EpisodesTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell") as! EpisodesTableHeaderCell
         
-        var imageData = selectedPodcast.image
-        var image = UIImage(data: imageData!)
+        headerCell.pvImage?.image = UIImage(named: "Blank52")
         
-        headerCell.pvImage!.image = image
+        var imageData = selectedPodcast.image
+        
+        if imageData != nil {
+            var image = UIImage(data: imageData!)
+            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
+            if image!.size.height != 0.0 {
+                headerCell.pvImage?.image = image
+            } else {
+                var itunesImageData = selectedPodcast.itunesImage
+                var itunesImage = UIImage(data: itunesImageData!)
+                
+                if itunesImage!.size.height != 0.0 {
+                    headerCell.pvImage?.image = itunesImage
+                }
+            }
+        }
+        
         headerCell.summary!.text = selectedPodcast.summary
         return headerCell
     }

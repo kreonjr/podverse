@@ -28,13 +28,15 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     func parsePodcastFeed(feedURL: NSURL, willSave: Bool, resolve: () -> (), reject: () -> ()) {
         
+        println(willSave)
+        
         if (willSave == false) {
             
             self.willSave = willSave
             var feedParser = MWFeedParser(feedURL: feedURL)
             feedParser.delegate = self
             feedParser.feedParseType = ParseTypeInfoOnly
-            feedParser.connectionType = ConnectionTypeSynchronously
+            feedParser.connectionType = ConnectionTypeAsynchronously
             feedParser.parse()
             
             // I'm not entirely sure how this Callback/Promise below works
@@ -47,6 +49,9 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
             })
             
         } else {
+            
+            self.willSave = true
+            
             moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
             
             let predicate = NSPredicate(format: "feedURL == %@", feedURL)
@@ -85,7 +90,6 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         
         if willSave == true {
             podcast = CoreDataHelper.insertManagedObject("Podcast", managedObjectContext: moc) as! Podcast
-            
             if info.title != nil {
                 podcast.title = info.title
             }
@@ -139,8 +143,6 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
             searchResultPodcast = SearchResultPodcast()
             
             if info.title != nil {
-                println(info)
-                println(info.title)
                 searchResultPodcast.title = info.title
             }
             
@@ -227,7 +229,6 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     }
     
     func feedParserDidFinish(parser: MWFeedParser!) {
-        println("hey")
         if willSave == true {
             podcast.lastPubDate = episodeArray[0].pubDate
             moc.save(nil)
