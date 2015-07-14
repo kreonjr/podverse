@@ -52,7 +52,6 @@ class PodcastsTableViewController: UITableViewController {
     
     func loadData() {
         podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: moc, predicate: nil) as! [Podcast]
-        println(podcastArray)
         self.tableView.reloadData()
     }
     
@@ -121,7 +120,6 @@ class PodcastsTableViewController: UITableViewController {
         var imageData = podcast.image
 
         if imageData != nil {
-            println("not nil")
             var image = UIImage(data: imageData!)
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if image!.size.height != 0.0 {

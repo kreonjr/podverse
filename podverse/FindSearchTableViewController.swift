@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class FindSearchTableViewController: UITableViewController, UISearchBarDelegate {
     
@@ -19,6 +20,8 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     var timer: NSTimer? = nil
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
+    var moc: NSManagedObjectContext!
     
     func searchItunesFor(searchText: String) {
         appDelegate.iTunesSearchPodcastFeedURLArray.removeAll(keepCapacity: false)
@@ -59,6 +62,17 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                             let feedURLString = podcastJSON["feedUrl"] as? String
                             searchResultPodcast.feedURL = NSURL(string: feedURLString!)
                             
+                            if searchResultPodcast.feedURL != nil {
+                                let predicate = NSPredicate(format: "feedURL == %@", searchResultPodcast.feedURL!)
+                                let podcastAlreadySubscribedTo = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate)
+                                
+                                if podcastAlreadySubscribedTo.count != 0 {
+                                    searchResultPodcast.isSubscribed = true
+                                } else {
+                                    searchResultPodcast.isSubscribed = false
+                                }
+                            }
+                            
                             let imageURLString = podcastJSON["artworkUrl100"] as? String
                             var imgURL: NSURL = NSURL(string: imageURLString!)!
                             let request: NSURLRequest = NSURLRequest(URL: imgURL)
@@ -90,6 +104,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
 //                            searchResultPodcast.episodesTotal = podcastJSON["trackCount"] as? Int
 //                            println(podcastJSON["trackCount"] as? String)
 //                            println("there it is")
+                            
                             self.appDelegate.iTunesSearchPodcastArray.append(searchResultPodcast)
                             self.tableView.reloadData()
                             
@@ -105,7 +120,15 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     }
     
     override func viewDidAppear(animated: Bool) {
-
+        moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
+        
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
+        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
+        
+        if ((appDelegate.nowPlayingEpisode) != nil) {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+        }
     }
     
     override func viewDidLoad() {
@@ -160,6 +183,40 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
 
         return cell
         
+    }
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        var searchResultPodcastActions = UIAlertController(title: "Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
+        
+        let podcast = self.appDelegate.iTunesSearchPodcastArray[indexPath.row]
+        
+        if podcast.isSubscribed == false {
+            searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
+                println("subscribe to podcast")
+            }))
+        } else {            
+            searchResultPodcastActions.addAction(UIAlertAction(title: "Unsubscribe", style: .Default, handler: { action in
+                println("unsubscribe to podcast")
+            }))
+        }
+        
+        searchResultPodcastActions.addAction(UIAlertAction(title: "Show Episodes", style: .Default, handler: { action in
+            println("Show Episodes")
+            //            self.performSegueWithIdentifier("Show Episodes", sender: self)
+        }))
+        
+        searchResultPodcastActions.addAction(UIAlertAction (title: "Show Clips", style: .Default, handler: { action in
+            println("Show Episodes")
+            //            self.performSegueWithIdentifier("Show Clip", sender: self)
+        }))
+        
+        searchResultPodcastActions.addAction(UIAlertAction (title: "Show Profile", style: .Default, handler: { action in
+            self.performSegueWithIdentifier("Show Podcast Profile", sender: self)
+        }))
+        
+        searchResultPodcastActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        
+        self.presentViewController(searchResultPodcastActions, animated: true, completion: nil)
     }
 
     /*

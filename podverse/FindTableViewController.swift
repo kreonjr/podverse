@@ -10,9 +10,21 @@ import UIKit
 
 class FindTableViewController: UITableViewController {
     
+    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
     var findSearchArray = ["Search for Podcasts", "Add Podcast by RSS"]
     
     var findBrowseArray = ["All", "ABC", "DEF", "GHI"]
+    
+    override func viewDidAppear(animated: Bool) {
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
+        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
+        
+        if ((appDelegate.nowPlayingEpisode) != nil) {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

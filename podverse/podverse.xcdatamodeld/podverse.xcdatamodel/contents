@@ -33,6 +33,7 @@
         <attribute name="feedURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="image" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isSubscribed" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="itunesAuthor" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="itunesImage" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="itunesImageURL" optional="YES" attributeType="String" syncable="YES"/>
@@ -45,6 +46,6 @@
     <elements>
         <element name="Clip" positionX="-20" positionY="-387" width="128" height="120"/>
         <element name="Episode" positionX="-207" positionY="-526" width="128" height="345"/>
-        <element name="Podcast" positionX="-398" positionY="-541" width="128" height="210"/>
+        <element name="Podcast" positionX="-398" positionY="-541" width="128" height="225"/>
     </elements>
 </model>

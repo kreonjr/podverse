@@ -2,14 +2,14 @@
 //  Clip.swift
 //  
 //
-//  Created by Mitchell Downey on 6/29/15.
+//  Created by Mitchell Downey on 7/13/15.
 //
 //
 
 import Foundation
 import CoreData
-
 @objc(Clip)
+
 class Clip: NSManagedObject {
 
     @NSManaged var endTime: NSNumber?

@@ -2,14 +2,14 @@
 //  Podcast.swift
 //  
 //
-//  Created by Mitchell Downey on 6/29/15.
+//  Created by Mitchell Downey on 7/13/15.
 //
 //
 
 import Foundation
 import CoreData
-
 @objc(Podcast)
+
 class Podcast: NSManagedObject {
 
     @NSManaged var feedURL: String
@@ -21,6 +21,7 @@ class Podcast: NSManagedObject {
     @NSManaged var lastPubDate: NSDate?
     @NSManaged var summary: String?
     @NSManaged var title: String
+    @NSManaged var isSubscribed: NSNumber
     @NSManaged var clips: NSSet
     @NSManaged var episodes: NSSet
     
@@ -29,4 +30,3 @@ class Podcast: NSManagedObject {
     }
 
 }
-

@@ -1120,7 +1120,6 @@
                                     <outlet property="pvImage" destination="dHC-hP-IBU" id="goM-yh-2H7"/>
                                     <outlet property="summary" destination="b1O-KZ-htg" id="C7F-bT-xI2"/>
                                     <outlet property="title" destination="f7t-2z-hmL" id="MVt-YB-8g6"/>
-                                    <segue destination="pXc-eT-gZd" kind="show" identifier="Show Podcast Profile" id="p7s-Kf-TEk"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -1131,6 +1130,7 @@
                     </tableView>
                     <connections>
                         <outlet property="searchBar" destination="fUv-R6-hrd" id="g1k-PY-voe"/>
+                        <segue destination="pXc-eT-gZd" kind="show" identifier="Show Podcast Profile" id="m8V-g9-2RE"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0A6-As-5s1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1185,8 +1185,8 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </tabBar>
                     <connections>
-                        <segue destination="fce-JR-16z" kind="relationship" relationship="viewControllers" id="4p8-Tg-6ho"/>
                         <segue destination="JYh-k0-k2Q" kind="relationship" relationship="viewControllers" id="gT7-y3-vPo"/>
+                        <segue destination="fce-JR-16z" kind="relationship" relationship="viewControllers" id="4p8-Tg-6ho"/>
                         <segue destination="VYu-72-9Dh" kind="relationship" relationship="viewControllers" id="8eg-GJ-qSm"/>
                     </connections>
                 </tabBarController>

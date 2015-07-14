@@ -15,6 +15,7 @@ class SearchResultPodcast: NSObject {
     var feedURL: NSURL?
     var image: NSData?
     var itunesImage: NSData?
+    var isSubscribed: Bool?
     var lastPubDate: NSDate?
     var primaryGenreName: String?
     var summary: String?
