@@ -17,6 +17,8 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     
     var parser = PVFeedParser()
     
+    var downloader = PVDownloader()
+    
     var timer: NSTimer? = nil
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -188,11 +190,32 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         var searchResultPodcastActions = UIAlertController(title: "Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
         
-        let podcast = self.appDelegate.iTunesSearchPodcastArray[indexPath.row]
+        let iTunesSearchPodcast = self.appDelegate.iTunesSearchPodcastArray[indexPath.row]
         
-        if podcast.isSubscribed == false {
+        if iTunesSearchPodcast.isSubscribed == false {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
                 println("subscribe to podcast")
+                
+                self.parser.parsePodcastFeed(iTunesSearchPodcast.feedURL!, willSave: true,
+                    resolve: {
+                        let predicate = NSPredicate(format: "feedURL == %@", iTunesSearchPodcast.feedURL!.absoluteString!)
+                        println(predicate)
+                        let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
+                        let podcast = podcastSet[0]
+                        
+                        let mostRecentEpisodePodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+                        let mostRecentEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
+                        let mostRecentEpisode = mostRecentEpisodeSet[0] as! Episode
+                        
+                        self.downloader.startOrPauseDownloadingEpisode(mostRecentEpisode, tblViewController: nil, completion: nil)
+                        
+                        iTunesSearchPodcast.isSubscribed = true
+                        
+                    },
+                    reject: {
+                        // do nothing
+                    }
+                )
             }))
         } else {            
             searchResultPodcastActions.addAction(UIAlertAction(title: "Unsubscribe", style: .Default, handler: { action in

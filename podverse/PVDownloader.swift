@@ -34,7 +34,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         self.session = NSURLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
     }
     
-    func startOrPauseDownloadingEpisode(episode: Episode, tblViewController: UITableViewController, completion: ((AnyObject) -> Void)!) {
+    func startOrPauseDownloadingEpisode(episode: Episode, tblViewController: UITableViewController?, completion: ((AnyObject) -> Void)!) {
         // If the session does not already exist, initialize the session
         if (self.session?.configuration.identifier != "fm.podverse") {
             initializeEpisodeDownloadSession()
@@ -74,7 +74,9 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     }
                     episode.isDownloading = false
                 }
-                tblViewController.tableView.reloadData()
+                if tblViewController != nil {
+                    tblViewController!.tableView.reloadData()
+                }
             }
         }
     }

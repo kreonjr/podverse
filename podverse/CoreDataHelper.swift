@@ -34,4 +34,24 @@ class CoreDataHelper: NSObject {
         return items
     }
     
+    class func fetchOnlyEntityWithMostRecentPubDate (className: NSString, managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> NSArray {
+        let fetchRequest = NSFetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "pubDate", ascending: false)]
+        fetchRequest.fetchLimit = 1
+        
+        let entityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: managedObjectContext)
+        
+        fetchRequest.entity = entityDescription
+        
+        if predicate != nil {
+            fetchRequest.predicate = predicate!
+        }
+        
+        fetchRequest.returnsObjectsAsFaults = false
+        
+        let mostRecentItemByPubDate = managedObjectContext.executeFetchRequest(fetchRequest, error: nil)!
+        
+        return mostRecentItemByPubDate
+    }
+    
 }

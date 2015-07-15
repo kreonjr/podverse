@@ -24,7 +24,6 @@ class EpisodesTableViewController: UITableViewController {
     
     func loadData() {
         episodeArray = [Episode]()
-        episodeArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: nil) as! [Episode]
         
         var unsortedEpisodes = NSMutableArray()
         
