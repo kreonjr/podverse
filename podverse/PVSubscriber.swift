@@ -19,6 +19,7 @@ class PVSubscriber: NSObject {
     
     func checkIfNewEpisode() {
         println("has there been a new episode?")
+        println("testing git commit tracking")
     }
     
 //    func subscribeToPodcast(feedURLString: String) {
