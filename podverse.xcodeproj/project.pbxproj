@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
 		812A094F1B42375F00E8F070 /* podverse.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 818615971B1E84CE006C9731 /* podverse.xcdatamodeld */; };
+		813FC8101B5CA992006248BC /* PVSubscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 813FC80F1B5CA992006248BC /* PVSubscriber.swift */; };
 		815A2E311B50C099002A21A7 /* FindTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 815A2E301B50C099002A21A7 /* FindTableViewController.swift */; };
 		815A2E331B50D002002A21A7 /* FindSearchTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 815A2E321B50D002002A21A7 /* FindSearchTableViewCell.swift */; };
 		815A2E371B50D855002A21A7 /* FindSearchTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 815A2E361B50D855002A21A7 /* FindSearchTableViewController.swift */; };
@@ -57,6 +58,7 @@
 /* Begin PBXFileReference section */
 		390CD96442FFFCCC0740C384 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		812A094E1B422AB300E8F070 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
+		813FC80F1B5CA992006248BC /* PVSubscriber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVSubscriber.swift; sourceTree = "<group>"; };
 		815A2E301B50C099002A21A7 /* FindTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindTableViewController.swift; sourceTree = "<group>"; };
 		815A2E321B50D002002A21A7 /* FindSearchTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindSearchTableViewCell.swift; sourceTree = "<group>"; };
 		815A2E361B50D855002A21A7 /* FindSearchTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindSearchTableViewController.swift; sourceTree = "<group>"; };
@@ -162,8 +164,9 @@
 				817C54071B4B6976007258F8 /* Constants.swift */,
 				818615BF1B1E950D006C9731 /* CoreDataHelper.swift */,
 				81623C281B35D3A100E906FE /* PVDownloader.swift */,
-				81E3578F1B21624500D67634 /* PVUtility.swift */,
 				81E3578D1B21619F00D67634 /* PVFeedParser.swift */,
+				813FC80F1B5CA992006248BC /* PVSubscriber.swift */,
+				81E3578F1B21624500D67634 /* PVUtility.swift */,
 				818615CD1B1EB12C006C9731 /* PodcastsTableViewController.swift */,
 				81DDBE5C1B24AC8100EF3B9C /* PodcastsTableCell.swift */,
 				818615CB1B1EB10E006C9731 /* EpisodesTableViewController.swift */,
@@ -396,6 +399,7 @@
 				81623C291B35D3A100E906FE /* PVDownloader.swift in Sources */,
 				81DDBE5D1B24AC8100EF3B9C /* PodcastsTableCell.swift in Sources */,
 				818615C01B1E950D006C9731 /* CoreDataHelper.swift in Sources */,
+				813FC8101B5CA992006248BC /* PVSubscriber.swift in Sources */,
 				818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */,
 				81DD2CCA1B549C4D00432E0C /* Episode.swift in Sources */,
 				81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */,

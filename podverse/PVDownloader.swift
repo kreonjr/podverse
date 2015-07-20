@@ -16,9 +16,9 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     
     // TODO: DOWNLOAD/PLAY ICON DOES NOT REFRESH AFTER DOWNLOAD FINISHED
     
-    var moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+    lazy var moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
     
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    lazy var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
     var session: NSURLSession?
     var docDirectoryURL: NSURL?
@@ -32,6 +32,10 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         var sessionConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("fm.podverse")
         sessionConfiguration.HTTPMaximumConnectionsPerHost = 5
         self.session = NSURLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
+    }
+    
+    func checkIfDownloadsPending() {
+        println("check if downloads are pending, then resume them")
     }
     
     func startOrPauseDownloadingEpisode(episode: Episode, tblViewController: UITableViewController?, completion: ((AnyObject) -> Void)!) {

@@ -24,7 +24,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     var willSave: Bool = false
     
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate?
     
     func parsePodcastFeed(feedURL: NSURL, willSave: Bool, resolve: () -> (), reject: () -> ()) {
         
@@ -233,7 +233,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
             podcast.lastPubDate = episodeArray[0].pubDate
             moc.save(nil)
         } else {
-            appDelegate.iTunesSearchPodcastArray.append(searchResultPodcast)
+            appDelegate!.iTunesSearchPodcastArray.append(searchResultPodcast)
         }
         
     }

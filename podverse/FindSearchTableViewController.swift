@@ -17,6 +17,8 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     
     var parser = PVFeedParser()
     
+    var subscriber = PVSubscriber()
+    
     var downloader = PVDownloader()
     
     var timer: NSTimer? = nil
@@ -196,26 +198,8 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
             searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
                 println("subscribe to podcast")
                 
-                self.parser.parsePodcastFeed(iTunesSearchPodcast.feedURL!, willSave: true,
-                    resolve: {
-                        let predicate = NSPredicate(format: "feedURL == %@", iTunesSearchPodcast.feedURL!.absoluteString!)
-                        println(predicate)
-                        let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
-                        let podcast = podcastSet[0]
-                        
-                        let mostRecentEpisodePodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-                        let mostRecentEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
-                        let mostRecentEpisode = mostRecentEpisodeSet[0] as! Episode
-                        
-                        self.downloader.startOrPauseDownloadingEpisode(mostRecentEpisode, tblViewController: nil, completion: nil)
-                        
-                        iTunesSearchPodcast.isSubscribed = true
-                        
-                    },
-                    reject: {
-                        // do nothing
-                    }
-                )
+//                self.subscriber.subscribeToPodcast(iTunesSearchPodcast.feedURL!.absoluteString!)
+                
             }))
         } else {            
             searchResultPodcastActions.addAction(UIAlertAction(title: "Unsubscribe", style: .Default, handler: { action in

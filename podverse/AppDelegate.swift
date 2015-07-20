@@ -17,6 +17,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var avPlayer: AVPlayer?
     
+    var subscriber = PVSubscriber()
+    
     var nowPlayingEpisode: Episode?
     
     var episodeDownloadArray = [Episode]()
@@ -26,13 +28,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var iTunesSearchPodcastFeedURLArray: [NSURL] = []
     
     var backgroundTransferCompletionHandler: (() -> Void)?
+    
+//    var timer: dispatch_source_t!
+//    
+//    func startCheckSubscriptionsForNewEpisodesTimer() {
+//        println("buenas dias")
+//        let queue = dispatch_queue_create("fm.podverse.new.episodes.timer", nil)
+//        timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue)
+//        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 1800 * NSEC_PER_SEC, 1 * NSEC_PER_SEC)
+//        dispatch_source_set_event_handler(timer) {
+////            self.subscriber.checkIfNewEpisode()
+//        }
+//        dispatch_resume(timer)
+//    }
 
     func application(application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: () -> Void) {
         self.backgroundTransferCompletionHandler = completionHandler
     }
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
+//        startCheckSubscriptionsForNewEpisodesTimer()
         return true
     }
 
