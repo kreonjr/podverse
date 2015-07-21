@@ -93,14 +93,14 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
 
                             // Grab the releaseDate, then convert into NSDate
                             var lastPubDateString = podcastJSON["releaseDate"] as? String
-                            println(lastPubDateString)
                             lastPubDateString = lastPubDateString?.stringByReplacingOccurrencesOfString("T", withString: " ", options: NSStringCompareOptions.LiteralSearch, range: nil)
                             lastPubDateString = lastPubDateString?.stringByReplacingOccurrencesOfString("Z", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
                             let dateFormatter = NSDateFormatter()
                             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-                            println(dateFormatter.dateFromString(lastPubDateString!))
-                            searchResultPodcast.lastPubDate = dateFormatter.dateFromString(lastPubDateString!)
-                            
+                            if lastPubDateString != nil {
+                                searchResultPodcast.lastPubDate = dateFormatter.dateFromString(lastPubDateString!)
+                            }
+
                             searchResultPodcast.primaryGenreName = podcastJSON["primaryGenreName"] as? String
                             
                             searchResultPodcast.title = podcastJSON["collectionName"] as? String

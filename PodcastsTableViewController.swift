@@ -121,9 +121,11 @@ class PodcastsTableViewController: UITableViewController {
         var itunesImageData = podcast.itunesImage
 
         if imageData != nil {
+            println("imageData is not nil")
             var image = UIImage(data: imageData!)
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if image!.size.height != 0.0 {
+                println("inside now")
                 cell.pvImage?.image = image
             }
         }

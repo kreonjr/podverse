@@ -106,6 +106,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
                 podcast.itunesAuthor = info.itunesAuthor
             }
             
+            println(info.image)
             if info.image != nil {
                 let imageURLString = info.image
                 var imgURL: NSURL = NSURL(string: imageURLString!)!
@@ -122,6 +123,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
                 
             }
             
+            println(info.itunesImage)
             if info.itunesImage != nil {
                 let imageURLString = info.itunesImage
                 var imgURL: NSURL = NSURL(string: imageURLString!)!
@@ -136,6 +138,8 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
                         }
                 })
             }
+            
+            moc.save(nil)
             
         }
         else {

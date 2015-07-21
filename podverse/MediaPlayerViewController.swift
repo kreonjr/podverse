@@ -110,28 +110,36 @@ class MediaPlayerViewController: UIViewController {
         let currentTime = avPlayer.currentTime()
         let timeAdjust = CMTimeMakeWithSeconds(60, 1)
         let resultTime = CMTimeAdd(currentTime, timeAdjust)
+        avPlayer.pause()
         avPlayer.seekToTime(resultTime)
+        avPlayer.play()
     }
 
     @IBAction func skip15seconds(sender: AnyObject) {
         let currentTime = avPlayer.currentTime()
         let timeAdjust = CMTimeMakeWithSeconds(15, 1)
         let resultTime = CMTimeAdd(currentTime, timeAdjust)
+        avPlayer.pause()
         avPlayer.seekToTime(resultTime)
+        avPlayer.play()
     }
     
     @IBAction func previous15seconds(sender: AnyObject) {
         let currentTime = avPlayer.currentTime()
         let timeAdjust = CMTimeMakeWithSeconds(15, 1)
         let resultTime = CMTimeSubtract(currentTime, timeAdjust)
+        avPlayer.pause()
         avPlayer.seekToTime(resultTime)
+        avPlayer.play()
     }
     
     @IBAction func previous1minute(sender: AnyObject) {
         let currentTime = avPlayer.currentTime()
         let timeAdjust = CMTimeMakeWithSeconds(60, 1)
         let resultTime = CMTimeSubtract(currentTime, timeAdjust)
+        avPlayer.pause()
         avPlayer.seekToTime(resultTime)
+        avPlayer.play()
     }
     
     @IBAction func makeClipNextSaveDone(sender: AnyObject) {
