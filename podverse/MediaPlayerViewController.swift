@@ -30,7 +30,7 @@ class MediaPlayerViewController: UIViewController {
     
     var newClip: Clip!
     
-    @IBOutlet weak var image: UIImageView!
+    @IBOutlet weak var mediaPlayerImage: UIImageView!
     @IBOutlet weak var podcastTitle: UILabel!
     @IBOutlet weak var episodeTitle: UILabel!
     @IBOutlet weak var currentTime: UILabel!
@@ -260,8 +260,18 @@ class MediaPlayerViewController: UIViewController {
         makeClipViewShare.hidden = true
         
         var imageData = selectedEpisode.podcast.image
-        var imageFile = UIImage(data: imageData!)
-        image?.image = imageFile
+        var itunesImageData = selectedEpisode.podcast.itunesImage
+        
+        if imageData != nil {
+            var image = UIImage(data: imageData!)
+            mediaPlayerImage.image = image
+        }
+        else if itunesImageData != nil {
+            var itunesImage = UIImage(data: itunesImageData!)
+            mediaPlayerImage.image = itunesImage
+            
+                
+        }
         
         podcastTitle?.text = selectedEpisode.podcast.title
         

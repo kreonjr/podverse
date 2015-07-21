@@ -29,18 +29,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var backgroundTransferCompletionHandler: (() -> Void)?
     
-//    var timer: dispatch_source_t!
-//    
-//    func startCheckSubscriptionsForNewEpisodesTimer() {
-//        println("buenas dias")
-//        let queue = dispatch_queue_create("fm.podverse.new.episodes.timer", nil)
-//        timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue)
-//        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 1800 * NSEC_PER_SEC, 1 * NSEC_PER_SEC)
-//        dispatch_source_set_event_handler(timer) {
-////            self.subscriber.checkIfNewEpisode()
-//        }
-//        dispatch_resume(timer)
-//    }
+    var timer: dispatch_source_t!
+    
+    func startCheckSubscriptionsForNewEpisodesTimer() {
+        println("buenas dias")
+        let queue = dispatch_queue_create("fm.podverse.new.episodes.timer", nil)
+        timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue)
+        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 1800 * NSEC_PER_SEC, 1 * NSEC_PER_SEC)
+        dispatch_source_set_event_handler(timer) {
+//            self.subscriber.checkIfNewEpisode()
+        }
+        dispatch_resume(timer)
+    }
 
     func application(application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: () -> Void) {
         self.backgroundTransferCompletionHandler = completionHandler

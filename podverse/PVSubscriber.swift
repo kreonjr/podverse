@@ -17,32 +17,46 @@ class PVSubscriber: NSObject {
     
     var moc: NSManagedObjectContext!
     
-    func checkIfNewEpisode() {
+    var isNewEpisode: Bool = false
+    
+    func checkIfNewEpisode(feedURL: NSURL) {
         println("has there been a new episode?")
-        println("testing git commit tracking pt 2")
+        self.parser.parsePodcastFeed(feedURL, willSave: false, onlyLatestEpisode: true,
+            resolve: {
+                
+            },
+            reject: {
+                
+            }
+        )
     }
     
-//    func subscribeToPodcast(feedURLString: String) {
-//        var feedURL = NSURL(string: feedURLString)
-//        self.parser.parsePodcastFeed(feedURL!, willSave: true,
-//            resolve: {
-//                let predicate = NSPredicate(format: "feedURL == %@", feedURL!.absoluteString!)
-//                let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
-//                
-//                let podcast = podcastSet[0]
-//                
-//                let mostRecentEpisodePodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-//                let mostRecentEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
-//                
-//                let mostRecentEpisode = mostRecentEpisodeSet[0] as! Episode
-//                
-//                self.downloader.startOrPauseDownloadingEpisode(mostRecentEpisode, tblViewController: nil, completion: nil)
-//                
-//                podcast.isSubscribed = true
-//            },
-//            reject: {
-//                // do nothing
-//            }
-//        )
-//    }
+    func subscribeToPodcast(feedURLString: String) {
+        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
+            moc = context
+        }
+        
+        var feedURL = NSURL(string: feedURLString)
+        
+        self.parser.parsePodcastFeed(feedURL!, willSave: true, onlyLatestEpisode: false,
+            resolve: {
+                let predicate = NSPredicate(format: "feedURL == %@", feedURL!.absoluteString!)
+                let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
+                
+                let podcast = podcastSet[0]
+                
+                let mostRecentEpisodePodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+                let mostRecentEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
+                
+                let mostRecentEpisode = mostRecentEpisodeSet[0] as! Episode
+                
+                self.downloader.startOrPauseDownloadingEpisode(mostRecentEpisode, tblViewController: nil, completion: nil)
+                
+                podcast.isSubscribed = true
+            },
+            reject: {
+                // do nothing
+            }
+        )
+    }
 }

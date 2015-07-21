@@ -198,7 +198,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
             searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
                 println("subscribe to podcast")
                 
-//                self.subscriber.subscribeToPodcast(iTunesSearchPodcast.feedURL!.absoluteString!)
+                self.subscriber.subscribeToPodcast(iTunesSearchPodcast.feedURL!.absoluteString!)
                 
             }))
         } else {            

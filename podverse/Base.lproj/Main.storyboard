@@ -988,7 +988,6 @@
                         <outlet property="audioButton" destination="ZGR-gy-QCk" id="k5B-Rs-qNv"/>
                         <outlet property="currentTime" destination="Hda-cH-Mse" id="PQf-z4-Zft"/>
                         <outlet property="episodeTitle" destination="S5e-uh-gwH" id="niH-br-B9p"/>
-                        <outlet property="image" destination="Bpm-pc-Wru" id="2mj-LQ-FRS"/>
                         <outlet property="makeClipButtonCancelBackEdit" destination="UVP-iL-6tG" id="hFs-Lf-NzT"/>
                         <outlet property="makeClipButtonNextSaveDone" destination="FvL-EU-HaK" id="NIF-Mh-QcE"/>
                         <outlet property="makeClipViewShare" destination="57n-bq-IQa" id="Eqo-TV-V8x"/>
@@ -1002,6 +1001,7 @@
                         <outlet property="makeClipViewTimeStartButton" destination="H93-Ne-Voi" id="QDY-sD-jcX"/>
                         <outlet property="makeClipViewTitle" destination="A0Y-On-LtB" id="Brh-mk-1NA"/>
                         <outlet property="makeClipViewTitleField" destination="w2f-JM-j1p" id="BC2-GA-Wp7"/>
+                        <outlet property="mediaPlayerImage" destination="Bpm-pc-Wru" id="ga2-bF-zYH"/>
                         <outlet property="nowPlayingSlider" destination="hQf-zg-87M" id="2g5-41-sqG"/>
                         <outlet property="playPauseButton" destination="j4a-e6-r4k" id="Kc3-vi-nIu"/>
                         <outlet property="podcastTitle" destination="CXq-ex-zyD" id="aOC-ig-0AX"/>

@@ -33,7 +33,7 @@ class PodcastsTableViewController: UITableViewController {
                 
                 // Uses Callback/Promise to make sure table data is refreshed
                 // after parsePodcastFeed() finishes
-                self.parser.parsePodcastFeed(feedURL!, willSave: true,
+                self.parser.parsePodcastFeed(feedURL!, willSave: true, onlyLatestEpisode: false,
                     resolve: {
                         self.loadData()
                     },
@@ -118,14 +118,17 @@ class PodcastsTableViewController: UITableViewController {
         cell.pvImage?.image = UIImage(named: "Blank52")
         
         var imageData = podcast.image
+        var itunesImageData = podcast.itunesImage
 
         if imageData != nil {
             var image = UIImage(data: imageData!)
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if image!.size.height != 0.0 {
                 cell.pvImage?.image = image
-            } else {
-                var itunesImageData = podcast.itunesImage
+            }
+        }
+        else {
+            if itunesImageData != nil {
                 var itunesImage = UIImage(data: itunesImageData!)
                 
                 if itunesImage!.size.height != 0.0 {

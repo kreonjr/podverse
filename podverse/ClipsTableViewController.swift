@@ -78,9 +78,25 @@ class ClipsTableViewController: UITableViewController {
         let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell") as! ClipsTableHeaderCell
         
         var imageData = selectedEpisode.podcast.image
-        var image = UIImage(data: imageData!)
+        var itunesImageData = selectedEpisode.podcast.itunesImage
         
-        headerCell.pvImage!.image = image
+        if imageData != nil {
+            var image = UIImage(data: imageData!)
+            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
+            if image!.size.height != 0.0 {
+                headerCell.pvImage?.image = image
+            }
+        }
+        else {
+            if itunesImageData != nil {
+                var itunesImage = UIImage(data: itunesImageData!)
+                
+                if itunesImage!.size.height != 0.0 {
+                    headerCell.pvImage?.image = itunesImage
+                }
+            }
+        }
+        
         headerCell.summary!.text = utility.removeHTMLFromString(selectedEpisode.summary!)
         
         return headerCell

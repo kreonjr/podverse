@@ -122,14 +122,17 @@ class EpisodesTableViewController: UITableViewController {
         headerCell.pvImage?.image = UIImage(named: "Blank52")
         
         var imageData = selectedPodcast.image
+        var itunesImageData = selectedPodcast.itunesImage
         
         if imageData != nil {
             var image = UIImage(data: imageData!)
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if image!.size.height != 0.0 {
                 headerCell.pvImage?.image = image
-            } else {
-                var itunesImageData = selectedPodcast.itunesImage
+            }
+        }
+        else {
+            if itunesImageData != nil {
                 var itunesImage = UIImage(data: itunesImageData!)
                 
                 if itunesImage!.size.height != 0.0 {

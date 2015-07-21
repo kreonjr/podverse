@@ -24,11 +24,11 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     var willSave: Bool = false
     
+    var onlyLatestEpisode: Bool = false
+    
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate?
     
-    func parsePodcastFeed(feedURL: NSURL, willSave: Bool, resolve: () -> (), reject: () -> ()) {
-        
-        println(willSave)
+    func parsePodcastFeed(feedURL: NSURL, willSave: Bool, onlyLatestEpisode: Bool, resolve: () -> (), reject: () -> ()) {
         
         if (willSave == false) {
             
@@ -88,7 +88,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
         
-        if willSave == true {
+        if willSave == true || onlyLatestEpisode == true {
             podcast = CoreDataHelper.insertManagedObject("Podcast", managedObjectContext: moc) as! Podcast
             if info.title != nil {
                 podcast.title = info.title
@@ -163,7 +163,6 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
                             println(error)
                         }
                 })
-                
             }
             
             if info.itunesImage != nil {
@@ -187,7 +186,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
         
-        if willSave == true {
+        if willSave == true || onlyLatestEpisode == true {
             let episode = CoreDataHelper.insertManagedObject("Episode", managedObjectContext: self.moc) as! Episode
             
             if item.title != nil {
@@ -223,6 +222,25 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
             podcast.addEpisodeObject(episode)
             
             episodeArray.append(episode)
+            
+            // Check if the latest episode download is the latest episode in the RSS feed
+            // If false, download latest episode, and begin the feedParser to download the entire RSS feed.
+            if onlyLatestEpisode == true {
+                parser.stopParsing()
+                
+                var feedURL = NSURL(string: podcast.feedURL)
+                
+                self.parsePodcastFeed(feedURL!, willSave: true, onlyLatestEpisode: false,
+                    resolve: {
+                        // do nothing
+                    },
+                    reject: {
+                        // do nothing
+                    }
+                )
+                
+                
+            }
             
         }
         

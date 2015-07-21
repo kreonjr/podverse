@@ -96,9 +96,21 @@ class DownloadsTableViewController: UITableViewController {
         cell.title!.text = episode.title
         
         var imageData = episode.podcast.image
-        var image = UIImage(data: imageData!)
         
-        cell.pvImage!.image = image
+        if imageData != nil {
+            var image = UIImage(data: imageData!)
+            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
+            if image!.size.height != 0.0 {
+                cell.pvImage?.image = image
+            } else {
+                var itunesImageData = episode.podcast.itunesImage
+                var itunesImage = UIImage(data: itunesImageData!)
+                
+                if itunesImage!.size.height != 0.0 {
+                    cell.pvImage?.image = itunesImage
+                }
+            }
+        }
 
         cell.progress.progress = Float(episode.downloadProgress!)
         
