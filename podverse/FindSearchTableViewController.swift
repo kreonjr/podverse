@@ -15,8 +15,6 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     
     var jsonTableData = []
     
-    var parser = PVFeedParser()
-    
     var subscriber = PVSubscriber()
     
     var downloader = PVDownloader()

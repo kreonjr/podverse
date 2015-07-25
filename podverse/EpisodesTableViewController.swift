@@ -12,6 +12,7 @@ import CoreData
 class EpisodesTableViewController: UITableViewController {
     
     var utility = PVUtility()
+    var subscriber = PVSubscriber()
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
@@ -76,9 +77,9 @@ class EpisodesTableViewController: UITableViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
-            moc = context
-        }
+//        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
+//            moc = context
+//        }
 
         loadData()
         
@@ -102,6 +103,8 @@ class EpisodesTableViewController: UITableViewController {
         super.viewDidLoad()
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: kDownloadHasFinished, object: nil)
+        
+//        self.subscriber.checkIfNewEpisode(NSURL(string: selectedPodcast.feedURL)!)
 
     }
     

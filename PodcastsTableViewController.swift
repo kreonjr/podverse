@@ -33,7 +33,7 @@ class PodcastsTableViewController: UITableViewController {
                 
                 // Uses Callback/Promise to make sure table data is refreshed
                 // after parsePodcastFeed() finishes
-                self.parser.parsePodcastFeed(feedURL!, willSave: true, onlyLatestEpisode: false,
+                self.parser.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
                     resolve: {
                         self.loadData()
                     },
@@ -52,6 +52,7 @@ class PodcastsTableViewController: UITableViewController {
     
     func loadData() {
         podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: moc, predicate: nil) as! [Podcast]
+        println(podcastArray.count)
         self.tableView.reloadData()
     }
     
@@ -121,21 +122,25 @@ class PodcastsTableViewController: UITableViewController {
         var itunesImageData = podcast.itunesImage
 
         if imageData != nil {
-            println("imageData is not nil")
+            
+            println("image is not nil")
+            
             var image = UIImage(data: imageData!)
+            
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if image!.size.height != 0.0 {
-                println("inside now")
                 cell.pvImage?.image = image
             }
+
         }
-        else {
-            if itunesImageData != nil {
-                var itunesImage = UIImage(data: itunesImageData!)
-                
-                if itunesImage!.size.height != 0.0 {
-                    cell.pvImage?.image = itunesImage
-                }
+        else if itunesImageData != nil {
+            println("itunesImage is not nil")
+            
+            var itunesImage = UIImage(data: itunesImageData!)
+            
+            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
+            if itunesImage!.size.height != 0.0 {
+                cell.pvImage?.image = itunesImage
             }
         }
 

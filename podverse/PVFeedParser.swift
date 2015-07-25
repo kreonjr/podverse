@@ -13,255 +13,111 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     var utility = PVUtility()
     
-    var moc: NSManagedObjectContext!
-    
-    var podcast: Podcast!
-    var episode: Episode!
-    
-    var searchResultPodcast: SearchResultPodcast!
-    
-    var episodeArray: [Episode] = [Episode]()
-    
-    var willSave: Bool = false
-    
-    var onlyLatestEpisode: Bool = false
+    var downloader = PVDownloader()
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate?
     
-    func parsePodcastFeed(feedURL: NSURL, willSave: Bool, onlyLatestEpisode: Bool, resolve: () -> (), reject: () -> ()) {
+    var moc: NSManagedObjectContext!
+    
+    var feedURL: NSURL!
+    var podcast: Podcast!
+    var episode: Episode!
+    
+    var episodeArray: [Episode] = [Episode]()
+    
+    var returnPodcast: Bool = false
+    var returnOnlyLatestEpisode: Bool = false
+    
+    func parsePodcastFeed(feedURL: NSURL, returnPodcast: Bool, returnOnlyLatestEpisode: Bool, resolve: () -> (), reject: () -> ()) {
         
-        if (willSave == false) {
-            
-            self.willSave = willSave
-            var feedParser = MWFeedParser(feedURL: feedURL)
-            feedParser.delegate = self
-            feedParser.feedParseType = ParseTypeInfoOnly
-            feedParser.connectionType = ConnectionTypeAsynchronously
-            feedParser.parse()
-            
-            // I'm not entirely sure how this Callback/Promise below works
-            // but I got it working after reading Mirco Zeiss's post at
-            // http://www.mircozeiss.com/swift-for-javascript-developers/
-            var delta: Int64 = 1 * Int64(NSEC_PER_SEC)
-            var time = dispatch_time(DISPATCH_TIME_NOW, delta)
-            dispatch_after(time, dispatch_get_main_queue(), {
-                resolve()
-            })
-            
-        } else {
-            
-            self.willSave = true
-            
-            moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
-            
-            let predicate = NSPredicate(format: "feedURL == %@", feedURL)
-            
-            let checkIfPodcastAlreadyExists = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: moc, predicate: predicate)
-            
-            if checkIfPodcastAlreadyExists.count < 1 {
-                var feedParser = MWFeedParser(feedURL: feedURL)
-                feedParser.delegate = self
-                feedParser.feedParseType = ParseTypeFull
-                feedParser.connectionType = ConnectionTypeAsynchronously
-                feedParser.parse()
-                
-                // I'm not entirely sure how this Callback/Promise below works
-                // but I got it working after reading Mirco Zeiss's post at
-                // http://www.mircozeiss.com/swift-for-javascript-developers/
-                var delta: Int64 = 1 * Int64(NSEC_PER_SEC)
-                var time = dispatch_time(DISPATCH_TIME_NOW, delta)
-                dispatch_after(time, dispatch_get_main_queue(), {
-                    resolve()
-                })
-                
-            } else {
-                println("that podcast is already added!")
-            }
-            
-        }
-
+        // Pass the parser task booleans to the global scope
+        self.returnPodcast = returnPodcast
+        self.returnOnlyLatestEpisode = returnOnlyLatestEpisode
+        
+        moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
+        
+        // Create, configure, and start the feedParser
+        var feedParser = MWFeedParser(feedURL: feedURL)
+        feedParser.delegate = self
+        feedParser.feedParseType = ParseTypeFull
+        // TODO: Why asynchronously? Why not synchronously?
+        feedParser.connectionType = ConnectionTypeAsynchronously
+        feedParser.parse()
+        
+        // TODO: I don't really understand this part
+        var delta: Int64 = 1 * Int64(NSEC_PER_SEC)
+        var time = dispatch_time(DISPATCH_TIME_NOW, delta)
+        dispatch_after(time, dispatch_get_main_queue(), {
+            resolve()
+        })
     }
     
     func feedParserDidStart(parser: MWFeedParser!) {
-        println("I started")
+        println("feedParser did start")
     }
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
         
-        if willSave == true || onlyLatestEpisode == true {
-            podcast = CoreDataHelper.insertManagedObject("Podcast", managedObjectContext: moc) as! Podcast
-            if info.title != nil {
-                podcast.title = info.title
-            }
-            
-            if info.summary != nil {
-                podcast.summary = info.summary
-            }
-            
-            if info.url != nil {
-                podcast.feedURL = info.url.absoluteString!
-            }
-            
-            if info.itunesAuthor != nil {
-                podcast.itunesAuthor = info.itunesAuthor
-            }
-            
-            println(info.image)
-            if info.image != nil {
-                let imageURLString = info.image
-                var imgURL: NSURL = NSURL(string: imageURLString!)!
-                let request: NSURLRequest = NSURLRequest(URL: imgURL)
-                NSURLConnection.sendAsynchronousRequest(
-                    request, queue: NSOperationQueue.mainQueue(),
-                    completionHandler: {(response: NSURLResponse!,data: NSData!,error: NSError!) -> Void in
-                        if error == nil {
-                            self.podcast.image = data
-                        } else {
-                            println(error)
-                        }
-                })
-                
-            }
-            
-            println(info.itunesImage)
-            if info.itunesImage != nil {
-                let imageURLString = info.itunesImage
-                var imgURL: NSURL = NSURL(string: imageURLString!)!
-                let request: NSURLRequest = NSURLRequest(URL: imgURL)
-                NSURLConnection.sendAsynchronousRequest(
-                    request, queue: NSOperationQueue.mainQueue(),
-                    completionHandler: {(response: NSURLResponse!,data: NSData!,error: NSError!) -> Void in
-                        if error == nil {
-                            self.podcast.itunesImage = data
-                        } else {
-                            println(error)
-                        }
-                })
-            }
-            
-            moc.save(nil)
-            
-        }
-        else {
-            
-            searchResultPodcast = SearchResultPodcast()
-            
-            if info.title != nil {
-                searchResultPodcast.title = info.title
-            }
-            
-            if info.summary != nil {
-                searchResultPodcast.summary = info.summary
-            }
-            
-            if info.image != nil {
-                let imageURLString = info.image
-                var imgURL: NSURL = NSURL(string: imageURLString!)!
-                let request: NSURLRequest = NSURLRequest(URL: imgURL)
-                NSURLConnection.sendAsynchronousRequest(
-                    request, queue: NSOperationQueue.mainQueue(),
-                    completionHandler: {(response: NSURLResponse!,data: NSData!,error: NSError!) -> Void in
-                        if error == nil {
-                            self.searchResultPodcast.image = data
-                        } else {
-                            println(error)
-                        }
-                })
-            }
-            
-            if info.itunesImage != nil {
-                let imageURLString = info.itunesImage
-                var imgURL: NSURL = NSURL(string: imageURLString!)!
-                let request: NSURLRequest = NSURLRequest(URL: imgURL)
-                NSURLConnection.sendAsynchronousRequest(
-                    request, queue: NSOperationQueue.mainQueue(),
-                    completionHandler: {(response: NSURLResponse!,data: NSData!,error: NSError!) -> Void in
-                        if error == nil {
-                            self.searchResultPodcast.itunesImage = data
-                        } else {
-                            println(error)
-                        }
-                })
-            }
-            
+        podcast = CoreDataHelper.insertManagedObject("Podcast", managedObjectContext: self.moc) as! Podcast
+        
+        if let title = info.title { podcast.title = title }
+
+        if let summary = info.summary { podcast.summary = summary }
+        
+        if let feedURL = info.url { podcast.feedURL = feedURL.absoluteString! }
+        
+        if let itunesAuthor = info.itunesAuthor { podcast.itunesAuthor = itunesAuthor }
+        
+        if let image = info.image {
+            let imgURL = NSURL(string: image)
+            let data = NSData(contentsOfURL: imgURL!)
+            self.podcast.image = data
         }
         
-    }
+        if let itunesImage = info.itunesImage {
+            let itunesImgURL = NSURL(string: itunesImage)
+            let data = NSData(contentsOfURL: itunesImgURL!)
+            self.podcast.itunesImage = data
+        }
     
+    }
+        
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
         
-        if willSave == true || onlyLatestEpisode == true {
-            let episode = CoreDataHelper.insertManagedObject("Episode", managedObjectContext: self.moc) as! Episode
-            
-            if item.title != nil {
-                episode.title = item.title
-            }
-            
-            if item.summary != nil {
-                episode.summary = item.summary
-            }
-            
-            if item.date != nil {
-                episode.pubDate = item.date
-            }
-            
-            if item.link != nil {
-                episode.link = item.link
-            }
-            
-            if item.enclosures != nil {
-                episode.mediaURL = item.enclosures[0]["url"] as? String
-                episode.mediaType = item.enclosures[0]["type"] as? String
-                episode.mediaBytes = item.enclosures[0]["length"] as! Int
-            }
-            
-            if item.duration != nil {
-                episode.duration = utility.convertStringToNSNumber(item.duration)
-            }
-            
-            if item.guid != nil {
-                episode.guid = item.guid
-            }
-            
-            podcast.addEpisodeObject(episode)
-            
-            episodeArray.append(episode)
-            
-            // Check if the latest episode download is the latest episode in the RSS feed
-            // If false, download latest episode, and begin the feedParser to download the entire RSS feed.
-            if onlyLatestEpisode == true {
-                parser.stopParsing()
-                
-                var feedURL = NSURL(string: podcast.feedURL)
-                
-                self.parsePodcastFeed(feedURL!, willSave: true, onlyLatestEpisode: false,
-                    resolve: {
-                        // do nothing
-                    },
-                    reject: {
-                        // do nothing
-                    }
-                )
-                
-                
-            }
-            
+        let episode = CoreDataHelper.insertManagedObject(NSStringFromClass(Episode), managedObjectContext: self.moc) as! Episode
+        
+        if let title = item.title { episode.title = title }
+        
+        if let summary = item.summary { episode.summary = summary }
+        
+        if let date = item.date { episode.pubDate = date }
+        
+        if let link = item.link { episode.link = link }
+        
+        if let enclosures = item.enclosures {
+            episode.mediaURL = enclosures[0]["url"] as? String
+            episode.mediaType = enclosures[0]["type"] as? String
+            episode.mediaBytes = enclosures[0]["length"] as? Int
         }
         
-    }
+        if let duration = item.duration {
+            let durationNSNumber = utility.convertStringToNSNumber(duration)
+            episode.duration = durationNSNumber
+        }
+        
+        if let guid = item.guid { episode.guid = guid }
+        
+        podcast.addEpisodeObject(episode)
+        
+        episodeArray.append(episode)
     
+    }
+        
     func feedParserDidFinish(parser: MWFeedParser!) {
-        if willSave == true {
-            podcast.lastPubDate = episodeArray[0].pubDate
-            moc.save(nil)
-        } else {
-            appDelegate!.iTunesSearchPodcastArray.append(searchResultPodcast)
-        }
-        
-    }
-    
-    func feedParser(parser: MWFeedParser!, didFailWithError error: NSError!) {
-        println(error)
+        println("feed parser has finished!")
+        podcast.lastPubDate = episodeArray[0].pubDate
+//        didReturnPodcast(podcast)
+//            moc.save(nil)
     }
     
 }
