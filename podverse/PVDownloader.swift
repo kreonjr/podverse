@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
     
@@ -16,73 +17,70 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     
     // TODO: DOWNLOAD/PLAY ICON DOES NOT REFRESH AFTER DOWNLOAD FINISHED
     
-    lazy var moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+    var moc: NSManagedObjectContext!
     
-    lazy var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate?
     
-    var session: NSURLSession?
     var docDirectoryURL: NSURL?
     
     func initializeEpisodeDownloadSession() {
+        
         // Get the appropriate local storage directory and assign it to docDirectoryURL
         var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
         self.docDirectoryURL = URLs[0] as? NSURL
         
         // Initialize the session configuration, then create the session
-        var sessionConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("fm.podverse")
+        var sessionConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("fm.podverse.episode.downloads")
         sessionConfiguration.HTTPMaximumConnectionsPerHost = 5
-        self.session = NSURLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
+        self.appDelegate!.episodeDownloadSession = NSURLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
+        
+    }
+    
+    func startPauseOrResumeDownloadingEpisode(episode: Episode, tblViewController: UITableViewController?, completion: ((AnyObject) -> Void)!) {
+        
+        self.moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
+        
+        // If the session does not already exist, initialize the session
+        
+        println("anything?")
+
+        if self.appDelegate!.episodeDownloadSession == nil {
+            initializeEpisodeDownloadSession()
+        }
+        
+        // If the episode has already downloaded, then do nothing
+        if (episode.downloadComplete == true) {
+            // do nothing
+        }
+        // Else if the episode is currently downloading, then pause the download
+        else if episode.isDownloading == true {
+            episode.downloadTask?.cancelByProducingResumeData() { resumeData in
+                if (resumeData != nil) {
+                    episode.taskResumeData = resumeData
+                    episode.isDownloading = false
+                }
+            }
+        }
+        // Else if the episode download is paused, then resume the download
+        else if episode.taskResumeData != nil {
+            var downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithResumeData(episode.taskResumeData!)
+            downloadTask.resume()
+            episode.taskIdentifier = episode.downloadTask?.taskIdentifier
+            episode.isDownloading = true
+        }
+        // Else start the download
+        else {
+            var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
+            var downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
+            downloadTask.resume()
+            episode.taskIdentifier = downloadTask.taskIdentifier
+            episode.isDownloading = true
+            appDelegate!.episodeDownloadArray.append(episode)
+        }
     }
     
     func checkIfDownloadsPending() {
         println("check if downloads are pending, then resume them")
-    }
-    
-    func startOrPauseDownloadingEpisode(episode: Episode, tblViewController: UITableViewController?, completion: ((AnyObject) -> Void)!) {
-        // If the session does not already exist, initialize the session
-        if (self.session?.configuration.identifier != "fm.podverse") {
-            initializeEpisodeDownloadSession()
-        }
-        
-        // If the episode is not already downloaded, then start, resume, or pause the download
-        if (episode.fileName == nil) {
-            appDelegate.episodeDownloadArray.append(episode)
-            
-            // If episode is not currently downloading, start or resume the download
-            if (episode.isDownloading == false) {
-                var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
-                // If download has not been previously started, start the download
-                if (episode.taskIdentifier == -1) {
-                    var downloadTask = self.session?.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
-                    episode.taskIdentifier = downloadTask!.taskIdentifier
-                    downloadTask!.resume()
-                    episode.isDownloading = true
-                }
-                    
-                // If download was previously started, then was paused, resume the download
-                else {
-                    if (episode.taskResumeData != nil) {
-                        var downloadTask = self.session?.downloadTaskWithResumeData(episode.taskResumeData!)
-                        downloadTask!.resume()
-                        episode.taskIdentifier = episode.downloadTask?.taskIdentifier
-                        episode.isDownloading = true
-                    }
-                }
-            }
-                
-            // If episode is currently downloading, pause the download, and save resume data for later
-            else {
-                episode.downloadTask?.cancelByProducingResumeData() { resumeData in
-                    if (resumeData != nil) {
-                        episode.taskResumeData = resumeData
-                    }
-                    episode.isDownloading = false
-                }
-                if tblViewController != nil {
-                    tblViewController!.tableView.reloadData()
-                }
-            }
-        }
     }
     
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
@@ -93,7 +91,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         else {
             // Get the corresponding episode object by its taskIdentifier value
             var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier)
-            var episode = appDelegate.episodeDownloadArray[episodeDownloadIndex]
+            var episode = appDelegate!.episodeDownloadArray[episodeDownloadIndex]
             
             var totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
             episode.downloadProgress = Float(totalProgress)
@@ -111,7 +109,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         
         // Get the corresponding episode object by its taskIdentifier value
         var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier)
-        var episode = appDelegate.episodeDownloadArray[episodeDownloadIndex]
+        var episode = appDelegate!.episodeDownloadArray[episodeDownloadIndex]
         
         // If file is already downloaded for this episode, remove the old file before saving the new one
         if (episode.fileName != nil) {
@@ -156,12 +154,12 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     }
     
     func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
-        self.session?.getTasksWithCompletionHandler { (dataTasks, uploadTasks, downloadTasks) -> Void in
+        self.appDelegate!.episodeDownloadSession!.getTasksWithCompletionHandler { (dataTasks, uploadTasks, downloadTasks) -> Void in
             if (downloadTasks.count == 0) {
-                if (self.appDelegate.backgroundTransferCompletionHandler != nil) {
-                    var completionHandler: (() -> Void)? = self.appDelegate.backgroundTransferCompletionHandler
+                if (self.appDelegate!.backgroundTransferCompletionHandler != nil) {
+                    var completionHandler: (() -> Void)? = self.appDelegate!.backgroundTransferCompletionHandler
                     
-                    self.appDelegate.backgroundTransferCompletionHandler = nil
+                    self.appDelegate!.backgroundTransferCompletionHandler = nil
                     
                     NSOperationQueue.mainQueue().addOperationWithBlock() {
                         completionHandler?()
@@ -179,8 +177,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     
     func getDownloadingEpisodeIndexWithTaskIdentifier(taskIdentifier: Int) -> Int {
         var index = 0
-        for (var i = 0; i < appDelegate.episodeDownloadArray.count; i++) {
-            var episode = appDelegate.episodeDownloadArray[i]
+        for (var i = 0; i < appDelegate!.episodeDownloadArray.count; i++) {
+            var episode = appDelegate!.episodeDownloadArray[i]
             if (episode.taskIdentifier! == taskIdentifier) {
                 index = i
                 break

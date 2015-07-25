@@ -84,7 +84,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
         
-        let episode = CoreDataHelper.insertManagedObject(NSStringFromClass(Episode), managedObjectContext: self.moc) as! Episode
+        episode = CoreDataHelper.insertManagedObject(NSStringFromClass(Episode), managedObjectContext: self.moc) as! Episode
         
         if let title = item.title { episode.title = title }
         
@@ -117,7 +117,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         println("feed parser has finished!")
         podcast.lastPubDate = episodeArray[0].pubDate
 //        didReturnPodcast(podcast)
-//            moc.save(nil)
+        moc.save(nil)
     }
     
 }

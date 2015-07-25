@@ -23,6 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var episodeDownloadArray = [Episode]()
     
+    var episodeDownloadSession : NSURLSession?
+    
     var iTunesSearchPodcastArray = [SearchResultPodcast]()
     
     var iTunesSearchPodcastFeedURLArray: [NSURL] = []

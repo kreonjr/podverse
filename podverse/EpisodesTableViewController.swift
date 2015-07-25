@@ -65,7 +65,7 @@ class EpisodesTableViewController: UITableViewController {
             if selectedEpisode.fileName != nil {
                 self.performSegueWithIdentifier("Quick Play Downloaded Episode", sender: selectedEpisode)
             } else {
-                self.downloader.startOrPauseDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
+                self.downloader.startPauseOrResumeDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
                 if (selectedEpisode.isDownloading == true) {
                     cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
                 }
@@ -171,25 +171,32 @@ class EpisodesTableViewController: UITableViewController {
         
         cell.title?.text = episode.title
         
-        if episode.summary != nil {
-            cell.summary?.text = utility.removeHTMLFromString(episode.summary!)
+        if let summary = episode.summary {
+            cell.summary?.text = utility.removeHTMLFromString(summary)
         }
         
         cell.totalClips?.text = String("123 clips")
         
-        cell.totalTimeLeft?.text = utility.convertNSNumberToHHMMSSString(episode.duration!)
+        if let duration = episode.duration {
+            cell.totalTimeLeft?.text = utility.convertNSNumberToHHMMSSString(episode.duration!)
+        }
+
+        if let pubDate = episode.pubDate {
+            cell.pubDate?.text = utility.formatDateToString(pubDate)
+        }
         
-        cell.pubDate?.text = utility.formatDateToString(episode.pubDate!)
-        
+        // Set icon conditionally if is downloaded, is downloading, or has not downloaded
+        // If filename exists, then episode is downloaded and display play button
         if episode.fileName != nil {
             cell.downloadPlayButton.setTitle("\u{f04b}", forState: .Normal)
         }
+        // Else if episode is downloading, then display downloading icon
+        else if (episode.isDownloading == true) {
+            cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
+        }
+        // Else display the start download icon
         else {
-            if (episode.isDownloading == true) {
-                cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
-            } else {
-                cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
-            }
+            cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
         }
         
         cell.downloadPlayButton.addTarget(self, action: "downloadPlay:", forControlEvents: .TouchUpInside)
@@ -216,7 +223,7 @@ class EpisodesTableViewController: UITableViewController {
            
             episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
                 
-                self.downloader.startOrPauseDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
+                self.downloader.startPauseOrResumeDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
                 
                 let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
                 
@@ -291,48 +298,47 @@ class EpisodesTableViewController: UITableViewController {
         if segue.identifier == "playDownloadedEpisode" {
             
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            
             if let index = self.tableView.indexPathForSelectedRow() {
                 mediaPlayerViewController.selectedEpisode = episodeArray[index.row]
             }
-            
             mediaPlayerViewController.startDownloadedEpisode = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
             
-        } else if segue.identifier == "Quick Play Downloaded Episode" {
+        }
+        else if segue.identifier == "Quick Play Downloaded Episode" {
             
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.selectedEpisode = sender as! Episode
             mediaPlayerViewController.startDownloadedEpisode = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
             
-        } else if segue.identifier == "showClips" {
-            let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
+        }
+        else if segue.identifier == "showClips" {
             
+            let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
             if let index = self.tableView.indexPathForSelectedRow() {
                 clipsTableViewController.selectedEpisode = episodeArray[index.row]
             }
-            
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
-        } else if segue.identifier == "streamEpisode" {
-            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             
+        }
+        else if segue.identifier == "streamEpisode" {
+            
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             if let index = self.tableView.indexPathForSelectedRow() {
                 mediaPlayerViewController.selectedEpisode = episodeArray[index.row]
             }
-            
             mediaPlayerViewController.startStreamingEpisode = true
-            
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
             
-        } else if segue.identifier == "Episodes to Now Playing" {
-            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            
-            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
-            
-            mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
-        // navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        else if segue.identifier == "Episodes to Now Playing" {
+            
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
+            
+        }
     }
     
 }
