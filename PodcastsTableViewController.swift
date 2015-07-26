@@ -17,6 +17,8 @@ class PodcastsTableViewController: UITableViewController {
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
+    let downloader = PVDownloader()
+    
     var moc: NSManagedObjectContext!
     var podcastArray = [Podcast]()
     
@@ -88,6 +90,15 @@ class PodcastsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        for var i = 0; i < self.appDelegate.episodeDownloadArray.count; i++ {
+            self.downloader.startPauseOrResumeDownloadingEpisode(self.appDelegate.episodeDownloadArray[i], completion: nil)
+        }
+
+        println("episode download array total below")
+        println(self.appDelegate.episodeDownloadArray.count)
+
+        
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -123,8 +134,6 @@ class PodcastsTableViewController: UITableViewController {
 
         if imageData != nil {
             
-            println("image is not nil")
-            
             var image = UIImage(data: imageData!)
             
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
@@ -134,7 +143,6 @@ class PodcastsTableViewController: UITableViewController {
 
         }
         else if itunesImageData != nil {
-            println("itunesImage is not nil")
             
             var itunesImage = UIImage(data: itunesImageData!)
             

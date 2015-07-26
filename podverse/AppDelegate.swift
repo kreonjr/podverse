@@ -15,9 +15,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     
+    var moc: NSManagedObjectContext!
+    
     var avPlayer: AVPlayer?
     
     var subscriber = PVSubscriber()
+    
+    var downloader = PVDownloader()
     
     var nowPlayingEpisode: Episode?
     
@@ -49,7 +53,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-//        startCheckSubscriptionsForNewEpisodesTimer()
+        
+        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
+            self.moc = context
+        }
+        
+        // On app launch, clear the taskIdentifier of any episodes that previously did not finish downloading
+        let firstPredicate = NSPredicate(format: "isDownloading != 0")
+        let secondPredicate = NSPredicate(format: "taskResumeData != nil")
+        let predicate = NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: [firstPredicate, secondPredicate])
+        
+        episodeDownloadArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
+        
+        for var i = 0; i < episodeDownloadArray.count; i++ {
+            println(episodeDownloadArray[i].taskIdentifier)
+            episodeDownloadArray[i].taskIdentifier = 0
+            println(episodeDownloadArray[i].taskIdentifier)
+            
+            if episodeDownloadArray[i].taskResumeData == nil {
+                
+            }
+            
+        }
+        
+        self.moc.save(nil)
+                
         return true
     }
 
@@ -68,7 +96,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(application: UIApplication) {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+
     }
 
     func applicationWillTerminate(application: UIApplication) {

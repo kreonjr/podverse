@@ -36,24 +36,32 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         
     }
     
-    func startPauseOrResumeDownloadingEpisode(episode: Episode, tblViewController: UITableViewController?, completion: ((AnyObject) -> Void)!) {
+    func startPauseOrResumeDownloadingEpisode(episode: Episode, completion: ((AnyObject) -> Void)!) {
         
         self.moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
         
         // If the session does not already exist, initialize the session
         
-        println("anything?")
-
         if self.appDelegate!.episodeDownloadSession == nil {
             initializeEpisodeDownloadSession()
         }
+        
+        println("episode.downloadComplete =")
+        println(episode.downloadComplete)
+        
+        println("episode.isDownloading =")
+        println(episode.isDownloading)
+        
+        println("episode.taskResumeData =")
+        println(episode.taskResumeData)
+        
         
         // If the episode has already downloaded, then do nothing
         if (episode.downloadComplete == true) {
             // do nothing
         }
-        // Else if the episode is currently downloading, then pause the download
-        else if episode.isDownloading == true {
+        // Else if the episode is currently downloading, and it has a taskIdentifer, then pause the download
+        else if episode.isDownloading == true && episode.taskIdentifier != 0 {
             episode.downloadTask?.cancelByProducingResumeData() { resumeData in
                 if (resumeData != nil) {
                     episode.taskResumeData = resumeData
@@ -64,23 +72,28 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         // Else if the episode download is paused, then resume the download
         else if episode.taskResumeData != nil {
             var downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithResumeData(episode.taskResumeData!)
-            downloadTask.resume()
             episode.taskIdentifier = episode.downloadTask?.taskIdentifier
+            downloadTask.resume()
             episode.isDownloading = true
         }
-        // Else start the download
+        // Else start or restart the download
         else {
             var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
             var downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
-            downloadTask.resume()
             episode.taskIdentifier = downloadTask.taskIdentifier
+            downloadTask.resume()
             episode.isDownloading = true
-            appDelegate!.episodeDownloadArray.append(episode)
+            
+            // If episode is already in episodeDownloadArray, do not add it to the array
+            if contains(appDelegate!.episodeDownloadArray, episode) {
+                // do nothing
+            }
+            // Else add the episode to the episodeDownloadArray 
+            else {
+                appDelegate!.episodeDownloadArray.append(episode)
+            }
+
         }
-    }
-    
-    func checkIfDownloadsPending() {
-        println("check if downloads are pending, then resume them")
     }
     
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
@@ -106,6 +119,9 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didFinishDownloadingToURL location: NSURL) {
         var error: NSError?
         var fileManager = NSFileManager.defaultManager()
+        
+        println("did finish downloading")
+        println(downloadTask.taskIdentifier)
         
         // Get the corresponding episode object by its taskIdentifier value
         var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier)

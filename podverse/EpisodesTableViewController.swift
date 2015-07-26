@@ -65,9 +65,10 @@ class EpisodesTableViewController: UITableViewController {
             if selectedEpisode.fileName != nil {
                 self.performSegueWithIdentifier("Quick Play Downloaded Episode", sender: selectedEpisode)
             } else {
-                self.downloader.startPauseOrResumeDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
+                self.downloader.startPauseOrResumeDownloadingEpisode(selectedEpisode, completion: nil)
                 if (selectedEpisode.isDownloading == true) {
                     cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
+                    
                 }
             }
         }
@@ -223,7 +224,7 @@ class EpisodesTableViewController: UITableViewController {
            
             episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
                 
-                self.downloader.startPauseOrResumeDownloadingEpisode(selectedEpisode, tblViewController: self, completion: nil)
+                self.downloader.startPauseOrResumeDownloadingEpisode(selectedEpisode, completion: nil)
                 
                 let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
                 

@@ -47,16 +47,19 @@ class PVSubscriber: NSObject {
                 
                 let predicate = NSPredicate(format: "feedURL == %@", feedURL!.absoluteString!)
                 let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
-                let podcast = podcastSet[0]
+                
+                if podcastSet.count > 0 {
+                    let podcast = podcastSet[0]
                     
-                let mostRecentEpisodePodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-                let mostRecentEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
-                let mostRecentEpisode = mostRecentEpisodeSet[0] as! Episode
-                
-                self.downloader.startPauseOrResumeDownloadingEpisode(mostRecentEpisode, tblViewController: nil, completion: nil)
-                
-                podcast.isSubscribed = true
-                println("is subscribed is true")
+                    let mostRecentEpisodePodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+                    let mostRecentEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
+                    let mostRecentEpisode = mostRecentEpisodeSet[0] as! Episode
+                    
+                    self.downloader.startPauseOrResumeDownloadingEpisode(mostRecentEpisode, completion: nil)
+                    
+                    podcast.isSubscribed = true
+                    println("is subscribed is true")
+                }
                 
             },
             reject: {
