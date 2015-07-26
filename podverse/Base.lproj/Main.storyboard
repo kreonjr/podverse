@@ -1208,8 +1208,8 @@
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="kaM-Od-SRg" id="CtH-yK-kQM">
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5vt-cC-gaV">
-                                            <rect key="frame" x="99" y="8" width="493" height="20"/>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Title" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5vt-cC-gaV">
+                                            <rect key="frame" x="99" y="8" width="493" height="19.5"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <nil key="highlightedColor"/>
                                         </label>
@@ -1223,20 +1223,38 @@
                                                 <constraint firstAttribute="width" constant="83" id="RUM-gk-ozd"/>
                                             </constraints>
                                         </imageView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Progress Current Bytes / Total Bytes" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uBO-xt-93x">
+                                            <rect key="frame" x="99" y="74" width="234" height="17"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" red="0.43529411764705883" green="0.44313725490196076" blue="0.47450980392156861" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Download Status" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XWu-hL-Bem">
+                                            <rect key="frame" x="481" y="74" width="111" height="17"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="5vt-cC-gaV" firstAttribute="leading" secondItem="DUq-Gs-qVD" secondAttribute="trailing" constant="8" id="4Jl-y7-uUI"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="XWu-hL-Bem" secondAttribute="bottom" constant="0.5" id="9iE-16-kps"/>
+                                        <constraint firstItem="XWu-hL-Bem" firstAttribute="trailing" secondItem="CtH-yK-kQM" secondAttribute="trailingMargin" id="BbD-Pm-xOF"/>
                                         <constraint firstItem="DUq-Gs-qVD" firstAttribute="leading" secondItem="CtH-yK-kQM" secondAttribute="leadingMargin" id="Fqs-9f-tE6"/>
+                                        <constraint firstItem="uBO-xt-93x" firstAttribute="leading" secondItem="DUq-Gs-qVD" secondAttribute="trailing" constant="8" id="IF2-Ee-1AQ"/>
                                         <constraint firstAttribute="bottomMargin" secondItem="zHJ-ze-47l" secondAttribute="bottom" constant="24.5" id="NZ7-oJ-tJL"/>
                                         <constraint firstItem="zHJ-ze-47l" firstAttribute="trailing" secondItem="CtH-yK-kQM" secondAttribute="trailingMargin" id="NoN-uu-SfM"/>
                                         <constraint firstItem="5vt-cC-gaV" firstAttribute="top" secondItem="CtH-yK-kQM" secondAttribute="topMargin" id="USl-RT-jRu"/>
                                         <constraint firstItem="DUq-Gs-qVD" firstAttribute="top" secondItem="CtH-yK-kQM" secondAttribute="topMargin" id="UVi-Nh-sDF"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="uBO-xt-93x" secondAttribute="bottom" constant="0.5" id="bcB-oy-nXf"/>
                                         <constraint firstItem="5vt-cC-gaV" firstAttribute="trailing" secondItem="CtH-yK-kQM" secondAttribute="trailingMargin" id="n2i-FD-Viy"/>
                                         <constraint firstItem="zHJ-ze-47l" firstAttribute="leading" secondItem="CtH-yK-kQM" secondAttribute="leadingMargin" constant="91" id="tlO-R2-rmo"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
+                                    <outlet property="downloadStatus" destination="XWu-hL-Bem" id="dYt-OY-TEN"/>
                                     <outlet property="progress" destination="zHJ-ze-47l" id="Qrs-Gk-BNH"/>
+                                    <outlet property="progressBytes" destination="uBO-xt-93x" id="CAC-lw-7IN"/>
                                     <outlet property="pvImage" destination="DUq-Gs-qVD" id="TlU-QZ-YRG"/>
                                     <outlet property="title" destination="5vt-cC-gaV" id="bw5-ID-gyP"/>
                                 </connections>
@@ -1262,6 +1280,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="wWz-oO-jVg"/>
+        <segue reference="Xc1-wE-NTg"/>
     </inferredMetricsTieBreakers>
 </document>

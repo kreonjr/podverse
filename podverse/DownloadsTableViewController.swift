@@ -16,19 +16,18 @@ class DownloadsTableViewController: UITableViewController {
     
     var episodeDownloadArray = [Episode]()
     
+    var downloader = PVDownloader()
+    
+    var reloadDataTimer: NSTimer!
+    
     func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Downloads to Now Playing", sender: nil)
     }
     
-    func updateDownloadProgressBar(notification: NSNotification) {
-        
-        let userInfo : Dictionary<String,Episode> = notification.userInfo as! Dictionary<String,Episode>
-        let episode = userInfo["episode"]
-        
+    func reloadDownloadTableData() {
         dispatch_async(dispatch_get_main_queue()) {
             self.tableView.reloadData()
         }
-        
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -39,8 +38,6 @@ class DownloadsTableViewController: UITableViewController {
         }
         
         self.episodeDownloadArray = self.appDelegate.episodeDownloadArray
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadProgressBar:", name: kDownloadHasProgressed, object: nil)
         
         dispatch_async(dispatch_get_main_queue()) {
             self.tableView.reloadData()
@@ -55,6 +52,10 @@ class DownloadsTableViewController: UITableViewController {
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
+        
+        // Create timer to reload the download table data every second
+        self.reloadDataTimer = NSTimer(timeInterval: 1.0, target: self, selector: Selector("reloadDownloadTableData"), userInfo: nil, repeats: true)
+        NSRunLoop.currentRunLoop().addTimer(reloadDataTimer, forMode: NSRunLoopCommonModes)
         
     }
     
@@ -113,6 +114,25 @@ class DownloadsTableViewController: UITableViewController {
         }
 
         cell.progress.progress = Float(episode.downloadProgress!)
+        
+        // Format the total bytes into a human readable KB or MB number
+        let dataFormatter = NSByteCountFormatter()
+        let currentBytesDownloaded = Int64(Float(episode.downloadProgress!) * Float(episode.mediaBytes!))
+        let formattedCurrentBytesDownloaded = dataFormatter.stringFromByteCount(currentBytesDownloaded)
+        let formattedTotalFileBytes = dataFormatter.stringFromByteCount(Int64(Float(episode.mediaBytes!)))
+        
+        cell.progressBytes.text = "\(formattedCurrentBytesDownloaded) / \(formattedTotalFileBytes)"
+        
+        if episode.downloadComplete == true {
+            cell.downloadStatus.text = "Finished"
+        }
+        else if episode.isDownloading == true {
+            cell.downloadStatus.text = "Downloading"
+        }
+        else {
+            cell.downloadStatus.text = "Paused"
+        }
+
         
         return cell
     }
