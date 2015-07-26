@@ -23,18 +23,6 @@ class PVSubscriber: NSObject {
     
     var isNewEpisode: Bool = false
     
-    func checkIfNewEpisode(feedURL: NSURL) {
-        println("has there been a new episode?")
-        self.parser.parsePodcastFeed(feedURL, returnPodcast: false, returnOnlyLatestEpisode: true,
-            resolve: {
-                
-            },
-            reject: {
-                
-            }
-        )
-    }
-    
     func subscribeToPodcast(feedURLString: String) {
         if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
             moc = context

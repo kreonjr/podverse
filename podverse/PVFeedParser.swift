@@ -26,14 +26,18 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     var episodeArray: [Episode] = [Episode]()
     
-    var returnPodcast: Bool = false
-    var returnOnlyLatestEpisode: Bool = false
+    var returnPodcast: Bool!
+    var returnOnlyLatestEpisode: Bool!
+    var episodeAlreadySaved: Bool?
     
     func parsePodcastFeed(feedURL: NSURL, returnPodcast: Bool, returnOnlyLatestEpisode: Bool, resolve: () -> (), reject: () -> ()) {
         
         // Pass the parser task booleans to the global scope
         self.returnPodcast = returnPodcast
         self.returnOnlyLatestEpisode = returnOnlyLatestEpisode
+        println("below")
+        println(returnOnlyLatestEpisode)
+        println(self.returnOnlyLatestEpisode)
         
         moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
         
@@ -59,7 +63,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
         
-        // If podcast already exists in the database, do not insert new managed object
+        // If podcast already exists in the database, do not insert new podcast, instead update existing podcast
         let feedURLString = info.url.absoluteString
         let predicate = NSPredicate(format: "feedURL == %@", feedURLString!)
         let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
@@ -94,14 +98,31 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
         
-        // If episode already exists in the database, do not insert new managed object
-        let predicate = NSPredicate(format: "mediaURL == %@", (item.enclosures[0]["url"] as? String)!)
+        // If episode already exists in the database, do not insert new episode, instead update existing episode
+        println(item.title)
+        
+        // TODO: Is there one field we can reliably check for matching episodes that will never error out?
+        var predicate = NSPredicate()
+        
+        // TODO: There's got to be a more elegant way of checking if item.enclosures[0]["url"] exists...
+        if item.enclosures != nil {
+            if item.enclosures[0]["url"] != nil {
+                predicate = NSPredicate(format: "mediaURL == %@", (item.enclosures[0]["url"] as? String)!)
+            }
+        }
+        else if item.date != nil {
+            predicate = NSPredicate(format: "pubDate == %@", (item.date))
+        }
+        
+
         let episodeSet = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
         if episodeSet.count > 0 {
             episode = episodeSet[0]
+            episodeAlreadySaved = true
         }
         else {
             episode = CoreDataHelper.insertManagedObject("Episode", managedObjectContext: self.moc) as! Episode
+            episodeAlreadySaved = false
         }
         
         if let title = item.title { episode.title = title }
@@ -125,32 +146,42 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         
         if let guid = item.guid { episode.guid = guid }
         
-        podcast.addEpisodeObject(episode)
-        
         episodeArray.append(episode)
         
+        if episodeAlreadySaved == false {
+            podcast.addEpisodeObject(episode)
+        }
+        
         if self.returnOnlyLatestEpisode == true {
-            parser.stopParsing()
             self.onlyMostRecentEpisode = episode
+            parser.stopParsing()
         }
     
     }
         
     func feedParserDidFinish(parser: MWFeedParser!) {
-        println("feed parser has finished!")
+        
+        // Set the podcast.lastPubDate equal to the newest episode's pubDate
         podcast.lastPubDate = episodeArray[0].pubDate
-//        didReturnPodcast(podcast)
+        
+        // Save the parsed podcast and episode information
         moc.save(nil)
         
+        // If the parser is only returning the latest episode, then if the podcast's latest episode returned
+        // is not the same as the latest episode saved locally, then download and save the latest episode
         if self.returnOnlyLatestEpisode == true {
             let mostRecentEpisodePodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
             let mostRecentSavedEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
             let mostRecentSavedEpisode = mostRecentSavedEpisodeSet[0] as! Episode
             if self.onlyMostRecentEpisode != mostRecentSavedEpisode {
                 self.downloader.startPauseOrResumeDownloadingEpisode(self.onlyMostRecentEpisode, completion: nil)
+                println("begin download for newer episode")
+            } else {
+                println("no newer episode available, don't download")
             }
         }
         
+        println("feed parser has finished!")
         
     }
     

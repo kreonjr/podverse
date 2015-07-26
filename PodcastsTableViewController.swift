@@ -62,6 +62,33 @@ class PodcastsTableViewController: UITableViewController {
         self.performSegueWithIdentifier("Podcasts to Now Playing", sender: nil)
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // If there are any unfinished downloads in the appDelegate.episodeDownloadArray, then resume those downloads
+        for var i = 0; i < self.appDelegate.episodeDownloadArray.count; i++ {
+            self.downloader.startPauseOrResumeDownloadingEpisode(self.appDelegate.episodeDownloadArray[i], completion: nil)
+        }
+
+        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
+            moc = context
+        }
+        
+        // Check each subscribed podcast for a new episode, and download if a new episode is available
+        podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: moc, predicate: nil) as! [Podcast]
+        for var i = 0; i < podcastArray.count; i++ {
+            let podcast = podcastArray[i]
+            let feedURL = NSURL(string: podcast.feedURL)
+            println("this'll start it")
+            self.parser.parsePodcastFeed(feedURL!, returnPodcast: false, returnOnlyLatestEpisode: true,
+                resolve: {
+                },
+                reject: {
+                }
+            )
+        }
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -70,10 +97,6 @@ class PodcastsTableViewController: UITableViewController {
         if registerUserNotificationSettings {
             var types: UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Sound
             UIApplication.sharedApplication().registerUserNotificationSettings(UIUserNotificationSettings(forTypes: types, categories: nil))
-        }
-        
-        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
-            moc = context
         }
         
         loadData()
@@ -86,19 +109,6 @@ class PodcastsTableViewController: UITableViewController {
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
-        
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        for var i = 0; i < self.appDelegate.episodeDownloadArray.count; i++ {
-            self.downloader.startPauseOrResumeDownloadingEpisode(self.appDelegate.episodeDownloadArray[i], completion: nil)
-        }
-
-        println("episode download array total below")
-        println(self.appDelegate.episodeDownloadArray.count)
-
         
     }
     

@@ -106,8 +106,6 @@ class EpisodesTableViewController: UITableViewController {
         super.viewDidLoad()
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: kDownloadHasFinished, object: nil)
-        
-//        self.subscriber.checkIfNewEpisode(NSURL(string: selectedPodcast.feedURL)!)
 
     }
     
