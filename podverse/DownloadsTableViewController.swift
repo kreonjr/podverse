@@ -43,6 +43,10 @@ class DownloadsTableViewController: UITableViewController {
             self.tableView.reloadData()
         }
         
+        // Create reloadDataTimer when this view appears to reload table data every second
+        self.reloadDataTimer = NSTimer(timeInterval: 1.0, target: self, selector: Selector("reloadDownloadTableData"), userInfo: nil, repeats: true)
+        NSRunLoop.currentRunLoop().addTimer(self.reloadDataTimer, forMode: NSRunLoopCommonModes)
+        
     }
     
     override func viewDidLoad() {
@@ -53,10 +57,6 @@ class DownloadsTableViewController: UITableViewController {
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
-        // Create timer to reload the download table data every second
-        self.reloadDataTimer = NSTimer(timeInterval: 1.0, target: self, selector: Selector("reloadDownloadTableData"), userInfo: nil, repeats: true)
-        NSRunLoop.currentRunLoop().addTimer(reloadDataTimer, forMode: NSRunLoopCommonModes)
-        
     }
     
     override func viewDidDisappear(animated: Bool) {
@@ -64,6 +64,10 @@ class DownloadsTableViewController: UITableViewController {
         //  TOASK: What if I had two different observers in one view controller?
         //  Would we pass in something other than self?
         NSNotificationCenter.defaultCenter().removeObserver(self)
+        
+        // Remove reloadDataTimer when leaving this view
+        self.reloadDataTimer.invalidate()
+        self.reloadDataTimer = nil
         
     }
 
