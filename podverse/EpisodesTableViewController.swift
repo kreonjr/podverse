@@ -18,6 +18,8 @@ class EpisodesTableViewController: UITableViewController {
     
     var downloader = PVDownloader()
     
+    var parser = PVFeedParser()
+    
     var selectedPodcast: Podcast!
     
     var moc: NSManagedObjectContext!

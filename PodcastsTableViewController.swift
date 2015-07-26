@@ -86,6 +86,7 @@ class PodcastsTableViewController: UITableViewController {
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
+        
     }
     
     override func viewDidLoad() {

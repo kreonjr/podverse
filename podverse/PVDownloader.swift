@@ -42,26 +42,20 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         
         // If the session does not already exist, initialize the session
         
+        println(episode.title)
+        
         if self.appDelegate!.episodeDownloadSession == nil {
             initializeEpisodeDownloadSession()
         }
         
-        println("episode.downloadComplete =")
-        println(episode.downloadComplete)
-        
-        println("episode.isDownloading =")
-        println(episode.isDownloading)
-        
-        println("episode.taskResumeData =")
-        println(episode.taskResumeData)
-        
-        
         // If the episode has already downloaded, then do nothing
         if (episode.downloadComplete == true) {
             // do nothing
+            println("do nothing")
         }
         // Else if the episode is currently downloading, and it has a taskIdentifer, then pause the download
         else if episode.isDownloading == true && episode.taskIdentifier != 0 {
+            println("else if currently downloading and has task identifier")
             episode.downloadTask?.cancelByProducingResumeData() { resumeData in
                 if (resumeData != nil) {
                     episode.taskResumeData = resumeData
@@ -71,6 +65,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
         // Else if the episode download is paused, then resume the download
         else if episode.taskResumeData != nil {
+            println("else if is paused")
             var downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithResumeData(episode.taskResumeData!)
             episode.taskIdentifier = episode.downloadTask?.taskIdentifier
             downloadTask.resume()
@@ -78,6 +73,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
         // Else start or restart the download
         else {
+            println("else start or restart download")
+            episode.downloadProgress = 0
             var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
             var downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
             episode.taskIdentifier = downloadTask.taskIdentifier

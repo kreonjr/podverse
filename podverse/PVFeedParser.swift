@@ -22,6 +22,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     var feedURL: NSURL!
     var podcast: Podcast!
     var episode: Episode!
+    var onlyMostRecentEpisode: Episode!
     
     var episodeArray: [Episode] = [Episode]()
     
@@ -58,7 +59,16 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
         
-        podcast = CoreDataHelper.insertManagedObject("Podcast", managedObjectContext: self.moc) as! Podcast
+        // If podcast already exists in the database, do not insert new managed object
+        let feedURLString = info.url.absoluteString
+        let predicate = NSPredicate(format: "feedURL == %@", feedURLString!)
+        let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
+        if podcastSet.count > 0 {
+            podcast = podcastSet[0]
+        }
+        else {
+            podcast = CoreDataHelper.insertManagedObject("Podcast", managedObjectContext: self.moc) as! Podcast
+        }
         
         if let title = info.title { podcast.title = title }
 
@@ -84,7 +94,15 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
         
-        episode = CoreDataHelper.insertManagedObject(NSStringFromClass(Episode), managedObjectContext: self.moc) as! Episode
+        // If episode already exists in the database, do not insert new managed object
+        let predicate = NSPredicate(format: "mediaURL == %@", (item.enclosures[0]["url"] as? String)!)
+        let episodeSet = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
+        if episodeSet.count > 0 {
+            episode = episodeSet[0]
+        }
+        else {
+            episode = CoreDataHelper.insertManagedObject("Episode", managedObjectContext: self.moc) as! Episode
+        }
         
         if let title = item.title { episode.title = title }
         
@@ -110,6 +128,11 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         podcast.addEpisodeObject(episode)
         
         episodeArray.append(episode)
+        
+        if self.returnOnlyLatestEpisode == true {
+            parser.stopParsing()
+            self.onlyMostRecentEpisode = episode
+        }
     
     }
         
@@ -118,6 +141,17 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         podcast.lastPubDate = episodeArray[0].pubDate
 //        didReturnPodcast(podcast)
         moc.save(nil)
+        
+        if self.returnOnlyLatestEpisode == true {
+            let mostRecentEpisodePodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+            let mostRecentSavedEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
+            let mostRecentSavedEpisode = mostRecentSavedEpisodeSet[0] as! Episode
+            if self.onlyMostRecentEpisode != mostRecentSavedEpisode {
+                self.downloader.startPauseOrResumeDownloadingEpisode(self.onlyMostRecentEpisode, completion: nil)
+            }
+        }
+        
+        
     }
     
 }

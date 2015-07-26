@@ -41,9 +41,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         println("buenas dias")
         let queue = dispatch_queue_create("fm.podverse.new.episodes.timer", nil)
         timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue)
-        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 1800 * NSEC_PER_SEC, 1 * NSEC_PER_SEC)
+        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC, 1 * NSEC_PER_SEC)
         dispatch_source_set_event_handler(timer) {
 //            self.subscriber.checkIfNewEpisode()
+            println("hey there!")
         }
         dispatch_resume(timer)
     }
@@ -66,17 +67,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         episodeDownloadArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
         
         for var i = 0; i < episodeDownloadArray.count; i++ {
-            println(episodeDownloadArray[i].taskIdentifier)
             episodeDownloadArray[i].taskIdentifier = 0
-            println(episodeDownloadArray[i].taskIdentifier)
-            
-            if episodeDownloadArray[i].taskResumeData == nil {
-                
-            }
-            
         }
         
         self.moc.save(nil)
+        
+        startCheckSubscriptionsForNewEpisodesTimer()
                 
         return true
     }
