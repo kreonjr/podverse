@@ -318,8 +318,6 @@ class MediaPlayerViewController: UIViewController {
                 var destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(selectedEpisode.fileName!)
                 
                 var checkValidation = NSFileManager.defaultManager()
-                println(destinationURL!)
-//                println(checkValidation.fileExistsAtPath(destinationURL?.absoluteString!))
                 
                 var playerItem = AVPlayerItem(URL: destinationURL!)
                 url = destinationURL

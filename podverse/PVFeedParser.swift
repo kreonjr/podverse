@@ -22,7 +22,8 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     var feedURL: NSURL!
     var podcast: Podcast!
     var episode: Episode!
-    var onlyMostRecentEpisode: Episode!
+    var mostRecentEpisodeInFeed: Episode!
+    var mostRecentEpisodeSaved: Episode!
     
     var episodeArray: [Episode] = [Episode]()
     
@@ -32,12 +33,11 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     func parsePodcastFeed(feedURL: NSURL, returnPodcast: Bool, returnOnlyLatestEpisode: Bool, resolve: () -> (), reject: () -> ()) {
         
+        
+        println("parse that feed")
         // Pass the parser task booleans to the global scope
         self.returnPodcast = returnPodcast
         self.returnOnlyLatestEpisode = returnOnlyLatestEpisode
-        println("below")
-        println(returnOnlyLatestEpisode)
-        println(self.returnOnlyLatestEpisode)
         
         moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
         
@@ -49,7 +49,9 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         feedParser.connectionType = ConnectionTypeAsynchronously
         feedParser.parse()
         
-        // TODO: I don't really understand this part
+        // TODO: WTF? I don't really understand this part, but I found it in a tutorial
+        // TODO: parsing needs to move off the main thread
+        // TODO: Important: https://github.com/mwaterfall/MWFeedParser/issues/78
         var delta: Int64 = 1 * Int64(NSEC_PER_SEC)
         var time = dispatch_time(DISPATCH_TIME_NOW, delta)
         dispatch_after(time, dispatch_get_main_queue(), {
@@ -62,6 +64,8 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     }
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
+        
+        println("parsing podcast")
         
         // If podcast already exists in the database, do not insert new podcast, instead update existing podcast
         let feedURLString = info.url.absoluteString
@@ -93,14 +97,18 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
             let data = NSData(contentsOfURL: itunesImgURL!)
             self.podcast.itunesImage = data
         }
-    
+        
+        let mostRecentEpisodeSavedPodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+        let mostRecentEpisodeSavedSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodeSavedPodcastPredicate)
+        if mostRecentEpisodeSavedSet.count > 0 {
+            self.mostRecentEpisodeSaved = mostRecentEpisodeSavedSet[0] as! Episode
+        }
+
     }
         
     func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
         
         // If episode already exists in the database, do not insert new episode, instead update existing episode
-        println(item.title)
-        
         // TODO: Is there one field we can reliably check for matching episodes that will never error out?
         var predicate = NSPredicate()
         
@@ -153,7 +161,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         }
         
         if self.returnOnlyLatestEpisode == true {
-            self.onlyMostRecentEpisode = episode
+            self.mostRecentEpisodeInFeed = episode
             parser.stopParsing()
         }
     
@@ -164,22 +172,32 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         // Set the podcast.lastPubDate equal to the newest episode's pubDate
         podcast.lastPubDate = episodeArray[0].pubDate
         
-        // Save the parsed podcast and episode information
-        moc.save(nil)
+        println("feedparserDidFinish meow")
         
         // If the parser is only returning the latest episode, then if the podcast's latest episode returned
-        // is not the same as the latest episode saved locally, then download and save the latest episode
+        // is not the same as the latest episode saved locally, parse the entire feed again,
+        // then download and save the latest episode
         if self.returnOnlyLatestEpisode == true {
-            let mostRecentEpisodePodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-            let mostRecentSavedEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
-            let mostRecentSavedEpisode = mostRecentSavedEpisodeSet[0] as! Episode
-            if self.onlyMostRecentEpisode != mostRecentSavedEpisode {
-                self.downloader.startPauseOrResumeDownloadingEpisode(self.onlyMostRecentEpisode, completion: nil)
-                println("begin download for newer episode")
+            println("returnOnlyLatestEpisode is true")
+            if self.mostRecentEpisodeInFeed != self.mostRecentEpisodeSaved {
+                let feedURL = NSURL(string: podcast.feedURL)
+                self.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
+                    resolve: {
+                        self.downloader.startPauseOrResumeDownloadingEpisode(self.mostRecentEpisodeInFeed, completion: nil)
+                        println("begin download for newer episode")
+                    },
+                    reject: {
+                        
+                    }
+                )
+                
             } else {
                 println("no newer episode available, don't download")
             }
         }
+        
+        // Save the parsed podcast and episode information
+        moc.save(nil)
         
         println("feed parser has finished!")
         

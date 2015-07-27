@@ -25,31 +25,51 @@ class PodcastsTableViewController: UITableViewController {
     var counter = 0
     
     @IBAction func addPodcast(sender: AnyObject) {
-        let addPodcastAlert = UIAlertController(title: "New Podcast", message: "Enter podcast feed URL", preferredStyle: UIAlertControllerStyle.Alert)
-        addPodcastAlert.addTextFieldWithConfigurationHandler(nil)
-        addPodcastAlert.addAction(UIAlertAction(title: "Save", style: UIAlertActionStyle.Default, handler: { (alertAction: UIAlertAction!) -> Void in
-            let textField = addPodcastAlert.textFields?.last as! UITextField
-            if textField.text != "" {
-                var feedURLString = textField.text
-                var feedURL = NSURL(string: feedURLString)
-                
-                // Uses Callback/Promise to make sure table data is refreshed
-                // after parsePodcastFeed() finishes
-                self.parser.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
-                    resolve: {
-                        self.loadData()
-                    },
-                    reject: {
-                        // do nothing
-                    }
-                )
-                
-            }
-        }))
+
+        // Remove latest episode for test purposes
+        var podcastToRemoveEpisodeFromArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
+        var podcastToRemoveEpisodeFrom = podcastToRemoveEpisodeFromArray[0] as Podcast
         
-        addPodcastAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
         
-        self.presentViewController(addPodcastAlert, animated: true, completion: nil)
+        let episodeToRemovePredicate = NSPredicate(format: "podcast == %@", podcastToRemoveEpisodeFrom)
+        let episodeToRemoveArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: episodeToRemovePredicate)
+        let episodeToRemove = episodeToRemoveArray[0] as! Episode
+        moc.deleteObject(episodeToRemove)
+        
+        if contains(appDelegate.episodeDownloadArray, episodeToRemove) {
+            var episodeDownloadArrayIndex = find(appDelegate.episodeDownloadArray, episodeToRemove)
+            appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
+        }
+
+        moc.save(nil)
+        println("episode deleted")
+        
+        
+//        let addPodcastAlert = UIAlertController(title: "New Podcast", message: "Enter podcast feed URL", preferredStyle: UIAlertControllerStyle.Alert)
+//        addPodcastAlert.addTextFieldWithConfigurationHandler(nil)
+//        addPodcastAlert.addAction(UIAlertAction(title: "Save", style: UIAlertActionStyle.Default, handler: { (alertAction: UIAlertAction!) -> Void in
+//            let textField = addPodcastAlert.textFields?.last as! UITextField
+//            if textField.text != "" {
+//                var feedURLString = textField.text
+//                var feedURL = NSURL(string: feedURLString)
+//                
+//                // Uses Callback/Promise to make sure table data is refreshed
+//                // after parsePodcastFeed() finishes
+//                self.parser.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
+//                    resolve: {
+//                        self.loadData()
+//                    },
+//                    reject: {
+//                        // do nothing
+//                    }
+//                )
+//                
+//            }
+//        }))
+//        
+//        addPodcastAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
+//        
+//        self.presentViewController(addPodcastAlert, animated: true, completion: nil)
     }
     
     func loadData() {
@@ -74,19 +94,6 @@ class PodcastsTableViewController: UITableViewController {
             moc = context
         }
         
-        // Check each subscribed podcast for a new episode, and download if a new episode is available
-        podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: moc, predicate: nil) as! [Podcast]
-        for var i = 0; i < podcastArray.count; i++ {
-            let podcast = podcastArray[i]
-            let feedURL = NSURL(string: podcast.feedURL)
-            println("this'll start it")
-            self.parser.parsePodcastFeed(feedURL!, returnPodcast: false, returnOnlyLatestEpisode: true,
-                resolve: {
-                },
-                reject: {
-                }
-            )
-        }
     }
     
     override func viewWillAppear(animated: Bool) {

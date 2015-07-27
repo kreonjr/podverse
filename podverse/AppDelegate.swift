@@ -23,6 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var downloader = PVDownloader()
     
+    var parser = PVFeedParser()
+    
     var nowPlayingEpisode: Episode?
     
     var episodeDownloadArray = [Episode]()
@@ -37,15 +39,36 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var timer: dispatch_source_t!
     
+    // This function runs once on app load, then runs in the background every 30 minutes.
+    // Check if a new episode is available for a subscribed podcast; if true, download that episode.
+    // TODO: make sure this is running in the background, even when app is not in the foreground
+    // TODO: can we allow resolve / reject to be optional? Allow nil as a parameter?
     func startCheckSubscriptionsForNewEpisodesTimer() {
-        println("buenas dias")
-        let queue = dispatch_queue_create("fm.podverse.new.episodes.timer", nil)
-        timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, queue)
-        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC, 1 * NSEC_PER_SEC)
+        
+        // TODO: Should I or should I not be using dispatch_get_main_queue here?
+        timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue())
+        
+        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 20 * NSEC_PER_SEC, 1 * NSEC_PER_SEC)
+        
         dispatch_source_set_event_handler(timer) {
-            println("hey there!")
+            
+            let podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
+            
+            for var i = 0; i < podcastArray.count; i++ {
+                let feedURL = NSURL(string: podcastArray[i].feedURL)
+                self.parser.parsePodcastFeed(feedURL!, returnPodcast: false, returnOnlyLatestEpisode: true,
+                    resolve: {
+                        
+                    }, reject: {
+                        
+                    }
+                )
+            }
+            
         }
+        
         dispatch_resume(timer)
+        
     }
 
     func application(application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: () -> Void) {
@@ -63,15 +86,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let secondPredicate = NSPredicate(format: "taskResumeData != nil")
         let predicate = NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: [firstPredicate, secondPredicate])
         
-        episodeDownloadArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
+        self.episodeDownloadArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
         
-        for var i = 0; i < episodeDownloadArray.count; i++ {
-            episodeDownloadArray[i].taskIdentifier = 0
+        for var i = 0; i < self.episodeDownloadArray.count; i++ {
+            self.episodeDownloadArray[i].taskIdentifier = 0
         }
-        
-        self.moc.save(nil)
-        
-        
         
         startCheckSubscriptionsForNewEpisodesTimer()
                 

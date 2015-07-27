@@ -39,7 +39,6 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
             let session = NSURLSession.sharedSession()
             let task = session.dataTaskWithURL(url!, completionHandler: {data, response, error -> Void in
                 
-                println("Task completed")
                 if (error != nil) {
                     println(error.localizedDescription)
                 }
@@ -102,10 +101,6 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                             searchResultPodcast.primaryGenreName = podcastJSON["primaryGenreName"] as? String
                             
                             searchResultPodcast.title = podcastJSON["collectionName"] as? String
-                            
-//                            searchResultPodcast.episodesTotal = podcastJSON["trackCount"] as? Int
-//                            println(podcastJSON["trackCount"] as? String)
-//                            println("there it is")
                             
                             self.appDelegate.iTunesSearchPodcastArray.append(searchResultPodcast)
                             self.tableView.reloadData()
@@ -194,12 +189,10 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         
         if iTunesSearchPodcast.isSubscribed == false {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
-                println("subscribe to podcast")
-                
                 self.subscriber.subscribeToPodcast(iTunesSearchPodcast.feedURL!.absoluteString!)
-                
             }))
-        } else {            
+        }
+        else {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Unsubscribe", style: .Default, handler: { action in
                 println("unsubscribe to podcast")
             }))
@@ -207,12 +200,10 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         
         searchResultPodcastActions.addAction(UIAlertAction(title: "Show Episodes", style: .Default, handler: { action in
             println("Show Episodes")
-            //            self.performSegueWithIdentifier("Show Episodes", sender: self)
         }))
         
         searchResultPodcastActions.addAction(UIAlertAction (title: "Show Clips", style: .Default, handler: { action in
             println("Show Episodes")
-            //            self.performSegueWithIdentifier("Show Clip", sender: self)
         }))
         
         searchResultPodcastActions.addAction(UIAlertAction (title: "Show Profile", style: .Default, handler: { action in

@@ -19,7 +19,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     
     var moc: NSManagedObjectContext!
     
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate?
+    var appDelegate: AppDelegate?
     
     var docDirectoryURL: NSURL?
     
@@ -40,9 +40,9 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         
         self.moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
         
-        // If the session does not already exist, initialize the session
+        appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate?
         
-        println(episode.title)
+        // If the session does not already exist, initialize the session
         
         if self.appDelegate!.episodeDownloadSession == nil {
             initializeEpisodeDownloadSession()
@@ -78,17 +78,14 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
             var downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
             episode.taskIdentifier = downloadTask.taskIdentifier
-            downloadTask.resume()
             episode.isDownloading = true
             
-            // If episode is already in episodeDownloadArray, do not add it to the array
-            if contains(appDelegate!.episodeDownloadArray, episode) {
-                // do nothing
-            }
-            // Else add the episode to the episodeDownloadArray 
-            else {
+            if !contains(appDelegate!.episodeDownloadArray, episode) {
                 appDelegate!.episodeDownloadArray.append(episode)
             }
+            
+            downloadTask.resume()
+
 
         }
     }
@@ -118,7 +115,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         var fileManager = NSFileManager.defaultManager()
         
         println("did finish downloading")
-        println(downloadTask.taskIdentifier)
         
         // Get the corresponding episode object by its taskIdentifier value
         var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier)
@@ -150,7 +146,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             // Add the file destination to the episode object for playback and retrieval
             episode.fileName = destinationFilename
 
-            // Reset the episode.download to nil before saving, or the app will crash
+            // Reset the episode.downloadTask to nil before saving, or the app will crash
             episode.downloadTask = nil
             
             // Save the downloadedMediaFileDestination with the object
@@ -190,12 +186,15 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     
     func getDownloadingEpisodeIndexWithTaskIdentifier(taskIdentifier: Int) -> Int {
         var index = 0
+
         for (var i = 0; i < appDelegate!.episodeDownloadArray.count; i++) {
             var episode = appDelegate!.episodeDownloadArray[i]
+
             if (episode.taskIdentifier! == taskIdentifier) {
                 index = i
                 break
             }
+
         }
         return index
     }
