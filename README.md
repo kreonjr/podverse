@@ -8,7 +8,7 @@ http://www.gnu.org/licenses/agpl-3.0.en.html
 
 ---
 
-***Getting Started***
+**Getting Started**
 
 Podverse uses CocoaPods to manage dependencies, but (I think?) you do not have to install CocoaPods to begin developing Podverse.
 
@@ -30,7 +30,7 @@ pod install
 
 This will create a podverse.xcworkspace file. You should use the podverse.xcworkspace file from now on.
 
-***MWFeedParser***
+**MWFeedParser**
 
 One of Podverse's dependencies is MWFeedParser, which is third-party free software that simplifies extracting information from RSS feeds.
 
