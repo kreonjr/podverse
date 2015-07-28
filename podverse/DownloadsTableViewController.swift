@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class DownloadsTableViewController: UITableViewController {
     
@@ -14,9 +15,9 @@ class DownloadsTableViewController: UITableViewController {
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var episodeDownloadArray = [Episode]()
-    
     var downloader = PVDownloader()
+    
+    var moc: NSManagedObjectContext!
     
     var reloadDataTimer: NSTimer!
     
@@ -30,6 +31,20 @@ class DownloadsTableViewController: UITableViewController {
         }
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
+            self.moc = context
+        }
+        
+        // Style the navigation bar
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
+        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
+        
+    }
+    
     override func viewWillAppear(animated: Bool) {
         
         // Add the Player button if an episode is loaded in the media player
@@ -37,25 +52,9 @@ class DownloadsTableViewController: UITableViewController {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
         
-        self.episodeDownloadArray = self.appDelegate.episodeDownloadArray
-        
-        dispatch_async(dispatch_get_main_queue()) {
-            self.tableView.reloadData()
-        }
-        
         // Create reloadDataTimer when this view appears to reload table data every second
         self.reloadDataTimer = NSTimer(timeInterval: 1.0, target: self, selector: Selector("reloadDownloadTableData"), userInfo: nil, repeats: true)
         NSRunLoop.currentRunLoop().addTimer(self.reloadDataTimer, forMode: NSRunLoopCommonModes)
-        
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        // Style the navigation bar
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
-        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
     }
     
@@ -86,21 +85,17 @@ class DownloadsTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
-        
-        self.episodeDownloadArray = self.appDelegate.episodeDownloadArray
-        
-        return self.episodeDownloadArray.count
+        return self.appDelegate.episodeDownloadArray.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell: DownloadsTableViewCell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! DownloadsTableViewCell
-        let episode = episodeDownloadArray[indexPath.row]
+        let episode = self.appDelegate.episodeDownloadArray[indexPath.row]
         
         cell.title!.text = episode.title
         
         var imageData = episode.podcast.image
+        var itunesImageData = episode.podcast.itunesImage
         
         if imageData != nil {
             var image = UIImage(data: imageData!)
@@ -109,6 +104,15 @@ class DownloadsTableViewController: UITableViewController {
                 cell.pvImage?.image = image
             } else {
                 var itunesImageData = episode.podcast.itunesImage
+                var itunesImage = UIImage(data: itunesImageData!)
+                
+                if itunesImage!.size.height != 0.0 {
+                    cell.pvImage?.image = itunesImage
+                }
+            }
+        }
+        else {
+            if itunesImageData != nil {
                 var itunesImage = UIImage(data: itunesImageData!)
                 
                 if itunesImage!.size.height != 0.0 {

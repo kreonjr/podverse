@@ -157,8 +157,9 @@ class PodcastsTableViewController: UITableViewController {
         cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded, 12 in progress"
         
         
-        
-        cell.lastPublishedDate?.text = self.utility.formatDateToString(podcast.lastPubDate!)
+        if let lastPubDate = podcast.lastPubDate {
+            cell.lastPublishedDate?.text = self.utility.formatDateToString(lastPubDate)
+        }
 
         if imageData != nil {
             

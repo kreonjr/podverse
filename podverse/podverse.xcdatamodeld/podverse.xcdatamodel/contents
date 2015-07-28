@@ -20,6 +20,7 @@
         <attribute name="mediaBytes" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
         <attribute name="mediaType" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="mediaURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="playbackPosition" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
         <attribute name="pubDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="summary" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="taskIdentifier" optional="YES" attributeType="Integer 32" valueTransformerName="unsigned long" defaultValueString="-1" syncable="YES"/>
@@ -45,7 +46,7 @@
     </entity>
     <elements>
         <element name="Clip" positionX="-20" positionY="-387" width="128" height="120"/>
-        <element name="Episode" positionX="-207" positionY="-526" width="128" height="345"/>
+        <element name="Episode" positionX="-207" positionY="-526" width="128" height="360"/>
         <element name="Podcast" positionX="-398" positionY="-541" width="128" height="225"/>
     </elements>
 </model>
