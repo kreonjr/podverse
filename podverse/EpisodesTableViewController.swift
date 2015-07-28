@@ -23,21 +23,36 @@ class EpisodesTableViewController: UITableViewController {
     var selectedPodcast: Podcast!
     
     var moc: NSManagedObjectContext!
-    var episodeArray = [Episode]()
+    var episodesArray = [Episode]()
+    
+    var showAllAvailableEpisodes: Bool = false
     
     func loadData() {
-        episodeArray = [Episode]()
         
+        // Clear the episodes array, then retrieve and sort the full episode or downloaded episode array
+        self.episodesArray = [Episode]()
         var unsortedEpisodes = NSMutableArray()
         
-        for singleEpisode in selectedPodcast.episodes {
-            let loopEpisode = singleEpisode as! Episode
-            unsortedEpisodes.addObject(loopEpisode)
+        if self.showAllAvailableEpisodes == true {
+            for singleEpisode in selectedPodcast.episodes {
+                let loopEpisode = singleEpisode as! Episode
+                unsortedEpisodes.addObject(loopEpisode)
+            }
+        }
+        else {
+            let downloadedEpisodesArrayPredicate = NSPredicate(format: "fileName != nil", [])
+
+            let downloadedEpisodesArray = selectedPodcast.episodes.filteredSetUsingPredicate(downloadedEpisodesArrayPredicate)
+            
+            for singleEpisode in downloadedEpisodesArray {
+                let loopEpisode = singleEpisode as! Episode
+                unsortedEpisodes.addObject(loopEpisode)
+            }
         }
         
         let sortDescriptor = NSSortDescriptor(key: "pubDate", ascending: false)
         
-        episodeArray = unsortedEpisodes.sortedArrayUsingDescriptors([sortDescriptor]) as! [Episode]
+        self.episodesArray = unsortedEpisodes.sortedArrayUsingDescriptors([sortDescriptor]) as! [Episode]
         
         self.tableView.reloadData()
     }
@@ -63,7 +78,7 @@ class EpisodesTableViewController: UITableViewController {
         let indexPath = self.tableView.indexPathForCell(cell)
         
         if let indexPath = self.tableView.indexPathForCell(cell) {
-            var selectedEpisode = episodeArray[indexPath.row]
+            var selectedEpisode = episodesArray[indexPath.row]
             if selectedEpisode.fileName != nil {
                 self.performSegueWithIdentifier("Quick Play Downloaded Episode", sender: selectedEpisode)
             } else {
@@ -154,107 +169,137 @@ class EpisodesTableViewController: UITableViewController {
     }
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        // #warning Potentially incomplete method implementation.
-        // Return the number of sections.
         return 1
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
-        return episodeArray.count
+        return episodesArray.count + 1
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
         
-        let episode = episodeArray[indexPath.row]
-        
-        cell.title?.text = episode.title
-        
-        if let summary = episode.summary {
-            cell.summary?.text = utility.removeHTMLFromString(summary)
-        }
-        
-        cell.totalClips?.text = String("123 clips")
-        
-        if let duration = episode.duration {
-            cell.totalTimeLeft?.text = utility.convertNSNumberToHHMMSSString(episode.duration!)
-        }
+        // If not the last cell, then insert episode information into cell
+        if indexPath.row < episodesArray.count {
+            let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
+            
+            let episode = episodesArray[indexPath.row]
+            
+            cell.title?.text = episode.title
+            
+            if let summary = episode.summary {
+                cell.summary?.text = utility.removeHTMLFromString(summary)
+            }
+            
+            cell.totalClips?.text = String("123 clips")
+            
+            if let duration = episode.duration {
+                cell.totalTimeLeft?.text = utility.convertNSNumberToHHMMSSString(episode.duration!)
+            }
 
-        if let pubDate = episode.pubDate {
-            cell.pubDate?.text = utility.formatDateToString(pubDate)
+            if let pubDate = episode.pubDate {
+                cell.pubDate?.text = utility.formatDateToString(pubDate)
+            }
+            
+            // Set icon conditionally if is downloaded, is downloading, or has not downloaded
+            // If filename exists, then episode is downloaded and display play button
+            if episode.fileName != nil {
+                cell.downloadPlayButton.setTitle("\u{f04b}", forState: .Normal)
+            }
+            // Else if episode is downloading, then display downloading icon
+            else if (episode.isDownloading == true) {
+                cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
+            }
+            // Else display the start download icon
+            else {
+                cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
+            }
+            
+            cell.downloadPlayButton.addTarget(self, action: "downloadPlay:", forControlEvents: .TouchUpInside)
+            
+            return cell
         }
-        
-        // Set icon conditionally if is downloaded, is downloading, or has not downloaded
-        // If filename exists, then episode is downloaded and display play button
-        if episode.fileName != nil {
-            cell.downloadPlayButton.setTitle("\u{f04b}", forState: .Normal)
-        }
-        // Else if episode is downloading, then display downloading icon
-        else if (episode.isDownloading == true) {
-            cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
-        }
-        // Else display the start download icon
+        // Return the Show All Available Episodes / Show Downloaded Episodes button
         else {
-            cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
+            let cell = tableView.dequeueReusableCellWithIdentifier("showAllEpisodesCell", forIndexPath: indexPath) as! UITableViewCell
+            
+            if showAllAvailableEpisodes == true {
+                cell.textLabel!.text = "Show Downloaded Episodes"
+            }
+            else {
+                cell.textLabel!.text = "Show All Available Episodes"
+            }
+            
+            return cell
         }
-        
-        cell.downloadPlayButton.addTarget(self, action: "downloadPlay:", forControlEvents: .TouchUpInside)
-        
-        return cell
     }
     
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 120
+        if indexPath.row < episodesArray.count {
+            return 120
+        }
+        else {
+            return 60
+        }
+
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
         
-        let selectedEpisode = episodeArray[indexPath.row]
-        
-        if selectedEpisode.fileName != nil {
+        // If not the last item in the array, then perform selected episode actions
+        if indexPath.row < episodesArray.count {
             
-            episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
-                self.performSegueWithIdentifier("playDownloadedEpisode", sender: nil)
+            var episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
+            
+            let selectedEpisode = episodesArray[indexPath.row]
+            
+            if selectedEpisode.fileName != nil {
+                
+                episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
+                    self.performSegueWithIdentifier("playDownloadedEpisode", sender: nil)
+                }))
+                
+            } else {
+                
+                episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
+                    
+                    self.downloader.startPauseOrResumeDownloadingEpisode(selectedEpisode, completion: nil)
+                    
+                    let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
+                    
+                    if (selectedEpisode.isDownloading == true) {
+                        cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
+                    } else {
+                        cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
+                    }
+                    
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.tableView.reloadData()
+                    }
+                    
+                }))
+            }
+            
+            let totalClips = "(123)"
+            episodeActions.addAction(UIAlertAction(title: "Show Clips \(totalClips)", style: .Default, handler: { action in
+                self.performSegueWithIdentifier("showClips", sender: self)
             }))
             
-        } else {
-           
-            episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
-                
-                self.downloader.startPauseOrResumeDownloadingEpisode(selectedEpisode, completion: nil)
-                
-                let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
-                
-                if (selectedEpisode.isDownloading == true) {
-                    cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
-                } else {
-                    cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
-                }
-                
-                dispatch_async(dispatch_get_main_queue()) {
-                    self.tableView.reloadData()
-                }
-                
+            episodeActions.addAction(UIAlertAction (title: "Episode Info", style: .Default, handler: nil))
+            
+            episodeActions.addAction(UIAlertAction (title: "Stream Episode", style: .Default, handler: { action in
+                self.performSegueWithIdentifier("streamEpisode", sender: self)
             }))
+            
+            episodeActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+            
+            self.presentViewController(episodeActions, animated: true, completion: nil)
         }
-        
-        let totalClips = "(123)"
-        episodeActions.addAction(UIAlertAction(title: "Show Clips \(totalClips)", style: .Default, handler: { action in
-            self.performSegueWithIdentifier("showClips", sender: self)
-        }))
-        
-        episodeActions.addAction(UIAlertAction (title: "Episode Info", style: .Default, handler: nil))
-        
-        episodeActions.addAction(UIAlertAction (title: "Stream Episode", style: .Default, handler: { action in
-            self.performSegueWithIdentifier("streamEpisode", sender: self)
-        }))
-        
-        episodeActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-        
-        self.presentViewController(episodeActions, animated: true, completion: nil)
+        // Else perform the Show All Episodes / Show Downloaded Episodes toggle
+        else {
+            showAllAvailableEpisodes = !showAllAvailableEpisodes
+            self.loadData()
+        }
+
     }
     
     /*
@@ -300,7 +345,7 @@ class EpisodesTableViewController: UITableViewController {
             
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             if let index = self.tableView.indexPathForSelectedRow() {
-                mediaPlayerViewController.selectedEpisode = episodeArray[index.row]
+                mediaPlayerViewController.selectedEpisode = episodesArray[index.row]
             }
             mediaPlayerViewController.startDownloadedEpisode = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
@@ -318,7 +363,7 @@ class EpisodesTableViewController: UITableViewController {
             
             let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
             if let index = self.tableView.indexPathForSelectedRow() {
-                clipsTableViewController.selectedEpisode = episodeArray[index.row]
+                clipsTableViewController.selectedEpisode = episodesArray[index.row]
             }
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
             
@@ -327,7 +372,7 @@ class EpisodesTableViewController: UITableViewController {
             
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             if let index = self.tableView.indexPathForSelectedRow() {
-                mediaPlayerViewController.selectedEpisode = episodeArray[index.row]
+                mediaPlayerViewController.selectedEpisode = episodesArray[index.row]
             }
             mediaPlayerViewController.startStreamingEpisode = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true

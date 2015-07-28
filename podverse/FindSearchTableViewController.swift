@@ -204,7 +204,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         }))
         
         searchResultPodcastActions.addAction(UIAlertAction (title: "Show Clips", style: .Default, handler: { action in
-            println("Show Episodes")
+            println("Show Clips")
         }))
         
         searchResultPodcastActions.addAction(UIAlertAction (title: "Show Profile", style: .Default, handler: { action in
