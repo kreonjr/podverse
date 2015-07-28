@@ -10,14 +10,14 @@
 	<string>podverse</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>7EF1BAD00036DEA999E2F03BC1A489DBF8D5761F</key>
+		<key>47A62715A5801E74905D66DA591CF9DE0053B54B</key>
 		<string>https://github.com/podverse/podverse.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>podverse.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>7EF1BAD00036DEA999E2F03BC1A489DBF8D5761F</key>
+		<key>47A62715A5801E74905D66DA591CF9DE0053B54B</key>
 		<string>..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
@@ -25,14 +25,14 @@
 	<key>IDESourceControlProjectVersion</key>
 	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>7EF1BAD00036DEA999E2F03BC1A489DBF8D5761F</string>
+	<string>47A62715A5801E74905D66DA591CF9DE0053B54B</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>7EF1BAD00036DEA999E2F03BC1A489DBF8D5761F</string>
+			<string>47A62715A5801E74905D66DA591CF9DE0053B54B</string>
 			<key>IDESourceControlWCCName</key>
 			<string>podverse</string>
 		</dict>
