@@ -15,6 +15,7 @@ class PodcastsTableCell: UITableViewCell {
     @IBOutlet weak var title: UILabel!
     @IBOutlet weak var totalClips: UILabel!
     @IBOutlet weak var lastPublishedDate: UILabel!
+    @IBOutlet weak var episodesDownloadedOrStarted: UILabel!
     
     
     override func awakeFromNib() {

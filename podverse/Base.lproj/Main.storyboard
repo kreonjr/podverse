@@ -40,26 +40,26 @@
                                                 <constraint firstAttribute="width" constant="83" id="oZN-Qj-jmW"/>
                                             </constraints>
                                         </imageView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Last Published Date" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gpB-7I-dQJ">
-                                            <rect key="frame" x="462" y="74" width="130" height="17"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="17" id="1ZZ-WP-KRO"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <color key="textColor" red="0.43529411764705883" green="0.44313725490196076" blue="0.47450980392156861" alpha="1" colorSpace="calibratedRGB"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Title" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xWX-FX-0OI">
-                                            <rect key="frame" x="99" y="8" width="493" height="20"/>
+                                            <rect key="frame" x="99" y="8" width="493" height="19.5"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Total Clips" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mhx-A8-Vu9">
-                                            <rect key="frame" x="99" y="74" width="68" height="17"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="17" id="omn-bs-99y"/>
-                                            </constraints>
+                                            <rect key="frame" x="99" y="74" width="67.5" height="17"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" red="0.43529411764705883" green="0.44313725490196076" blue="0.47450980392156861" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Last Published Date" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZFt-a8-p4F">
+                                            <rect key="frame" x="462" y="74" width="130" height="17"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                            <color key="textColor" red="0.43529411764705883" green="0.44313725490196076" blue="0.47450980392156861" alpha="1" colorSpace="calibratedRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Episodes downloaded / Episodes started" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qLV-qO-PKC">
+                                            <rect key="frame" x="99" y="54" width="265" height="17"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <color key="textColor" red="0.43529411764705883" green="0.44313725490196076" blue="0.47450980392156861" alpha="1" colorSpace="calibratedRGB"/>
                                             <nil key="highlightedColor"/>
@@ -68,19 +68,21 @@
                                     <constraints>
                                         <constraint firstItem="xWX-FX-0OI" firstAttribute="top" secondItem="M57-XM-7AC" secondAttribute="topMargin" id="4gM-YD-XHt"/>
                                         <constraint firstItem="xWX-FX-0OI" firstAttribute="trailing" secondItem="M57-XM-7AC" secondAttribute="trailingMargin" id="54q-q8-TvH"/>
-                                        <constraint firstItem="Mhx-A8-Vu9" firstAttribute="leading" secondItem="2Mn-OG-suD" secondAttribute="trailing" constant="8" id="R6G-sB-55d"/>
+                                        <constraint firstItem="ZFt-a8-p4F" firstAttribute="trailing" secondItem="M57-XM-7AC" secondAttribute="trailingMargin" id="MOW-1x-a2o"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="Mhx-A8-Vu9" secondAttribute="bottom" constant="0.5" id="MoG-eT-RAA"/>
                                         <constraint firstAttribute="bottomMargin" secondItem="2Mn-OG-suD" secondAttribute="bottom" constant="0.5" id="RgY-mD-AGp"/>
-                                        <constraint firstAttribute="bottomMargin" secondItem="gpB-7I-dQJ" secondAttribute="bottom" constant="0.5" id="Tvb-M8-qlC"/>
                                         <constraint firstItem="2Mn-OG-suD" firstAttribute="leading" secondItem="M57-XM-7AC" secondAttribute="leadingMargin" id="WJV-vC-LFa"/>
-                                        <constraint firstAttribute="bottomMargin" secondItem="Mhx-A8-Vu9" secondAttribute="bottom" constant="0.5" id="bPJ-QY-lHz"/>
-                                        <constraint firstItem="gpB-7I-dQJ" firstAttribute="trailing" secondItem="M57-XM-7AC" secondAttribute="trailingMargin" id="dIQ-Ot-lU9"/>
+                                        <constraint firstItem="qLV-qO-PKC" firstAttribute="leading" secondItem="2Mn-OG-suD" secondAttribute="trailing" constant="8" id="ejk-aA-33w"/>
                                         <constraint firstItem="2Mn-OG-suD" firstAttribute="top" secondItem="M57-XM-7AC" secondAttribute="topMargin" id="fxP-xN-z27"/>
-                                        <constraint firstItem="Mhx-A8-Vu9" firstAttribute="leading" secondItem="2Mn-OG-suD" secondAttribute="trailing" constant="8" id="qbC-GW-W9I"/>
+                                        <constraint firstItem="Mhx-A8-Vu9" firstAttribute="top" secondItem="qLV-qO-PKC" secondAttribute="bottom" constant="3" id="gMt-MC-Pel"/>
+                                        <constraint firstItem="Mhx-A8-Vu9" firstAttribute="leading" secondItem="2Mn-OG-suD" secondAttribute="trailing" constant="8" id="lfy-g3-emR"/>
+                                        <constraint firstAttribute="bottomMargin" secondItem="ZFt-a8-p4F" secondAttribute="bottom" constant="0.5" id="pYc-LB-hlt"/>
                                         <constraint firstItem="xWX-FX-0OI" firstAttribute="leading" secondItem="2Mn-OG-suD" secondAttribute="trailing" constant="8" id="wXg-A2-P5H"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
-                                    <outlet property="lastPublishedDate" destination="gpB-7I-dQJ" id="tcw-a3-BvT"/>
+                                    <outlet property="episodesDownloadedOrStarted" destination="qLV-qO-PKC" id="5Fi-QQ-eG4"/>
+                                    <outlet property="lastPublishedDate" destination="ZFt-a8-p4F" id="bIj-Sp-O1s"/>
                                     <outlet property="pvImage" destination="2Mn-OG-suD" id="YsQ-gZ-6nt"/>
                                     <outlet property="title" destination="xWX-FX-0OI" id="5hF-3R-nME"/>
                                     <outlet property="totalClips" destination="Mhx-A8-Vu9" id="qxb-9E-NVd"/>
@@ -1280,6 +1282,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="Xc1-wE-NTg"/>
+        <segue reference="4Uo-DI-SEB"/>
     </inferredMetricsTieBreakers>
 </document>
