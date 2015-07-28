@@ -18,6 +18,8 @@ If these instructions do not work, then (we need to fix them!) the information y
 
 ---
 
+**Install CocoaPods**
+
 You will need to install CocoaPods to manage dependencies for Podverse. Installation can be as simple as running the following command in your terminal:
 
 $ sudo gem install cocoapods
@@ -30,7 +32,7 @@ pod install
 
 This will create a podverse.xcworkspace file. You should use the podverse.xcworkspace file from now on.
 
-**MWFeedParser**
+**MWFeedParser Dependency**
 
 One of Podverse's dependencies is MWFeedParser, which is third-party free software that simplifies extracting information from RSS feeds.
 
