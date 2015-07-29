@@ -186,25 +186,36 @@ class PodcastsTableViewController: UITableViewController {
         return cell
     }
 
-    /*
     // Override to support conditional editing of the table view.
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return NO if you do not want the specified item to be editable.
         return true
     }
-    */
 
-    /*
     // Override to support editing the table view.
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            // Delete the row from the data source
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+
+            // Remove latest episode for test purposes
+            
+            let podcast = podcastArray[indexPath.row]
+            moc.deleteObject(podcast)
+            moc.save(nil)
+            podcastArray.removeAtIndex(indexPath.row)
+            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            
+//            if contains(appDelegate.episodeDownloadArray, episodeToRemove) {
+//                var episodeDownloadArrayIndex = find(appDelegate.episodeDownloadArray, episodeToRemove)
+//                appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
+//            }
+            
+
+            println("episode deleted")
+            
         } else if editingStyle == .Insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
     }
-    */
 
     /*
     // Override to support rearranging the table view.
