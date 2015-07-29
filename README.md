@@ -1,0 +1,39 @@
+Podverse
+Podcast subscribing and clip sharing iOS mobile app written in Swift
+
+Work In Progress :)
+
+GNU Affero General Public License
+http://www.gnu.org/licenses/agpl-3.0.en.html
+
+---
+
+**Getting Started**
+
+Podverse uses CocoaPods to manage dependencies, but (I think?) you do not have to install CocoaPods to begin developing Podverse.
+
+All you need to remember is to open the podverse.xcworkspace file (which is integrated with CocoaPod dependencies) in XCode, AND DO NOT use podverse.xcodeproj.
+
+If these instructions do not work, then (we need to fix them!) the information you need to successfully set up the project can be found here: http://swiftalicio.us/2014/11/using-cocoapods-from-swift/
+
+---
+
+**Install CocoaPods**
+
+You will need to install CocoaPods to manage dependencies for Podverse. Installation can be as simple as running the following command in your terminal:
+
+$ sudo gem install cocoapods
+
+(For more information about installing CocoaPods, visit http://guides.cocoapods.org/using/getting-started.html#getting-started)
+
+Once you have CocoaPods installed, change into the directory that contains the Podfile (should be /Podverse/Podfile ), then type the following command:
+
+pod install
+
+This will create a podverse.xcworkspace file. You should use the podverse.xcworkspace file from now on.
+
+**MWFeedParser Dependency**
+
+One of Podverse's dependencies is MWFeedParser, which is third-party free software that simplifies extracting information from RSS feeds.
+
+Please note that we have modified MWFeedParser specifically to support Podverse's use case, so and Podverse will not work without this customized version of MWFeedParser.
