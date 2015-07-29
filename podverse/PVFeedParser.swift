@@ -125,7 +125,6 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
             predicate = NSPredicate(format: "pubDate == %@", (item.date))
         }
         
-
         let episodeSet = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
         if episodeSet.count > 0 {
             episode = episodeSet[0]
@@ -137,7 +136,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         }
         
         if let title = item.title { episode.title = title }
-        
+
         if let summary = item.summary { episode.summary = summary }
         
         if let date = item.date { episode.pubDate = date }
@@ -161,6 +160,9 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         
         if episodeAlreadySaved == false {
             podcast.addEpisodeObject(episode)
+            println("not already saved!")
+        } else {
+            println("already saved!")
         }
         
         if self.returnOnlyLatestEpisode == true {
@@ -175,19 +177,15 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         // Set the podcast.lastPubDate equal to the newest episode's pubDate
         podcast.lastPubDate = episodeArray[0].pubDate
         
-        println("feedparserDidFinish meow")
-        
         // If the parser is only returning the latest episode, then if the podcast's latest episode returned
         // is not the same as the latest episode saved locally, parse the entire feed again,
         // then download and save the latest episode
         if self.returnOnlyLatestEpisode == true {
-            println("returnOnlyLatestEpisode is true")
             if self.mostRecentEpisodeInFeed != self.mostRecentEpisodeSaved {
                 let feedURL = NSURL(string: podcast.feedURL)
                 self.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
                     resolve: {
                         self.downloader.startPauseOrResumeDownloadingEpisode(self.mostRecentEpisodeInFeed, completion: nil)
-                        println("begin download for newer episode")
                     },
                     reject: {
                         

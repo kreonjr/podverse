@@ -196,20 +196,29 @@ class PodcastsTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             
-            // Remove latest episode for test purposes
-            
             let podcast = podcastArray[indexPath.row]
+            
+            // TODO: Is there a more efficient way to delete episodes that have the podcast as a parent?
+            let episodeToRemovePredicate = NSPredicate(format: "podcast == %@", podcast)
+            let episodeToRemoveArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: episodeToRemovePredicate)
+            
+            for var i = 0; i < episodeToRemoveArray.count; i++ {
+                let episodeToRemove = episodeToRemoveArray[i] as! Episode
+                moc.deleteObject(episodeToRemove)
+            }
+            
             moc.deleteObject(podcast)
-            moc.save(nil)
             podcastArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            
+            moc.save(nil)
             
             // TODO: remove any episodes from that podcast from the episodeDownloadArray
             //            if contains(appDelegate.episodeDownloadArray, episodeToRemove) {
             //                var episodeDownloadArrayIndex = find(appDelegate.episodeDownloadArray, episodeToRemove)
             //                appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
             //            }
-            println("episode deleted")
+            println("podcast and it's episodes deleted")
             
         }
     }
