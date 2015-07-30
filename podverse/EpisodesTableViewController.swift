@@ -40,7 +40,7 @@ class EpisodesTableViewController: UITableViewController {
             }
         }
         else {
-            let downloadedEpisodesArrayPredicate = NSPredicate(format: "fileName != nil", [])
+            let downloadedEpisodesArrayPredicate = NSPredicate(format: "fileName != nil || isDownloading == true", [])
 
             let downloadedEpisodesArray = selectedPodcast.episodes.filteredSetUsingPredicate(downloadedEpisodesArrayPredicate)
             
