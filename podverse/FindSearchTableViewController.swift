@@ -269,6 +269,11 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
             }
             
         }
+        else if segue.identifier == "Find Search to Now Playing" {
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
+        }
     }
 
 

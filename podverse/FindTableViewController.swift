@@ -16,6 +16,10 @@ class FindTableViewController: UITableViewController {
     
     var findBrowseArray = ["All", "ABC", "DEF", "GHI"]
     
+    func segueToNowPlaying(sender: UIBarButtonItem) {
+        self.performSegueWithIdentifier("Find to Now Playing", sender: nil)
+    }
+    
     override func viewDidAppear(animated: Bool) {
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
@@ -135,6 +139,11 @@ class FindTableViewController: UITableViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "Search For Podcasts" {
             
+        }
+        else if segue.identifier == "Find to Now Playing" {
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }
 
