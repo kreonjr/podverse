@@ -44,8 +44,6 @@ class PodcastsTableViewController: UITableViewController {
         }
 
         moc.save(nil)
-        println("episode deleted")
-        
         
 //        let addPodcastAlert = UIAlertController(title: "New Podcast", message: "Enter podcast feed URL", preferredStyle: UIAlertControllerStyle.Alert)
 //        addPodcastAlert.addTextFieldWithConfigurationHandler(nil)
@@ -76,7 +74,6 @@ class PodcastsTableViewController: UITableViewController {
     
     func loadData() {
         podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: moc, predicate: nil) as! [Podcast]
-        println(podcastArray.count)
         self.tableView.reloadData()
     }
     
@@ -204,7 +201,18 @@ class PodcastsTableViewController: UITableViewController {
             
             for var i = 0; i < episodeToRemoveArray.count; i++ {
                 let episodeToRemove = episodeToRemoveArray[i] as! Episode
+                
+                if episodeToRemove.isDownloading == true {
+//                    episodeToRemove.downloadTask!.stop()
+//                    episodeToRemove.downloadTask!.cancel()
+                }
+                
                 moc.deleteObject(episodeToRemove)
+                
+                if contains(appDelegate.episodeDownloadArray, episodeToRemove) {
+                    var episodeDownloadArrayIndex = find(appDelegate.episodeDownloadArray, episodeToRemove)
+                    appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
+                }
             }
             
             moc.deleteObject(podcast)
@@ -212,12 +220,7 @@ class PodcastsTableViewController: UITableViewController {
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             
             moc.save(nil)
-            
-            // TODO: remove any episodes from that podcast from the episodeDownloadArray
-            //            if contains(appDelegate.episodeDownloadArray, episodeToRemove) {
-            //                var episodeDownloadArrayIndex = find(appDelegate.episodeDownloadArray, episodeToRemove)
-            //                appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
-            //            }
+
             println("podcast and it's episodes deleted")
             
         }

@@ -33,8 +33,6 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     func parsePodcastFeed(feedURL: NSURL, returnPodcast: Bool, returnOnlyLatestEpisode: Bool, resolve: () -> (), reject: () -> ()) {
         
-        
-        println("parse that feed")
         // Pass the parser task booleans to the global scope
         self.returnPodcast = returnPodcast
         self.returnOnlyLatestEpisode = returnOnlyLatestEpisode
@@ -64,8 +62,6 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     }
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
-        
-        println("parsing podcast")
         
         // If podcast already exists in the database, do not insert new podcast, instead update existing podcast
         let feedURLString = info.url.absoluteString
@@ -160,9 +156,6 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         
         if episodeAlreadySaved == false {
             podcast.addEpisodeObject(episode)
-            println("not already saved!")
-        } else {
-            println("already saved!")
         }
         
         if self.returnOnlyLatestEpisode == true {

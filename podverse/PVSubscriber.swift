@@ -11,10 +11,6 @@ import CoreData
 
 class PVSubscriber: NSObject {
     
-    func didReturnPodcast(results: Podcast) {
-        println("over here now!")
-    }
-    
     var parser = PVFeedParser()
     
     var downloader = PVDownloader()
@@ -38,18 +34,15 @@ class PVSubscriber: NSObject {
 
                 if podcastSet.count > 0 {
                     let podcast = podcastSet[0]
-                    println(podcast)
                     let mostRecentEpisodePodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
                     let mostRecentEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
-                    println(mostRecentEpisodeSet)
-//                    let mostRecentEpisode = mostRecentEpisodeSet[0] as! Episode
-//                    
-//                    self.downloader.startPauseOrResumeDownloadingEpisode(mostRecentEpisode, completion: nil)
-//                    
-//                    podcast.isSubscribed = true
-//                    println("is subscribed is true")
+                    let mostRecentEpisode = mostRecentEpisodeSet[0] as! Episode
+                    
+                    self.downloader.startPauseOrResumeDownloadingEpisode(mostRecentEpisode, completion: nil)
+                    
+                    podcast.isSubscribed = true
                 }
-                
+        
             },
             reject: {
                 // do nothing

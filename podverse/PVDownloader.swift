@@ -80,6 +80,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             episode.taskIdentifier = downloadTask.taskIdentifier
             episode.isDownloading = true
             
+            
             if !contains(appDelegate!.episodeDownloadArray, episode) {
                 appDelegate!.episodeDownloadArray.append(episode)
             }
