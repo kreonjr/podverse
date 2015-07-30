@@ -92,6 +92,17 @@ class EpisodesTableViewController: UITableViewController {
         
     }
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
+            moc = context
+        }
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: kDownloadHasFinished, object: nil)
+        
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -115,13 +126,6 @@ class EpisodesTableViewController: UITableViewController {
             self.tableView.reloadData()
         }
         
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: kDownloadHasFinished, object: nil)
-
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -302,25 +306,54 @@ class EpisodesTableViewController: UITableViewController {
 
     }
     
-    /*
     // Override to support conditional editing of the table view.
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the specified item to be editable.
-        return true
+        // Return False if you do not want the specified item to be editable.
+        
+        if indexPath.row < episodesArray.count {
+            
+            let episode = episodesArray[indexPath.row]
+            if episode.fileName != nil {
+                return true
+            }
+            else {
+                return false
+            }
+            
+        }
+        else {
+            return false
+        }
+        
     }
-    */
-
-    /*
+    
     // Override to support editing the table view.
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            // Delete the row from the data source
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+            
+            let episodeToRemove = episodesArray[indexPath.row]
+            
+            // TODO: Make sure the downloadTask is stopped/canceled
+            if episodeToRemove.isDownloading == true {
+                //                    episodeToRemove.downloadTask!.stop()
+                //                    episodeToRemove.downloadTask!.cancel()
+            }
+            
+            if contains(appDelegate.episodeDownloadArray, episodeToRemove) {
+                var episodeDownloadArrayIndex = find(appDelegate.episodeDownloadArray, episodeToRemove)
+                appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
+            }
+            
+            moc.deleteObject(episodeToRemove)
+            episodesArray.removeAtIndex(indexPath.row)
+            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            
+            moc.save(nil)
+            
+            println("episode deleted")
+            
+        }
     }
-    */
 
     /*
     // Override to support rearranging the table view.

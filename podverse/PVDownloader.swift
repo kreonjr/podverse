@@ -80,6 +80,11 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             episode.taskIdentifier = downloadTask.taskIdentifier
             episode.isDownloading = true
             
+            // TODO: I think the code below if failing because the transformable downloadTask property is not properly configured for Core Data
+            // ask???
+            //            println("downloadTask derp")
+            //            println(downloadTask)
+            //            episode.downloadTask = downloadTask
             
             if !contains(appDelegate!.episodeDownloadArray, episode) {
                 appDelegate!.episodeDownloadArray.append(episode)

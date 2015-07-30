@@ -151,6 +151,22 @@ class DownloadsTableViewController: UITableViewController {
         return 100
     }
 
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! DownloadsTableViewCell
+        let episode = self.appDelegate.episodeDownloadArray[indexPath.row]
+        
+        if episode.isDownloading == true {
+            cell.downloadStatus.text = "Paused"
+            downloader.startPauseOrResumeDownloadingEpisode(episode, completion: nil)
+        }
+        else {
+            cell.downloadStatus.text = "Downloading"
+            downloader.startPauseOrResumeDownloadingEpisode(episode, completion: nil)
+        }
+        
+    }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {

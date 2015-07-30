@@ -180,12 +180,15 @@ class MediaPlayerViewController: UIViewController {
     func updateCurrentTimeDisplay() {
         let time = NSNumber(double: CMTimeGetSeconds(avPlayer.currentTime()))
         
-        currentTime?.text = utility.convertNSNumberToHHMMSSString(time)
-        
-        let floatCurrentTime = Float(time)
-        let floatTotalTime = Float(selectedEpisode.duration!)
-        
-        nowPlayingSlider.value = floatCurrentTime / floatTotalTime
+        //TODO: If an episode is the NowPlayingEpisode, and the episode is deleted, this seems to crash it
+        if time != 0 {
+            currentTime?.text = utility.convertNSNumberToHHMMSSString(time)
+            
+            let floatCurrentTime = Float(time)
+            let floatTotalTime = Float(selectedEpisode.duration!)
+            
+            nowPlayingSlider.value = floatCurrentTime / floatTotalTime
+        }
     }
     
     func createMakeClipButton () {
