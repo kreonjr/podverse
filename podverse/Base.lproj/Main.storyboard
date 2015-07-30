@@ -1031,7 +1031,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gtd-Og-dc0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4499" y="1021"/>
+            <point key="canvasLocation" x="4540" y="1021"/>
         </scene>
         <!--Find-->
         <scene sceneID="sBP-OA-kTq">
@@ -1148,6 +1148,7 @@
                     <connections>
                         <outlet property="searchBar" destination="fUv-R6-hrd" id="g1k-PY-voe"/>
                         <segue destination="pXc-eT-gZd" kind="show" identifier="Show Podcast Profile" id="m8V-g9-2RE"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="Find Search to Now Playing" id="ueq-kl-s1Y"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0A6-As-5s1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1297,6 +1298,6 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="zDb-Gw-nok"/>
+        <segue reference="ueq-kl-s1Y"/>
     </inferredMetricsTieBreakers>
 </document>

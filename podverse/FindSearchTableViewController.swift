@@ -116,6 +116,10 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         }
     }
     
+    func segueToNowPlaying(sender: UIBarButtonItem) {
+        self.performSegueWithIdentifier("Find Search to Now Playing", sender: nil)
+    }
+    
     override func viewDidAppear(animated: Bool) {
         moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
         

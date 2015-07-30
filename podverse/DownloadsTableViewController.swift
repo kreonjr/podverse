@@ -65,8 +65,10 @@ class DownloadsTableViewController: UITableViewController {
         NSNotificationCenter.defaultCenter().removeObserver(self)
         
         // Remove reloadDataTimer when leaving this view
-        self.reloadDataTimer.invalidate()
-        self.reloadDataTimer = nil
+        if self.reloadDataTimer != nil {
+            self.reloadDataTimer.invalidate()
+            self.reloadDataTimer = nil
+        }
         
     }
 
