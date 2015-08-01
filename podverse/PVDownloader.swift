@@ -107,7 +107,9 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             var episode = appDelegate!.episodeDownloadArray[episodeDownloadIndex]
             
             var totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
+
             episode.downloadProgress = Float(totalProgress)
+            episode.mediaBytes = Float(totalBytesExpectedToWrite)
             
             let downloadHasProgressedUserInfo = ["episode":episode]
             
