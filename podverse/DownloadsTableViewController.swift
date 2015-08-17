@@ -53,23 +53,15 @@ class DownloadsTableViewController: UITableViewController {
         }
         
         // Create reloadDataTimer when this view appears to reload table data every second
-        self.reloadDataTimer = NSTimer(timeInterval: 1.0, target: self, selector: Selector("reloadDownloadTableData"), userInfo: nil, repeats: true)
-        NSRunLoop.currentRunLoop().addTimer(self.reloadDataTimer, forMode: NSRunLoopCommonModes)
-        
+        self.reloadDataTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("reloadDownloadTableData"), userInfo: nil, repeats: true)
     }
     
     override func viewDidDisappear(animated: Bool) {
-        
-        //  TOASK: What if I had two different observers in one view controller?
-        //  Would we pass in something other than self?
-        NSNotificationCenter.defaultCenter().removeObserver(self)
-        
         // Remove reloadDataTimer when leaving this view
         if self.reloadDataTimer != nil {
             self.reloadDataTimer.invalidate()
             self.reloadDataTimer = nil
         }
-        
     }
 
     override func didReceiveMemoryWarning() {
@@ -96,33 +88,20 @@ class DownloadsTableViewController: UITableViewController {
         
         cell.title!.text = episode.title
         
-        var imageData = episode.podcast.image
-        var itunesImageData = episode.podcast.itunesImage
-        
-        if imageData != nil {
-            var image = UIImage(data: imageData!)
-            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
-            if image!.size.height != 0.0 {
+        if let imageData = episode.podcast.image {
+            if let image = UIImage(data: imageData) {
                 cell.pvImage?.image = image
-            } else {
-                var itunesImageData = episode.podcast.itunesImage
-                var itunesImage = UIImage(data: itunesImageData!)
-                
-                if itunesImage!.size.height != 0.0 {
-                    cell.pvImage?.image = itunesImage
-                }
-            }
-        }
-        else {
-            if itunesImageData != nil {
-                var itunesImage = UIImage(data: itunesImageData!)
-                
-                if itunesImage!.size.height != 0.0 {
-                    cell.pvImage?.image = itunesImage
-                }
             }
         }
 
+        if cell.pvImage?.image == nil {
+            if let itunesImageData = episode.podcast.itunesImage {
+                if let itunesImage = UIImage(data: itunesImageData) {
+                    cell.pvImage?.image = itunesImage
+                }
+            }
+        }
+        
         cell.progress.progress = Float(episode.downloadProgress!)
         
         // Format the total bytes into a human readable KB or MB number
