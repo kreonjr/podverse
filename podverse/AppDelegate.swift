@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import AVFoundation
+import ReachabilitySwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -38,6 +39,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var backgroundTransferCompletionHandler: (() -> Void)?
     
     var timer: dispatch_source_t!
+    
+    var internetReach: Reachability?
     
     // This function runs once on app load, then runs in the background every 30 minutes.
     // Check if a new episode is available for a subscribed podcast; if true, download that episode.
@@ -93,8 +96,47 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         startCheckSubscriptionsForNewEpisodesTimer()
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reachabilityChanged:", name: ReachabilityChangedNotification, object: nil)
+        
+        // Instantiate the Reachability object
+        internetReach = Reachability.reachabilityForInternetConnection()
+        // Run startNotifier so Reachability constantly listens for changes to the internet connection
+        internetReach?.startNotifier()
+        
+        if internetReach != nil {
+            self.statusChangedWithReachability(internetReach!)
+        }
                 
         return true
+    }
+    
+    func statusChangedWithReachability(currentReachabilityStatus: Reachability) {
+        var networkStatus = currentReachabilityStatus.currentReachabilityStatus
+        
+        if networkStatus.description == "WiFi" {
+            // WiFi is enabled
+            // TODO: Add resume all downloads function when WiFi is enabled
+            reachabilityStatus = kReachableWithWIFI
+        }
+        else if networkStatus.description == "Cellular" {
+            // Cellular data is enabled
+            // TODO: Add pause all downloads function when Cellular is enabled
+            reachabilityStatus = kReachableWithWWAN
+        }
+        else {
+            // No internet access is enabled
+            // TODO: Add pause all downloads function when No Internet is enabled
+            reachabilityStatus = kNotReachable
+        }
+        
+        NSNotificationCenter.defaultCenter().postNotificationName("ReachStatusChanged", object: nil)
+    }
+    
+    func reachabilityChanged(notification: NSNotification) {
+        println("Reachability Status Changed")
+        reachability = notification.object as? Reachability
+        self.statusChangedWithReachability(reachability!)
     }
 
     func applicationWillResignActive(application: UIApplication) {
@@ -119,6 +161,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
         self.saveContext()
+        
+        // Stop listening for Reachability changes when the app is terminated
+        // TODO: do we actually want the ReachabilityChangedNotification to continue running in the background after the app is terminated?
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: ReachabilityChangedNotification, object: nil)
     }
 
     // MARK: - Core Data stack

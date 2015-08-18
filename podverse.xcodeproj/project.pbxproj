@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3A4368AFFC327700F507C1B8 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DDDE676FE37ED4A98326424C /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
 		812A094F1B42375F00E8F070 /* podverse.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 818615971B1E84CE006C9731 /* podverse.xcdatamodeld */; };
 		813FC8101B5CA992006248BC /* PVSubscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 813FC80F1B5CA992006248BC /* PVSubscriber.swift */; };
@@ -42,7 +43,6 @@
 		81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578D1B21619F00D67634 /* PVFeedParser.swift */; };
 		81E357901B21624500D67634 /* PVUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578F1B21624500D67634 /* PVUtility.swift */; };
 		81E4FE671B2E11D600A10A77 /* fontawesome-webfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */; };
-		BF0D6DB83D35A9AC9F60886C /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 91EBE45FBA5BB3BC622668AA /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,8 +96,8 @@
 		81E3578D1B21619F00D67634 /* PVFeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVFeedParser.swift; sourceTree = "<group>"; };
 		81E3578F1B21624500D67634 /* PVUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVUtility.swift; sourceTree = "<group>"; };
 		81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fontawesome-webfont.ttf"; sourceTree = "<group>"; };
-		91EBE45FBA5BB3BC622668AA /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B31276F33CB9962F14309BFA /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		DDDE676FE37ED4A98326424C /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,7 +105,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BF0D6DB83D35A9AC9F60886C /* libPods.a in Frameworks */,
+				3A4368AFFC327700F507C1B8 /* Pods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,7 +131,7 @@
 		7631984921B25193880208CD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				91EBE45FBA5BB3BC622668AA /* libPods.a */,
+				DDDE676FE37ED4A98326424C /* Pods.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -243,6 +243,7 @@
 				8186158D1B1E84CE006C9731 /* Frameworks */,
 				8186158E1B1E84CE006C9731 /* Resources */,
 				711CA948AE2242A116AA975C /* Copy Pods Resources */,
+				05A2B9224E1E6E9B23F1E177 /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -339,6 +340,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		05A2B9224E1E6E9B23F1E177 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		711CA948AE2242A116AA975C /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

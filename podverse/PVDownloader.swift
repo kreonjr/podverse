@@ -91,9 +91,9 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             }
             
             downloadTask.resume()
-
-
         }
+        
+        
     }
     
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
@@ -107,7 +107,9 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             var episode = appDelegate!.episodeDownloadArray[episodeDownloadIndex]
             
             var totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
-
+            
+            // TODO: A crash happened at this line below when I downloaded many NPR PlanetMoney episodes rapidly. "Thread 26: EXC_BAD_ACCESS(code=1, address=0x10)
+            // The app then would freeze whenever I reopened it. I also could not see the NPR PlanetMoney episodes on the main page when I reopened it.
             episode.downloadProgress = Float(totalProgress)
             episode.mediaBytes = Float(totalBytesExpectedToWrite)
             

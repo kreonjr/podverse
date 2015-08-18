@@ -94,7 +94,6 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
             if let data = NSData(contentsOfURL: itunesImgURL!) {
                 self.podcast.itunesImage = data
             }
-
         }
         
         let mostRecentEpisodeSavedPodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
