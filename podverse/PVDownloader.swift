@@ -15,8 +15,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
 
     // TODO: WHAT IF I HIT DOWNLOAD SEVERAL TIMES RAPIDLY?
     
-    // TODO: DOWNLOAD/PLAY ICON DOES NOT REFRESH AFTER DOWNLOAD FINISHED
-    
     var moc: NSManagedObjectContext!
     
     var appDelegate: AppDelegate?
@@ -60,6 +58,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 if (resumeData != nil) {
                     episode.taskResumeData = resumeData
                     episode.isDownloading = false
+                    self.moc.save(nil)
                 }
             }
         }
@@ -68,8 +67,9 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             println("else if is paused")
             var downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithResumeData(episode.taskResumeData!)
             episode.taskIdentifier = episode.downloadTask?.taskIdentifier
-            downloadTask.resume()
             episode.isDownloading = true
+            self.moc.save(nil)
+            downloadTask.resume()
         }
         // Else start or restart the download
         else {
@@ -80,15 +80,11 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             episode.taskIdentifier = downloadTask.taskIdentifier
             episode.isDownloading = true
             
-            // TODO: I think the code below if failing because the transformable downloadTask property is not properly configured for Core Data
-            // ask???
-            //            println("downloadTask derp")
-            //            println(downloadTask)
-            //            episode.downloadTask = downloadTask
-            
             if !contains(appDelegate!.episodeDownloadArray, episode) {
                 appDelegate!.episodeDownloadArray.append(episode)
             }
+            
+            self.moc.save(nil)
             
             downloadTask.resume()
         }
