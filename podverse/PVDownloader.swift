@@ -21,6 +21,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     
     var docDirectoryURL: NSURL?
     
+    var downloadTask: NSURLSessionDownloadTask?
+    
     func initializeEpisodeDownloadSession() {
         
         // Get the appropriate local storage directory and assign it to docDirectoryURL
@@ -65,19 +67,19 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         // Else if the episode download is paused, then resume the download
         else if episode.taskResumeData != nil {
             println("else if is paused")
-            var downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithResumeData(episode.taskResumeData!)
+            self.downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithResumeData(episode.taskResumeData!)
             episode.taskIdentifier = episode.downloadTask?.taskIdentifier
             episode.isDownloading = true
             self.moc.save(nil)
-            downloadTask.resume()
+            downloadTask?.resume()
         }
         // Else start or restart the download
         else {
             println("else start or restart download")
             episode.downloadProgress = 0
             var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
-            var downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
-            episode.taskIdentifier = downloadTask.taskIdentifier
+            self.downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
+            episode.taskIdentifier = self.downloadTask?.taskIdentifier
             episode.isDownloading = true
             
             if !contains(appDelegate!.episodeDownloadArray, episode) {
@@ -86,10 +88,25 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             
             self.moc.save(nil)
             
-            downloadTask.resume()
+            self.downloadTask?.resume()
         }
-        
-        
+    }
+    
+    func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
+        print(self.downloadTask)
+        if let task = self.downloadTask {
+            task.cancelByProducingResumeData({[unowned self] (resumeData) -> Void in
+                var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(task.taskIdentifier)
+                var episode = self.appDelegate!.episodeDownloadArray[episodeDownloadIndex]
+                
+                episode.taskResumeData = resumeData
+                
+                episode.isDownloading = false
+                
+                self.moc.save(nil)
+            })
+        }
+
     }
     
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
