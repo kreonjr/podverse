@@ -47,11 +47,9 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         // If the episode has already downloaded, then do nothing
         if (episode.downloadComplete == true) {
             // do nothing
-            println("do nothing, download complete")
         }
         // Else if the episode is currently downloading, then pause the download
         else if episode.isDownloading == true {
-            println("isDownloading is true")
             self.appDelegate!.episodeDownloadSession?.getTasksWithCompletionHandler { (dataTasks: [AnyObject]!, uploadTasks: [AnyObject]!, downloadTasks: [AnyObject]!) -> Void in
                 for (var i = 0; i < downloadTasks.count; i++) {
                     if downloadTasks[i].taskIdentifier == episode.taskIdentifier {
@@ -68,7 +66,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
         // Else if the episode download is paused, then resume the download
         else if episode.taskResumeData != nil {
-            println("taskResumeData exists")
             self.downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithResumeData(episode.taskResumeData!)
             episode.taskIdentifier = self.downloadTask?.taskIdentifier
             episode.isDownloading = true
@@ -77,7 +74,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
         // Else start or restart the download
         else {
-            println("start download")
             episode.downloadProgress = 0
             var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
             self.downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
