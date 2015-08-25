@@ -10,21 +10,17 @@ import UIKit
 import CoreData
 
 class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
-    
-    // TODO: DOWNLOAD RESUME FEATURE IS CURRENTLY NOT WORKING :(
 
     // TODO: WHAT IF I HIT DOWNLOAD SEVERAL TIMES RAPIDLY?
     
     var moc: NSManagedObjectContext!
-    
     var appDelegate: AppDelegate?
-    
     var docDirectoryURL: NSURL?
-    
     var downloadTask: NSURLSessionDownloadTask?
+    var downloadSession: NSURLSession?
     
     func initializeEpisodeDownloadSession() {
-        
+
         // Get the appropriate local storage directory and assign it to docDirectoryURL
         var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
         self.docDirectoryURL = URLs[0] as? NSURL
@@ -32,6 +28,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         // Initialize the session configuration, then create the session
         var sessionConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("fm.podverse.episode.downloads")
         sessionConfiguration.HTTPMaximumConnectionsPerHost = 5
+        sessionConfiguration.allowsCellularAccess = false
+        
         self.appDelegate!.episodeDownloadSession = NSURLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
         
     }
@@ -42,8 +40,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         
         appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate?
         
-        // If the session does not already exist, initialize the session
-        
         if self.appDelegate!.episodeDownloadSession == nil {
             initializeEpisodeDownloadSession()
         }
@@ -51,31 +47,37 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         // If the episode has already downloaded, then do nothing
         if (episode.downloadComplete == true) {
             // do nothing
-            println("do nothing")
+            println("do nothing, download complete")
         }
-        // Else if the episode is currently downloading, and it has a taskIdentifer, then pause the download
-        else if episode.isDownloading == true && episode.taskIdentifier != 0 {
-            println("else if currently downloading and has task identifier")
-            episode.downloadTask?.cancelByProducingResumeData() { resumeData in
-                if (resumeData != nil) {
-                    episode.taskResumeData = resumeData
-                    episode.isDownloading = false
-                    self.moc.save(nil)
+        // Else if the episode is currently downloading, then pause the download
+        else if episode.isDownloading == true {
+            println("isDownloading is true")
+            self.appDelegate!.episodeDownloadSession?.getTasksWithCompletionHandler { (dataTasks: [AnyObject]!, uploadTasks: [AnyObject]!, downloadTasks: [AnyObject]!) -> Void in
+                for (var i = 0; i < downloadTasks.count; i++) {
+                    if downloadTasks[i].taskIdentifier == episode.taskIdentifier {
+                        downloadTasks[i].cancelByProducingResumeData() { resumeData in
+                            if (resumeData != nil) {
+                                episode.taskResumeData = resumeData
+                                episode.isDownloading = false
+                                self.moc.save(nil)
+                            }
+                        }
+                    }
                 }
             }
         }
         // Else if the episode download is paused, then resume the download
         else if episode.taskResumeData != nil {
-            println("else if is paused")
+            println("taskResumeData exists")
             self.downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithResumeData(episode.taskResumeData!)
-            episode.taskIdentifier = episode.downloadTask?.taskIdentifier
+            episode.taskIdentifier = self.downloadTask?.taskIdentifier
             episode.isDownloading = true
             self.moc.save(nil)
             downloadTask?.resume()
         }
         // Else start or restart the download
         else {
-            println("else start or restart download")
+            println("start download")
             episode.downloadProgress = 0
             var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
             self.downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
@@ -93,20 +95,37 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     }
     
     func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
-        print(self.downloadTask)
-        if let task = self.downloadTask {
-            task.cancelByProducingResumeData({[unowned self] (resumeData) -> Void in
-                var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(task.taskIdentifier)
-                var episode = self.appDelegate!.episodeDownloadArray[episodeDownloadIndex]
-                
-                episode.taskResumeData = resumeData
-                
-                episode.isDownloading = false
-                
-                self.moc.save(nil)
-            })
-        }
 
+//        // This was not working properly for me...
+//        if let task = self.downloadTask {
+//            task.cancelByProducingResumeData({[unowned self] (resumeData) -> Void in
+//                var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(task.taskIdentifier)
+//                var episode = self.appDelegate!.episodeDownloadArray[episodeDownloadIndex]
+//                episode.taskResumeData = resumeData
+//                episode.isDownloading = false
+//                self.moc.save(nil)
+//            })
+//        }
+        
+        var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(task.taskIdentifier)
+        var episode = self.appDelegate!.episodeDownloadArray[episodeDownloadIndex]
+        
+        self.appDelegate!.episodeDownloadSession?.getTasksWithCompletionHandler { (dataTasks: [AnyObject]!, uploadTasks: [AnyObject]!, downloadTasks: [AnyObject]!) -> Void in
+            for (var i = 0; i < downloadTasks.count; i++) {
+                if downloadTasks[i].taskIdentifier == episode.taskIdentifier {
+                    // TODO: Why does this work when I click a cell...but not when the app closes?
+                    downloadTasks[i].cancelByProducingResumeData() { resumeData in
+                        if (resumeData != nil) {
+                            episode.taskResumeData = resumeData
+                            episode.isDownloading = false
+                            self.moc.save(nil)
+                        }
+                    }
+                }
+            }
+        }
+        
+        
     }
     
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {

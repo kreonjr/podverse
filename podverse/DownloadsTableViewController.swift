@@ -52,6 +52,8 @@ class DownloadsTableViewController: UITableViewController {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
         
+        reloadDownloadTableData()
+        
         // Create reloadDataTimer when this view appears to reload table data every second
         self.reloadDataTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("reloadDownloadTableData"), userInfo: nil, repeats: true)
     }
@@ -122,7 +124,6 @@ class DownloadsTableViewController: UITableViewController {
             cell.downloadStatus.text = "Paused"
         }
 
-        
         return cell
     }
     
@@ -131,19 +132,8 @@ class DownloadsTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! DownloadsTableViewCell
         let episode = self.appDelegate.episodeDownloadArray[indexPath.row]
-        
-        if episode.isDownloading == true {
-            cell.downloadStatus.text = "Paused"
-            downloader.startPauseOrResumeDownloadingEpisode(episode, completion: nil)
-        }
-        else {
-            cell.downloadStatus.text = "Downloading"
-            downloader.startPauseOrResumeDownloadingEpisode(episode, completion: nil)
-        }
-        
+        downloader.startPauseOrResumeDownloadingEpisode(episode, completion: nil)
     }
     
     /*

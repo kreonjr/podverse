@@ -73,7 +73,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dispatch_resume(timer)
         
     }
-
+    
+    // TODO: What does the completionHandler do?
     func application(application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: () -> Void) {
         self.backgroundTransferCompletionHandler = completionHandler
     }
@@ -84,30 +85,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.moc = context
         }
         
-        // On app launch, clear the taskIdentifier of any episodes that previously did not finish downloading
-        let firstPredicate = NSPredicate(format: "isDownloading != 0")
+        // On app launch, clear the taskIdentifier of any episodes that previously did not finish downloading, and resume downloading
+        let firstPredicate = NSPredicate(format: "isDownloading != false")
         let secondPredicate = NSPredicate(format: "taskResumeData != nil")
         let predicate = NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: [firstPredicate, secondPredicate])
         
         self.episodeDownloadArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
         
+        println("did finish")
+        
+        for var i = 0; i < self.episodeDownloadArray.count; i++ {
+            println(self.episodeDownloadArray[i].title)
+        }
+        
         for var i = 0; i < self.episodeDownloadArray.count; i++ {
             self.episodeDownloadArray[i].taskIdentifier = 0
+            self.episodeDownloadArray[i].isDownloading = false
         }
-        
+
         startCheckSubscriptionsForNewEpisodesTimer()
+
+//        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reachabilityChanged:", name: ReachabilityChangedNotification, object: nil)
+//        
+//        // Instantiate the Reachability object
+//        internetReach = Reachability.reachabilityForInternetConnection()
+//        // Run startNotifier so Reachability constantly listens for changes to the internet connection
+//        internetReach?.startNotifier()
+//        
+//        if internetReach != nil {
+//            self.statusChangedWithReachability(internetReach!)
+//        }
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reachabilityChanged:", name: ReachabilityChangedNotification, object: nil)
-        
-        // Instantiate the Reachability object
-        internetReach = Reachability.reachabilityForInternetConnection()
-        // Run startNotifier so Reachability constantly listens for changes to the internet connection
-        internetReach?.startNotifier()
-        
-        if internetReach != nil {
-            self.statusChangedWithReachability(internetReach!)
-        }
-                
         return true
     }
     
@@ -163,7 +171,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         self.saveContext()
         
         // Stop listening for Reachability changes when the app is terminated
-        // TODO: do we actually want the ReachabilityChangedNotification to continue running in the background after the app is terminated?
+        // TODO: do we instead want the ReachabilityChangedNotification to continue running in the background after the app is terminated?
         NSNotificationCenter.defaultCenter().removeObserver(self, name: ReachabilityChangedNotification, object: nil)
     }
 
