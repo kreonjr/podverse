@@ -91,36 +91,17 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     }
     
     func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
-
-//        // This was not working properly for me...
-//        if let task = self.downloadTask {
-//            task.cancelByProducingResumeData({[unowned self] (resumeData) -> Void in
-//                var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(task.taskIdentifier)
-//                var episode = self.appDelegate!.episodeDownloadArray[episodeDownloadIndex]
-//                episode.taskResumeData = resumeData
-//                episode.isDownloading = false
-//                self.moc.save(nil)
-//            })
-//        }
         
         var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(task.taskIdentifier)
         var episode = self.appDelegate!.episodeDownloadArray[episodeDownloadIndex]
         
-        self.appDelegate!.episodeDownloadSession?.getTasksWithCompletionHandler { (dataTasks: [AnyObject]!, uploadTasks: [AnyObject]!, downloadTasks: [AnyObject]!) -> Void in
-            for (var i = 0; i < downloadTasks.count; i++) {
-                if downloadTasks[i].taskIdentifier == episode.taskIdentifier {
-                    // TODO: Why does this work when I click a cell...but not when the app closes?
-                    downloadTasks[i].cancelByProducingResumeData() { resumeData in
-                        if (resumeData != nil) {
-                            episode.taskResumeData = resumeData
-                            episode.isDownloading = false
-                            self.moc.save(nil)
-                        }
-                    }
-                }
-            }
-        }
+        var resumeData = error!.userInfo?[NSURLSessionDownloadTaskResumeData] as? NSData
         
+        if (resumeData != nil) {
+            episode.taskResumeData = resumeData
+            episode.isDownloading = false
+            self.moc.save(nil)
+        }        
         
     }
     
