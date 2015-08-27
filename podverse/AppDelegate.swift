@@ -21,17 +21,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var avPlayer: AVPlayer?
     
     var subscriber = PVSubscriber()
-    
-    var downloader = PVDownloader()
-    
+        
     var parser = PVFeedParser()
     
     var nowPlayingEpisode: Episode?
     
     var episodeDownloadArray = [Episode]()
-    
-    var episodeDownloadSession : NSURLSession?
-    
+        
     var iTunesSearchPodcastArray = [SearchResultPodcast]()
     
     var iTunesSearchPodcastFeedURLArray: [NSURL] = []

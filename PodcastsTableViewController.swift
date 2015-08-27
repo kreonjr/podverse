@@ -19,8 +19,6 @@ class PodcastsTableViewController: UITableViewController {
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    let downloader = PVDownloader()
-    
     var moc: NSManagedObjectContext!
     var podcastArray = [Podcast]()
     
@@ -86,7 +84,7 @@ class PodcastsTableViewController: UITableViewController {
         
         // If there are any unfinished downloads in the appDelegate.episodeDownloadArray, then resume those downloads
         for var i = 0; i < self.appDelegate.episodeDownloadArray.count; i++ {
-            self.downloader.startPauseOrResumeDownloadingEpisode(self.appDelegate.episodeDownloadArray[i], completion: nil)
+            PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(self.appDelegate.episodeDownloadArray[i], completion: nil)
         }
 
         if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {

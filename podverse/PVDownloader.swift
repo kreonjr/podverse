@@ -13,47 +13,49 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
 
     // TODO: WHAT IF I HIT DOWNLOAD SEVERAL TIMES RAPIDLY?
     
-    var moc: NSManagedObjectContext!
-    var appDelegate: AppDelegate?
+    var moc: NSManagedObjectContext! {
+        get {
+            return appDelegate.managedObjectContext
+        }
+    }
+    var appDelegate: AppDelegate {
+        get {
+            return UIApplication.sharedApplication().delegate as! AppDelegate
+        }
+    }
     var docDirectoryURL: NSURL?
-    var downloadTask: NSURLSessionDownloadTask?
-    var downloadSession: NSURLSession?
+    var downloadTask = NSURLSessionDownloadTask()
+    var downloadSession: NSURLSession!
     
-    func initializeEpisodeDownloadSession() {
-
-        // Get the appropriate local storage directory and assign it to docDirectoryURL
+    static let sharedInstance = PVDownloader()
+    
+    override init() {
+        super.init()
+        
+        var sessionConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("fm.podverse.episode.downloads")
+    
         var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
         self.docDirectoryURL = URLs[0] as? NSURL
         
         // Initialize the session configuration, then create the session
-        var sessionConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("fm.podverse.episode.downloads")
+        
         sessionConfiguration.HTTPMaximumConnectionsPerHost = 5
         sessionConfiguration.allowsCellularAccess = false
         
-        self.appDelegate!.episodeDownloadSession = NSURLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
-        
+        self.downloadSession = NSURLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
     }
     
     func startPauseOrResumeDownloadingEpisode(episode: Episode, completion: ((AnyObject) -> Void)!) {
-        
-        self.moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
-        
-        appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate?
-        
-        if self.appDelegate!.episodeDownloadSession == nil {
-            initializeEpisodeDownloadSession()
-        }
-        
         // If the episode has already downloaded, then do nothing
         if (episode.downloadComplete == true) {
             // do nothing
         }
         // Else if the episode is currently downloading, then pause the download
         else if episode.isDownloading == true {
-            self.appDelegate!.episodeDownloadSession?.getTasksWithCompletionHandler { (dataTasks: [AnyObject]!, uploadTasks: [AnyObject]!, downloadTasks: [AnyObject]!) -> Void in
+            downloadSession.getTasksWithCompletionHandler { (dataTasks: [AnyObject]!, uploadTasks: [AnyObject]!, downloadTasks: [AnyObject]!) -> Void in
                 for (var i = 0; i < downloadTasks.count; i++) {
                     if downloadTasks[i].taskIdentifier == episode.taskIdentifier {
-                        downloadTasks[i].cancelByProducingResumeData() { resumeData in
+                        downloadTasks[i].cancelByProducingResumeData() {[unowned self] resumeData in
                             if (resumeData != nil) {
                                 episode.taskResumeData = resumeData
                                 episode.isDownloading = false
@@ -66,43 +68,39 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
         // Else if the episode download is paused, then resume the download
         else if episode.taskResumeData != nil {
-            self.downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithResumeData(episode.taskResumeData!)
-            episode.taskIdentifier = self.downloadTask?.taskIdentifier
+            downloadTask = downloadSession.downloadTaskWithResumeData(episode.taskResumeData!)
+            episode.taskIdentifier = downloadTask.taskIdentifier
             episode.isDownloading = true
             self.moc.save(nil)
-            downloadTask?.resume()
+            downloadTask.resume()
         }
         // Else start or restart the download
         else {
             episode.downloadProgress = 0
             var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
-            self.downloadTask = self.appDelegate!.episodeDownloadSession!.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
-            episode.taskIdentifier = self.downloadTask?.taskIdentifier
+            downloadTask = downloadSession.downloadTaskWithURL(downloadSourceURL!, completionHandler: nil)
+            episode.taskIdentifier = downloadTask.taskIdentifier
             episode.isDownloading = true
             
-            if !contains(appDelegate!.episodeDownloadArray, episode) {
-                appDelegate!.episodeDownloadArray.append(episode)
+            if !contains(appDelegate.episodeDownloadArray, episode) {
+                appDelegate.episodeDownloadArray.append(episode)
             }
             
             self.moc.save(nil)
             
-            self.downloadTask?.resume()
+            downloadTask.resume()
         }
     }
     
     func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
-        
         var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(task.taskIdentifier)
-        var episode = self.appDelegate!.episodeDownloadArray[episodeDownloadIndex]
+        var episode = appDelegate.episodeDownloadArray[episodeDownloadIndex]
         
-        var resumeData = error!.userInfo?[NSURLSessionDownloadTaskResumeData] as? NSData
-        
-        if (resumeData != nil) {
+        if let resumeData = error?.userInfo?[NSURLSessionDownloadTaskResumeData] as? NSData {
             episode.taskResumeData = resumeData
             episode.isDownloading = false
             self.moc.save(nil)
-        }        
-        
+        }
     }
     
     func URLSession(session: NSURLSession, downloadTask: NSURLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
@@ -113,7 +111,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         else {
             // Get the corresponding episode object by its taskIdentifier value
             var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier)
-            var episode = appDelegate!.episodeDownloadArray[episodeDownloadIndex]
+            var episode = appDelegate.episodeDownloadArray[episodeDownloadIndex]
             
             var totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
             
@@ -125,7 +123,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             let downloadHasProgressedUserInfo = ["episode":episode]
             
             NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
-
         }
     }
     
@@ -137,7 +134,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         
         // Get the corresponding episode object by its taskIdentifier value
         var episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier)
-        var episode = appDelegate!.episodeDownloadArray[episodeDownloadIndex]
+        var episode = appDelegate.episodeDownloadArray[episodeDownloadIndex]
         
         // If file is already downloaded for this episode, remove the old file before saving the new one
         if (episode.fileName != nil) {
@@ -182,12 +179,12 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     }
     
     func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
-        self.appDelegate!.episodeDownloadSession!.getTasksWithCompletionHandler { (dataTasks, uploadTasks, downloadTasks) -> Void in
+        downloadSession.getTasksWithCompletionHandler { (dataTasks, uploadTasks, downloadTasks) -> Void in
             if (downloadTasks.count == 0) {
-                if (self.appDelegate!.backgroundTransferCompletionHandler != nil) {
-                    var completionHandler: (() -> Void)? = self.appDelegate!.backgroundTransferCompletionHandler
+                if (self.appDelegate.backgroundTransferCompletionHandler != nil) {
+                    var completionHandler: (() -> Void)? = self.appDelegate.backgroundTransferCompletionHandler
                     
-                    self.appDelegate!.backgroundTransferCompletionHandler = nil
+                    self.appDelegate.backgroundTransferCompletionHandler = nil
                     
                     NSOperationQueue.mainQueue().addOperationWithBlock() {
                         completionHandler?()
@@ -206,8 +203,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     func getDownloadingEpisodeIndexWithTaskIdentifier(taskIdentifier: Int) -> Int {
         var index = 0
 
-        for (var i = 0; i < appDelegate!.episodeDownloadArray.count; i++) {
-            var episode = appDelegate!.episodeDownloadArray[i]
+        for (var i = 0; i < appDelegate.episodeDownloadArray.count; i++) {
+            var episode = appDelegate.episodeDownloadArray[i]
 
             if (episode.taskIdentifier! == taskIdentifier) {
                 index = i

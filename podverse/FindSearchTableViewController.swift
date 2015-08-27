@@ -16,9 +16,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     var jsonTableData = []
     
     var subscriber = PVSubscriber()
-    
-    var downloader = PVDownloader()
-    
+        
     var timer: NSTimer? = nil
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate

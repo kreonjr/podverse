@@ -13,8 +13,6 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     
     var utility = PVUtility()
     
-    var downloader = PVDownloader()
-    
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate?
     
     var moc: NSManagedObjectContext!
@@ -177,7 +175,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
                 let feedURL = NSURL(string: podcast.feedURL)
                 self.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
                     resolve: {
-                        self.downloader.startPauseOrResumeDownloadingEpisode(self.mostRecentEpisodeInFeed, completion: nil)
+                        PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(self.mostRecentEpisodeInFeed, completion: nil)
                     },
                     reject: {
                         
