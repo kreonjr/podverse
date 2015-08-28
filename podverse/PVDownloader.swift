@@ -35,14 +35,14 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         var sessionConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("fm.podverse.episode.downloads")
     
         var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
-        self.docDirectoryURL = URLs[0] as? NSURL
+        docDirectoryURL = URLs[0] as? NSURL
         
         // Initialize the session configuration, then create the session
         
         sessionConfiguration.HTTPMaximumConnectionsPerHost = 5
         sessionConfiguration.allowsCellularAccess = false
         
-        self.downloadSession = NSURLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
+        downloadSession = NSURLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
     }
     
     func startPauseOrResumeDownloadingEpisode(episode: Episode, completion: ((AnyObject) -> Void)!) {
@@ -71,7 +71,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             downloadTask = downloadSession.downloadTaskWithResumeData(episode.taskResumeData!)
             episode.taskIdentifier = downloadTask.taskIdentifier
             episode.isDownloading = true
-            self.moc.save(nil)
+            moc.save(nil)
             downloadTask.resume()
         }
         // Else start or restart the download
