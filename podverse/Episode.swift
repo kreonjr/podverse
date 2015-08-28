@@ -27,7 +27,7 @@ class Episode: NSManagedObject {
     @NSManaged var playbackPosition: NSNumber?
     @NSManaged var pubDate: NSDate?
     @NSManaged var summary: String?
-    @NSManaged var taskIdentifier: NSNumber?
+    @NSManaged var taskIdentifier: Int
     @NSManaged var taskResumeData: NSData?
     @NSManaged var title: String
     @NSManaged var uuid: String?

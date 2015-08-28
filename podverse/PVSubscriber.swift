@@ -13,8 +13,6 @@ class PVSubscriber: NSObject {
     
     var parser = PVFeedParser()
     
-    var downloader = PVDownloader()
-    
     var moc: NSManagedObjectContext!
     
     var isNewEpisode: Bool = false
@@ -38,7 +36,7 @@ class PVSubscriber: NSObject {
                     let mostRecentEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
                     let mostRecentEpisode = mostRecentEpisodeSet[0] as! Episode
                     
-                    self.downloader.startPauseOrResumeDownloadingEpisode(mostRecentEpisode, completion: nil)
+                    PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(mostRecentEpisode, completion: nil)
                     
                     podcast.isSubscribed = true
                 }

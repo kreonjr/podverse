@@ -15,8 +15,6 @@ class DownloadsTableViewController: UITableViewController {
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var downloader = PVDownloader()
-    
     var moc: NSManagedObjectContext!
     
     var reloadDataTimer: NSTimer!
@@ -133,7 +131,7 @@ class DownloadsTableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let episode = self.appDelegate.episodeDownloadArray[indexPath.row]
-        downloader.startPauseOrResumeDownloadingEpisode(episode, completion: nil)
+        PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(episode, completion: nil)
     }
     
     /*

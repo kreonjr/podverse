@@ -16,8 +16,6 @@ class EpisodesTableViewController: UITableViewController {
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var downloader = PVDownloader()
-    
     var parser = PVFeedParser()
     
     var selectedPodcast: Podcast!
@@ -82,7 +80,7 @@ class EpisodesTableViewController: UITableViewController {
             if selectedEpisode.fileName != nil {
                 self.performSegueWithIdentifier("Quick Play Downloaded Episode", sender: selectedEpisode)
             } else {
-                self.downloader.startPauseOrResumeDownloadingEpisode(selectedEpisode, completion: nil)
+                PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(selectedEpisode, completion: nil)
                 if (selectedEpisode.isDownloading == true) {
                     cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
                     
@@ -266,7 +264,7 @@ class EpisodesTableViewController: UITableViewController {
                 
                 episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
                     
-                    self.downloader.startPauseOrResumeDownloadingEpisode(selectedEpisode, completion: nil)
+                    PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(selectedEpisode, completion: nil)
                     
                     let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
                     
