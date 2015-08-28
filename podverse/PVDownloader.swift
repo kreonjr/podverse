@@ -201,18 +201,13 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     }
     
     func getDownloadingEpisodeIndexWithTaskIdentifier(taskIdentifier: Int) -> Int {
-        var index = 0
-
-        for (var i = 0; i < appDelegate.episodeDownloadArray.count; i++) {
-            var episode = appDelegate.episodeDownloadArray[i]
-
-            if (episode.taskIdentifier! == taskIdentifier) {
-                index = i
-                break
+        for (index,episode) in enumerate(appDelegate.episodeDownloadArray) {
+            if taskIdentifier == episode.taskIdentifier {
+                return index
             }
-
         }
-        return index
+        
+        return 0
     }
     
 }
