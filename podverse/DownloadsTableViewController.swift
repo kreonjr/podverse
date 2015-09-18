@@ -10,9 +10,7 @@ import UIKit
 import CoreData
 
 class DownloadsTableViewController: UITableViewController {
-    
-    var utility = PVUtility()
-    
+        
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
     var moc: NSManagedObjectContext!

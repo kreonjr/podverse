@@ -10,9 +10,7 @@ import UIKit
 import CoreData
 
 class ClipsTableViewController: UITableViewController {
-    
-    var utility = PVUtility()
-    
+        
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
     var selectedEpisode: Episode!
@@ -97,7 +95,7 @@ class ClipsTableViewController: UITableViewController {
             }
         }
         
-        headerCell.summary!.text = utility.removeHTMLFromString(selectedEpisode.summary!)
+        headerCell.summary!.text = PVUtility.removeHTMLFromString(selectedEpisode.summary!)
         
         return headerCell
     }

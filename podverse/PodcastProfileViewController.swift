@@ -9,9 +9,7 @@
 import UIKit
 
 class PodcastProfileViewController: UIViewController {
-    
-    var utility = PVUtility()
-    
+        
     var searchResultPodcast: SearchResultPodcast!
     
     @IBOutlet weak var searchResultImage: UIImageView!
@@ -54,7 +52,7 @@ class PodcastProfileViewController: UIViewController {
         
         searchResultTotalClips.text = "123 clips"
         
-        searchResultLastPublishedDate.text = utility.formatDateToString(searchResultPodcast.lastPubDate!)
+        searchResultLastPublishedDate.text = PVUtility.formatDateToString(searchResultPodcast.lastPubDate!)
 
         searchResultPrimaryGenreName.text = "Genre: " + searchResultPodcast.primaryGenreName!
 //

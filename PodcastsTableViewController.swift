@@ -153,7 +153,7 @@ class PodcastsTableViewController: UITableViewController {
         
         
         if let lastPubDate = podcast.lastPubDate {
-            cell.lastPublishedDate?.text = self.utility.formatDateToString(lastPubDate)
+            cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
         }
 
         if imageData != nil {

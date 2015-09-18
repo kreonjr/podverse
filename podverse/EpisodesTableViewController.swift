@@ -11,7 +11,6 @@ import CoreData
 
 class EpisodesTableViewController: UITableViewController {
     
-    var utility = PVUtility()
     var subscriber = PVSubscriber()
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -189,17 +188,17 @@ class EpisodesTableViewController: UITableViewController {
             cell.title?.text = episode.title
             
             if let summary = episode.summary {
-                cell.summary?.text = utility.removeHTMLFromString(summary)
+                cell.summary?.text = PVUtility.removeHTMLFromString(summary)
             }
             
             cell.totalClips?.text = String("123 clips")
             
             if let duration = episode.duration {
-                cell.totalTimeLeft?.text = utility.convertNSNumberToHHMMSSString(episode.duration!)
+                cell.totalTimeLeft?.text = PVUtility.convertNSNumberToHHMMSSString(episode.duration!)
             }
 
             if let pubDate = episode.pubDate {
-                cell.pubDate?.text = utility.formatDateToString(pubDate)
+                cell.pubDate?.text = PVUtility.formatDateToString(pubDate)
             }
             
             // Set icon conditionally if is downloaded, is downloading, or has not downloaded

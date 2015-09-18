@@ -182,7 +182,7 @@ class MediaPlayerViewController: UIViewController {
         
         //TODO: If an episode is the NowPlayingEpisode, and the episode is deleted, this seems to crash it
         if time != 0 {
-            currentTime?.text = utility.convertNSNumberToHHMMSSString(time)
+            currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(time)
             
             let floatCurrentTime = Float(time)
             let floatTotalTime = Float(selectedEpisode.duration!)
@@ -288,9 +288,9 @@ class MediaPlayerViewController: UIViewController {
         
         episodeTitle?.text = selectedEpisode.title
         
-        totalTime?.text = utility.convertNSNumberToHHMMSSString(selectedEpisode.duration!) as String
+        totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(selectedEpisode.duration!) as String
         
-        summary?.text = utility.removeHTMLFromString(selectedEpisode.summary!)
+        summary?.text = PVUtility.removeHTMLFromString(selectedEpisode.summary!)
         
         if appDelegate.avPlayer != nil && appDelegate.nowPlayingEpisode == selectedEpisode {
             avPlayer = appDelegate.avPlayer!
