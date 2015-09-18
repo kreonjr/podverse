@@ -81,6 +81,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.moc = context
         }
         
+        application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: .Alert | .Badge, categories: nil))  // types are UIUserNotificationType members
+        
         // On app launch, clear the taskIdentifier of any episodes that previously did not finish downloading, and resume downloading
         let firstPredicate = NSPredicate(format: "isDownloading != false")
         let secondPredicate = NSPredicate(format: "taskResumeData != nil")

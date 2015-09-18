@@ -10,9 +10,7 @@ import UIKit
 import CoreData
 
 class PVFeedParser: NSObject, MWFeedParserDelegate {
-    
-    var utility = PVUtility()
-    
+        
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate?
     
     var moc: NSManagedObjectContext!
@@ -143,7 +141,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         }
         
         if let duration = item.duration {
-            let durationNSNumber = utility.convertStringToNSNumber(duration)
+            let durationNSNumber = PVUtility.convertStringToNSNumber(duration)
             episode.duration = durationNSNumber
         }
         
