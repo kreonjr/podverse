@@ -22,7 +22,7 @@ class PVSubscriber: NSObject {
             moc = context
         }
         
-        var feedURL = NSURL(string: feedURLString)
+        let feedURL = NSURL(string: feedURLString)
         
         self.parser.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
             resolve: {
@@ -35,9 +35,9 @@ class PVSubscriber: NSObject {
                     let mostRecentEpisodePodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
                     let mostRecentEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
                     let mostRecentEpisode = mostRecentEpisodeSet[0] as! Episode
-                    
+
                     PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(mostRecentEpisode, completion: nil)
-                    
+
                     podcast.isSubscribed = true
                 }
         

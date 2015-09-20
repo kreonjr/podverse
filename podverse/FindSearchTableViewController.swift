@@ -32,7 +32,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         
         if let escapedSearchTerm = itunesSearchTerm.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet()) {
             
-            let urlPath = "http://itunes.apple.com/search?media=podcast&entity=podcast&term=\(escapedSearchTerm)"
+            let urlPath = "https://itunes.apple.com/search?media=podcast&entity=podcast&term=\(escapedSearchTerm)"
             let url = NSURL(string: urlPath)
             let session = NSURLSession.sharedSession()
             let task = session.dataTaskWithURL(url!) {(data, response, error) in

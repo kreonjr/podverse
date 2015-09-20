@@ -163,7 +163,9 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     func feedParserDidFinish(parser: MWFeedParser!) {
         
         // Set the podcast.lastPubDate equal to the newest episode's pubDate
-        podcast.lastPubDate = episodeArray[0].pubDate
+        let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+        let mostRecentEpisode = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: podcastPredicate)[0] as! Episode
+        podcast.lastPubDate = mostRecentEpisode.pubDate
         
         // If the parser is only returning the latest episode, then if the podcast's latest episode returned
         // is not the same as the latest episode saved locally, parse the entire feed again,

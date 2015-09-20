@@ -60,7 +60,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                                 episode.taskResumeData = resumeData
                                 episode.isDownloading = false
                                 do {
-                                    self.moc.save()
+                                    try self.moc.save()
                                 } catch {
                                     print(error)
                                 }
@@ -86,12 +86,12 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         // Else start or restart the download
         else {
             episode.downloadProgress = 0
-            var downloadSourceURL = NSURL(string: episode.mediaURL! as String)
+            let downloadSourceURL = NSURL(string: episode.mediaURL! as String)
             downloadTask = downloadSession.downloadTaskWithURL(downloadSourceURL!)
             episode.taskIdentifier = downloadTask.taskIdentifier
             episode.isDownloading = true
             
-            if appDelegate.episodeDownloadArray.contains(episode) {
+            if !appDelegate.episodeDownloadArray.contains(episode) {
                 appDelegate.episodeDownloadArray.append(episode)
             }
             

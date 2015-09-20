@@ -260,25 +260,21 @@ class MediaPlayerViewController: UIViewController {
             moc = context
         }
         
-        var dirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] 
-        
-        var newClip = CoreDataHelper.insertManagedObject(NSStringFromClass(Clip), managedObjectContext: self.moc) as! Clip
-        
         createMakeClipButton()
         
         makeClipViewTime.hidden = true
         makeClipViewTitle.hidden = true
         makeClipViewShare.hidden = true
         
-        var imageData = selectedEpisode.podcast.image
-        var itunesImageData = selectedEpisode.podcast.itunesImage
+        let imageData = selectedEpisode.podcast.image
+        let itunesImageData = selectedEpisode.podcast.itunesImage
         
         if imageData != nil {
-            var image = UIImage(data: imageData!)
+            let image = UIImage(data: imageData!)
             mediaPlayerImage.image = image
         }
         else if itunesImageData != nil {
-            var itunesImage = UIImage(data: itunesImageData!)
+            let itunesImage = UIImage(data: itunesImageData!)
             mediaPlayerImage.image = itunesImage
             
                 
@@ -318,11 +314,9 @@ class MediaPlayerViewController: UIViewController {
             if selectedEpisode.downloadedMediaFileDestination != nil {
                 var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
                 self.docDirectoryURL = URLs[0]
-                var destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(selectedEpisode.fileName!)
+                let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(selectedEpisode.fileName!)
                 
-                var checkValidation = NSFileManager.defaultManager()
-                
-                var playerItem = AVPlayerItem(URL: destinationURL!)
+                let playerItem = AVPlayerItem(URL: destinationURL!)
                 url = destinationURL
                 appDelegate.avPlayer = AVPlayer(playerItem: playerItem)
                 avPlayer = appDelegate.avPlayer
@@ -345,7 +339,6 @@ class MediaPlayerViewController: UIViewController {
             playPauseButton.setTitle("\u{f04c}", forState: .Normal)
         }
         
-        var error: NSError?
         let session = AVAudioSession.sharedInstance()
         do {
             try session.setCategory(AVAudioSessionCategoryPlayAndRecord)
