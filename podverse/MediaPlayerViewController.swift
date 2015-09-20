@@ -196,11 +196,11 @@ class MediaPlayerViewController: UIViewController {
         // thanks to Naveen Sharma
         // http://iostechsolutions.blogspot.com/2014/11/swift-add-custom-right-bar-button-item.html
         
-        let buttonMakeClip: UIButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
+        let buttonMakeClip: UIButton = UIButton(type : UIButtonType.System)
         buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
         buttonMakeClip.setTitle("Make Clip", forState: UIControlState.Normal)
         buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
-        var rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
+        let rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
         
         self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
     }
@@ -260,7 +260,7 @@ class MediaPlayerViewController: UIViewController {
             moc = context
         }
         
-        var dirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String
+        var dirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] 
         
         var newClip = CoreDataHelper.insertManagedObject(NSStringFromClass(Clip), managedObjectContext: self.moc) as! Clip
         
@@ -317,7 +317,7 @@ class MediaPlayerViewController: UIViewController {
             
             if selectedEpisode.downloadedMediaFileDestination != nil {
                 var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
-                self.docDirectoryURL = URLs[0] as? NSURL
+                self.docDirectoryURL = URLs[0]
                 var destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(selectedEpisode.fileName!)
                 
                 var checkValidation = NSFileManager.defaultManager()
@@ -346,10 +346,11 @@ class MediaPlayerViewController: UIViewController {
         }
         
         var error: NSError?
-        var success = AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord, withOptions: .DefaultToSpeaker, error: &error)
-        
-        if !success {
-            NSLog("Failed to set audio session category. Error: \(error)")
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(AVAudioSessionCategoryPlayAndRecord)
+        } catch let error as NSError {
+            print(error)
         }
         
     }

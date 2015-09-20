@@ -36,7 +36,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
         
         // Create, configure, and start the feedParser
-        var feedParser = MWFeedParser(feedURL: feedURL)
+        let feedParser = MWFeedParser(feedURL: feedURL)
         feedParser.delegate = self
         feedParser.feedParseType = ParseTypeFull
         // TODO: Why asynchronously? Why not synchronously?
@@ -46,22 +46,22 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         // TODO: WTF? I don't really understand this part, but I found it in a tutorial
         // TODO: parsing needs to move off the main thread
         // TODO: Important: https://github.com/mwaterfall/MWFeedParser/issues/78
-        var delta: Int64 = 1 * Int64(NSEC_PER_SEC)
-        var time = dispatch_time(DISPATCH_TIME_NOW, delta)
+        let delta: Int64 = 1 * Int64(NSEC_PER_SEC)
+        let time = dispatch_time(DISPATCH_TIME_NOW, delta)
         dispatch_after(time, dispatch_get_main_queue(), {
             resolve()
         })
     }
     
     func feedParserDidStart(parser: MWFeedParser!) {
-        println("feedParser did start")
+        print("feedParser did start")
     }
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
         
         // If podcast already exists in the database, do not insert new podcast, instead update existing podcast
         let feedURLString = info.url.absoluteString
-        let predicate = NSPredicate(format: "feedURL == %@", feedURLString!)
+        let predicate = NSPredicate(format: "feedURL == %@", feedURLString)
         let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
         if podcastSet.count > 0 {
             podcast = podcastSet[0]
@@ -74,7 +74,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
 
         if let summary = info.summary { podcast.summary = summary }
         
-        if let feedURL = info.url { podcast.feedURL = feedURL.absoluteString! }
+        if let feedURL = info.url { podcast.feedURL = feedURL.absoluteString }
         
         if let itunesAuthor = info.itunesAuthor { podcast.itunesAuthor = itunesAuthor }
         
@@ -181,14 +181,18 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
                 )
                 
             } else {
-                println("no newer episode available, don't download")
+                print("no newer episode available, don't download")
             }
         }
         
         // Save the parsed podcast and episode information
-        moc.save(nil)
+        do {
+            try moc.save()
+        } catch {
+            print(error)
+        }
         
-        println("feed parser has finished!")
+        print("feed parser has finished!")
         
     }
     

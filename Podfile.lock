@@ -8,7 +8,7 @@ PODS:
     - MWFeedParser/NSString+HTML
   - MWFeedParser/NSDate+InternetDateTime (1.0.1)
   - MWFeedParser/NSString+HTML (1.0.1)
-  - ReachabilitySwift (1.1)
+  - ReachabilitySwift (2.0)
 
 DEPENDENCIES:
   - MWFeedParser
@@ -20,11 +20,11 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   ReachabilitySwift:
-    :commit: 7e0180c2761db33bc88eef310ef6d7a79c7ea40e
+    :commit: 6f7854758cbdd5ae7685800e86e334cf8bb3e40a
     :git: https://github.com/ashleymills/Reachability.swift
 
 SPEC CHECKSUMS:
   MWFeedParser: 2cf646014c1baf6ad1b08c480b40a08180079247
-  ReachabilitySwift: 1e53abddb01111deac0d229dabdb8bb043567b18
+  ReachabilitySwift: 227b98ae7ec99e1c01148b17fb22357aa91a5675
 
 COCOAPODS: 0.38.2

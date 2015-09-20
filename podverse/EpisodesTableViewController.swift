@@ -28,7 +28,7 @@ class EpisodesTableViewController: UITableViewController {
         
         // Clear the episodes array, then retrieve and sort the full episode or downloaded episode array
         self.episodesArray = [Episode]()
-        var unsortedEpisodes = NSMutableArray()
+        let unsortedEpisodes = NSMutableArray()
         
         if self.showAllAvailableEpisodes == true {
             for singleEpisode in selectedPodcast.episodes {
@@ -59,8 +59,7 @@ class EpisodesTableViewController: UITableViewController {
     }
     
     func updateDownloadFinishedButton(notification: NSNotification) {
-        let userInfo : Dictionary<String,Episode> = notification.userInfo as! Dictionary<String,Episode>
-        let episode = userInfo["episode"]
+//        let userInfo : Dictionary<String,Episode> = notification.userInfo as! Dictionary<String,Episode>
         
         //  TOASK: Could this be more efficient? Should we only reload the proper cell, and not all with reloadData?
         dispatch_async(dispatch_get_main_queue()) {
@@ -72,10 +71,9 @@ class EpisodesTableViewController: UITableViewController {
     func downloadPlay(sender: UIButton) {
         let view = sender.superview!
         let cell = view.superview as! EpisodesTableCell
-        let indexPath = self.tableView.indexPathForCell(cell)
         
         if let indexPath = self.tableView.indexPathForCell(cell) {
-            var selectedEpisode = episodesArray[indexPath.row]
+            let selectedEpisode = episodesArray[indexPath.row]
             if selectedEpisode.fileName != nil {
                 self.performSegueWithIdentifier("Quick Play Downloaded Episode", sender: selectedEpisode)
             } else {
@@ -141,11 +139,11 @@ class EpisodesTableViewController: UITableViewController {
         
         headerCell.pvImage?.image = UIImage(named: "Blank52")
         
-        var imageData = selectedPodcast.image
-        var itunesImageData = selectedPodcast.itunesImage
+        let imageData = selectedPodcast.image
+        let itunesImageData = selectedPodcast.itunesImage
         
         if imageData != nil {
-            var image = UIImage(data: imageData!)
+            let image = UIImage(data: imageData!)
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if image!.size.height != 0.0 {
                 headerCell.pvImage?.image = image
@@ -153,7 +151,7 @@ class EpisodesTableViewController: UITableViewController {
         }
         else {
             if itunesImageData != nil {
-                var itunesImage = UIImage(data: itunesImageData!)
+                let itunesImage = UIImage(data: itunesImageData!)
                 
                 if itunesImage!.size.height != 0.0 {
                     headerCell.pvImage?.image = itunesImage
@@ -193,9 +191,9 @@ class EpisodesTableViewController: UITableViewController {
             
             cell.totalClips?.text = String("123 clips")
             
-            if let duration = episode.duration {
-                cell.totalTimeLeft?.text = PVUtility.convertNSNumberToHHMMSSString(episode.duration!)
-            }
+//            if let duration = episode.duration {
+//                cell.totalTimeLeft?.text = PVUtility.convertNSNumberToHHMMSSString(episode.duration!)
+//            }
 
             if let pubDate = episode.pubDate {
                 cell.pubDate?.text = PVUtility.formatDateToString(pubDate)
@@ -221,7 +219,7 @@ class EpisodesTableViewController: UITableViewController {
         }
         // Return the Show All Available Episodes / Show Downloaded Episodes button
         else {
-            let cell = tableView.dequeueReusableCellWithIdentifier("showAllEpisodesCell", forIndexPath: indexPath) as! UITableViewCell
+            let cell = tableView.dequeueReusableCellWithIdentifier("showAllEpisodesCell", forIndexPath: indexPath) 
             
             if showAllAvailableEpisodes == true {
                 cell.textLabel!.text = "Show Downloaded Episodes"
@@ -249,7 +247,7 @@ class EpisodesTableViewController: UITableViewController {
         // If not the last item in the array, then perform selected episode actions
         if indexPath.row < episodesArray.count {
             
-            var episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
+            let episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
             
             let selectedEpisode = episodesArray[indexPath.row]
             
@@ -336,8 +334,8 @@ class EpisodesTableViewController: UITableViewController {
                 //                    episodeToRemove.downloadTask!.cancel()
             }
             
-            if contains(appDelegate.episodeDownloadArray, episodeToRemove) {
-                var episodeDownloadArrayIndex = find(appDelegate.episodeDownloadArray, episodeToRemove)
+            if appDelegate.episodeDownloadArray.contains(episodeToRemove) {
+                let episodeDownloadArrayIndex = appDelegate.episodeDownloadArray.indexOf(episodeToRemove)
                 appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
             }
             
@@ -345,9 +343,13 @@ class EpisodesTableViewController: UITableViewController {
             episodesArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             
-            moc.save(nil)
+            do {
+                try moc.save()
+            } catch let error as NSError {
+                print(error)
+            }
             
-            println("episode deleted")
+            print("episode deleted")
             
         }
     }
@@ -374,9 +376,8 @@ class EpisodesTableViewController: UITableViewController {
         if segue.identifier == "playDownloadedEpisode" {
             
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            if let index = self.tableView.indexPathForSelectedRow() {
-                mediaPlayerViewController.selectedEpisode = episodesArray[index.row]
-            }
+            let index = self.tableView.indexPathForSelectedRow!
+            mediaPlayerViewController.selectedEpisode = episodesArray[index.row]
             mediaPlayerViewController.startDownloadedEpisode = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
             
@@ -392,18 +393,16 @@ class EpisodesTableViewController: UITableViewController {
         else if segue.identifier == "showClips" {
             
             let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
-            if let index = self.tableView.indexPathForSelectedRow() {
-                clipsTableViewController.selectedEpisode = episodesArray[index.row]
-            }
+            let index = self.tableView.indexPathForSelectedRow!
+            clipsTableViewController.selectedEpisode = episodesArray[index.row]
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
             
         }
         else if segue.identifier == "streamEpisode" {
             
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            if let index = self.tableView.indexPathForSelectedRow() {
-                mediaPlayerViewController.selectedEpisode = episodesArray[index.row]
-            }
+            let index = self.tableView.indexPathForSelectedRow!
+            mediaPlayerViewController.selectedEpisode = episodesArray[index.row]
             mediaPlayerViewController.startStreamingEpisode = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
             

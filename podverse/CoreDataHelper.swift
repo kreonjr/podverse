@@ -12,7 +12,7 @@ import CoreData
 class CoreDataHelper: NSObject {
 
     class func insertManagedObject(className: NSString, managedObjectContext: NSManagedObjectContext) -> AnyObject {
-        let managedObject = NSEntityDescription.insertNewObjectForEntityForName(className as String, inManagedObjectContext: managedObjectContext) as! NSManagedObject
+        let managedObject = NSEntityDescription.insertNewObjectForEntityForName(className as String, inManagedObjectContext: managedObjectContext) 
         
         return managedObject
     }
@@ -29,9 +29,15 @@ class CoreDataHelper: NSObject {
         
         fetchRequest.returnsObjectsAsFaults = false
         
-        let items = managedObjectContext.executeFetchRequest(fetchRequest, error: nil)!
-        
+        var items = NSArray()
+        do {
+            items = try managedObjectContext.executeFetchRequest(fetchRequest)
+        } catch {
+            print(error)
+        }
+
         return items
+        
     }
     
     class func fetchOnlyEntityWithMostRecentPubDate (className: NSString, managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> NSArray {
@@ -49,9 +55,15 @@ class CoreDataHelper: NSObject {
         
         fetchRequest.returnsObjectsAsFaults = false
         
-        let mostRecentItemByPubDate = managedObjectContext.executeFetchRequest(fetchRequest, error: nil)!
-        
+        var mostRecentItemByPubDate = NSArray()
+        do {
+            mostRecentItemByPubDate = try managedObjectContext.executeFetchRequest(fetchRequest)
+        } catch {
+            print(error)
+        }
+
         return mostRecentItemByPubDate
+
     }
     
 }

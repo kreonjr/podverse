@@ -28,7 +28,7 @@ class PodcastsTableViewController: UITableViewController {
 
         // Remove latest episode for test purposes
         var podcastToRemoveEpisodeFromArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
-        var podcastToRemoveEpisodeFrom = podcastToRemoveEpisodeFromArray[0] as Podcast
+        let podcastToRemoveEpisodeFrom = podcastToRemoveEpisodeFromArray[0] as Podcast
         
         
         let episodeToRemovePredicate = NSPredicate(format: "podcast == %@", podcastToRemoveEpisodeFrom)
@@ -36,12 +36,17 @@ class PodcastsTableViewController: UITableViewController {
         let episodeToRemove = episodeToRemoveArray[0] as! Episode
         moc.deleteObject(episodeToRemove)
         
-        if contains(appDelegate.episodeDownloadArray, episodeToRemove) {
-            var episodeDownloadArrayIndex = find(appDelegate.episodeDownloadArray, episodeToRemove)
+        if self.appDelegate.episodeDownloadArray.contains(episodeToRemove) {
+            let episodeDownloadArrayIndex = appDelegate.episodeDownloadArray.indexOf(episodeToRemove)
             appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
         }
+        
+        do {
+            try moc.save()
+        } catch let error as NSError {
+            print(error)
+        }
 
-        moc.save(nil)
         
 //        let addPodcastAlert = UIAlertController(title: "New Podcast", message: "Enter podcast feed URL", preferredStyle: UIAlertControllerStyle.Alert)
 //        addPodcastAlert.addTextFieldWithConfigurationHandler(nil)
@@ -99,7 +104,7 @@ class PodcastsTableViewController: UITableViewController {
         // Alert the user to enable background notifications
         let registerUserNotificationSettings = UIApplication.instancesRespondToSelector("registerUserNotificationSettings:")
         if registerUserNotificationSettings {
-            var types: UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Sound
+            let types: UIUserNotificationType = [.Alert , .Sound]
             UIApplication.sharedApplication().registerUserNotificationSettings(UIUserNotificationSettings(forTypes: types, categories: nil))
         }
         
@@ -144,11 +149,11 @@ class PodcastsTableViewController: UITableViewController {
         cell.title?.text = podcast.title
         cell.pvImage?.image = UIImage(named: "Blank52")
         
-        var imageData = podcast.image
-        var itunesImageData = podcast.itunesImage
+        let imageData = podcast.image
+        let itunesImageData = podcast.itunesImage
         
         let totalEpisodesDownloadedPredicate = NSPredicate(format: "podcast == %@ && downloadComplete == true", podcast)
-        var totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: totalEpisodesDownloadedPredicate)
+        let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: totalEpisodesDownloadedPredicate)
         cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded, 12 in progress"
         
         
@@ -158,7 +163,7 @@ class PodcastsTableViewController: UITableViewController {
 
         if imageData != nil {
             
-            var image = UIImage(data: imageData!)
+            let image = UIImage(data: imageData!)
             
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if image!.size.height != 0.0 {
@@ -168,7 +173,7 @@ class PodcastsTableViewController: UITableViewController {
         }
         else if itunesImageData != nil {
             
-            var itunesImage = UIImage(data: itunesImageData!)
+            let itunesImage = UIImage(data: itunesImageData!)
             
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if itunesImage!.size.height != 0.0 {
@@ -207,8 +212,8 @@ class PodcastsTableViewController: UITableViewController {
                 
                 moc.deleteObject(episodeToRemove)
                 
-                if contains(appDelegate.episodeDownloadArray, episodeToRemove) {
-                    var episodeDownloadArrayIndex = find(appDelegate.episodeDownloadArray, episodeToRemove)
+                if appDelegate.episodeDownloadArray.contains(episodeToRemove) {
+                    let episodeDownloadArrayIndex = appDelegate.episodeDownloadArray.indexOf(episodeToRemove)
                     appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
                 }
             }
@@ -217,10 +222,12 @@ class PodcastsTableViewController: UITableViewController {
             podcastArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             
-            moc.save(nil)
-
-            println("podcast and it's episodes deleted")
-            
+            do {
+                try moc.save()
+                print("podcast and it's episodes deleted")
+            } catch let error as NSError {
+                print(error)
+            }
         }
     }
 
@@ -245,7 +252,7 @@ class PodcastsTableViewController: UITableViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showEpisodes" {
             let episodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
-            if let index = self.tableView.indexPathForSelectedRow() {
+            if let index = self.tableView.indexPathForSelectedRow {
                 episodesTableViewController.selectedPodcast = podcastArray[index.row]
             }
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)

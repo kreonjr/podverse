@@ -30,32 +30,26 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         
         let itunesSearchTerm = searchText.stringByReplacingOccurrencesOfString(" ", withString: "+", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
         
-        if let escapedSearchTerm = itunesSearchTerm.stringByAddingPercentEscapesUsingEncoding(NSUTF8StringEncoding) {
+        if let escapedSearchTerm = itunesSearchTerm.stringByAddingPercentEncodingWithAllowedCharacters(NSCharacterSet.URLQueryAllowedCharacterSet()) {
             
             let urlPath = "http://itunes.apple.com/search?media=podcast&entity=podcast&term=\(escapedSearchTerm)"
             let url = NSURL(string: urlPath)
             let session = NSURLSession.sharedSession()
-            let task = session.dataTaskWithURL(url!, completionHandler: {data, response, error -> Void in
+            let task = session.dataTaskWithURL(url!) {(data, response, error) in
                 
                 if (error != nil) {
-                    println(error.localizedDescription)
+                    print(error!.localizedDescription)
                 }
                 
-                var err: NSError?
-                
-                if let jsonResult = NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions.MutableContainers, error: &err) as? NSDictionary {
-                    
-                    if (err != nil) {
-                        println("JSON Error \(err!.localizedDescription)")
-                    }
-                    
+                do {
+                    let jsonResult = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers) as! NSDictionary
                     if let results: NSArray = jsonResult["results"] as? NSArray {
                         for (var i = 0; i < results.count; i++) {
                             
                             let podcastJSON: AnyObject = results[i]
                             
                             let searchResultPodcast = SearchResultPodcast()
-
+                            
                             searchResultPodcast.artistName = podcastJSON["artistName"] as? String
                             
                             let feedURLString = podcastJSON["feedUrl"] as? String
@@ -73,19 +67,20 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                             }
                             
                             let imageURLString = podcastJSON["artworkUrl100"] as? String
-                            var imgURL: NSURL = NSURL(string: imageURLString!)!
+                            let imgURL: NSURL = NSURL(string: imageURLString!)!
                             let request: NSURLRequest = NSURLRequest(URL: imgURL)
                             NSURLConnection.sendAsynchronousRequest(
                                 request, queue: NSOperationQueue.mainQueue(),
-                                completionHandler: {(response: NSURLResponse!,data: NSData!,error: NSError!) -> Void in
+                                completionHandler: { response, data, error in
                                     if error == nil {
                                         searchResultPodcast.image = data
                                         self.tableView.reloadData()
                                     } else {
-                                        println(error)
+                                        print(error)
                                     }
-                            })
-
+                                }
+                            )
+                            
                             // Grab the releaseDate, then convert into NSDate
                             var lastPubDateString = podcastJSON["releaseDate"] as? String
                             lastPubDateString = lastPubDateString?.stringByReplacingOccurrencesOfString("T", withString: " ", options: NSStringCompareOptions.LiteralSearch, range: nil)
@@ -95,7 +90,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                             if lastPubDateString != nil {
                                 searchResultPodcast.lastPubDate = dateFormatter.dateFromString(lastPubDateString!)
                             }
-
+                            
                             searchResultPodcast.primaryGenreName = podcastJSON["primaryGenreName"] as? String
                             
                             searchResultPodcast.title = podcastJSON["collectionName"] as? String
@@ -106,8 +101,10 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                         }
                     }
                     
+                } catch let error as NSError {
+                    print(error)
                 }
-            })
+            }
             
             task.resume()
             
@@ -135,7 +132,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     }
     
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
-        searchItunesFor(searchBar.text)
+        searchItunesFor(searchBar.text!)
     }
     
     override func didReceiveMemoryWarning() {
@@ -163,16 +160,16 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         cell.summary?.text = podcast.artistName
         cell.pvImage?.image = UIImage(named: "Blank52")
 
-        var imageData = podcast.image
+        let imageData = podcast.image
         
         if imageData != nil {
-            var image = UIImage(data: imageData!)
+            let image = UIImage(data: imageData!)
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if image!.size.height != 0.0 {
                 cell.pvImage?.image = image
             } else {
-                var itunesImageData = podcast.itunesImage
-                var itunesImage = UIImage(data: itunesImageData!)
+                let itunesImageData = podcast.itunesImage
+                let itunesImage = UIImage(data: itunesImageData!)
                 
                 if itunesImage!.size.height != 0.0 {
                     cell.pvImage?.image = itunesImage
@@ -185,28 +182,28 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        var searchResultPodcastActions = UIAlertController(title: "Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
+        let searchResultPodcastActions = UIAlertController(title: "Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
         
         let iTunesSearchPodcast = self.appDelegate.iTunesSearchPodcastArray[indexPath.row]
         
         if iTunesSearchPodcast.isSubscribed == false {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
-                self.subscriber.subscribeToPodcast(iTunesSearchPodcast.feedURL!.absoluteString!)
+                self.subscriber.subscribeToPodcast(iTunesSearchPodcast.feedURL!.absoluteString)
                 iTunesSearchPodcast.isSubscribed = true
             }))
         }
         else {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Unsubscribe", style: .Default, handler: { action in
-                println("unsubscribe to podcast")
+                print("unsubscribe to podcast")
             }))
         }
         
         searchResultPodcastActions.addAction(UIAlertAction(title: "Show Episodes", style: .Default, handler: { action in
-            println("Show Episodes")
+            print("Show Episodes")
         }))
         
         searchResultPodcastActions.addAction(UIAlertAction (title: "Show Clips", style: .Default, handler: { action in
-            println("Show Clips")
+            print("Show Clips")
         }))
         
         searchResultPodcastActions.addAction(UIAlertAction (title: "Show Profile", style: .Default, handler: { action in
@@ -262,7 +259,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
             
             let podcastProfileViewController = segue.destinationViewController as! PodcastProfileViewController
             
-            if let index = self.tableView.indexPathForSelectedRow() {
+            if let index = self.tableView.indexPathForSelectedRow {
                 podcastProfileViewController.searchResultPodcast = self.appDelegate.iTunesSearchPodcastArray[index.row]
             }
             

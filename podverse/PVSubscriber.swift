@@ -27,7 +27,7 @@ class PVSubscriber: NSObject {
         self.parser.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
             resolve: {
                 
-                let predicate = NSPredicate(format: "feedURL == %@", feedURL!.absoluteString!)
+                let predicate = NSPredicate(format: "feedURL == %@", feedURL!.absoluteString)
                 let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
 
                 if podcastSet.count > 0 {
