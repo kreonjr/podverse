@@ -113,7 +113,7 @@ class DownloadsTableViewController: UITableViewController {
         if episode.downloadComplete == true {
             cell.downloadStatus.text = "Finished"
         }
-        else if episode.isDownloading == true {
+        else if episode.taskIdentifier != nil {
             cell.downloadStatus.text = "Downloading"
         }
         else {
@@ -129,7 +129,7 @@ class DownloadsTableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let episode = self.appDelegate.episodeDownloadArray[indexPath.row]
-        PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(episode, completion: nil)
+        PVDownloader.sharedInstance.pauseOrResumeDownloadingEpisode(episode)
     }
     
     /*

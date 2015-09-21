@@ -93,12 +93,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("did finish")
         
         for var i = 0; i < self.episodeDownloadArray.count; i++ {
-            print(self.episodeDownloadArray[i].title)
-        }
-        
-        for var i = 0; i < self.episodeDownloadArray.count; i++ {
-            self.episodeDownloadArray[i].taskIdentifier = 0
-            self.episodeDownloadArray[i].isDownloading = false
+            self.episodeDownloadArray[i].taskIdentifier = nil
         }
 
         startCheckSubscriptionsForNewEpisodesTimer()

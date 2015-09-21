@@ -12,19 +12,15 @@ import CoreData
 class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
 
     // TODO: WHAT IF I HIT DOWNLOAD SEVERAL TIMES RAPIDLY?
-    
+    var appDelegate: AppDelegate =  UIApplication.sharedApplication().delegate as! AppDelegate
+
     var moc: NSManagedObjectContext! {
         get {
             return appDelegate.managedObjectContext
         }
     }
-    var appDelegate: AppDelegate {
-        get {
-            return UIApplication.sharedApplication().delegate as! AppDelegate
-        }
-    }
+    
     var docDirectoryURL: NSURL?
-    var downloadTask = NSURLSessionDownloadTask()
     var downloadSession: NSURLSession!
     
     static let sharedInstance = PVDownloader()
@@ -45,20 +41,38 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         downloadSession = NSURLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
     }
     
-    func startPauseOrResumeDownloadingEpisode(episode: Episode, completion: ((AnyObject) -> Void)!) {
+    func startDownloadingEpisode (episode: Episode) {
+        episode.downloadProgress = 0
+        let downloadSourceURL = NSURL(string: episode.mediaURL! as String)
+        let downloadTask = downloadSession.downloadTaskWithURL(downloadSourceURL!)
+        episode.taskIdentifier = downloadTask.taskIdentifier
+        
+        if !appDelegate.episodeDownloadArray.contains(episode) {
+            appDelegate.episodeDownloadArray.append(episode)
+        }
+        
+        do {
+            try self.moc.save()
+        } catch {
+            print(error)
+        }
+        
+        downloadTask.resume()
+    }
+    
+    func pauseOrResumeDownloadingEpisode(episode: Episode) {
         // If the episode has already downloaded, then do nothing
         if (episode.downloadComplete == true) {
             // do nothing
         }
         // Else if the episode is currently downloading, then pause the download
-        else if episode.isDownloading == true {
+        else if let taskIdentifier = episode.taskIdentifier {
             downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
-                for (var i = 0; i < downloadTasks.count; i++) {
-                    if downloadTasks[i].taskIdentifier == episode.taskIdentifier {
-                        downloadTasks[i].cancelByProducingResumeData() {[unowned self] resumeData in
+                for episodeDownloadTask in downloadTasks {
+                    if episodeDownloadTask.taskIdentifier == taskIdentifier {
+                        episodeDownloadTask.cancelByProducingResumeData() {[unowned self] resumeData in
                             if (resumeData != nil) {
                                 episode.taskResumeData = resumeData
-                                episode.isDownloading = false
                                 do {
                                     try self.moc.save()
                                 } catch {
@@ -72,9 +86,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
         // Else if the episode download is paused, then resume the download
         else if episode.taskResumeData != nil {
-            downloadTask = downloadSession.downloadTaskWithResumeData(episode.taskResumeData!)
+            let downloadTask = downloadSession.downloadTaskWithResumeData(episode.taskResumeData!)
             episode.taskIdentifier = downloadTask.taskIdentifier
-            episode.isDownloading = true
             do {
                 try moc.save()
             } catch let error as NSError {
@@ -85,37 +98,21 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
         // Else start or restart the download
         else {
-            episode.downloadProgress = 0
-            let downloadSourceURL = NSURL(string: episode.mediaURL! as String)
-            downloadTask = downloadSession.downloadTaskWithURL(downloadSourceURL!)
-            episode.taskIdentifier = downloadTask.taskIdentifier
-            episode.isDownloading = true
-            
-            if !appDelegate.episodeDownloadArray.contains(episode) {
-                appDelegate.episodeDownloadArray.append(episode)
-            }
-            
-            do {
-                try self.moc.save()
-            } catch {
-                print(error)
-            }
-            
-            downloadTask.resume()
+          startDownloadingEpisode(episode)
         }
     }
     
     func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
-        let episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(task.taskIdentifier)
-        let episode = appDelegate.episodeDownloadArray[episodeDownloadIndex]
-        
-        if let resumeData = error?.userInfo[NSURLSessionDownloadTaskResumeData] as? NSData {
-            episode.taskResumeData = resumeData
-            episode.isDownloading = false
-            do {
-                try self.moc.save()
-            } catch {
-                print(error)
+        if let episodeDownloadIndex = getDownloadingEpisodeIndexWithTaskIdentifier(task.taskIdentifier) {
+            let episode = appDelegate.episodeDownloadArray[episodeDownloadIndex.integerValue]
+            
+            if let resumeData = error?.userInfo[NSURLSessionDownloadTaskResumeData] as? NSData {
+                episode.taskResumeData = resumeData
+                do {
+                    try self.moc.save()
+                } catch {
+                    print(error)
+                }
             }
         }
     }
@@ -127,19 +124,18 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
         else {
             // Get the corresponding episode object by its taskIdentifier value
-            let episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier)
-            let episode = appDelegate.episodeDownloadArray[episodeDownloadIndex]
-            
-            let totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
-            
-            // TODO: A crash happened at this line below when I downloaded many NPR PlanetMoney episodes rapidly. "Thread 26: EXC_BAD_ACCESS(code=1, address=0x10)
-            // The app then would freeze whenever I reopened it. I also could not see the NPR PlanetMoney episodes on the main page when I reopened it.
-            episode.downloadProgress = Float(totalProgress)
-            episode.mediaBytes = Float(totalBytesExpectedToWrite)
-            
-            let downloadHasProgressedUserInfo = ["episode":episode]
-            
-            NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
+            if let episodeDownloadIndex = getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier) {
+                let episode = appDelegate.episodeDownloadArray[episodeDownloadIndex.integerValue]
+                
+                let totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
+                
+                episode.downloadProgress = Float(totalProgress)
+                episode.mediaBytes = Float(totalBytesExpectedToWrite)
+                
+                let downloadHasProgressedUserInfo = ["episode":episode]
+                
+                NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
+            }
         }
     }
     
@@ -150,54 +146,55 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         print("did finish downloading")
         
         // Get the corresponding episode object by its taskIdentifier value
-        let episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier)
-        let episode = appDelegate.episodeDownloadArray[episodeDownloadIndex]
-        
-        // If file is already downloaded for this episode, remove the old file before saving the new one
-        if (episode.fileName != nil) {
-            var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
-            self.docDirectoryURL = URLs[0]
-            let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(episode.fileName!)
+        if let episodeDownloadIndex = getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier) {
+            let episode = appDelegate.episodeDownloadArray[episodeDownloadIndex.integerValue]
+            
+            // If file is already downloaded for this episode, remove the old file before saving the new one
+            if let fileName = episode.fileName {
+                var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
+                self.docDirectoryURL = URLs[0]
+                let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName)
+                
+                do {
+                    try fileManager.removeItemAtPath(destinationURL!.path!)
+                } catch {
+                    print(error)
+                }
+            }
+            
+            // Specify a unique file name and path where the file will stored permanently
+            let currentDateTime = NSDate()
+            let formatter = NSDateFormatter()
+            formatter.dateFormat = "ddMMyyyy-HHmmss"
+            let destinationFilename = formatter.stringFromDate(currentDateTime)
+            let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(destinationFilename)
+            
             do {
-                try fileManager.removeItemAtPath(destinationURL!.path!)
+                try fileManager.copyItemAtURL(location, toURL: destinationURL!)
+                
+                episode.downloadComplete = true
+                episode.taskIdentifier = -1
+                episode.taskResumeData = nil
+                
+                // Add the file destination to the episode object for playback and retrieval
+                episode.fileName = destinationFilename
+
+                // Reset the episode.downloadTask to nil before saving, or the app will crash
+                episode.taskIdentifier = nil
+                
+                // Save the downloadedMediaFileDestination with the object
+                do {
+                    try self.moc.save()
+                } catch {
+                    print(error)
+                }
+
+                let downloadHasFinishedUserInfo = ["episode":episode]
+                
+                NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
             } catch {
                 print(error)
             }
-        }
-        
-        // Specify a unique file name and path where the file will stored permanently
-        let currentDateTime = NSDate()
-        let formatter = NSDateFormatter()
-        formatter.dateFormat = "ddMMyyyy-HHmmss"
-        let destinationFilename = formatter.stringFromDate(currentDateTime)
-        let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(destinationFilename)
-        
-        do {
-            try fileManager.copyItemAtURL(location, toURL: destinationURL!)
-            
-            episode.isDownloading = false
-            episode.downloadComplete = true
-            episode.taskIdentifier = -1
-            episode.taskResumeData = nil
-            
-            // Add the file destination to the episode object for playback and retrieval
-            episode.fileName = destinationFilename
-
-            // Reset the episode.downloadTask to nil before saving, or the app will crash
-            episode.downloadTask = nil
-            
-            // Save the downloadedMediaFileDestination with the object
-            do {
-                try self.moc.save()
-            } catch {
-                print(error)
-            }
-
-            let downloadHasFinishedUserInfo = ["episode":episode]
-            
-            NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
-        } catch {
-            print(error)
         }
     }
     
@@ -223,14 +220,14 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
     }
     
-    func getDownloadingEpisodeIndexWithTaskIdentifier(taskIdentifier: Int) -> Int {
+    func getDownloadingEpisodeIndexWithTaskIdentifier(taskIdentifier: NSNumber) -> NSNumber? {
         for (index,episode) in appDelegate.episodeDownloadArray.enumerate() {
             if taskIdentifier == episode.taskIdentifier {
                 return index
             }
         }
         
-        return 0
+        return nil
     }
     
 }

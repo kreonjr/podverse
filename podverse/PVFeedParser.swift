@@ -175,7 +175,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
                 let feedURL = NSURL(string: podcast.feedURL)
                 self.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
                     resolve: {
-                        PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(self.mostRecentEpisodeInFeed, completion: nil)
+                        PVDownloader.sharedInstance.startDownloadingEpisode(self.mostRecentEpisodeInFeed)
                     },
                     reject: {
                         

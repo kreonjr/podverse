@@ -88,8 +88,8 @@ class PodcastsTableViewController: UITableViewController {
         super.viewDidLoad()
         
         // If there are any unfinished downloads in the appDelegate.episodeDownloadArray, then resume those downloads
-        for var i = 0; i < self.appDelegate.episodeDownloadArray.count; i++ {
-            PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(self.appDelegate.episodeDownloadArray[i], completion: nil)
+        for episode:Episode in appDelegate.episodeDownloadArray {
+            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
         }
 
         if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
@@ -203,11 +203,6 @@ class PodcastsTableViewController: UITableViewController {
             
             for var i = 0; i < episodeToRemoveArray.count; i++ {
                 let episodeToRemove = episodeToRemoveArray[i] as! Episode
-                
-                if episodeToRemove.isDownloading == true {
-//                    episodeToRemove.downloadTask!.stop()
-//                    episodeToRemove.downloadTask!.cancel()
-                }
                 
                 moc.deleteObject(episodeToRemove)
                 

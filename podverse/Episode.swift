@@ -11,15 +11,12 @@ import CoreData
 @objc(Episode)
 
 class Episode: NSManagedObject {
-
-    @NSManaged var downloadComplete: NSNumber?
+    @NSManaged var downloadComplete: Bool
     @NSManaged var downloadedMediaFileDestination: String?
     @NSManaged var downloadProgress: NSNumber?
-    @NSManaged var downloadTask: AnyObject?
     @NSManaged var duration: NSNumber?
     @NSManaged var fileName: String?
     @NSManaged var guid: String?
-    @NSManaged var isDownloading: NSNumber?
     @NSManaged var link: String?
     @NSManaged var mediaBytes: NSNumber?
     @NSManaged var mediaType: String?
@@ -27,11 +24,10 @@ class Episode: NSManagedObject {
     @NSManaged var playbackPosition: NSNumber?
     @NSManaged var pubDate: NSDate?
     @NSManaged var summary: String?
-    @NSManaged var taskIdentifier: Int
+    @NSManaged var taskIdentifier: NSNumber?
     @NSManaged var taskResumeData: NSData?
-    @NSManaged var title: String
+    @NSManaged var title: String?
     @NSManaged var uuid: String?
     @NSManaged var clips: NSSet
     @NSManaged var podcast: Podcast
-
 }

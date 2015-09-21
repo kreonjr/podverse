@@ -77,11 +77,8 @@ class EpisodesTableViewController: UITableViewController {
             if selectedEpisode.fileName != nil {
                 self.performSegueWithIdentifier("Quick Play Downloaded Episode", sender: selectedEpisode)
             } else {
-                PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(selectedEpisode, completion: nil)
-                if (selectedEpisode.isDownloading == true) {
-                    cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
-                    
-                }
+                PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
+                cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
             }
         }
         
@@ -205,7 +202,7 @@ class EpisodesTableViewController: UITableViewController {
                 cell.downloadPlayButton.setTitle("\u{f04b}", forState: .Normal)
             }
             // Else if episode is downloading, then display downloading icon
-            else if (episode.isDownloading == true) {
+            else if (episode.taskIdentifier != nil) {
                 cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
             }
             // Else display the start download icon
@@ -261,11 +258,11 @@ class EpisodesTableViewController: UITableViewController {
                 
                 episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
                     
-                    PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(selectedEpisode, completion: nil)
+                    PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
                     
                     let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
                     
-                    if (selectedEpisode.isDownloading == true) {
+                    if (selectedEpisode.taskIdentifier != nil) {
                         cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
                     } else {
                         cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
@@ -328,11 +325,11 @@ class EpisodesTableViewController: UITableViewController {
             
             let episodeToRemove = episodesArray[indexPath.row]
             
-            // TODO: Make sure the downloadTask is stopped/canceled
-            if episodeToRemove.isDownloading == true {
-                //                    episodeToRemove.downloadTask!.stop()
-                //                    episodeToRemove.downloadTask!.cancel()
-            }
+//            TODO: Make sure the downloadTask is stopped/canceled
+//            if episodeToRemove.isDownloading == true {
+//                episodeToRemove.downloadTask!.stop()
+//                episodeToRemove.downloadTask!.cancel()
+//            }
             
             if appDelegate.episodeDownloadArray.contains(episodeToRemove) {
                 let episodeDownloadArrayIndex = appDelegate.episodeDownloadArray.indexOf(episodeToRemove)
