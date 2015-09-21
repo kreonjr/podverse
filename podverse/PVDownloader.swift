@@ -45,7 +45,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         episode.downloadProgress = 0
         let downloadSourceURL = NSURL(string: episode.mediaURL! as String)
         let downloadTask = downloadSession.downloadTaskWithURL(downloadSourceURL!)
-        episode.taskIdentifier = downloadTask.taskIdentifier
+        episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
         
         if !appDelegate.episodeDownloadArray.contains(episode) {
             appDelegate.episodeDownloadArray.append(episode)
@@ -65,11 +65,25 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         if (episode.downloadComplete == true) {
             // do nothing
         }
+        // Else if the episode download is paused, then resume the download
+        else if episode.taskResumeData != nil {
+            let downloadTask = downloadSession.downloadTaskWithResumeData(episode.taskResumeData!)
+            episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
+            episode.taskResumeData = nil
+
+            do {
+                try moc.save()
+            } catch let error as NSError {
+                print(error)
+            }
+            
+            downloadTask.resume()
+        }
         // Else if the episode is currently downloading, then pause the download
         else if let taskIdentifier = episode.taskIdentifier {
             downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
                 for episodeDownloadTask in downloadTasks {
-                    if episodeDownloadTask.taskIdentifier == taskIdentifier {
+                    if episodeDownloadTask.taskIdentifier == taskIdentifier.integerValue {
                         episodeDownloadTask.cancelByProducingResumeData() {[unowned self] resumeData in
                             if (resumeData != nil) {
                                 episode.taskResumeData = resumeData
@@ -83,18 +97,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     }
                 }
             }
-        }
-        // Else if the episode download is paused, then resume the download
-        else if episode.taskResumeData != nil {
-            let downloadTask = downloadSession.downloadTaskWithResumeData(episode.taskResumeData!)
-            episode.taskIdentifier = downloadTask.taskIdentifier
-            do {
-                try moc.save()
-            } catch let error as NSError {
-                print(error)
-            }
-
-            downloadTask.resume()
         }
         // Else start or restart the download
         else {
@@ -173,7 +175,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 try fileManager.copyItemAtURL(location, toURL: destinationURL!)
                 
                 episode.downloadComplete = true
-                episode.taskIdentifier = -1
                 episode.taskResumeData = nil
                 
                 // Add the file destination to the episode object for playback and retrieval
@@ -220,10 +221,10 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
     }
     
-    func getDownloadingEpisodeIndexWithTaskIdentifier(taskIdentifier: NSNumber) -> NSNumber? {
+    func getDownloadingEpisodeIndexWithTaskIdentifier(taskIdentifier: Int) -> NSNumber? {
         for (index,episode) in appDelegate.episodeDownloadArray.enumerate() {
-            if taskIdentifier == episode.taskIdentifier {
-                return index
+            if taskIdentifier == episode.taskIdentifier?.integerValue {
+                return NSNumber(integer: index)
             }
         }
         
