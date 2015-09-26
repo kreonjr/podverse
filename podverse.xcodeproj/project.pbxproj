@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3081B6BD1BB7431C00233E08 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3081B6BC1BB7431C00233E08 /* Extensions.swift */; settings = {ASSET_TAGS = (); }; };
 		3A4368AFFC327700F507C1B8 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DDDE676FE37ED4A98326424C /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
 		812A094F1B42375F00E8F070 /* podverse.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 818615971B1E84CE006C9731 /* podverse.xcdatamodeld */; };
@@ -56,6 +57,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3081B6BC1BB7431C00233E08 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		390CD96442FFFCCC0740C384 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		812A094E1B422AB300E8F070 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
 		813FC80F1B5CA992006248BC /* PVSubscriber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVSubscriber.swift; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 				8186159C1B1E84CF006C9731 /* Main.storyboard */,
 				818615951B1E84CE006C9731 /* AppDelegate.swift */,
 				817C54071B4B6976007258F8 /* Constants.swift */,
+				3081B6BC1BB7431C00233E08 /* Extensions.swift */,
 				818615BF1B1E950D006C9731 /* CoreDataHelper.swift */,
 				81623C281B35D3A100E906FE /* PVDownloader.swift */,
 				81E3578D1B21619F00D67634 /* PVFeedParser.swift */,
@@ -420,6 +423,7 @@
 				818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */,
 				81DD2CCA1B549C4D00432E0C /* Episode.swift in Sources */,
 				81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */,
+				3081B6BD1BB7431C00233E08 /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

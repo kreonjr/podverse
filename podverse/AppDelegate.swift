@@ -81,33 +81,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.moc = context
         }
         
+        // Ask for permission for Podverse to use push notifications
         application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge], categories: nil))  // types are UIUserNotificationType members
         
-        // On app launch, clear the taskIdentifier of any episodes that previously did not finish downloading, and resume downloading
-        let firstPredicate = NSPredicate(format: "isDownloading != false")
-        let secondPredicate = NSPredicate(format: "taskResumeData != nil")
-        let predicate = NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: [firstPredicate, secondPredicate])
+        let downloadSession = PVDownloader.sharedInstance.downloadSession
         
-        self.episodeDownloadArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
+        let predicate = NSPredicate(format: "taskIdentifier != nil")
         
-        print("did finish")
+        let episodesWithTaskIdentifiers = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
         
-        for var i = 0; i < self.episodeDownloadArray.count; i++ {
-            self.episodeDownloadArray[i].taskIdentifier = nil
+        downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
+            for episodeDownloadTask in downloadTasks {
+                if let episodeWithMatchingTaskIdentifier = episodesWithTaskIdentifiers.find({$0.taskIdentifier == episodeDownloadTask.taskIdentifier}) {
+                    print(episodeWithMatchingTaskIdentifier.title)
+                    print(episodeDownloadTask.taskIdentifier)
+                    self.episodeDownloadArray.append(episodeWithMatchingTaskIdentifier)
+                }
+            }
+            self.episodeDownloadArray.sortInPlace({ Int($0.taskIdentifier!) < Int($1.taskIdentifier!) })
+            
         }
-
+        
+        //        print("did finish")
+        //
+        //        for var i = 0; i < self.episodeDownloadArray.count; i++ {
+        //            self.episodeDownloadArray[i].taskIdentifier = nil
+        //        }
+        
         startCheckSubscriptionsForNewEpisodesTimer()
-
-//        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reachabilityChanged:", name: ReachabilityChangedNotification, object: nil)
-//        
-//        // Instantiate the Reachability object
-//        internetReach = Reachability.reachabilityForInternetConnection()
-//        // Run startNotifier so Reachability constantly listens for changes to the internet connection
-//        internetReach?.startNotifier()
-//        
-//        if internetReach != nil {
-//            self.statusChangedWithReachability(internetReach!)
-//        }
         
         return true
     }
