@@ -147,6 +147,9 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         
         if let guid = item.guid { episode.guid = guid }
         
+        // TODO: episode.taskIdentifier must be manually set to nil, or else it defaults to -1. Why?
+        episode.taskIdentifier = nil
+        
         episodeArray.append(episode)
         
         if episodeAlreadySaved == false {
