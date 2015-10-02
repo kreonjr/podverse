@@ -11,8 +11,7 @@ import CoreData
 
 class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
 
-    // TODO: WHAT IF I HIT DOWNLOAD SEVERAL TIMES RAPIDLY?
-    var appDelegate: AppDelegate =  UIApplication.sharedApplication().delegate as! AppDelegate
+    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
 
     var moc: NSManagedObjectContext! {
         get {

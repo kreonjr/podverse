@@ -14,8 +14,6 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     @IBOutlet weak var searchBar: UISearchBar!
     
     var jsonTableData = []
-    
-    var subscriber = PVSubscriber()
         
     var timer: NSTimer? = nil
     
@@ -118,10 +116,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     override func viewDidAppear(animated: Bool) {
         moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
         
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
-        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
-        
+        // If there is a now playing episode, add Now Playing button to navigation bar
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
@@ -188,7 +183,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         
         if iTunesSearchPodcast.isSubscribed == false {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
-                self.subscriber.subscribeToPodcast(iTunesSearchPodcast.feedURL!.absoluteString)
+                PVSubscriber.sharedInstance.subscribeToPodcast(iTunesSearchPodcast.feedURL!.absoluteString)
                 iTunesSearchPodcast.isSubscribed = true
             }))
         }

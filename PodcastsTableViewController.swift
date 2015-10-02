@@ -12,67 +12,19 @@ import CoreData
 class PodcastsTableViewController: UITableViewController {
 
     @IBOutlet var myPodcastsTableView: UITableView!
-
-    var utility = PVUtility()
     
-    var parser = PVFeedParser()
+    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    var moc: NSManagedObjectContext! {
+        get {
+            return appDelegate.managedObjectContext
+        }
+    }
     
-    var moc: NSManagedObjectContext!
     var podcastArray = [Podcast]()
     
-    var counter = 0
-    
     @IBAction func addPodcast(sender: AnyObject) {
-
-        // Remove latest episode for test purposes
-        var podcastToRemoveEpisodeFromArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
-        let podcastToRemoveEpisodeFrom = podcastToRemoveEpisodeFromArray[0] as Podcast
-        
-        
-        let episodeToRemovePredicate = NSPredicate(format: "podcast == %@", podcastToRemoveEpisodeFrom)
-        let episodeToRemoveArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: episodeToRemovePredicate)
-        let episodeToRemove = episodeToRemoveArray[0] as! Episode
-        moc.deleteObject(episodeToRemove)
-        
-        if self.appDelegate.episodeDownloadArray.contains(episodeToRemove) {
-            let episodeDownloadArrayIndex = appDelegate.episodeDownloadArray.indexOf(episodeToRemove)
-            appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
-        }
-        
-        do {
-            try moc.save()
-        } catch let error as NSError {
-            print(error)
-        }
-
-        
-//        let addPodcastAlert = UIAlertController(title: "New Podcast", message: "Enter podcast feed URL", preferredStyle: UIAlertControllerStyle.Alert)
-//        addPodcastAlert.addTextFieldWithConfigurationHandler(nil)
-//        addPodcastAlert.addAction(UIAlertAction(title: "Save", style: UIAlertActionStyle.Default, handler: { (alertAction: UIAlertAction!) -> Void in
-//            let textField = addPodcastAlert.textFields?.last as! UITextField
-//            if textField.text != "" {
-//                var feedURLString = textField.text
-//                var feedURL = NSURL(string: feedURLString)
-//                
-//                // Uses Callback/Promise to make sure table data is refreshed
-//                // after parsePodcastFeed() finishes
-//                self.parser.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
-//                    resolve: {
-//                        self.loadData()
-//                    },
-//                    reject: {
-//                        // do nothing
-//                    }
-//                )
-//                
-//            }
-//        }))
-//        
-//        addPodcastAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-//        
-//        self.presentViewController(addPodcastAlert, animated: true, completion: nil)
+        print("does nothing for now :)")
     }
     
     func loadData() {
@@ -91,10 +43,6 @@ class PodcastsTableViewController: UITableViewController {
         for episode:Episode in appDelegate.episodeDownloadArray {
             PVDownloader.sharedInstance.startDownloadingEpisode(episode)
         }
-
-        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
-            moc = context
-        }
         
     }
     
@@ -102,6 +50,7 @@ class PodcastsTableViewController: UITableViewController {
         super.viewWillAppear(animated)
         
         // Alert the user to enable background notifications
+        // TODO: Shouldn't this be moved to somewhere like the AppDelegate?
         let registerUserNotificationSettings = UIApplication.instancesRespondToSelector("registerUserNotificationSettings:")
         if registerUserNotificationSettings {
             let types: UIUserNotificationType = [.Alert , .Sound]
@@ -110,18 +59,16 @@ class PodcastsTableViewController: UITableViewController {
         
         loadData()
         
+        // Set navigation bar styles
         self.navigationItem.title = "Podverse"
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
+        // If there is a now playing episode, add Now Playing button to navigation bar
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
-        
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
     }
 
     override func didReceiveMemoryWarning() {
@@ -153,7 +100,7 @@ class PodcastsTableViewController: UITableViewController {
         let itunesImageData = podcast.itunesImage
         
         let totalEpisodesDownloadedPredicate = NSPredicate(format: "podcast == %@ && downloadComplete == true", podcast)
-        let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: totalEpisodesDownloadedPredicate)
+        let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: totalEpisodesDownloadedPredicate)
         cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded, 12 in progress"
         
         if let lastPubDate = podcast.lastPubDate {
@@ -161,26 +108,17 @@ class PodcastsTableViewController: UITableViewController {
         }
 
         if imageData != nil {
-            
             let image = UIImage(data: imageData!)
-            
-            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if image!.size.height != 0.0 {
                 cell.pvImage?.image = image
             }
-
         }
         else if itunesImageData != nil {
-            
             let itunesImage = UIImage(data: itunesImageData!)
-            
-            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if itunesImage!.size.height != 0.0 {
                 cell.pvImage?.image = itunesImage
             }
         }
-        
-        
 
         return cell
     }
@@ -215,7 +153,7 @@ class PodcastsTableViewController: UITableViewController {
             moc.deleteObject(podcast)
             podcastArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-            
+
             do {
                 try moc.save()
                 print("podcast and it's episodes deleted")
@@ -225,24 +163,7 @@ class PodcastsTableViewController: UITableViewController {
         }
     }
 
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
     // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showEpisodes" {
             let episodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
@@ -250,12 +171,9 @@ class PodcastsTableViewController: UITableViewController {
                 episodesTableViewController.selectedPodcast = podcastArray[index.row]
             }
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
-            
         } else if segue.identifier == "Podcasts to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-
             mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
-            
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }

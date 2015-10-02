@@ -57,6 +57,7 @@ class ClipsTableViewController: UITableViewController {
         
         self.title = selectedEpisode.title
         
+        // If there is a now playing episode, add Now Playing button to navigation bar
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }

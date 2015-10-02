@@ -43,7 +43,7 @@ class DownloadsTableViewController: UITableViewController {
     
     override func viewWillAppear(animated: Bool) {
         
-        // Add the Player button if an episode is loaded in the media player
+        // If there is a now playing episode, add Now Playing button to navigation bar
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }

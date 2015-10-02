@@ -11,15 +11,16 @@ import CoreData
 
 class EpisodesTableViewController: UITableViewController {
     
-    var subscriber = PVSubscriber()
-    
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var parser = PVFeedParser()
+    var moc: NSManagedObjectContext! {
+        get {
+            return appDelegate.managedObjectContext
+        }
+    }
     
     var selectedPodcast: Podcast!
     
-    var moc: NSManagedObjectContext!
     var episodesArray = [Episode]()
     
     var showAllAvailableEpisodes: Bool = false
@@ -86,30 +87,17 @@ class EpisodesTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
-            moc = context
-        }
-        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: kDownloadHasFinished, object: nil)
-        
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-//        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
-//            moc = context
-//        }
 
         loadData()
         
         self.title = selectedPodcast.title
         
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        
-        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
-        
+        // If there is a now playing episode, add Now Playing button to navigation bar
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
@@ -202,6 +190,7 @@ class EpisodesTableViewController: UITableViewController {
                 cell.downloadPlayButton.setTitle("\u{f04b}", forState: .Normal)
             }
             // Else if episode is downloading, then display downloading icon
+            // TODO: why is the taskIdentifier sometimes getting turned into -1???
             else if (episode.taskIdentifier != nil) {
                 cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
             }
@@ -236,26 +225,19 @@ class EpisodesTableViewController: UITableViewController {
         else {
             return 60
         }
-
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
         // If not the last item in the array, then perform selected episode actions
         if indexPath.row < episodesArray.count {
-            
             let episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
-            
             let selectedEpisode = episodesArray[indexPath.row]
-            
             if selectedEpisode.fileName != nil {
-                
                 episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
                     self.performSegueWithIdentifier("playDownloadedEpisode", sender: nil)
                 }))
-                
             } else {
-                
                 episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
                     
                     PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
@@ -267,15 +249,14 @@ class EpisodesTableViewController: UITableViewController {
                     } else {
                         cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
                     }
-                    
                     dispatch_async(dispatch_get_main_queue()) {
                         self.tableView.reloadData()
                     }
-                    
                 }))
             }
             
             let totalClips = "(123)"
+            
             episodeActions.addAction(UIAlertAction(title: "Show Clips \(totalClips)", style: .Default, handler: { action in
                 self.performSegueWithIdentifier("showClips", sender: self)
             }))
@@ -295,15 +276,12 @@ class EpisodesTableViewController: UITableViewController {
             showAllAvailableEpisodes = !showAllAvailableEpisodes
             self.loadData()
         }
-
     }
     
     // Override to support conditional editing of the table view.
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return False if you do not want the specified item to be editable.
-        
         if indexPath.row < episodesArray.count {
-            
             let episode = episodesArray[indexPath.row]
             if episode.fileName != nil {
                 return true
@@ -311,15 +289,14 @@ class EpisodesTableViewController: UITableViewController {
             else {
                 return false
             }
-            
         }
         else {
             return false
         }
-        
     }
     
     // Override to support editing the table view.
+    // TODO: This is probably incomplete
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             
@@ -350,37 +327,19 @@ class EpisodesTableViewController: UITableViewController {
             
         }
     }
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the item to be re-orderable.
-        return true
-    }
-    */
     
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "playDownloadedEpisode" {
-            
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             let index = self.tableView.indexPathForSelectedRow!
             mediaPlayerViewController.selectedEpisode = episodesArray[index.row]
             mediaPlayerViewController.startDownloadedEpisode = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
-            
         }
         else if segue.identifier == "Quick Play Downloaded Episode" {
-            
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.selectedEpisode = sender as! Episode
             mediaPlayerViewController.startDownloadedEpisode = true
@@ -388,29 +347,22 @@ class EpisodesTableViewController: UITableViewController {
             
         }
         else if segue.identifier == "showClips" {
-            
             let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
             let index = self.tableView.indexPathForSelectedRow!
             clipsTableViewController.selectedEpisode = episodesArray[index.row]
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
-            
         }
         else if segue.identifier == "streamEpisode" {
-            
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             let index = self.tableView.indexPathForSelectedRow!
             mediaPlayerViewController.selectedEpisode = episodesArray[index.row]
             mediaPlayerViewController.startStreamingEpisode = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
-            
         }
         else if segue.identifier == "Episodes to Now Playing" {
-            
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
-            
         }
     }
-    
 }
