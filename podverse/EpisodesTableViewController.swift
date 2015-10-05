@@ -120,6 +120,9 @@ class EpisodesTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        // TODO: Why couldn't I get dequeReusableHeaderFooterViewWithIdentifier to return anything other than nil?
+        // let headerCell = tableView.dequeueReusableHeaderFooterViewWithIdentifier("HeaderCell") as! EpisodesTableHeaderCell
+        
         let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell") as! EpisodesTableHeaderCell
         
         headerCell.pvImage?.image = UIImage(named: "Blank52")
@@ -296,35 +299,47 @@ class EpisodesTableViewController: UITableViewController {
     }
     
     // Override to support editing the table view.
-    // TODO: This is probably incomplete
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             
+            // Get the episode and store it in a variable
             let episodeToRemove = episodesArray[indexPath.row]
             
-//            TODO: Make sure the downloadTask is stopped/canceled
-//            if episodeToRemove.isDownloading == true {
-//                episodeToRemove.downloadTask!.stop()
-//                episodeToRemove.downloadTask!.cancel()
-//            }
+            // Get the downloadSession, and if there is a downloadSession with a matching taskIdentifier as episode's taskIdentifier, then cancel the downloadSession
+            let downloadSession = PVDownloader.sharedInstance.downloadSession
+            downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
+                for episodeDownloadTask in downloadTasks {
+                    if episodeDownloadTask.taskIdentifier == episodeToRemove.taskIdentifier {
+                        episodeDownloadTask.cancel()
+                    }
+                }
+            }
             
+            // If the episode is currently in the episodeDownloadArray, then delete the episode from the episodeDownloadArray
             if appDelegate.episodeDownloadArray.contains(episodeToRemove) {
                 let episodeDownloadArrayIndex = appDelegate.episodeDownloadArray.indexOf(episodeToRemove)
                 appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
             }
             
+            // If the episodeToRemove is currently now playing, then remove the now playing episode, and remove the Player button from the navbar
+            // TODO: this is needed below
+            if episodeToRemove == appDelegate.nowPlayingEpisode {
+                
+            }
+            
+            // Delete the episode from CoreData, and update the UI
             moc.deleteObject(episodeToRemove)
             episodesArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             
+            // Save
             do {
                 try moc.save()
             } catch let error as NSError {
                 print(error)
+            } catch {
+                print("why is this catch necessary?")
             }
-            
-            print("episode deleted")
-            
         }
     }
     

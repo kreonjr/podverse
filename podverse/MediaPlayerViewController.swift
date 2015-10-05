@@ -329,7 +329,8 @@ class MediaPlayerViewController: UIViewController {
             appDelegate.nowPlayingEpisode = selectedEpisode
             
         }
-
+        
+        // TODO: Below should probably be replaced with a notification class approach
         avPlayer.addPeriodicTimeObserverForInterval(CMTimeMakeWithSeconds(1,1), queue: dispatch_get_main_queue()) { (CMTime) -> Void in
             self.updateCurrentTimeDisplay()
         }

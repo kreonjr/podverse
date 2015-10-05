@@ -86,6 +86,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                         episodeDownloadTask.cancelByProducingResumeData() {[unowned self] resumeData in
                             if (resumeData != nil) {
                                 episode.taskResumeData = resumeData
+                                episode.taskIdentifier = nil
                                 do {
                                     try self.moc.save()
                                 } catch {
