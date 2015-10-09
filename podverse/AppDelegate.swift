@@ -61,30 +61,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dispatch_resume(timer)
         
     }
-    
-    // TODO: What does the completionHandler do?
-    func application(application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: () -> Void) {
-        self.backgroundTransferCompletionHandler = completionHandler
-    }
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
         // Ask for permission for Podverse to use push notifications
         application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge], categories: nil))  // types are UIUserNotificationType members
         
-        // TODO: The code below was an attempt to resume background download tasks after the app has crashed. This code should probably be replaced with code that would cancel and reset the background download session, and create a new background download session. I had difficulty getting the background download tasks to completely cancel before creating a new background download session, and need to talk this one through...
-        let downloadSession = PVDownloader.sharedInstance.downloadSession
         let predicate = NSPredicate(format: "taskIdentifier != nil")
-        let episodesWithTaskIdentifiers = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: predicate) as! [Episode]
-        downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
-            for episodeDownloadTask in downloadTasks {
-                if let episodeWithMatchingTaskIdentifier = episodesWithTaskIdentifiers.find({$0.taskIdentifier == episodeDownloadTask.taskIdentifier}) {
-                    self.episodeDownloadArray.append(episodeWithMatchingTaskIdentifier)
-                }
-            }
-            self.episodeDownloadArray.sortInPlace({ Int($0.taskIdentifier!) < Int($1.taskIdentifier!) })
-        }
+        let savedEpisodes = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: predicate) as! [Episode]
         
+        for episode in savedEpisodes {
+            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
+        }
+
         startCheckSubscriptionsForNewEpisodesTimer()
         
         return true

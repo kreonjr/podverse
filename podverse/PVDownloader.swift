@@ -27,7 +27,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     override init() {
         super.init()
         
-        let sessionConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("fm.podverse.episode.downloads")
+        let sessionConfiguration = NSURLSessionConfiguration.defaultSessionConfiguration()
     
         var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
         docDirectoryURL = URLs[0]
