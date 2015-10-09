@@ -12,6 +12,7 @@ import CoreData
 class EpisodesTableViewController: UITableViewController {
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    @IBOutlet weak var headerView: EpisodeTableHeader!
     
     var moc: NSManagedObjectContext! {
         get {
@@ -120,12 +121,7 @@ class EpisodesTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        // TODO: Why couldn't I get dequeReusableHeaderFooterViewWithIdentifier to return anything other than nil?
-        // let headerCell = tableView.dequeueReusableHeaderFooterViewWithIdentifier("HeaderCell") as! EpisodesTableHeaderCell
-        
-        let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell") as! EpisodesTableHeaderCell
-        
-        headerCell.pvImage?.image = UIImage(named: "Blank52")
+        headerView.headerImageView.image = UIImage(named: "Blank52")
         
         let imageData = selectedPodcast.image
         let itunesImageData = selectedPodcast.itunesImage
@@ -134,7 +130,7 @@ class EpisodesTableViewController: UITableViewController {
             let image = UIImage(data: imageData!)
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if image!.size.height != 0.0 {
-                headerCell.pvImage?.image = image
+                headerView.headerImageView.image = image
             }
         }
         else {
@@ -142,17 +138,13 @@ class EpisodesTableViewController: UITableViewController {
                 let itunesImage = UIImage(data: itunesImageData!)
                 
                 if itunesImage!.size.height != 0.0 {
-                    headerCell.pvImage?.image = itunesImage
+                    headerView.headerImageView.image = itunesImage
                 }
             }
         }
         
-        headerCell.summary!.text = selectedPodcast.summary
-        return headerCell
-    }
-    
-    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 100
+        headerView.headerSummaryLabel.text = selectedPodcast.summary
+        return headerView
     }
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {

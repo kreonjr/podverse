@@ -184,10 +184,11 @@ class MediaPlayerViewController: UIViewController {
         if time != 0 {
             currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(time)
             
-            let floatCurrentTime = Float(time)
-            let floatTotalTime = Float(selectedEpisode.duration!)
-            
-            nowPlayingSlider.value = floatCurrentTime / floatTotalTime
+            let floatCurrentTime = time.floatValue
+            if let episodeDuration = selectedEpisode.duration {
+                let floatTotalTime = episodeDuration.floatValue
+                nowPlayingSlider.value = floatCurrentTime / floatTotalTime
+            }
         }
     }
     
@@ -266,27 +267,28 @@ class MediaPlayerViewController: UIViewController {
         makeClipViewTitle.hidden = true
         makeClipViewShare.hidden = true
         
-        let imageData = selectedEpisode.podcast.image
-        let itunesImageData = selectedEpisode.podcast.itunesImage
         
-        if imageData != nil {
-            let image = UIImage(data: imageData!)
-            mediaPlayerImage.image = image
+        if let imageData = selectedEpisode.podcast.image {
+            mediaPlayerImage.image = UIImage(data: imageData)
         }
-        else if itunesImageData != nil {
-            let itunesImage = UIImage(data: itunesImageData!)
-            mediaPlayerImage.image = itunesImage
-            
-                
+        else if let itunesImageData = selectedEpisode.podcast.itunesImage {
+            mediaPlayerImage.image = UIImage(data: itunesImageData)
         }
         
         podcastTitle?.text = selectedEpisode.podcast.title
         
         episodeTitle?.text = selectedEpisode.title
         
-        totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(selectedEpisode.duration!) as String
+        if let currentEpisodeDuration = selectedEpisode.duration {
+            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(currentEpisodeDuration) as String
+        }
         
-        summary?.text = PVUtility.removeHTMLFromString(selectedEpisode.summary!)
+        if let episodeSummary = selectedEpisode.summary {
+            summary?.text = PVUtility.removeHTMLFromString(episodeSummary)
+        }
+        else {
+            summary.text = ""
+        }
         
         if appDelegate.avPlayer != nil && appDelegate.nowPlayingEpisode == selectedEpisode {
             avPlayer = appDelegate.avPlayer!
@@ -309,21 +311,20 @@ class MediaPlayerViewController: UIViewController {
                 appDelegate.avPlayer = nil
             }
             
-            let url: NSURL!
-            
             if selectedEpisode.downloadedMediaFileDestination != nil {
                 var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
                 self.docDirectoryURL = URLs[0]
-                let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(selectedEpisode.fileName!)
                 
-                let playerItem = AVPlayerItem(URL: destinationURL!)
-                url = destinationURL
-                appDelegate.avPlayer = AVPlayer(playerItem: playerItem)
-                avPlayer = appDelegate.avPlayer
+                if let fileName = selectedEpisode.fileName, let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName) {
+                    let playerItem = AVPlayerItem(URL: destinationURL)
+                    appDelegate.avPlayer = AVPlayer(playerItem: playerItem)
+                    avPlayer = appDelegate.avPlayer
+                }
             } else {
-                url = NSURL(string: selectedEpisode.mediaURL!)
-                appDelegate.avPlayer = AVPlayer(URL: url)
-                avPlayer = appDelegate.avPlayer
+                if let urlString = selectedEpisode.mediaURL, let url = NSURL(string: urlString) {
+                    appDelegate.avPlayer = AVPlayer(URL:url)
+                    avPlayer = appDelegate.avPlayer
+                }
             }
             
             appDelegate.nowPlayingEpisode = selectedEpisode
