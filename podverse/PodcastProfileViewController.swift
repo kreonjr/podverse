@@ -34,15 +34,15 @@ class PodcastProfileViewController: UIViewController {
         
         searchResultTitle.text = searchResultPodcast.title
         
-        var imageData = searchResultPodcast.image
+        let imageData = searchResultPodcast.image
         if imageData != nil {
-            var image = UIImage(data: imageData!)
+            let image = UIImage(data: imageData!)
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if image!.size.height != 0.0 {
                 searchResultImage?.image = image
             } else {
-                var itunesImageData = searchResultPodcast.itunesImage
-                var itunesImage = UIImage(data: itunesImageData!)
+                let itunesImageData = searchResultPodcast.itunesImage
+                let itunesImage = UIImage(data: itunesImageData!)
                 
                 if itunesImage!.size.height != 0.0 {
                     searchResultImage?.image = itunesImage
@@ -58,7 +58,7 @@ class PodcastProfileViewController: UIViewController {
 //
 ////        searchResultEpisodesTotal.text = "Episodes Available: " + String(searchResultPodcast.episodesTotal!)
         
-        searchResultFeedURL.text = "RSS Feed: " + searchResultPodcast.feedURL!.absoluteString!
+        searchResultFeedURL.text = "RSS Feed: " + searchResultPodcast.feedURL!.absoluteString
 
         searchResultSummary.text = searchResultPodcast.artistName!
         

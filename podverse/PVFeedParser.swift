@@ -10,18 +10,22 @@ import UIKit
 import CoreData
 
 class PVFeedParser: NSObject, MWFeedParserDelegate {
-        
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate?
     
-    var moc: NSManagedObjectContext!
+    static let sharedInstance = PVFeedParser()
+    
+    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
+    var moc: NSManagedObjectContext! {
+        get {
+            return appDelegate.managedObjectContext
+        }
+    }
     
     var feedURL: NSURL!
     var podcast: Podcast!
     var episode: Episode!
     var mostRecentEpisodeInFeed: Episode!
     var mostRecentEpisodeSaved: Episode!
-    
-    var episodeArray: [Episode] = [Episode]()
     
     var returnPodcast: Bool!
     var returnOnlyLatestEpisode: Bool!
@@ -33,35 +37,33 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         self.returnPodcast = returnPodcast
         self.returnOnlyLatestEpisode = returnOnlyLatestEpisode
         
-        moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
-        
         // Create, configure, and start the feedParser
-        var feedParser = MWFeedParser(feedURL: feedURL)
+        let feedParser = MWFeedParser(feedURL: feedURL)
         feedParser.delegate = self
         feedParser.feedParseType = ParseTypeFull
-        // TODO: Why asynchronously? Why not synchronously?
         feedParser.connectionType = ConnectionTypeAsynchronously
         feedParser.parse()
         
-        // TODO: WTF? I don't really understand this part, but I found it in a tutorial
+        // START WTF? I don't really understand this part, but I found it in a tutorial
         // TODO: parsing needs to move off the main thread
-        // TODO: Important: https://github.com/mwaterfall/MWFeedParser/issues/78
-        var delta: Int64 = 1 * Int64(NSEC_PER_SEC)
-        var time = dispatch_time(DISPATCH_TIME_NOW, delta)
+        // TODO: Important: MWFeedParser creator recommends NSOperation instead of GCD https://github.com/mwaterfall/MWFeedParser/issues/78
+        let delta: Int64 = 1 * Int64(NSEC_PER_SEC)
+        let time = dispatch_time(DISPATCH_TIME_NOW, delta)
         dispatch_after(time, dispatch_get_main_queue(), {
             resolve()
         })
+        // END WTF?
     }
     
     func feedParserDidStart(parser: MWFeedParser!) {
-        println("feedParser did start")
+        print("feedParser did start")
     }
     
     func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
         
         // If podcast already exists in the database, do not insert new podcast, instead update existing podcast
         let feedURLString = info.url.absoluteString
-        let predicate = NSPredicate(format: "feedURL == %@", feedURLString!)
+        let predicate = NSPredicate(format: "feedURL == %@", feedURLString)
         let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
         if podcastSet.count > 0 {
             podcast = podcastSet[0]
@@ -74,7 +76,7 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
 
         if let summary = info.summary { podcast.summary = summary }
         
-        if let feedURL = info.url { podcast.feedURL = feedURL.absoluteString! }
+        if let feedURL = info.url { podcast.feedURL = feedURL.absoluteString }
         
         if let itunesAuthor = info.itunesAuthor { podcast.itunesAuthor = itunesAuthor }
         
@@ -105,8 +107,6 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         // If episode already exists in the database, do not insert new episode, instead update existing episode
         // TODO: Is there one field we can reliably check for matching episodes that will never error out?
         var predicate = NSPredicate()
-        
-        // TODO: There's got to be a more elegant way of checking if item.enclosures[0]["url"] exists...
         if item.enclosures != nil {
             if item.enclosures[0]["url"] != nil {
                 predicate = NSPredicate(format: "mediaURL == %@", (item.enclosures[0]["url"] as? String)!)
@@ -126,33 +126,32 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
             episodeAlreadySaved = false
         }
         
+        // Retrieve parsed values from item and add values to their respective episode properties
         if let title = item.title { episode.title = title }
-
         if let summary = item.summary { episode.summary = summary }
-        
         if let date = item.date { episode.pubDate = date }
-        
         if let link = item.link { episode.link = link }
-        
         if let enclosures = item.enclosures {
             episode.mediaURL = enclosures[0]["url"] as? String
             episode.mediaType = enclosures[0]["type"] as? String
             episode.mediaBytes = enclosures[0]["length"] as? Int
         }
-        
         if let duration = item.duration {
             let durationNSNumber = PVUtility.convertStringToNSNumber(duration)
             episode.duration = durationNSNumber
         }
-        
         if let guid = item.guid { episode.guid = guid }
         
-        episodeArray.append(episode)
+        // Manually set the taskIdentifier = nil. For some reason taskIdentifiers seem to be defaulting to -1 instead of nil. This results in an issue on the EpisodeTableController that makes all episodes appear like they are currently downlaoding.
+        // TODO: why is the taskIdentifier sometimes getting turned into -1???
+        episode.taskIdentifier = nil
         
+        // If episode is not already saved, then add episode to the podcast object
         if episodeAlreadySaved == false {
             podcast.addEpisodeObject(episode)
         }
         
+        // If only parsing for the latest episode, stop parsing after parsing the first episode.
         if self.returnOnlyLatestEpisode == true {
             self.mostRecentEpisodeInFeed = episode
             parser.stopParsing()
@@ -163,17 +162,17 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     func feedParserDidFinish(parser: MWFeedParser!) {
         
         // Set the podcast.lastPubDate equal to the newest episode's pubDate
-        podcast.lastPubDate = episodeArray[0].pubDate
+        let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+        let mostRecentEpisode = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: podcastPredicate)[0] as! Episode
+        podcast.lastPubDate = mostRecentEpisode.pubDate
         
-        // If the parser is only returning the latest episode, then if the podcast's latest episode returned
-        // is not the same as the latest episode saved locally, parse the entire feed again,
-        // then download and save the latest episode
+        // If the parser is only returning the latest episode, then if the podcast's latest episode returned is not the same as the latest episode saved locally, parse the entire feed again, then download and save the latest episode
         if self.returnOnlyLatestEpisode == true {
             if self.mostRecentEpisodeInFeed != self.mostRecentEpisodeSaved {
                 let feedURL = NSURL(string: podcast.feedURL)
                 self.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
                     resolve: {
-                        PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(self.mostRecentEpisodeInFeed, completion: nil)
+                        PVDownloader.sharedInstance.startDownloadingEpisode(self.mostRecentEpisodeInFeed)
                     },
                     reject: {
                         
@@ -181,14 +180,18 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
                 )
                 
             } else {
-                println("no newer episode available, don't download")
+                print("no newer episode available, don't download")
             }
         }
         
         // Save the parsed podcast and episode information
-        moc.save(nil)
+        do {
+            try moc.save()
+        } catch {
+            print(error)
+        }
         
-        println("feed parser has finished!")
+        print("feed parser has finished!")
         
     }
     

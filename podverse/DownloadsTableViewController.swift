@@ -43,7 +43,7 @@ class DownloadsTableViewController: UITableViewController {
     
     override func viewWillAppear(animated: Bool) {
         
-        // Add the Player button if an episode is loaded in the media player
+        // If there is a now playing episode, add Now Playing button to navigation bar
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
@@ -113,7 +113,7 @@ class DownloadsTableViewController: UITableViewController {
         if episode.downloadComplete == true {
             cell.downloadStatus.text = "Finished"
         }
-        else if episode.isDownloading == true {
+        else if episode.taskIdentifier != nil {
             cell.downloadStatus.text = "Downloading"
         }
         else {
@@ -129,7 +129,7 @@ class DownloadsTableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let episode = self.appDelegate.episodeDownloadArray[indexPath.row]
-        PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(episode, completion: nil)
+        PVDownloader.sharedInstance.pauseOrResumeDownloadingEpisode(episode)
     }
     
     /*

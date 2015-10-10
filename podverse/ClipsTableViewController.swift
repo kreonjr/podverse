@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 
 class ClipsTableViewController: UITableViewController {
-        
+    
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
     var selectedEpisode: Episode!
@@ -22,7 +22,7 @@ class ClipsTableViewController: UITableViewController {
         clipArray = [Clip]()
         clipArray = CoreDataHelper.fetchEntities("Clip", managedObjectContext: moc, predicate: nil) as! [Clip]
         
-        var unsortedClips = NSMutableArray()
+        let unsortedClips = NSMutableArray()
 
         for singleClip in selectedEpisode.clips {
             let loopClip = singleClip as! Clip
@@ -57,6 +57,7 @@ class ClipsTableViewController: UITableViewController {
         
         self.title = selectedEpisode.title
         
+        // If there is a now playing episode, add Now Playing button to navigation bar
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
@@ -75,11 +76,11 @@ class ClipsTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell") as! ClipsTableHeaderCell
         
-        var imageData = selectedEpisode.podcast.image
-        var itunesImageData = selectedEpisode.podcast.itunesImage
+        let imageData = selectedEpisode.podcast.image
+        let itunesImageData = selectedEpisode.podcast.itunesImage
         
         if imageData != nil {
-            var image = UIImage(data: imageData!)
+            let image = UIImage(data: imageData!)
             // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
             if image!.size.height != 0.0 {
                 headerCell.pvImage?.image = image
@@ -87,7 +88,7 @@ class ClipsTableViewController: UITableViewController {
         }
         else {
             if itunesImageData != nil {
-                var itunesImage = UIImage(data: itunesImageData!)
+                let itunesImage = UIImage(data: itunesImageData!)
                 
                 if itunesImage!.size.height != 0.0 {
                     headerCell.pvImage?.image = itunesImage
@@ -177,18 +178,16 @@ class ClipsTableViewController: UITableViewController {
         if segue.identifier == "Play" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             
-            if let index = self.tableView.indexPathForSelectedRow() {
-                if index.row == 0 {
-                    mediaPlayerViewController.selectedEpisode = selectedEpisode
-                    if selectedEpisode.downloadedMediaFileDestination != nil {
-                        mediaPlayerViewController.startDownloadedEpisode = true
-                    } else {
-                        mediaPlayerViewController.startStreamingEpisode = true
-                    }
-                    
+            let index = self.tableView.indexPathForSelectedRow!
+            if index.row == 0 {
+                mediaPlayerViewController.selectedEpisode = selectedEpisode
+                if selectedEpisode.downloadedMediaFileDestination != nil {
+                    mediaPlayerViewController.startDownloadedEpisode = true
                 } else {
-                    mediaPlayerViewController.selectedClip = clipArray[index.row]
+                    mediaPlayerViewController.startStreamingEpisode = true
                 }
+            } else {
+                mediaPlayerViewController.selectedClip = clipArray[index.row]
             }
             
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)

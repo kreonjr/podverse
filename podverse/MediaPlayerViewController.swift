@@ -184,10 +184,11 @@ class MediaPlayerViewController: UIViewController {
         if time != 0 {
             currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(time)
             
-            let floatCurrentTime = Float(time)
-            let floatTotalTime = Float(selectedEpisode.duration!)
-            
-            nowPlayingSlider.value = floatCurrentTime / floatTotalTime
+            let floatCurrentTime = time.floatValue
+            if let episodeDuration = selectedEpisode.duration {
+                let floatTotalTime = episodeDuration.floatValue
+                nowPlayingSlider.value = floatCurrentTime / floatTotalTime
+            }
         }
     }
     
@@ -196,11 +197,11 @@ class MediaPlayerViewController: UIViewController {
         // thanks to Naveen Sharma
         // http://iostechsolutions.blogspot.com/2014/11/swift-add-custom-right-bar-button-item.html
         
-        let buttonMakeClip: UIButton = UIButton.buttonWithType(UIButtonType.Custom) as! UIButton
+        let buttonMakeClip: UIButton = UIButton(type : UIButtonType.System)
         buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
         buttonMakeClip.setTitle("Make Clip", forState: UIControlState.Normal)
         buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
-        var rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
+        let rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
         
         self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
     }
@@ -260,37 +261,34 @@ class MediaPlayerViewController: UIViewController {
             moc = context
         }
         
-        var dirPath = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String
-        
-        var newClip = CoreDataHelper.insertManagedObject(NSStringFromClass(Clip), managedObjectContext: self.moc) as! Clip
-        
         createMakeClipButton()
         
         makeClipViewTime.hidden = true
         makeClipViewTitle.hidden = true
         makeClipViewShare.hidden = true
         
-        var imageData = selectedEpisode.podcast.image
-        var itunesImageData = selectedEpisode.podcast.itunesImage
         
-        if imageData != nil {
-            var image = UIImage(data: imageData!)
-            mediaPlayerImage.image = image
+        if let imageData = selectedEpisode.podcast.image {
+            mediaPlayerImage.image = UIImage(data: imageData)
         }
-        else if itunesImageData != nil {
-            var itunesImage = UIImage(data: itunesImageData!)
-            mediaPlayerImage.image = itunesImage
-            
-                
+        else if let itunesImageData = selectedEpisode.podcast.itunesImage {
+            mediaPlayerImage.image = UIImage(data: itunesImageData)
         }
         
         podcastTitle?.text = selectedEpisode.podcast.title
         
         episodeTitle?.text = selectedEpisode.title
         
-        totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(selectedEpisode.duration!) as String
+        if let currentEpisodeDuration = selectedEpisode.duration {
+            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(currentEpisodeDuration) as String
+        }
         
-        summary?.text = PVUtility.removeHTMLFromString(selectedEpisode.summary!)
+        if let episodeSummary = selectedEpisode.summary {
+            summary?.text = PVUtility.removeHTMLFromString(episodeSummary)
+        }
+        else {
+            summary.text = ""
+        }
         
         if appDelegate.avPlayer != nil && appDelegate.nowPlayingEpisode == selectedEpisode {
             avPlayer = appDelegate.avPlayer!
@@ -313,29 +311,27 @@ class MediaPlayerViewController: UIViewController {
                 appDelegate.avPlayer = nil
             }
             
-            let url: NSURL!
-            
             if selectedEpisode.downloadedMediaFileDestination != nil {
                 var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
-                self.docDirectoryURL = URLs[0] as? NSURL
-                var destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(selectedEpisode.fileName!)
+                self.docDirectoryURL = URLs[0]
                 
-                var checkValidation = NSFileManager.defaultManager()
-                
-                var playerItem = AVPlayerItem(URL: destinationURL!)
-                url = destinationURL
-                appDelegate.avPlayer = AVPlayer(playerItem: playerItem)
-                avPlayer = appDelegate.avPlayer
+                if let fileName = selectedEpisode.fileName, let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName) {
+                    let playerItem = AVPlayerItem(URL: destinationURL)
+                    appDelegate.avPlayer = AVPlayer(playerItem: playerItem)
+                    avPlayer = appDelegate.avPlayer
+                }
             } else {
-                url = NSURL(string: selectedEpisode.mediaURL!)
-                appDelegate.avPlayer = AVPlayer(URL: url)
-                avPlayer = appDelegate.avPlayer
+                if let urlString = selectedEpisode.mediaURL, let url = NSURL(string: urlString) {
+                    appDelegate.avPlayer = AVPlayer(URL:url)
+                    avPlayer = appDelegate.avPlayer
+                }
             }
             
             appDelegate.nowPlayingEpisode = selectedEpisode
             
         }
-
+        
+        // TODO: Below should probably be replaced with a notification class approach
         avPlayer.addPeriodicTimeObserverForInterval(CMTimeMakeWithSeconds(1,1), queue: dispatch_get_main_queue()) { (CMTime) -> Void in
             self.updateCurrentTimeDisplay()
         }
@@ -345,11 +341,11 @@ class MediaPlayerViewController: UIViewController {
             playPauseButton.setTitle("\u{f04c}", forState: .Normal)
         }
         
-        var error: NSError?
-        var success = AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayAndRecord, withOptions: .DefaultToSpeaker, error: &error)
-        
-        if !success {
-            NSLog("Failed to set audio session category. Error: \(error)")
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(AVAudioSessionCategoryPlayAndRecord)
+        } catch let error as NSError {
+            print(error)
         }
         
     }

@@ -12,62 +12,19 @@ import CoreData
 class PodcastsTableViewController: UITableViewController {
 
     @IBOutlet var myPodcastsTableView: UITableView!
-
-    var utility = PVUtility()
     
-    var parser = PVFeedParser()
+    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    var moc: NSManagedObjectContext! {
+        get {
+            return appDelegate.managedObjectContext
+        }
+    }
     
-    var moc: NSManagedObjectContext!
     var podcastArray = [Podcast]()
     
-    var counter = 0
-    
     @IBAction func addPodcast(sender: AnyObject) {
-
-        // Remove latest episode for test purposes
-        var podcastToRemoveEpisodeFromArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
-        var podcastToRemoveEpisodeFrom = podcastToRemoveEpisodeFromArray[0] as Podcast
-        
-        
-        let episodeToRemovePredicate = NSPredicate(format: "podcast == %@", podcastToRemoveEpisodeFrom)
-        let episodeToRemoveArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: episodeToRemovePredicate)
-        let episodeToRemove = episodeToRemoveArray[0] as! Episode
-        moc.deleteObject(episodeToRemove)
-        
-        if contains(appDelegate.episodeDownloadArray, episodeToRemove) {
-            var episodeDownloadArrayIndex = find(appDelegate.episodeDownloadArray, episodeToRemove)
-            appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
-        }
-
-        moc.save(nil)
-        
-//        let addPodcastAlert = UIAlertController(title: "New Podcast", message: "Enter podcast feed URL", preferredStyle: UIAlertControllerStyle.Alert)
-//        addPodcastAlert.addTextFieldWithConfigurationHandler(nil)
-//        addPodcastAlert.addAction(UIAlertAction(title: "Save", style: UIAlertActionStyle.Default, handler: { (alertAction: UIAlertAction!) -> Void in
-//            let textField = addPodcastAlert.textFields?.last as! UITextField
-//            if textField.text != "" {
-//                var feedURLString = textField.text
-//                var feedURL = NSURL(string: feedURLString)
-//                
-//                // Uses Callback/Promise to make sure table data is refreshed
-//                // after parsePodcastFeed() finishes
-//                self.parser.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
-//                    resolve: {
-//                        self.loadData()
-//                    },
-//                    reject: {
-//                        // do nothing
-//                    }
-//                )
-//                
-//            }
-//        }))
-//        
-//        addPodcastAlert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel, handler: nil))
-//        
-//        self.presentViewController(addPodcastAlert, animated: true, completion: nil)
+        print("does nothing for now :)")
     }
     
     func loadData() {
@@ -83,12 +40,8 @@ class PodcastsTableViewController: UITableViewController {
         super.viewDidLoad()
         
         // If there are any unfinished downloads in the appDelegate.episodeDownloadArray, then resume those downloads
-        for var i = 0; i < self.appDelegate.episodeDownloadArray.count; i++ {
-            PVDownloader.sharedInstance.startPauseOrResumeDownloadingEpisode(self.appDelegate.episodeDownloadArray[i], completion: nil)
-        }
-
-        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
-            moc = context
+        for episode:Episode in appDelegate.episodeDownloadArray {
+            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
         }
         
     }
@@ -97,26 +50,25 @@ class PodcastsTableViewController: UITableViewController {
         super.viewWillAppear(animated)
         
         // Alert the user to enable background notifications
+        // TODO: Shouldn't this be moved to somewhere like the AppDelegate?
         let registerUserNotificationSettings = UIApplication.instancesRespondToSelector("registerUserNotificationSettings:")
         if registerUserNotificationSettings {
-            var types: UIUserNotificationType = UIUserNotificationType.Alert | UIUserNotificationType.Sound
+            let types: UIUserNotificationType = [.Alert , .Sound]
             UIApplication.sharedApplication().registerUserNotificationSettings(UIUserNotificationSettings(forTypes: types, categories: nil))
         }
         
         loadData()
         
+        // Set navigation bar styles
         self.navigationItem.title = "Podverse"
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
+        // If there is a now playing episode, add Now Playing button to navigation bar
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
-        
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
     }
 
     override func didReceiveMemoryWarning() {
@@ -144,39 +96,29 @@ class PodcastsTableViewController: UITableViewController {
         cell.title?.text = podcast.title
         cell.pvImage?.image = UIImage(named: "Blank52")
         
-        var imageData = podcast.image
-        var itunesImageData = podcast.itunesImage
+        let imageData = podcast.image
+        let itunesImageData = podcast.itunesImage
         
         let totalEpisodesDownloadedPredicate = NSPredicate(format: "podcast == %@ && downloadComplete == true", podcast)
-        var totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: totalEpisodesDownloadedPredicate)
+        let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: totalEpisodesDownloadedPredicate)
         cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded, 12 in progress"
-        
         
         if let lastPubDate = podcast.lastPubDate {
             cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
         }
 
         if imageData != nil {
-            
-            var image = UIImage(data: imageData!)
-            
-            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
+            let image = UIImage(data: imageData!)
             if image!.size.height != 0.0 {
                 cell.pvImage?.image = image
             }
-
         }
         else if itunesImageData != nil {
-            
-            var itunesImage = UIImage(data: itunesImageData!)
-            
-            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
+            let itunesImage = UIImage(data: itunesImageData!)
             if itunesImage!.size.height != 0.0 {
                 cell.pvImage?.image = itunesImage
             }
         }
-        
-        
 
         return cell
     }
@@ -193,68 +135,72 @@ class PodcastsTableViewController: UITableViewController {
             
             let podcast = podcastArray[indexPath.row]
             
-            // TODO: Is there a more efficient way to delete episodes that have the podcast as a parent?
+            // Get all episodes with this podcast as a parent, then delete those episodes from CoreData and the episodeDownloadArray
             let episodeToRemovePredicate = NSPredicate(format: "podcast == %@", podcast)
             let episodeToRemoveArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: episodeToRemovePredicate)
             
-            for var i = 0; i < episodeToRemoveArray.count; i++ {
-                let episodeToRemove = episodeToRemoveArray[i] as! Episode
-                
-                if episodeToRemove.isDownloading == true {
-//                    episodeToRemove.downloadTask!.stop()
-//                    episodeToRemove.downloadTask!.cancel()
-                }
-                
-                moc.deleteObject(episodeToRemove)
-                
-                if contains(appDelegate.episodeDownloadArray, episodeToRemove) {
-                    var episodeDownloadArrayIndex = find(appDelegate.episodeDownloadArray, episodeToRemove)
-                    appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
-                }
+            // Get the downloadSession and the downloadTasks, and make downloadTasks available to parent
+            let downloadSession = PVDownloader.sharedInstance.downloadSession
+            var downloadTasksArray = [NSURLSessionDownloadTask]()
+            downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
+                downloadTasksArray = downloadTasks
             }
             
+            // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
+            for var i = 0; i < episodeToRemoveArray.count; i++ {
+                let episodeToRemove = episodeToRemoveArray[i] as! Episode
+                moc.deleteObject(episodeToRemove)
+                
+                // If the episodeToRemove is currently downloading, then retrieve and cancel the download
+                if episodeToRemove.taskIdentifier != nil {
+                    for episodeDownloadTask in downloadTasksArray {
+                        if episodeDownloadTask.taskIdentifier == episodeToRemove.taskIdentifier {
+                            episodeDownloadTask.cancel()
+                        }
+                    }
+                }
+                
+                // If the episodeToRemove is in the episodeDownloadArray, then remove the episodeToRemove from the episodeDownloadArray
+                if appDelegate.episodeDownloadArray.contains(episodeToRemove) {
+                    let episodeDownloadArrayIndex = appDelegate.episodeDownloadArray.indexOf(episodeToRemove)
+                    appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
+                }
+                
+                // If the episodeToRemove is currently now playing, then remove the now playing episode, and remove the Player button from the navbar
+                // TODO: this is needed below
+                if episodeToRemove == appDelegate.nowPlayingEpisode {
+                    
+                }
+                
+                
+            }
+            
+            // Delete podcast from CoreData, then update UI
             moc.deleteObject(podcast)
             podcastArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             
-            moc.save(nil)
-
-            println("podcast and it's episodes deleted")
-            
+            // Save
+            do {
+                try moc.save()
+                print("podcast and it's episodes deleted")
+            } catch let error as NSError {
+                print(error)
+            }
         }
     }
 
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
     // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "showEpisodes" {
             let episodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
-            if let index = self.tableView.indexPathForSelectedRow() {
+            if let index = self.tableView.indexPathForSelectedRow {
                 episodesTableViewController.selectedPodcast = podcastArray[index.row]
             }
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
-            
         } else if segue.identifier == "Podcasts to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-
             mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
-            
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }

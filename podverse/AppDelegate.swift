@@ -9,39 +9,34 @@
 import UIKit
 import CoreData
 import AVFoundation
-import ReachabilitySwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     
-    var moc: NSManagedObjectContext!
-    
-    var avPlayer: AVPlayer?
-    
-    var subscriber = PVSubscriber()
-        
-    var parser = PVFeedParser()
+    var moc: NSManagedObjectContext! {
+        get {
+            return self.managedObjectContext
+        }
+    }
     
     var nowPlayingEpisode: Episode?
     
     var episodeDownloadArray = [Episode]()
         
     var iTunesSearchPodcastArray = [SearchResultPodcast]()
-    
     var iTunesSearchPodcastFeedURLArray: [NSURL] = []
     
     var backgroundTransferCompletionHandler: (() -> Void)?
     
-    var timer: dispatch_source_t!
+    var avPlayer: AVPlayer?
     
-    var internetReach: Reachability?
+    var timer: dispatch_source_t!
     
     // This function runs once on app load, then runs in the background every 30 minutes.
     // Check if a new episode is available for a subscribed podcast; if true, download that episode.
-    // TODO: make sure this is running in the background, even when app is not in the foreground
-    // TODO: can we allow resolve / reject to be optional? Allow nil as a parameter?
+    // TODO: shouldn't we check via push notifications? Rather than a timer that continuously runs in the background?
     func startCheckSubscriptionsForNewEpisodesTimer() {
         
         // TODO: Should I or should I not be using dispatch_get_main_queue here?
@@ -52,14 +47,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dispatch_source_set_event_handler(timer) {
             
             let podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
-            
             for var i = 0; i < podcastArray.count; i++ {
                 let feedURL = NSURL(string: podcastArray[i].feedURL)
-                self.parser.parsePodcastFeed(feedURL!, returnPodcast: false, returnOnlyLatestEpisode: true,
+                PVFeedParser.sharedInstance.parsePodcastFeed(feedURL!, returnPodcast: false, returnOnlyLatestEpisode: true,
                     resolve: {
-                        
                     }, reject: {
-                        
                     }
                 )
             }
@@ -69,80 +61,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         dispatch_resume(timer)
         
     }
-    
-    // TODO: What does the completionHandler do?
-    func application(application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: () -> Void) {
-        self.backgroundTransferCompletionHandler = completionHandler
-    }
-    
+
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
-        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
-            self.moc = context
-        }
+        // Ask for permission for Podverse to use push notifications
+        application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge], categories: nil))  // types are UIUserNotificationType members
         
-        application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: .Alert | .Badge, categories: nil))  // types are UIUserNotificationType members
+        let predicate = NSPredicate(format: "taskIdentifier != nil")
+        let savedEpisodes = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: predicate) as! [Episode]
         
-        // On app launch, clear the taskIdentifier of any episodes that previously did not finish downloading, and resume downloading
-        let firstPredicate = NSPredicate(format: "isDownloading != false")
-        let secondPredicate = NSPredicate(format: "taskResumeData != nil")
-        let predicate = NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: [firstPredicate, secondPredicate])
-        
-        self.episodeDownloadArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
-        
-        println("did finish")
-        
-        for var i = 0; i < self.episodeDownloadArray.count; i++ {
-            println(self.episodeDownloadArray[i].title)
-        }
-        
-        for var i = 0; i < self.episodeDownloadArray.count; i++ {
-            self.episodeDownloadArray[i].taskIdentifier = 0
-            self.episodeDownloadArray[i].isDownloading = false
+        for episode in savedEpisodes {
+            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
         }
 
         startCheckSubscriptionsForNewEpisodesTimer()
-
-//        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reachabilityChanged:", name: ReachabilityChangedNotification, object: nil)
-//        
-//        // Instantiate the Reachability object
-//        internetReach = Reachability.reachabilityForInternetConnection()
-//        // Run startNotifier so Reachability constantly listens for changes to the internet connection
-//        internetReach?.startNotifier()
-//        
-//        if internetReach != nil {
-//            self.statusChangedWithReachability(internetReach!)
-//        }
         
         return true
-    }
-    
-    func statusChangedWithReachability(currentReachabilityStatus: Reachability) {
-        var networkStatus = currentReachabilityStatus.currentReachabilityStatus
-        
-        if networkStatus.description == "WiFi" {
-            // WiFi is enabled
-            // TODO: Add resume all downloads function when WiFi is enabled
-            reachabilityStatus = kReachableWithWIFI
-        }
-        else if networkStatus.description == "Cellular" {
-            // Cellular data is enabled
-            // TODO: Add pause all downloads function when Cellular is enabled
-            reachabilityStatus = kReachableWithWWAN
-        }
-        else {
-            // No internet access is enabled
-            // TODO: Add pause all downloads function when No Internet is enabled
-            reachabilityStatus = kNotReachable
-        }
-        
-        NSNotificationCenter.defaultCenter().postNotificationName("ReachStatusChanged", object: nil)
-    }
-    
-    func reachabilityChanged(notification: NSNotification) {
-        println("Reachability Status Changed")
-        reachability = notification.object as? Reachability
-        self.statusChangedWithReachability(reachability!)
     }
 
     func applicationWillResignActive(application: UIApplication) {
@@ -167,10 +101,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
         self.saveContext()
-        
-        // Stop listening for Reachability changes when the app is terminated
-        // TODO: do we instead want the ReachabilityChangedNotification to continue running in the background after the app is terminated?
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: ReachabilityChangedNotification, object: nil)
     }
 
     // MARK: - Core Data stack
@@ -178,7 +108,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     lazy var applicationDocumentsDirectory: NSURL = {
         // The directory the application uses to store the Core Data store file. This code uses a directory named "fm.podverse.podverse" in the application's documents Application Support directory.
         let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
-        return urls[urls.count-1] as! NSURL
+        return urls[urls.count-1]
     }()
 
     lazy var managedObjectModel: NSManagedObjectModel = {
@@ -194,7 +124,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("podverse.sqlite")
         var error: NSError? = nil
         var failureReason = "There was an error creating or loading the application's saved data."
-        if coordinator!.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil, error: &error) == nil {
+        do {
+            try coordinator!.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: [NSMigratePersistentStoresAutomaticallyOption: true, NSInferMappingModelAutomaticallyOption: true])
+        } catch var error1 as NSError {
+            error = error1
             coordinator = nil
             // Report any error we got.
             var dict = [String: AnyObject]()
@@ -206,6 +139,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
             NSLog("Unresolved error \(error), \(error!.userInfo)")
             abort()
+        } catch {
+            fatalError()
         }
         
         return coordinator
@@ -223,18 +158,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }()
 
     // MARK: - Core Data Saving support
-
     func saveContext () {
-        if let moc = self.managedObjectContext {
-            var error: NSError? = nil
-            if moc.hasChanges && !moc.save(&error) {
+        if moc.hasChanges {
+            do {
+                try moc.save()
+            } catch {
+                print(error)
+                
                 // Replace this implementation with code to handle the error appropriately.
                 // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                NSLog("Unresolved error \(error), \(error!.userInfo)")
+//                    NSLog("Unresolved error \(error), \(error.userInfo)")
                 abort()
             }
         }
     }
-
 }
 
