@@ -20,7 +20,7 @@ class PodcastsTableViewController: UITableViewController {
             return appDelegate.managedObjectContext
         }
     }
-    
+
     var podcastArray = [Podcast]()
     
     @IBAction func addPodcast(sender: AnyObject) {
