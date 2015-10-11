@@ -7,28 +7,24 @@
 //
 
 import UIKit
-import AVFoundation
 import CoreData
+import AVFoundation
 
 class MediaPlayerViewController: UIViewController {
     
-    var utility = PVUtility()
-    
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var avPlayer: AVPlayer!
+    var moc: NSManagedObjectContext! {
+        get {
+            return appDelegate.managedObjectContext
+        }
+    }
     
-    var moc: NSManagedObjectContext!
+    let pvMediaPlayer = PVMediaPlayer.sharedInstance
     
-    var selectedEpisode: Episode!
-    var selectedClip: Clip!
+    var nowPlayingCurrentTimeTimer: NSTimer!
     
-    var startDownloadedEpisode: Bool! = false
-    var startStreamingEpisode: Bool! = false
-    
-    var docDirectoryURL: NSURL?
-    
-    var newClip: Clip!
+    var returnToNowPlaying: Bool! = false
     
     @IBOutlet weak var mediaPlayerImage: UIImageView!
     @IBOutlet weak var podcastTitle: UILabel!
@@ -44,6 +40,159 @@ class MediaPlayerViewController: UIViewController {
     @IBOutlet weak var audioButton: UIButton!
     
     @IBOutlet weak var nowPlayingSlider: UISlider!
+    
+    @IBAction func sliderTimeChange(sender: UISlider) {
+        let currentSliderValue = Float64(sender.value)
+        let totalTime = Float64(pvMediaPlayer.nowPlayingEpisode.duration!)
+        let resultTime = totalTime * currentSliderValue
+        pvMediaPlayer.goToTime(resultTime)
+    }
+
+    @IBAction func playPause(sender: AnyObject) {
+        // Call playOrPause function, which returns a boolean for isNowPlaying status
+        let isNowPlaying = pvMediaPlayer.playOrPause()
+        
+        if isNowPlaying == true {
+            // Change Play/Pause button to Play icon
+            playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+        } else {
+            // Change Play/Pause button to Pause icon
+            playPauseButton.setTitle("\u{f04b}", forState: .Normal)
+        }
+    }
+    
+    @IBAction func skip(sender: AnyObject) {
+    }
+    
+    @IBAction func previous(sender: AnyObject) {
+    }
+    
+    @IBAction func speed(sender: AnyObject) {
+    }
+    
+    @IBAction func audio(sender: AnyObject) {
+    }
+    
+    @IBAction func skip1minute(sender: AnyObject) {
+        pvMediaPlayer.skipTime(60)
+    }
+
+    @IBAction func skip15seconds(sender: AnyObject) {
+        pvMediaPlayer.skipTime(15)
+    }
+    
+    @IBAction func previous15seconds(sender: AnyObject) {
+        pvMediaPlayer.previousTime(15)
+    }
+    
+    @IBAction func previous1minute(sender: AnyObject) {
+        pvMediaPlayer.previousTime(60)
+    }
+    
+    func updateNowPlayingCurrentTime(notification: NSNotification) {
+        if let nowPlayingCurrentTime = notification.userInfo?["nowPlayingCurrentTime"] as? Float {
+            currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(nowPlayingCurrentTime)
+            nowPlayingSlider.value = nowPlayingCurrentTime / Float(pvMediaPlayer.nowPlayingEpisode.duration!)
+        }
+    }
+    
+    // TODO: how do I pass the PVMediaPlayer's updateNowPlayingCurrentTimeNotification directly into the selector paramter of the scheduledTimerWithTimeInterval? Creating another function to call the PVMediaPlayer's function seems redundant...
+    func updateNowPlayingCurrentTimeNotification() {
+        pvMediaPlayer.updateNowPlayingCurrentTimeNotification()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        // Call updateNowPlayingCurrentTime whenever the now playing current time changes
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateNowPlayingCurrentTime:", name: kNowPlayingTimeHasChanged, object: nil)
+        
+        // Start timer to check every second if the now playing current time has changed
+        nowPlayingCurrentTimeTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "updateNowPlayingCurrentTimeNotification", userInfo: nil, repeats: true)
+        
+        // If currentTime != 0.0, then immediately insert the currentTime in its label; else manually set the currentTime label to 00:00.
+        if CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()) != 0.0 {
+            currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(Float(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime())))
+        } else {
+            currentTime?.text = "00:00"
+        }
+        
+        // Check if a clip or episode is loaded. If it is, then display either Play or Pause icon.
+        if pvMediaPlayer.avPlayer.rate == 1 {
+            // If playing, then display Play icon.
+            playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+        } else {
+            // If paused, then display Pause icon.
+            playPauseButton.setTitle("\u{f04b}", forState: .Normal)
+        }
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        // Create and add the Make Clip button to the UI
+        let buttonMakeClip: UIButton = UIButton(type : UIButtonType.System)
+        buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
+        buttonMakeClip.setTitle("Make Clip", forState: UIControlState.Normal)
+        buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
+        let rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
+        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
+        
+        // Hide the Make Clip menu when the Media Player first loads
+        makeClipViewTime.hidden = true
+        makeClipViewTitle.hidden = true
+        makeClipViewShare.hidden = true
+        
+        // Populate the Media Player UI with the current episode's information
+        if let imageData = pvMediaPlayer.nowPlayingEpisode.podcast.image {
+            mediaPlayerImage.image = UIImage(data: imageData)
+        }
+        else if let itunesImageData = pvMediaPlayer.nowPlayingEpisode.podcast.itunesImage {
+            mediaPlayerImage.image = UIImage(data: itunesImageData)
+        }
+        podcastTitle?.text = pvMediaPlayer.nowPlayingEpisode.podcast.title
+        episodeTitle?.text = pvMediaPlayer.nowPlayingEpisode.title
+        if let nowPlayingEpisodeDuration = pvMediaPlayer.nowPlayingEpisode.duration {
+            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(nowPlayingEpisodeDuration) as String
+        }
+        if let episodeSummary = pvMediaPlayer.nowPlayingEpisode.summary {
+            summary?.text = PVUtility.removeHTMLFromString(episodeSummary)
+        }
+        else {
+            summary.text = ""
+        }
+        
+        // If the user is not returning to the Media Player via the Now Playing button, load and start a new episode or clip.
+        if returnToNowPlaying != true {
+            // Load the Episode into the AVPlayer
+            pvMediaPlayer.loadEpisodeMediaFileOrStream(pvMediaPlayer.nowPlayingEpisode)
+            
+            // TODO: Load the Clip into the AVPlayer
+            
+            pvMediaPlayer.avPlayer.play()
+            playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+        }
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        // Stop calling updateNowPlayingCurrentTime whenever the now playing current time changes
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: kNowPlayingTimeHasChanged, object: nil)
+        
+        // Stop timer that checks every second if the now playing current time has changed
+        nowPlayingCurrentTimeTimer.invalidate()
+    }
+    
+    
+    
+    // TODO: Make Clip features are below. They should probably be decoupled from the MediaPlayerViewController.
+    var newClip: Clip!
     
     @IBOutlet weak var makeClipViewTime: UIView!
     @IBOutlet weak var makeClipViewTimeStartButton: UIButton!
@@ -62,85 +211,6 @@ class MediaPlayerViewController: UIViewController {
     var makeClipButtonState: Int = 0
     @IBOutlet weak var makeClipButtonNextSaveDone: UIButton!
     @IBOutlet weak var makeClipButtonCancelBackEdit: UIButton!
-    
-    @IBAction func sliderTimeChange(sender: UISlider) {
-        let currentSliderValue = Float64(sender.value)
-        let totalTime = Float64(selectedEpisode.duration!)
-        let resultTime = CMTimeMakeWithSeconds(totalTime * currentSliderValue, 1)
-        avPlayer.seekToTime(resultTime, completionHandler: { (result: Bool) -> Void in
-            // forcing avPlayer to play() regardless of result value
-                self.avPlayer.play()
-            // if avPlayer is not playing for some reason,
-            // change playPauseButton to pause icon
-            if self.avPlayer.rate == 0 {
-                self.playPauseButton.setTitle("\u{f04b}", forState: .Normal)
-            }
-
-        })
-    }
-
-    @IBAction func playPause(sender: AnyObject) {
-        if avPlayer.rate == 0 {
-            avPlayer.play()
-            playPauseButton.setTitle("\u{f04c}", forState: .Normal)
-        } else {
-            avPlayer.pause()
-            playPauseButton.setTitle("\u{f04b}", forState: .Normal)
-        }
-        appDelegate.nowPlayingEpisode = selectedEpisode
-    }
-    
-    @IBAction func skip(sender: AnyObject) {
-
-    }
-    
-    @IBAction func previous(sender: AnyObject) {
-
-    }
-    
-    @IBAction func speed(sender: AnyObject) {
-
-    }
-    
-    @IBAction func audio(sender: AnyObject) {
-
-    }
-    
-    @IBAction func skip1minute(sender: AnyObject) {
-        let currentTime = avPlayer.currentTime()
-        let timeAdjust = CMTimeMakeWithSeconds(60, 1)
-        let resultTime = CMTimeAdd(currentTime, timeAdjust)
-        avPlayer.pause()
-        avPlayer.seekToTime(resultTime)
-        avPlayer.play()
-    }
-
-    @IBAction func skip15seconds(sender: AnyObject) {
-        let currentTime = avPlayer.currentTime()
-        let timeAdjust = CMTimeMakeWithSeconds(15, 1)
-        let resultTime = CMTimeAdd(currentTime, timeAdjust)
-        avPlayer.pause()
-        avPlayer.seekToTime(resultTime)
-        avPlayer.play()
-    }
-    
-    @IBAction func previous15seconds(sender: AnyObject) {
-        let currentTime = avPlayer.currentTime()
-        let timeAdjust = CMTimeMakeWithSeconds(15, 1)
-        let resultTime = CMTimeSubtract(currentTime, timeAdjust)
-        avPlayer.pause()
-        avPlayer.seekToTime(resultTime)
-        avPlayer.play()
-    }
-    
-    @IBAction func previous1minute(sender: AnyObject) {
-        let currentTime = avPlayer.currentTime()
-        let timeAdjust = CMTimeMakeWithSeconds(60, 1)
-        let resultTime = CMTimeSubtract(currentTime, timeAdjust)
-        avPlayer.pause()
-        avPlayer.seekToTime(resultTime)
-        avPlayer.play()
-    }
     
     @IBAction func makeClipNextSaveDone(sender: AnyObject) {
         makeClipButtonState++
@@ -177,38 +247,8 @@ class MediaPlayerViewController: UIViewController {
         }
     }
     
-    func updateCurrentTimeDisplay() {
-        let time = NSNumber(double: CMTimeGetSeconds(avPlayer.currentTime()))
-        
-        //TODO: If an episode is the NowPlayingEpisode, and the episode is deleted, this seems to crash it
-        if time != 0 {
-            currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(time)
-            
-            let floatCurrentTime = time.floatValue
-            if let episodeDuration = selectedEpisode.duration {
-                let floatTotalTime = episodeDuration.floatValue
-                nowPlayingSlider.value = floatCurrentTime / floatTotalTime
-            }
-        }
-    }
-    
-    func createMakeClipButton () {
-        //--- Add Custom Left Bar Button Item/s --//
-        // thanks to Naveen Sharma
-        // http://iostechsolutions.blogspot.com/2014/11/swift-add-custom-right-bar-button-item.html
-        
-        let buttonMakeClip: UIButton = UIButton(type : UIButtonType.System)
-        buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
-        buttonMakeClip.setTitle("Make Clip", forState: UIControlState.Normal)
-        buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
-        let rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
-        
-        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
-    }
-    
     func closeMakeClipView(sender: UIButton!) {
         newClip = CoreDataHelper.insertManagedObject("Clip", managedObjectContext: self.moc) as! Clip
-        
         makeClipViewTime.hidden = true
         makeClipViewTitle.hidden = true
         makeClipViewShare.hidden = true
@@ -233,9 +273,6 @@ class MediaPlayerViewController: UIViewController {
     }
     
     func saveClip(sender: UIButton!) {
-//        newClip.startTime = utility.convertStringToNSNumber(makeClipViewTimeStart.text)
-//        newClip.endTime = utility.convertStringToNSNumber(makeClipViewTimeEnd.text)
-//        newClip.title = makeClipViewTitleField.text
     }
     
     func displayMakeClipViewTitle(sender: UIButton!) {
@@ -250,122 +287,13 @@ class MediaPlayerViewController: UIViewController {
         makeClipViewShare.hidden = false
     }
     
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
-            moc = context
-        }
-        
-        createMakeClipButton()
-        
-        makeClipViewTime.hidden = true
-        makeClipViewTitle.hidden = true
-        makeClipViewShare.hidden = true
-        
-        
-        if let imageData = selectedEpisode.podcast.image {
-            mediaPlayerImage.image = UIImage(data: imageData)
-        }
-        else if let itunesImageData = selectedEpisode.podcast.itunesImage {
-            mediaPlayerImage.image = UIImage(data: itunesImageData)
-        }
-        
-        podcastTitle?.text = selectedEpisode.podcast.title
-        
-        episodeTitle?.text = selectedEpisode.title
-        
-        if let currentEpisodeDuration = selectedEpisode.duration {
-            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(currentEpisodeDuration) as String
-        }
-        
-        if let episodeSummary = selectedEpisode.summary {
-            summary?.text = PVUtility.removeHTMLFromString(episodeSummary)
-        }
-        else {
-            summary.text = ""
-        }
-        
-        if appDelegate.avPlayer != nil && appDelegate.nowPlayingEpisode == selectedEpisode {
-            avPlayer = appDelegate.avPlayer!
-            
-            if avPlayer.rate == 1 {
-                playPauseButton.setTitle("\u{f04c}", forState: .Normal)
-            } else {
-                playPauseButton.setTitle("\u{f04b}", forState: .Normal)
-            }
-            
-            appDelegate.nowPlayingEpisode = selectedEpisode
-        } else {
-            
-            // if the player is playing in the background, but a different episode was selected, reinit the player
-            if appDelegate.avPlayer != nil {
-                // TODO: I am worried this may be causing memory leak, with appDelegate.avPlayers not actually
-                // being removed with the = nil, and resulting in multiple avPlayers being instantiated and
-                // staying in the background
-                appDelegate.avPlayer!.pause()
-                appDelegate.avPlayer = nil
-            }
-            
-            if selectedEpisode.downloadedMediaFileDestination != nil {
-                var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
-                self.docDirectoryURL = URLs[0]
-                
-                if let fileName = selectedEpisode.fileName, let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName) {
-                    let playerItem = AVPlayerItem(URL: destinationURL)
-                    appDelegate.avPlayer = AVPlayer(playerItem: playerItem)
-                    avPlayer = appDelegate.avPlayer
-                }
-            } else {
-                if let urlString = selectedEpisode.mediaURL, let url = NSURL(string: urlString) {
-                    appDelegate.avPlayer = AVPlayer(URL:url)
-                    avPlayer = appDelegate.avPlayer
-                }
-            }
-            
-            appDelegate.nowPlayingEpisode = selectedEpisode
-            
-        }
-        
-        // TODO: Below should probably be replaced with a notification class approach
-        avPlayer.addPeriodicTimeObserverForInterval(CMTimeMakeWithSeconds(1,1), queue: dispatch_get_main_queue()) { (CMTime) -> Void in
-            self.updateCurrentTimeDisplay()
-        }
-        
-        if startStreamingEpisode == true || startDownloadedEpisode == true {
-            avPlayer.play()
-            playPauseButton.setTitle("\u{f04c}", forState: .Normal)
-        }
-        
-        let session = AVAudioSession.sharedInstance()
-        do {
-            try session.setCategory(AVAudioSessionCategoryPlayAndRecord)
-        } catch let error as NSError {
-            print(error)
-        }
-        
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-    }
-    
     /*
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        // Pass the current object to the new view controller.
     }
     */
 

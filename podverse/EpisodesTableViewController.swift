@@ -99,7 +99,7 @@ class EpisodesTableViewController: UITableViewController {
         self.title = selectedPodcast.title
         
         // If there is a now playing episode, add Now Playing button to navigation bar
-        if ((appDelegate.nowPlayingEpisode) != nil) {
+        if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
         
@@ -315,7 +315,7 @@ class EpisodesTableViewController: UITableViewController {
             
             // If the episodeToRemove is currently now playing, then remove the now playing episode, and remove the Player button from the navbar
             // TODO: this is needed below
-            if episodeToRemove == appDelegate.nowPlayingEpisode {
+            if episodeToRemove == PVMediaPlayer.sharedInstance.nowPlayingEpisode {
                 
             }
             
@@ -342,33 +342,30 @@ class EpisodesTableViewController: UITableViewController {
         if segue.identifier == "playDownloadedEpisode" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             let index = self.tableView.indexPathForSelectedRow!
-            mediaPlayerViewController.selectedEpisode = episodesArray[index.row]
-            mediaPlayerViewController.startDownloadedEpisode = true
+            PVMediaPlayer.sharedInstance.nowPlayingEpisode = episodesArray[index.row]
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
         else if segue.identifier == "Quick Play Downloaded Episode" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            mediaPlayerViewController.selectedEpisode = sender as! Episode
-            mediaPlayerViewController.startDownloadedEpisode = true
+            PVMediaPlayer.sharedInstance.nowPlayingEpisode = sender as! Episode
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
             
         }
         else if segue.identifier == "showClips" {
             let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
             let index = self.tableView.indexPathForSelectedRow!
-            clipsTableViewController.selectedEpisode = episodesArray[index.row]
+            clipsTableViewController.currentEpisode = episodesArray[index.row]
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
         else if segue.identifier == "streamEpisode" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             let index = self.tableView.indexPathForSelectedRow!
-            mediaPlayerViewController.selectedEpisode = episodesArray[index.row]
-            mediaPlayerViewController.startStreamingEpisode = true
+            PVMediaPlayer.sharedInstance.nowPlayingEpisode = episodesArray[index.row]
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
         else if segue.identifier == "Episodes to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
+            mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }

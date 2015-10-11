@@ -13,7 +13,7 @@ class ClipsTableViewController: UITableViewController {
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var selectedEpisode: Episode!
+    var currentEpisode: Episode!
     
     var moc: NSManagedObjectContext!
     var clipArray = [Clip]()
@@ -24,7 +24,7 @@ class ClipsTableViewController: UITableViewController {
         
         let unsortedClips = NSMutableArray()
 
-        for singleClip in selectedEpisode.clips {
+        for singleClip in currentEpisode.clips {
             let loopClip = singleClip as! Clip
             unsortedClips.addObject(loopClip)
         }
@@ -55,10 +55,10 @@ class ClipsTableViewController: UITableViewController {
         
         loadData()
         
-        self.title = selectedEpisode.title
+        self.title = currentEpisode.title
         
         // If there is a now playing episode, add Now Playing button to navigation bar
-        if ((appDelegate.nowPlayingEpisode) != nil) {
+        if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
     }
@@ -76,8 +76,8 @@ class ClipsTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell") as! ClipsTableHeaderCell
         
-        let imageData = selectedEpisode.podcast.image
-        let itunesImageData = selectedEpisode.podcast.itunesImage
+        let imageData = currentEpisode.podcast.image
+        let itunesImageData = currentEpisode.podcast.itunesImage
         
         if imageData != nil {
             let image = UIImage(data: imageData!)
@@ -96,7 +96,7 @@ class ClipsTableViewController: UITableViewController {
             }
         }
         
-        headerCell.summary!.text = PVUtility.removeHTMLFromString(selectedEpisode.summary!)
+        headerCell.summary!.text = PVUtility.removeHTMLFromString(currentEpisode.summary!)
         
         return headerCell
     }
@@ -180,14 +180,9 @@ class ClipsTableViewController: UITableViewController {
             
             let index = self.tableView.indexPathForSelectedRow!
             if index.row == 0 {
-                mediaPlayerViewController.selectedEpisode = selectedEpisode
-                if selectedEpisode.downloadedMediaFileDestination != nil {
-                    mediaPlayerViewController.startDownloadedEpisode = true
-                } else {
-                    mediaPlayerViewController.startStreamingEpisode = true
-                }
+                PVMediaPlayer.sharedInstance.nowPlayingEpisode = currentEpisode
             } else {
-                mediaPlayerViewController.selectedClip = clipArray[index.row]
+                PVMediaPlayer.sharedInstance.nowPlayingClip = clipArray[index.row]
             }
             
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
@@ -195,9 +190,7 @@ class ClipsTableViewController: UITableViewController {
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         } else if segue.identifier == "Clips to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            
-            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
-            
+            mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }

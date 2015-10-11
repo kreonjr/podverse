@@ -22,7 +22,7 @@ class FindTableViewController: UITableViewController {
     
     override func viewDidAppear(animated: Bool) {
         // If there is a now playing episode, add Now Playing button to navigation bar
-        if ((appDelegate.nowPlayingEpisode) != nil) {
+        if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
     }
@@ -139,7 +139,7 @@ class FindTableViewController: UITableViewController {
         }
         else if segue.identifier == "Find to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
+            mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }

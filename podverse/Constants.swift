@@ -9,3 +9,5 @@
 let kDownloadHasFinished  = "downloadHasFinished"
 
 let kDownloadHasProgressed = "downloadHasProgressed"
+
+let kNowPlayingTimeHasChanged = "nowPlayingTimeHasChanged"
