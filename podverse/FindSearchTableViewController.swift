@@ -117,7 +117,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
         
         // If there is a now playing episode, add Now Playing button to navigation bar
-        if ((appDelegate.nowPlayingEpisode) != nil) {
+        if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
     }
@@ -261,7 +261,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         }
         else if segue.identifier == "Find Search to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
+            mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }

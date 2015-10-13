@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3010F39C1BC9B64E001DFFF6 /* PVMediaPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */; settings = {ASSET_TAGS = (); }; };
+		3010F39E1BC9D2F0001DFFF6 /* PVClipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3010F39D1BC9D2F0001DFFF6 /* PVClipper.swift */; settings = {ASSET_TAGS = (); }; };
 		3081B6BD1BB7431C00233E08 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3081B6BC1BB7431C00233E08 /* Extensions.swift */; settings = {ASSET_TAGS = (); }; };
 		3A4368AFFC327700F507C1B8 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DDDE676FE37ED4A98326424C /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
@@ -56,6 +58,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVMediaPlayer.swift; sourceTree = "<group>"; };
+		3010F39D1BC9D2F0001DFFF6 /* PVClipper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipper.swift; sourceTree = "<group>"; };
 		3081B6BC1BB7431C00233E08 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		390CD96442FFFCCC0740C384 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		812A094E1B422AB300E8F070 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
@@ -164,8 +168,10 @@
 				817C54071B4B6976007258F8 /* Constants.swift */,
 				3081B6BC1BB7431C00233E08 /* Extensions.swift */,
 				818615BF1B1E950D006C9731 /* CoreDataHelper.swift */,
+				3010F39D1BC9D2F0001DFFF6 /* PVClipper.swift */,
 				81623C281B35D3A100E906FE /* PVDownloader.swift */,
 				81E3578D1B21619F00D67634 /* PVFeedParser.swift */,
+				3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */,
 				813FC80F1B5CA992006248BC /* PVSubscriber.swift */,
 				81E3578F1B21624500D67634 /* PVUtility.swift */,
 				818615CD1B1EB12C006C9731 /* PodcastsTableViewController.swift */,
@@ -414,10 +420,13 @@
 				81E357901B21624500D67634 /* PVUtility.swift in Sources */,
 				81623C291B35D3A100E906FE /* PVDownloader.swift in Sources */,
 				81DDBE5D1B24AC8100EF3B9C /* PodcastsTableCell.swift in Sources */,
+				3010F39E1BC9D2F0001DFFF6 /* PVClipper.swift in Sources */,
 				818615C01B1E950D006C9731 /* CoreDataHelper.swift in Sources */,
 				813FC8101B5CA992006248BC /* PVSubscriber.swift in Sources */,
 				818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */,
 				81DD2CCA1B549C4D00432E0C /* Episode.swift in Sources */,
+				EF2EC2911BC9AAB9006F7289 /* EpisodeTableHeader.swift in Sources */,
+				3010F39C1BC9B64E001DFFF6 /* PVMediaPlayer.swift in Sources */,
 				81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */,
 				3081B6BD1BB7431C00233E08 /* Extensions.swift in Sources */,
 			);

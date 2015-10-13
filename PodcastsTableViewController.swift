@@ -66,7 +66,7 @@ class PodcastsTableViewController: UITableViewController {
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
         // If there is a now playing episode, add Now Playing button to navigation bar
-        if ((appDelegate.nowPlayingEpisode) != nil) {
+        if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
     }
@@ -168,7 +168,7 @@ class PodcastsTableViewController: UITableViewController {
                 
                 // If the episodeToRemove is currently now playing, then remove the now playing episode, and remove the Player button from the navbar
                 // TODO: this is needed below
-                if episodeToRemove == appDelegate.nowPlayingEpisode {
+                if episodeToRemove == PVMediaPlayer.sharedInstance.nowPlayingEpisode {
                     
                 }
                 
@@ -200,7 +200,7 @@ class PodcastsTableViewController: UITableViewController {
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         } else if segue.identifier == "Podcasts to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            mediaPlayerViewController.selectedEpisode = appDelegate.nowPlayingEpisode
+            mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }
