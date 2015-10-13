@@ -9,11 +9,15 @@
 import UIKit
 import CoreData
 
-class EpisodesTableViewController: UITableViewController {
+class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    @IBOutlet weak var tableView: UITableView!
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    @IBOutlet weak var headerView: EpisodeTableHeader!
+    @IBOutlet weak var headerView: UIView!
+    @IBOutlet weak var headerImageView: UIImageView!
     
+    @IBOutlet weak var headerSummaryLabel: UILabel!
+    @IBOutlet weak var headerShadowView: UIView!
     var moc: NSManagedObjectContext! {
         get {
             return appDelegate.managedObjectContext
@@ -89,28 +93,29 @@ class EpisodesTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: kDownloadHasFinished, object: nil)
+        
+        if let imageData = selectedPodcast.image, image = UIImage(data: imageData)  {
+            headerImageView.image = image
+        }
+        else if let itunesImageData = selectedPodcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
+            headerImageView.image = itunesImage
+        }
+        
+        headerSummaryLabel.text = selectedPodcast.summary
+        
+        self.title = selectedPodcast.title
+        
+        loadData()
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
 
-        loadData()
-        
-        self.title = selectedPodcast.title
         
         // If there is a now playing episode, add Now Playing button to navigation bar
         if ((appDelegate.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
-        
-        dispatch_async(dispatch_get_main_queue()) {
-            self.tableView.reloadData()
-        }
-        
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-
     }
 
     override func didReceiveMemoryWarning() {
@@ -119,43 +124,15 @@ class EpisodesTableViewController: UITableViewController {
     }
 
     // MARK: - Table view data source
-
-    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        headerView.headerImageView.image = UIImage(named: "Blank52")
-        
-        let imageData = selectedPodcast.image
-        let itunesImageData = selectedPodcast.itunesImage
-        
-        if imageData != nil {
-            let image = UIImage(data: imageData!)
-            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
-            if image!.size.height != 0.0 {
-                headerView.headerImageView.image = image
-            }
-        }
-        else {
-            if itunesImageData != nil {
-                let itunesImage = UIImage(data: itunesImageData!)
-                
-                if itunesImage!.size.height != 0.0 {
-                    headerView.headerImageView.image = itunesImage
-                }
-            }
-        }
-        
-        headerView.headerSummaryLabel.text = selectedPodcast.summary
-        return headerView
-    }
-    
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return episodesArray.count + 1
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         // If not the last cell, then insert episode information into cell
         if indexPath.row < episodesArray.count {
@@ -200,7 +177,7 @@ class EpisodesTableViewController: UITableViewController {
         }
         // Return the Show All Available Episodes / Show Downloaded Episodes button
         else {
-            let cell = tableView.dequeueReusableCellWithIdentifier("showAllEpisodesCell", forIndexPath: indexPath) 
+            let cell = tableView.dequeueReusableCellWithIdentifier("showAllEpisodesCell", forIndexPath: indexPath)
             
             if showAllAvailableEpisodes == true {
                 cell.textLabel!.text = "Show Downloaded Episodes"
@@ -213,7 +190,7 @@ class EpisodesTableViewController: UITableViewController {
         }
     }
     
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if indexPath.row < episodesArray.count {
             return 120
         }
@@ -222,7 +199,7 @@ class EpisodesTableViewController: UITableViewController {
         }
     }
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
         // If not the last item in the array, then perform selected episode actions
         if indexPath.row < episodesArray.count {
@@ -274,7 +251,7 @@ class EpisodesTableViewController: UITableViewController {
     }
     
     // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return False if you do not want the specified item to be editable.
         if indexPath.row < episodesArray.count {
             let episode = episodesArray[indexPath.row]
@@ -291,7 +268,7 @@ class EpisodesTableViewController: UITableViewController {
     }
     
     // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             
             // Get the episode and store it in a variable
