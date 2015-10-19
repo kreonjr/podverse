@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class PVFeedParser: NSObject, MWFeedParserDelegate, FeedParserDelegate {
+class PVFeedParser: NSObject, FeedParserDelegate {
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
     var moc: NSManagedObjectContext! {
