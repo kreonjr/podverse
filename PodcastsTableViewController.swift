@@ -96,7 +96,7 @@ class PodcastsTableViewController: UITableViewController {
         cell.title?.text = podcast.title
         cell.pvImage?.image = UIImage(named: "Blank52")
         
-        let imageData = podcast.image
+        let imageData = podcast.imageData
         let itunesImageData = podcast.itunesImage
         
         let totalEpisodesDownloadedPredicate = NSPredicate(format: "podcast == %@ && downloadComplete == true", podcast)

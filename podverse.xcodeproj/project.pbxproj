@@ -45,6 +45,12 @@
 		81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578D1B21619F00D67634 /* PVFeedParser.swift */; };
 		81E357901B21624500D67634 /* PVUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578F1B21624500D67634 /* PVUtility.swift */; };
 		81E4FE671B2E11D600A10A77 /* fontawesome-webfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */; };
+		EF59CECA1BD07AB6002D9DDF /* FeedChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC41BD07AB6002D9DDF /* FeedChannel.swift */; settings = {ASSET_TAGS = (); }; };
+		EF59CECB1BD07AB6002D9DDF /* FeedEnclosure.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC51BD07AB6002D9DDF /* FeedEnclosure.swift */; settings = {ASSET_TAGS = (); }; };
+		EF59CECC1BD07AB6002D9DDF /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC61BD07AB6002D9DDF /* FeedItem.swift */; settings = {ASSET_TAGS = (); }; };
+		EF59CECD1BD07AB6002D9DDF /* FeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC71BD07AB6002D9DDF /* FeedParser.swift */; settings = {ASSET_TAGS = (); }; };
+		EF59CECE1BD07AB6002D9DDF /* NSDate+FeedsDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC81BD07AB6002D9DDF /* NSDate+FeedsDate.swift */; settings = {ASSET_TAGS = (); }; };
+		EF59CECF1BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC91BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,6 +108,12 @@
 		81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fontawesome-webfont.ttf"; sourceTree = "<group>"; };
 		B31276F33CB9962F14309BFA /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 		DDDE676FE37ED4A98326424C /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		EF59CEC41BD07AB6002D9DDF /* FeedChannel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedChannel.swift; sourceTree = "<group>"; };
+		EF59CEC51BD07AB6002D9DDF /* FeedEnclosure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedEnclosure.swift; sourceTree = "<group>"; };
+		EF59CEC61BD07AB6002D9DDF /* FeedItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedItem.swift; sourceTree = "<group>"; };
+		EF59CEC71BD07AB6002D9DDF /* FeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedParser.swift; sourceTree = "<group>"; };
+		EF59CEC81BD07AB6002D9DDF /* NSDate+FeedsDate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDate+FeedsDate.swift"; sourceTree = "<group>"; };
+		EF59CEC91BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+RemoveHTMLCharacters.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -202,6 +214,7 @@
 		818615931B1E84CE006C9731 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				EF59CED01BD07AE5002D9DDF /* SwiftFeedParse */,
 				81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */,
 				818615B81B1E85F6006C9731 /* README */,
 				818615941B1E84CE006C9731 /* Info.plist */,
@@ -235,6 +248,19 @@
 				815A2E3A1B522467002A21A7 /* SearchResultPodcast.swift */,
 			);
 			name = Datamodel;
+			sourceTree = "<group>";
+		};
+		EF59CED01BD07AE5002D9DDF /* SwiftFeedParse */ = {
+			isa = PBXGroup;
+			children = (
+				EF59CEC41BD07AB6002D9DDF /* FeedChannel.swift */,
+				EF59CEC51BD07AB6002D9DDF /* FeedEnclosure.swift */,
+				EF59CEC61BD07AB6002D9DDF /* FeedItem.swift */,
+				EF59CEC71BD07AB6002D9DDF /* FeedParser.swift */,
+				EF59CEC81BD07AB6002D9DDF /* NSDate+FeedsDate.swift */,
+				EF59CEC91BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift */,
+			);
+			name = SwiftFeedParse;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -405,18 +431,23 @@
 				815A2E371B50D855002A21A7 /* FindSearchTableViewController.swift in Sources */,
 				818615D01B1EB144006C9731 /* ClipsTableViewController.swift in Sources */,
 				81DDBE631B253C9200EF3B9C /* ClipsTableCell.swift in Sources */,
+				EF59CECF1BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift in Sources */,
 				81DD2CCB1B549C4D00432E0C /* Podcast.swift in Sources */,
 				81CCE4E21B52DB8B00DC8346 /* PodcastProfileViewController.swift in Sources */,
 				81DDBE5F1B24BAF300EF3B9C /* EpisodesTableCell.swift in Sources */,
 				817C54081B4B6976007258F8 /* Constants.swift in Sources */,
 				81A3B5161B3A60F5007D9A96 /* DownloadsTableViewController.swift in Sources */,
 				812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */,
+				EF59CECC1BD07AB6002D9DDF /* FeedItem.swift in Sources */,
 				81A3B5181B3A614B007D9A96 /* DownloadsTableViewCell.swift in Sources */,
+				EF59CECA1BD07AB6002D9DDF /* FeedChannel.swift in Sources */,
 				818615CE1B1EB12C006C9731 /* PodcastsTableViewController.swift in Sources */,
+				EF59CECB1BD07AB6002D9DDF /* FeedEnclosure.swift in Sources */,
 				81DD2CC91B549C4D00432E0C /* Clip.swift in Sources */,
 				815A2E3B1B522467002A21A7 /* SearchResultPodcast.swift in Sources */,
 				818615CC1B1EB10E006C9731 /* EpisodesTableViewController.swift in Sources */,
 				815A2E331B50D002002A21A7 /* FindSearchTableViewCell.swift in Sources */,
+				EF59CECD1BD07AB6002D9DDF /* FeedParser.swift in Sources */,
 				81E357901B21624500D67634 /* PVUtility.swift in Sources */,
 				81623C291B35D3A100E906FE /* PVDownloader.swift in Sources */,
 				81DDBE5D1B24AC8100EF3B9C /* PodcastsTableCell.swift in Sources */,
@@ -425,9 +456,9 @@
 				813FC8101B5CA992006248BC /* PVSubscriber.swift in Sources */,
 				818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */,
 				81DD2CCA1B549C4D00432E0C /* Episode.swift in Sources */,
-				EF2EC2911BC9AAB9006F7289 /* EpisodeTableHeader.swift in Sources */,
 				3010F39C1BC9B64E001DFFF6 /* PVMediaPlayer.swift in Sources */,
 				81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */,
+				EF59CECE1BD07AB6002D9DDF /* NSDate+FeedsDate.swift in Sources */,
 				3081B6BD1BB7431C00233E08 /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

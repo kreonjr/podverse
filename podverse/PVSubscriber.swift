@@ -22,26 +22,9 @@ class PVSubscriber: NSObject {
     }
     
     func subscribeToPodcast(feedURLString: String) {
-        
-        let feedURL = NSURL(string: feedURLString)
-        
-        PVFeedParser.sharedInstance.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
-            resolve: {
-                // After parsePodcastFeed has resolved, then retrieve the newly created podcast object by matching feedURL stored in CoreData, then get the most recent episode for that podcast, and start downloading that episode.
-                let predicate = NSPredicate(format: "feedURL == %@", feedURL!.absoluteString)
-                let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
-                if podcastSet.count > 0 {
-                    let podcast = podcastSet[0]
-                    let mostRecentEpisodePodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-                    let mostRecentEpisodeSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodePodcastPredicate)
-                    let mostRecentEpisode = mostRecentEpisodeSet[0] as! Episode
-                    PVDownloader.sharedInstance.startDownloadingEpisode(mostRecentEpisode)
-                    podcast.isSubscribed = true
-                }
-        
-            },
-            reject: {
-            }
-        )
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
+            let feedParser = PVFeedParser(shouldGetMostRecent: false, shouldSubscribe: true)
+            feedParser.parsePodcastFeed(feedURLString)
+        }
     }
 }

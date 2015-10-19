@@ -94,7 +94,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: kDownloadHasFinished, object: nil)
         
-        if let imageData = selectedPodcast.image, image = UIImage(data: imageData)  {
+        if let imageData = selectedPodcast.imageData, image = UIImage(data: imageData)  {
             headerImageView.image = image
         }
         else if let itunesImageData = selectedPodcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {

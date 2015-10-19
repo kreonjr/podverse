@@ -49,11 +49,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
             for var i = 0; i < podcastArray.count; i++ {
                 let feedURL = NSURL(string: podcastArray[i].feedURL)
-                PVFeedParser.sharedInstance.parsePodcastFeed(feedURL!, returnPodcast: false, returnOnlyLatestEpisode: true,
-                    resolve: {
-                    }, reject: {
-                    }
-                )
+                
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
+                    let feedParser = PVFeedParser(shouldGetMostRecent: true, shouldSubscribe:false )
+                    feedParser.parsePodcastFeed(feedURL!.absoluteString)
+                }
             }
             
         }

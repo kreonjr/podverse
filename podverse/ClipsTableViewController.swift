@@ -76,7 +76,7 @@ class ClipsTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell") as! ClipsTableHeaderCell
         
-        let imageData = currentEpisode.podcast.image
+        let imageData = currentEpisode.podcast.imageData
         let itunesImageData = currentEpisode.podcast.itunesImage
         
         if imageData != nil {

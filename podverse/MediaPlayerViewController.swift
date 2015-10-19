@@ -144,7 +144,7 @@ class MediaPlayerViewController: UIViewController {
         makeClipViewShare.hidden = true
         
         // Populate the Media Player UI with the current episode's information
-        if let imageData = pvMediaPlayer.nowPlayingEpisode.podcast.image {
+        if let imageData = pvMediaPlayer.nowPlayingEpisode.podcast.imageData {
             mediaPlayerImage.image = UIImage(data: imageData)
         }
         else if let itunesImageData = pvMediaPlayer.nowPlayingEpisode.podcast.itunesImage {
