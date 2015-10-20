@@ -127,9 +127,8 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func feedParserParsingAborted(parser: FeedParser) {
-        // If the parser is only returning the latest episode, then if the podcast's latest episode returned is not the same as the latest episode saved locally, parse the entire feed again, then download and save the latest episode
         
-
+        // If the parser is only returning the latest episode, then if the podcast's latest episode returned is not the same as the latest episode saved locally, parse the entire feed again, then download and save the latest episode
         if self.shouldGetMostRecentEpisode == true {
             if let newestFeedEpisode = latestEpisodeInFeed {
                 let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
@@ -161,8 +160,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         // If subscribing to a podcast, then get the latest episode and begin downloading
         if shouldSubscribeToPodcast == true {
             let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-            let mostRecentEpisode = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: podcastPredicate)[0] as! Episode
-            PVDownloader.sharedInstance.startDownloadingEpisode(mostRecentEpisode)
+            let latestEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: podcastPredicate)
+            
+            // If there is an episode in the array, then download the episode
+            if latestEpisodeArray.count > 0 {
+                PVDownloader.sharedInstance.startDownloadingEpisode(latestEpisodeArray[0] as! Episode)
+            }
         }
         
         // Save the parsed podcast and episode information
