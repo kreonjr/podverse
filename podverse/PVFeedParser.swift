@@ -117,12 +117,13 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         if episodeAlreadySaved == false {
             podcast.addEpisodeObject(episode)
         }
-
+        
         // If only parsing for the latest episode, stop parsing after parsing the first episode.
         if shouldGetMostRecentEpisode == true {
             latestEpisodeInFeed = episode
             parser.abortParsing()
         }
+        
     }
     
     func feedParserParsingAborted(parser: FeedParser) {
@@ -156,7 +157,14 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func feedParser(parser: FeedParser, successfullyParsedURL url: String) {
-
+        
+        // If subscribing to a podcast, then get the latest episode and begin downloading
+        if shouldSubscribeToPodcast == true {
+            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+            let mostRecentEpisode = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: podcastPredicate)[0] as! Episode
+            PVDownloader.sharedInstance.startDownloadingEpisode(mostRecentEpisode)
+        }
+        
         // Save the parsed podcast and episode information
         dispatch_async(dispatch_get_main_queue()) { () -> Void in
             do {
