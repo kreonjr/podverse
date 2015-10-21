@@ -291,9 +291,12 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             }
             
             // If the episodeToRemove is currently now playing, then remove the now playing episode, and remove the Player button from the navbar
-            // TODO: this is needed below
-            if episodeToRemove == PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-                
+            if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+                if episodeToRemove == nowPlayingEpisode {
+                    PVMediaPlayer.sharedInstance.avPlayer.pause()
+                    PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
+                    self.navigationItem.rightBarButtonItem = nil
+                }
             }
             
             // Delete the episode from CoreData, and update the UI
