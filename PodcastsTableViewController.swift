@@ -149,6 +149,10 @@ class PodcastsTableViewController: UITableViewController {
             // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
             for var i = 0; i < episodeToRemoveArray.count; i++ {
                 let episodeToRemove = episodeToRemoveArray[i] as! Episode
+                if let fileName = episodeToRemove.fileName {
+                    PVUtility.deleteEpisodeFromDiskWithName(fileName)
+                }
+                
                 moc.deleteObject(episodeToRemove)
                 
                 // If the episodeToRemove is currently downloading, then retrieve and cancel the download

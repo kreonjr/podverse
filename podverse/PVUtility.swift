@@ -75,4 +75,15 @@ class PVUtility: NSObject {
         return dateString
     }
     
+    static func deleteEpisodeFromDiskWithName(fileName:String) {
+        let URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
+        let destinationURL = URLs.first?.URLByAppendingPathComponent(fileName)
+        
+        do {
+            try NSFileManager().removeItemAtURL(destinationURL!)
+        } catch {
+            print("Item does not exist on disk")
+        }
+    }
+    
 }

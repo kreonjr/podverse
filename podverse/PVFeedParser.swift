@@ -105,6 +105,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         if let summary = item.feedContent { episode.summary = summary }
         if let date = item.feedPubDate { episode.pubDate = date }
         if let link = item.feedLink { episode.link = link }
+        if let duration = item.duration { episode.duration = NSNumber(integer:duration) }
         
         //TODO: Add duration to feedItem
         //episode.duration = item

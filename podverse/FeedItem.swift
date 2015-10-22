@@ -34,6 +34,7 @@ class FeedItem: NSObject {
     var feedEnclosures: [FeedEnclosure] = []
     var feedIdentifier: String?
     var feedSource: String? // rss channel where the feed came from, name or url.
+    var duration:Int? //PV: Added to get podcast duration
     
     // MARK: - other
     var imageURLsFromDescription: [String]?

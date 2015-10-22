@@ -299,7 +299,11 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 }
             }
             
-            // Delete the episode from CoreData, and update the UI
+            // Delete the episode from CoreData and the disk, and update the UI
+            if let fileName = episodeToRemove.fileName {
+                PVUtility.deleteEpisodeFromDiskWithName(fileName)
+            }
+
             moc.deleteObject(episodeToRemove)
             episodesArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
