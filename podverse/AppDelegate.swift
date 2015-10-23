@@ -52,7 +52,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
                     let feedParser = PVFeedParser(shouldGetMostRecent: true, shouldSubscribe:false )
-                    feedParser.parsePodcastFeed(feedURL!.absoluteString)
+                    if let feedURLString = feedURL?.absoluteString {
+                        feedParser.parsePodcastFeed(feedURLString)
+                    }
                 }
             }
             
@@ -66,13 +68,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Ask for permission for Podverse to use push notifications
         application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge], categories: nil))  // types are UIUserNotificationType members
-        
-        let predicate = NSPredicate(format: "taskIdentifier != nil")
-        let savedEpisodes = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: predicate) as! [Episode]
-        
-        for episode in savedEpisodes {
-            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
-        }
 
         startCheckSubscriptionsForNewEpisodesTimer()
         

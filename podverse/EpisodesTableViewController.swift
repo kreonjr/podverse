@@ -148,9 +148,9 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             
             cell.totalClips?.text = String("123 clips")
             
-//            if let duration = episode.duration {
-//                cell.totalTimeLeft?.text = PVUtility.convertNSNumberToHHMMSSString(episode.duration!)
-//            }
+            if let duration = episode.duration {
+                cell.totalTimeLeft?.text = PVUtility.convertNSNumberToHHMMSSString(duration)
+            }
 
             if let pubDate = episode.pubDate {
                 cell.pubDate?.text = PVUtility.formatDateToString(pubDate)

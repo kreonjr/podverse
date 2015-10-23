@@ -23,11 +23,19 @@ class CustomFeedParser:FeedParser {
             }
         }
         else if self.currentPath == "/rss/channel/image/url"{
-            self.currentFeedChannel.channelLogoURL = self.currentElementContent
+            self.currentFeedChannel?.channelLogoURL = self.currentElementContent
         }
         else if self.currentPath == "/rss/channel/item/itunes:duration" {
-            self.currentFeedItem.duration = Int(self.currentElementContent)
+            self.currentFeedItem?.duration = Int(self.currentElementContent)
         }
+        else if self.currentPath == "/rss/channel/lastBuildDate" {
+            self.currentFeedChannel?.channelDateOfLastChange = NSDate(fromString: self.currentElementContent, format: .ISO8601)
+        }
+        else if self.currentPath == "/rss/channel/pubDate" {
+            self.currentFeedItem?.feedPubDate = NSDate(fromString: self.currentElementContent, format: .ISO8601)
+        }
+        
+        
         
         super.parseEndOfRSS2Element(elementName, qualifiedName: qName)
     }
