@@ -12,6 +12,10 @@ class CustomFeedParser:FeedParser {
 
     override func parseEndOfRSS2Element(elementName: String, qualifiedName qName: String!) {
         
+        // TODO: This maxFeedsToParse should probably be limited in some way. Such as, only retrieve the last 100 episodes, but return the next 100 episodes if the user scrolls to the bottom of the EpisodesTableView. 
+        // Also, for some reason the maxFeedsToParse will only return half the number of episodes maxFeedsToParse we set. So 100 would actually result in 50 episodes.
+        self.maxFeedsToParse = 5000
+        
         if self.currentPath == "/rss/channel/item" {
             self.delegate?.feedParser?(self, didParseItem: self.currentFeedItem)
             self.currentFeedItem = nil
