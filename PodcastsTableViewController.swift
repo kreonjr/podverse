@@ -29,6 +29,7 @@ class PodcastsTableViewController: UITableViewController {
     
     func loadData() {
         podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: moc, predicate: nil) as! [Podcast]
+        podcastArray.sortInPlace({ $0.title < $1.title })
         self.tableView.reloadData()
     }
     
