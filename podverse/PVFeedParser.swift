@@ -88,6 +88,8 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             if item.feedEnclosures[0].url.characters.count > 0 {
                 predicate = NSPredicate(format: "mediaURL == %@", item.feedEnclosures[0].url)
             }
+        } else {
+            return
         }
         
         let episodeSet = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
