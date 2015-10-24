@@ -94,7 +94,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: kDownloadHasFinished, object: nil)
         
-        if let imageData = selectedPodcast.image, image = UIImage(data: imageData)  {
+        if let imageData = selectedPodcast.imageData, image = UIImage(data: imageData)  {
             headerImageView.image = image
         }
         else if let itunesImageData = selectedPodcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
@@ -148,9 +148,9 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             
             cell.totalClips?.text = String("123 clips")
             
-//            if let duration = episode.duration {
-//                cell.totalTimeLeft?.text = PVUtility.convertNSNumberToHHMMSSString(episode.duration!)
-//            }
+            if let duration = episode.duration {
+                cell.totalTimeLeft?.text = PVUtility.convertNSNumberToHHMMSSString(duration)
+            }
 
             if let pubDate = episode.pubDate {
                 cell.pubDate?.text = PVUtility.formatDateToString(pubDate)
@@ -291,12 +291,19 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             }
             
             // If the episodeToRemove is currently now playing, then remove the now playing episode, and remove the Player button from the navbar
-            // TODO: this is needed below
-            if episodeToRemove == PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-                
+            if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+                if episodeToRemove == nowPlayingEpisode {
+                    PVMediaPlayer.sharedInstance.avPlayer.pause()
+                    PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
+                    self.navigationItem.rightBarButtonItem = nil
+                }
             }
             
-            // Delete the episode from CoreData, and update the UI
+            // Delete the episode from CoreData and the disk, and update the UI
+            if let fileName = episodeToRemove.fileName {
+                PVUtility.deleteEpisodeFromDiskWithName(fileName)
+            }
+
             moc.deleteObject(episodeToRemove)
             episodesArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)

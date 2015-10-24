@@ -49,11 +49,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
             for var i = 0; i < podcastArray.count; i++ {
                 let feedURL = NSURL(string: podcastArray[i].feedURL)
-                PVFeedParser.sharedInstance.parsePodcastFeed(feedURL!, returnPodcast: false, returnOnlyLatestEpisode: true,
-                    resolve: {
-                    }, reject: {
+                
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
+                    let feedParser = PVFeedParser(shouldGetMostRecent: true, shouldSubscribe:false )
+                    if let feedURLString = feedURL?.absoluteString {
+                        feedParser.parsePodcastFeed(feedURLString)
                     }
-                )
+                }
             }
             
         }
@@ -66,13 +68,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Ask for permission for Podverse to use push notifications
         application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge], categories: nil))  // types are UIUserNotificationType members
-        
-        let predicate = NSPredicate(format: "taskIdentifier != nil")
-        let savedEpisodes = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: predicate) as! [Episode]
-        
-        for episode in savedEpisodes {
-            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
-        }
 
         startCheckSubscriptionsForNewEpisodesTimer()
         

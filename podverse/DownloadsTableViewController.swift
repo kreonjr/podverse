@@ -86,7 +86,7 @@ class DownloadsTableViewController: UITableViewController {
         
         cell.title!.text = episode.title
         
-        if let imageData = episode.podcast.image {
+        if let imageData = episode.podcast.imageData {
             if let image = UIImage(data: imageData) {
                 cell.pvImage?.image = image
             }

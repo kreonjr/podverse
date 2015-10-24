@@ -9,10 +9,7 @@
 import UIKit
 import CoreData
 
-class PVFeedParser: NSObject, MWFeedParserDelegate {
-    
-    static let sharedInstance = PVFeedParser()
-    
+class PVFeedParser: NSObject, FeedParserDelegate {
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
     var moc: NSManagedObjectContext! {
@@ -24,96 +21,73 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
     var feedURL: NSURL!
     var podcast: Podcast!
     var episode: Episode!
-    var mostRecentEpisodeInFeed: Episode!
-    var mostRecentEpisodeSaved: Episode!
     
-    var returnPodcast: Bool!
-    var returnOnlyLatestEpisode: Bool!
+    var shouldGetMostRecentEpisode: Bool
+    var shouldSubscribeToPodcast: Bool
     var episodeAlreadySaved: Bool?
+    var latestEpisodeInFeed: Episode?
     
-    func parsePodcastFeed(feedURL: NSURL, returnPodcast: Bool, returnOnlyLatestEpisode: Bool, resolve: () -> (), reject: () -> ()) {
-        
-        // Pass the parser task booleans to the global scope
-        self.returnPodcast = returnPodcast
-        self.returnOnlyLatestEpisode = returnOnlyLatestEpisode
-        
-        // Create, configure, and start the feedParser
-        let feedParser = MWFeedParser(feedURL: feedURL)
-        feedParser.delegate = self
-        feedParser.feedParseType = ParseTypeFull
-        feedParser.connectionType = ConnectionTypeAsynchronously
-        feedParser.parse()
-        
-        // START WTF? I don't really understand this part, but I found it in a tutorial
-        // TODO: parsing needs to move off the main thread
-        // TODO: Important: MWFeedParser creator recommends NSOperation instead of GCD https://github.com/mwaterfall/MWFeedParser/issues/78
-        let delta: Int64 = 1 * Int64(NSEC_PER_SEC)
-        let time = dispatch_time(DISPATCH_TIME_NOW, delta)
-        dispatch_after(time, dispatch_get_main_queue(), {
-            resolve()
-        })
-        // END WTF?
+    init(shouldGetMostRecent:Bool, shouldSubscribe:Bool) {
+        shouldGetMostRecentEpisode = shouldGetMostRecent
+        shouldSubscribeToPodcast = shouldSubscribe
     }
     
-    func feedParserDidStart(parser: MWFeedParser!) {
+    func parsePodcastFeed(feedURLString: String) {
+        // Create, configure, and start the feedParser
+        let feedParser = CustomFeedParser(feedURL: feedURLString)
+        feedParser.delegate = self
+        feedParser.parsingType = .Full
+
+        feedParser.parse()
+        
         print("feedParser did start")
     }
     
-    func feedParser(parser: MWFeedParser!, didParseFeedInfo info: MWFeedInfo!) {
-        
-        // If podcast already exists in the database, do not insert new podcast, instead update existing podcast
-        let feedURLString = info.url.absoluteString
-        let predicate = NSPredicate(format: "feedURL == %@", feedURLString)
-        let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
-        if podcastSet.count > 0 {
-            podcast = podcastSet[0]
-        }
-        else {
-            podcast = CoreDataHelper.insertManagedObject("Podcast", managedObjectContext: self.moc) as! Podcast
-        }
-        
-        if let title = info.title { podcast.title = title }
-
-        if let summary = info.summary { podcast.summary = summary }
-        
-        if let feedURL = info.url { podcast.feedURL = feedURL.absoluteString }
-        
-        if let itunesAuthor = info.itunesAuthor { podcast.itunesAuthor = itunesAuthor }
-        
-        if let image = info.image {
-            let imgURL = NSURL(string: image)
-            if let data = NSData(contentsOfURL: imgURL!) {
-                self.podcast.image = data
+    func feedParser(parser: FeedParser, didParseChannel channel: FeedChannel) {
+        if let feedURLString = channel.channelURL {
+            let predicate = NSPredicate(format: "feedURL == %@", feedURLString)
+            let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
+            if podcastSet.count > 0 {
+                podcast = podcastSet[0]
+            }
+            else {
+                podcast = CoreDataHelper.insertManagedObject("Podcast", managedObjectContext: self.moc) as! Podcast
             }
         }
         
-        if let itunesImage = info.itunesImage {
-            let itunesImgURL = NSURL(string: itunesImage)
-            if let data = NSData(contentsOfURL: itunesImgURL!) {
-                self.podcast.itunesImage = data
-            }
+        if let title = channel.channelTitle {
+            podcast.title = title
         }
         
-        let mostRecentEpisodeSavedPodcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-        let mostRecentEpisodeSavedSet = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: mostRecentEpisodeSavedPodcastPredicate)
-        if mostRecentEpisodeSavedSet.count > 0 {
-            self.mostRecentEpisodeSaved = mostRecentEpisodeSavedSet[0] as! Episode
+        if let summary = channel.channelDescription {
+            podcast.summary = summary
         }
-
+        
+        if let feedURL = channel.channelLink {
+            podcast.feedURL = feedURL
+        }
+        
+        //Look into maybe adding it in the library manually
+        //if let itunesAuthor = channel.itunesAuthor { podcast.itunesAuthor = itunesAuthor }
+        if let imageUrlString = channel.channelLogoURL, let imageUrl = NSURL(string:imageUrlString) {
+            self.podcast.imageData = NSData(contentsOfURL: imageUrl)
+        }
+        
+        if let lastModifiedDate = channel.channelDateOfLastChange {
+            self.podcast.lastPubDate = lastModifiedDate
+        }
+        
+        podcast.isSubscribed = self.shouldSubscribeToPodcast
     }
-        
-    func feedParser(parser: MWFeedParser!, didParseFeedItem item: MWFeedItem!) {
-        
+    
+    func feedParser(parser: FeedParser, didParseItem item: FeedItem) {
+    
         // If episode already exists in the database, do not insert new episode, instead update existing episode
-        // TODO: Is there one field we can reliably check for matching episodes that will never error out?
         var predicate = NSPredicate()
-        if item.enclosures != nil {
-            if item.enclosures[0]["url"] != nil {
-                predicate = NSPredicate(format: "mediaURL == %@", (item.enclosures[0]["url"] as? String)!)
+        if item.feedEnclosures.count > 0 {
+            if item.feedEnclosures[0].url.characters.count > 0 {
+                predicate = NSPredicate(format: "mediaURL == %@", item.feedEnclosures[0].url)
             }
-        }
-        else if item.date != nil {
-            predicate = NSPredicate(format: "pubDate == %@", (item.date))
         }
         
         let episodeSet = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
@@ -127,24 +101,18 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         }
         
         // Retrieve parsed values from item and add values to their respective episode properties
-        if let title = item.title { episode.title = title }
-        if let summary = item.summary { episode.summary = summary }
-        if let date = item.date { episode.pubDate = date }
-        if let link = item.link { episode.link = link }
-        if let enclosures = item.enclosures {
-            episode.mediaURL = enclosures[0]["url"] as? String
-            episode.mediaType = enclosures[0]["type"] as? String
-            episode.mediaBytes = enclosures[0]["length"] as? Int
-        }
-        if let duration = item.duration {
-            let durationNSNumber = PVUtility.convertStringToNSNumber(duration)
-            episode.duration = durationNSNumber
-        }
-        if let guid = item.guid { episode.guid = guid }
+        if let title = item.feedTitle { episode.title = title }
+        if let summary = item.feedContent { episode.summary = summary }
+        if let date = item.feedPubDate { episode.pubDate = date }
+        if let link = item.feedLink { episode.link = link }
+        if let duration = item.duration { episode.duration = NSNumber(integer:duration) }
         
-        // Manually set the taskIdentifier = nil. For some reason taskIdentifiers seem to be defaulting to -1 instead of nil. This results in an issue on the EpisodeTableController that makes all episodes appear like they are currently downlaoding.
-        // TODO: why is the taskIdentifier sometimes getting turned into -1???
-        episode.taskIdentifier = nil
+        //TODO: Add duration to feedItem
+        //episode.duration = item
+        episode.mediaURL = item.feedEnclosures[0].url
+        episode.mediaType = item.feedEnclosures[0].type
+        episode.mediaBytes = NSNumber(integer: item.feedEnclosures[0].length)
+        if let guid = item.feedIdentifier { episode.guid = guid }
         
         // If episode is not already saved, then add episode to the podcast object
         if episodeAlreadySaved == false {
@@ -152,47 +120,65 @@ class PVFeedParser: NSObject, MWFeedParserDelegate {
         }
         
         // If only parsing for the latest episode, stop parsing after parsing the first episode.
-        if self.returnOnlyLatestEpisode == true {
-            self.mostRecentEpisodeInFeed = episode
-            parser.stopParsing()
+        if shouldGetMostRecentEpisode == true {
+            latestEpisodeInFeed = episode
+            parser.abortParsing()
         }
-    
+        
     }
-        
-    func feedParserDidFinish(parser: MWFeedParser!) {
-        
-        // Set the podcast.lastPubDate equal to the newest episode's pubDate
-        let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-        let mostRecentEpisode = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: podcastPredicate)[0] as! Episode
-        podcast.lastPubDate = mostRecentEpisode.pubDate
+    
+    func feedParserParsingAborted(parser: FeedParser) {
         
         // If the parser is only returning the latest episode, then if the podcast's latest episode returned is not the same as the latest episode saved locally, parse the entire feed again, then download and save the latest episode
-        if self.returnOnlyLatestEpisode == true {
-            if self.mostRecentEpisodeInFeed != self.mostRecentEpisodeSaved {
-                let feedURL = NSURL(string: podcast.feedURL)
-                self.parsePodcastFeed(feedURL!, returnPodcast: true, returnOnlyLatestEpisode: false,
-                    resolve: {
-                        PVDownloader.sharedInstance.startDownloadingEpisode(self.mostRecentEpisodeInFeed)
-                    },
-                    reject: {
-                        
-                    }
-                )
+        if self.shouldGetMostRecentEpisode == true {
+            if let newestFeedEpisode = latestEpisodeInFeed {
+                let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+                let mostRecentEpisode = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: podcastPredicate)[0] as! Episode
                 
-            } else {
-                print("no newer episode available, don't download")
+                    if latestEpisodeInFeed != mostRecentEpisode {
+                        shouldGetMostRecentEpisode = false
+                        PVDownloader.sharedInstance.startDownloadingEpisode(newestFeedEpisode)
+                        parsePodcastFeed(podcast.feedURL)
+                    }
+            }
+        } else {
+            print("no newer episode available, don't download")
+        }
+        
+        // Save the parsed podcast and episode information
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            do {
+                try self.moc.save()
+            } catch {
+                print(error)
+            }
+        }
+        
+    }
+    
+    func feedParser(parser: FeedParser, successfullyParsedURL url: String) {
+        
+        // If subscribing to a podcast, then get the latest episode and begin downloading
+        if shouldSubscribeToPodcast == true {
+            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+            let latestEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: podcastPredicate)
+            
+            // If there is an episode in the array, then download the episode
+            if latestEpisodeArray.count > 0 {
+                PVDownloader.sharedInstance.startDownloadingEpisode(latestEpisodeArray[0] as! Episode)
             }
         }
         
         // Save the parsed podcast and episode information
-        do {
-            try moc.save()
-        } catch {
-            print(error)
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            do {
+                try self.moc.save()
+            } catch {
+                print(error)
+            }
         }
         
         print("feed parser has finished!")
-        
     }
     
 }

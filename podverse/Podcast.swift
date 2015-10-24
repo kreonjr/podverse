@@ -13,7 +13,7 @@ import CoreData
 class Podcast: NSManagedObject {
 
     @NSManaged var feedURL: String
-    @NSManaged var image: NSData?
+    @NSManaged var imageData: NSData?
     @NSManaged var imageURL: String?
     @NSManaged var itunesAuthor: String?
     @NSManaged var itunesImage: NSData?

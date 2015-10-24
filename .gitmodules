@@ -1,0 +1,3 @@
+[submodule "lib/SwiftFeedParser"]
+	path = lib/SwiftFeedParser
+	url = https://github.com/DigitalLeaves/SwiftFeedParser.git

@@ -96,7 +96,7 @@ class PodcastsTableViewController: UITableViewController {
         cell.title?.text = podcast.title
         cell.pvImage?.image = UIImage(named: "Blank52")
         
-        let imageData = podcast.image
+        let imageData = podcast.imageData
         let itunesImageData = podcast.itunesImage
         
         let totalEpisodesDownloadedPredicate = NSPredicate(format: "podcast == %@ && downloadComplete == true", podcast)
@@ -149,6 +149,10 @@ class PodcastsTableViewController: UITableViewController {
             // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
             for var i = 0; i < episodeToRemoveArray.count; i++ {
                 let episodeToRemove = episodeToRemoveArray[i] as! Episode
+                if let fileName = episodeToRemove.fileName {
+                    PVUtility.deleteEpisodeFromDiskWithName(fileName)
+                }
+                
                 moc.deleteObject(episodeToRemove)
                 
                 // If the episodeToRemove is currently downloading, then retrieve and cancel the download
@@ -167,11 +171,13 @@ class PodcastsTableViewController: UITableViewController {
                 }
                 
                 // If the episodeToRemove is currently now playing, then remove the now playing episode, and remove the Player button from the navbar
-                // TODO: this is needed below
-                if episodeToRemove == PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-                    
+                if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+                    if episodeToRemove == nowPlayingEpisode {
+                        PVMediaPlayer.sharedInstance.avPlayer.pause()
+                        PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
+                        self.navigationItem.rightBarButtonItem = nil
+                    }
                 }
-                
                 
             }
             
