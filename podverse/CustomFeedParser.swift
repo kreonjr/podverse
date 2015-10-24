@@ -26,7 +26,16 @@ class CustomFeedParser:FeedParser {
             self.currentFeedChannel?.channelLogoURL = self.currentElementContent
         }
         else if self.currentPath == "/rss/channel/item/itunes:duration" {
-            self.currentFeedItem?.duration = Int(self.currentElementContent)
+            // if the : is present, then the duration is in hh:mm:ss
+            if self.currentElementContent.containsString(":") {
+                self.currentFeedItem?.duration = PVUtility.convertHHMMSSStringToNSNumber(self.currentElementContent);
+            }
+            // else the duration is an integer in seconds
+            else {
+                if let durationInteger = Int(self.currentElementContent) {
+                    self.currentFeedItem?.duration = NSNumber(integer: durationInteger)
+                }
+            }
         }
         else if self.currentPath == "/rss/channel/lastBuildDate" {
             self.currentFeedChannel?.channelDateOfLastChange = NSDate(fromString: self.currentElementContent, format: .ISO8601)
