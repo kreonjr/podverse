@@ -12,7 +12,6 @@ import CoreData
 
 class Episode: NSManagedObject {
     @NSManaged var downloadComplete: Bool
-    @NSManaged var downloadedMediaFileDestination: String?
     @NSManaged var downloadProgress: NSNumber?
     @NSManaged var duration: NSNumber?
     @NSManaged var fileName: String?

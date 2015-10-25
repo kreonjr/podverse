@@ -65,7 +65,7 @@ class PVMediaPlayer: NSObject {
     func loadEpisodeMediaFileOrStream(episode: Episode) {
         nowPlayingEpisode = episode
         
-        if episode.downloadedMediaFileDestination != nil {
+        if episode.fileName != nil {
             var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
             self.docDirectoryURL = URLs[0]
             

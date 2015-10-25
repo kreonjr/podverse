@@ -171,7 +171,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             let currentDateTime = NSDate()
             let formatter = NSDateFormatter()
             formatter.dateFormat = "ddMMyyyy-HHmmss"
-            let destinationFilename = formatter.stringFromDate(currentDateTime)
+            // TODO: why must we add .mp3 to the end of the file name in order for the media player to play the file? What would happen if a downloaded file is not actually an .mp3?
+            let destinationFilename = formatter.stringFromDate(currentDateTime) + ".mp3"
             let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(destinationFilename)
             
             do {
