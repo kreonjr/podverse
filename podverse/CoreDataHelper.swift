@@ -17,6 +17,10 @@ class CoreDataHelper: NSObject {
         return managedObject
     }
     
+    class func removeManagedObjectFromClass(className:String, managedObjectContext: NSManagedObjectContext, object:NSManagedObject) {
+        managedObjectContext.deleteObject(object)
+    }
+    
     class func fetchEntities (className: NSString, managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> NSArray {
         let fetchRequest = NSFetchRequest()
         let entityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: managedObjectContext)

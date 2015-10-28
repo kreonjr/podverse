@@ -20,12 +20,11 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     
     var feedURL: NSURL!
     var podcast: Podcast!
-    var episode: Episode!
     
     var shouldGetMostRecentEpisode: Bool
     var shouldSubscribeToPodcast: Bool
-    var episodeAlreadySaved: Bool?
     var latestEpisodeInFeed: Episode?
+    var downloadedEpisodes = []
     
     init(shouldGetMostRecent:Bool, shouldSubscribe:Bool) {
         shouldGetMostRecentEpisode = shouldGetMostRecent
@@ -78,55 +77,51 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         }
         
         podcast.isSubscribed = self.shouldSubscribeToPodcast
+        
+        downloadedEpisodes = Array(podcast.episodes)
     }
     
     func feedParser(parser: FeedParser, didParseItem item: FeedItem) {
-    
-        // If episode already exists in the database, do not insert new episode, instead update existing episode
-        var predicate = NSPredicate()
-        if item.feedEnclosures.count > 0 {
-            if item.feedEnclosures[0].url.characters.count > 0 {
-                predicate = NSPredicate(format: "mediaURL == %@", item.feedEnclosures[0].url)
-            }
-        } else {
+        if item.feedEnclosures.count <= 0 {
+            //Do not parse episode if it does not contain feedEnclosures.
             return
         }
-        
-        let episodeSet = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
-        if episodeSet.count > 0 {
-            episode = episodeSet[0]
-            episodeAlreadySaved = true
-        }
-        else {
-            episode = CoreDataHelper.insertManagedObject("Episode", managedObjectContext: self.moc) as! Episode
-            episodeAlreadySaved = false
-        }
+        var episodeAlreadySaved = false
+        let newEpisode = CoreDataHelper.insertManagedObject("Episode", managedObjectContext: self.moc) as! Episode
         
         // Retrieve parsed values from item and add values to their respective episode properties
-        if let title = item.feedTitle { episode.title = title }
-        if let summary = item.feedContent { episode.summary = summary }
-        if let date = item.feedPubDate { episode.pubDate = date }
-        if let link = item.feedLink { episode.link = link }
-        if let duration = item.duration { episode.duration = duration }
+        if let title = item.feedTitle { newEpisode.title = title }
+        if let summary = item.feedContent { newEpisode.summary = summary }
+        if let date = item.feedPubDate { newEpisode.pubDate = date }
+        if let link = item.feedLink { newEpisode.link = link }
+        if let duration = item.duration { newEpisode.duration = duration }
         
-        //TODO: Add duration to feedItem
-        //episode.duration = item
-        episode.mediaURL = item.feedEnclosures[0].url
-        episode.mediaType = item.feedEnclosures[0].type
-        episode.mediaBytes = NSNumber(integer: item.feedEnclosures[0].length)
-        if let guid = item.feedIdentifier { episode.guid = guid }
+        newEpisode.mediaURL = item.feedEnclosures[0].url
+        newEpisode.mediaType = item.feedEnclosures[0].type
+        newEpisode.mediaBytes = NSNumber(integer: item.feedEnclosures[0].length)
+        if let guid = item.feedIdentifier { newEpisode.guid = guid }
+        
+        // If episode already exists in the database, do not insert new episode, instead update existing episode
+        for var existingEpisode in downloadedEpisodes {
+            if newEpisode.mediaURL == existingEpisode.mediaURL {
+                existingEpisode = newEpisode
+                episodeAlreadySaved = true
+                //Remove the created entity from core data if it already exists
+                CoreDataHelper.removeManagedObjectFromClass("Episode", managedObjectContext: self.moc, object: newEpisode)
+                break
+            }
+        }
         
         // If episode is not already saved, then add episode to the podcast object
-        if episodeAlreadySaved == false {
-            podcast.addEpisodeObject(episode)
+        if !episodeAlreadySaved {
+            podcast.addEpisodeObject(newEpisode)
         }
         
         // If only parsing for the latest episode, stop parsing after parsing the first episode.
         if shouldGetMostRecentEpisode == true {
-            latestEpisodeInFeed = episode
+            latestEpisodeInFeed = newEpisode
             parser.abortParsing()
         }
-        
     }
     
     func feedParserParsingAborted(parser: FeedParser) {
