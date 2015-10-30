@@ -50,7 +50,7 @@ class PVMediaPlayer: NSObject {
     func previousTime(seconds: Float64) {
         let currentTime = avPlayer.currentTime()
         let timeAdjust = CMTimeMakeWithSeconds(seconds, 1)
-        let resultTime = CMTimeAdd(currentTime, timeAdjust)
+        let resultTime = CMTimeSubtract(currentTime, timeAdjust)
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
         avPlayer.play()
