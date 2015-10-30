@@ -163,10 +163,12 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 self.docDirectoryURL = URLs[0]
                 let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName)
                 
-                do {
-                    try fileManager.removeItemAtPath(destinationURL!.path!)
-                } catch {
-                    print(error)
+                if let destination = destinationURL, let path = destination.path {
+                    do {
+                        try fileManager.removeItemAtPath(path)
+                    } catch {
+                        print(error)
+                    }
                 }
             }
             
@@ -179,27 +181,29 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(destinationFilename)
             
             do {
-                try fileManager.copyItemAtURL(location, toURL: destinationURL!)
-                
-                episode.downloadComplete = true
-                episode.taskResumeData = nil
-                
-                // Add the file destination to the episode object for playback and retrieval
-                episode.fileName = destinationFilename
-
-                // Reset the episode.downloadTask to nil before saving, or the app will crash
-                episode.taskIdentifier = nil
-                
-                // Save the downloadedMediaFileDestination with the object
-                do {
-                    try self.moc.save()
-                } catch {
-                    print(error)
+                if let destination = destinationURL {
+                    try fileManager.copyItemAtURL(location, toURL: destination)
+                    
+                    episode.downloadComplete = true
+                    episode.taskResumeData = nil
+                    
+                    // Add the file destination to the episode object for playback and retrieval
+                    episode.fileName = destinationFilename
+                    
+                    // Reset the episode.downloadTask to nil before saving, or the app will crash
+                    episode.taskIdentifier = nil
+                    
+                    // Save the downloadedMediaFileDestination with the object
+                    do {
+                        try self.moc.save()
+                    } catch {
+                        print(error)
+                    }
+                    
+                    let downloadHasFinishedUserInfo = ["episode":episode]
+                    
+                    NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
                 }
-
-                let downloadHasFinishedUserInfo = ["episode":episode]
-                
-                NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
             } catch {
                 print(error)
             }
