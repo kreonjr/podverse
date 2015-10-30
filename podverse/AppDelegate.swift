@@ -24,9 +24,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var nowPlayingEpisode: Episode?
     
     var episodeDownloadArray = [Episode]()
-        
-    var iTunesSearchPodcastArray = [SearchResultPodcast]()
-    var iTunesSearchPodcastFeedURLArray: [NSURL] = []
     
     var backgroundTransferCompletionHandler: (() -> Void)?
     

@@ -13,17 +13,22 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     
     @IBOutlet weak var searchBar: UISearchBar!
     
+    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    
+    var moc: NSManagedObjectContext! {
+        get {
+            return appDelegate.managedObjectContext
+        }
+    }
+    
     var jsonTableData = []
-        
-    var timer: NSTimer? = nil
     
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    
-    var moc: NSManagedObjectContext!
+    var iTunesSearchPodcastArray = [SearchResultPodcast]()
+    var iTunesSearchPodcastFeedURLArray: [NSURL] = []
     
     func searchItunesFor(searchText: String) {
-        appDelegate.iTunesSearchPodcastFeedURLArray.removeAll(keepCapacity: false)
-        appDelegate.iTunesSearchPodcastArray.removeAll(keepCapacity: false)
+        iTunesSearchPodcastFeedURLArray.removeAll(keepCapacity: false)
+        iTunesSearchPodcastArray.removeAll(keepCapacity: false)
         self.tableView.reloadData()
         
         let itunesSearchTerm = searchText.stringByReplacingOccurrencesOfString(" ", withString: "+", options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil)
@@ -93,7 +98,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                             
                             searchResultPodcast.title = podcastJSON["collectionName"] as? String
                             
-                            self.appDelegate.iTunesSearchPodcastArray.append(searchResultPodcast)
+                            self.iTunesSearchPodcastArray.append(searchResultPodcast)
                             self.tableView.reloadData()
                             
                         }
@@ -113,9 +118,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         self.performSegueWithIdentifier("Find Search to Now Playing", sender: nil)
     }
     
-    override func viewDidAppear(animated: Bool) {
-        moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
-        
+    override func viewDidAppear(animated: Bool) {        
         // If there is a now playing episode, add Now Playing button to navigation bar
         if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
@@ -142,14 +145,14 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.appDelegate.iTunesSearchPodcastArray.count
+        return iTunesSearchPodcastArray.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! FindSearchTableViewCell
         
-        let podcast = self.appDelegate.iTunesSearchPodcastArray[indexPath.row]
+        let podcast = iTunesSearchPodcastArray[indexPath.row]
         
         cell.title?.text = podcast.title
         cell.summary?.text = podcast.artistName
@@ -179,7 +182,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let searchResultPodcastActions = UIAlertController(title: "Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
         
-        let iTunesSearchPodcast = self.appDelegate.iTunesSearchPodcastArray[indexPath.row]
+        let iTunesSearchPodcast = iTunesSearchPodcastArray[indexPath.row]
         
         if iTunesSearchPodcast.isSubscribed == false {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
@@ -255,7 +258,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
             let podcastProfileViewController = segue.destinationViewController as! PodcastProfileViewController
             
             if let index = self.tableView.indexPathForSelectedRow {
-                podcastProfileViewController.searchResultPodcast = self.appDelegate.iTunesSearchPodcastArray[index.row]
+                podcastProfileViewController.searchResultPodcast = iTunesSearchPodcastArray[index.row]
             }
             
         }
