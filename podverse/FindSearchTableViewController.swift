@@ -55,13 +55,11 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                             
                             searchResultPodcast.artistName = podcastJSON["artistName"] as? String
                             
-                            let feedURLString = podcastJSON["feedUrl"] as? String
-                            searchResultPodcast.feedURL = NSURL(string: feedURLString!)
-                            
-                            if searchResultPodcast.feedURL != nil {
+                            if let feedURLString = podcastJSON["feedUrl"] as? String {
+                                searchResultPodcast.feedURL = NSURL(string: feedURLString)
+                                
                                 let predicate = NSPredicate(format: "feedURL == %@", searchResultPodcast.feedURL!)
                                 let podcastAlreadySubscribedTo = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate)
-                                
                                 if podcastAlreadySubscribedTo.count != 0 {
                                     searchResultPodcast.isSubscribed = true
                                 } else {
@@ -69,29 +67,29 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                                 }
                             }
                             
-                            let imageURLString = podcastJSON["artworkUrl100"] as? String
-                            let imgURL: NSURL = NSURL(string: imageURLString!)!
-                            let request: NSURLRequest = NSURLRequest(URL: imgURL)
-                            NSURLConnection.sendAsynchronousRequest(
-                                request, queue: NSOperationQueue.mainQueue(),
-                                completionHandler: { response, data, error in
-                                    if error == nil {
-                                        searchResultPodcast.image = data
-                                        self.tableView.reloadData()
-                                    } else {
-                                        print(error)
+                            if let imageURLString = podcastJSON["artworkUrl100"] as? String {
+                                let imgURL = NSURL(string: imageURLString)
+                                let request = NSURLRequest(URL: imgURL!)
+                                NSURLConnection.sendAsynchronousRequest(
+                                    request, queue: NSOperationQueue.mainQueue(),
+                                    completionHandler: { response, data, error in
+                                        if error == nil {
+                                            searchResultPodcast.image = data
+                                            self.tableView.reloadData()
+                                        } else {
+                                            print(error)
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                             
                             // Grab the releaseDate, then convert into NSDate
-                            var lastPubDateString = podcastJSON["releaseDate"] as? String
-                            lastPubDateString = lastPubDateString?.stringByReplacingOccurrencesOfString("T", withString: " ", options: NSStringCompareOptions.LiteralSearch, range: nil)
-                            lastPubDateString = lastPubDateString?.stringByReplacingOccurrencesOfString("Z", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
-                            let dateFormatter = NSDateFormatter()
-                            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-                            if lastPubDateString != nil {
-                                searchResultPodcast.lastPubDate = dateFormatter.dateFromString(lastPubDateString!)
+                            if let lastPubDateString = podcastJSON["releaseDate"] as? String {
+                                var modifiedPubDateString = lastPubDateString.stringByReplacingOccurrencesOfString("T", withString: " ", options: NSStringCompareOptions.LiteralSearch, range: nil)
+                                modifiedPubDateString = modifiedPubDateString.stringByReplacingOccurrencesOfString("Z", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+                                let dateFormatter = NSDateFormatter()
+                                dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+                                searchResultPodcast.lastPubDate = dateFormatter.dateFromString(modifiedPubDateString)
                             }
                             
                             searchResultPodcast.primaryGenreName = podcastJSON["primaryGenreName"] as? String
@@ -158,25 +156,15 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         cell.summary?.text = podcast.artistName
         cell.pvImage?.image = UIImage(named: "Blank52")
 
-        let imageData = podcast.image
-        
-        if imageData != nil {
-            let image = UIImage(data: imageData!)
-            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
-            if image!.size.height != 0.0 {
-                cell.pvImage?.image = image
-            } else {
-                let itunesImageData = podcast.itunesImage
-                let itunesImage = UIImage(data: itunesImageData!)
-                
-                if itunesImage!.size.height != 0.0 {
-                    cell.pvImage?.image = itunesImage
-                }
-            }
+        if let imageData = podcast.image {
+            let image = UIImage(data: imageData)
+            cell.pvImage?.image = image
+        } else if let itunesImageData = podcast.itunesImage {
+            let itunesImage = UIImage(data: itunesImageData)
+            cell.pvImage?.image = itunesImage
         }
 
         return cell
-        
     }
     
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
@@ -186,8 +174,10 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         
         if iTunesSearchPodcast.isSubscribed == false {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
-                PVSubscriber.sharedInstance.subscribeToPodcast(iTunesSearchPodcast.feedURL!.absoluteString)
-                iTunesSearchPodcast.isSubscribed = true
+                if let feedURL = iTunesSearchPodcast.feedURL {
+                    PVSubscriber.sharedInstance.subscribeToPodcast(feedURL.absoluteString)
+                    iTunesSearchPodcast.isSubscribed = true
+                }
             }))
         }
         else {
@@ -213,54 +203,15 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         self.presentViewController(searchResultPodcastActions, animated: true, completion: nil)
     }
 
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            // Delete the row from the data source
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-        } else if editingStyle == .Insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(tableView: UITableView, canMoveRowAtIndexPath indexPath: NSIndexPath) -> Bool {
-        // Return NO if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "Show Podcast Profile" {
-            
             let podcastProfileViewController = segue.destinationViewController as! PodcastProfileViewController
-            
             if let index = self.tableView.indexPathForSelectedRow {
                 podcastProfileViewController.searchResultPodcast = iTunesSearchPodcastArray[index.row]
             }
-            
         }
         else if segue.identifier == "Find Search to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
@@ -268,6 +219,4 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }
-
-
 }
