@@ -15,13 +15,7 @@ class MediaPlayerViewController: UIViewController {
     let makeClipString = "Make Clip"
     let hideClipper = "Hide Clipper"
     let buttonMakeClip: UIButton = UIButton(type : UIButtonType.System)
-    var secondsArray = [String]()
-    var minutesArray = [String]()
-    var hoursArray = [String]()
     var clipper:PVClipperViewController?
-    
-    @IBOutlet weak var timePickerToolBar: UIToolbar!
-    var pickerData: [[String]] = [[String]]()
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
@@ -37,7 +31,6 @@ class MediaPlayerViewController: UIViewController {
     
     var returnToNowPlaying: Bool! = false
     
-    @IBOutlet weak var timePicker: UIPickerView!
     @IBOutlet weak var mediaPlayerImage: UIImageView!
     @IBOutlet weak var podcastTitle: UILabel!
     @IBOutlet weak var episodeTitle: UILabel!
@@ -58,20 +51,9 @@ class MediaPlayerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        for i in 1...60 {
-            secondsArray.append("\(i)")
-            minutesArray.append("\(i)")
-        }
-        for i in 1...24 {
-            hoursArray.append("\(i)")
-        }
-        pickerData = [hoursArray,minutesArray,secondsArray]
-        
         self.clipper = ((self.childViewControllers.first as! UINavigationController).topViewController as? PVClipperViewController)
-        self.clipper?.delegate = self
-        timePicker.hidden = true
-        timePickerToolBar.hidden = true
-        
+        self.clipper?.totalDuration = Int(pvMediaPlayer.nowPlayingEpisode.duration!)
+
         // Create and add the Make Clip button to the UI
         buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
         buttonMakeClip.setTitle(makeClipString, forState: .Normal)
@@ -226,53 +208,10 @@ class MediaPlayerViewController: UIViewController {
         }
         else {
             if let PVClipper = self.clipper {
-                PVClipper.startTime = CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime())
+                PVClipper.startTime = Int(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()))
                 PVClipper.updateUI()
             }
             buttonMakeClip.setTitle(hideClipper, forState: .Normal)
         }
-    }
-}
-
-extension MediaPlayerViewController:UIPickerViewDataSource, UIPickerViewDelegate,ClipperDelegate {
-    func showTimePicker() {
-        self.parentViewController?.view.addSubview(timePicker)
-    }
-    
-    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
-        return 3
-    }
-    
-    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return pickerData[component].count
-    }
-    
-    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        let timeValue = pickerData[component][row]
-        switch component {
-        case 0:
-            return "Hour: " + timeValue
-        case 1:
-            return "Min: " + timeValue
-        case 2:
-            return "Sec: " + timeValue
-        default:
-            return timeValue
-        }
-    }
-    
-    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        // This method is triggered whenever the user makes a change to the picker selection.
-        // The parameter named row and component represents what was selected.
-    }
-    
-    func displayTimePicker() {
-        timePicker.hidden = false
-        timePickerToolBar.hidden = false
-    }
-    
-    @IBAction func timeChosen(sender: AnyObject) {
-        timePicker.hidden = true
-        timePickerToolBar.hidden = true
     }
 }

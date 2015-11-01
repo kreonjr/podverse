@@ -10,6 +10,8 @@ import UIKit
 
 class PVClipperAddInfoViewController: UIViewController {
 
+    var clipTime:Int = 0
+    
     @IBOutlet weak var clipTitleTextField: UITextField!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,5 +28,11 @@ class PVClipperAddInfoViewController: UIViewController {
     
     func goToConfirm () {
         self.performSegueWithIdentifier("show_confirm_clip", sender: self)
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "show_confirm_clip" {
+            (segue.destinationViewController as! PVClipperConfirmationViewController).clipTime = clipTime
+        }
     }
 }

@@ -8,30 +8,23 @@
 
 import UIKit
 
-protocol ClipperDelegate {
-    func displayTimePicker()
-}
+class PVClipperViewController: UIViewController, UITextFieldDelegate {
 
-class PVClipperViewController: UIViewController {
+    var startTime = 0
+    var endTime = 0
+    var totalDuration = 0
+    var clipDuration = 0
     
-    @IBOutlet weak var startTimeLabel: UILabel!
+    @IBOutlet weak var startHourTextField: UITextField!
+    @IBOutlet weak var startMinuteTextField: UITextField!
+    @IBOutlet weak var startSecTextField: UITextField!
+    @IBOutlet weak var endHourTextField: UITextField!
+    @IBOutlet weak var endMinuteTextField: UITextField!
+    @IBOutlet weak var endSecTextField: UITextField!
     
-    @IBOutlet weak var endTimeLabel: UILabel!
-    
-    var delegate: ClipperDelegate?
-    
-    var startTime = 0.0
-    var endTime = 0.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let startTapGesture = UITapGestureRecognizer(target: self, action: "showTimePicker")
-        let endTapGesture = UITapGestureRecognizer(target: self, action: "showTimePicker")
-        self.startTimeLabel.addGestureRecognizer(startTapGesture)
-        self.endTimeLabel.addGestureRecognizer(endTapGesture)
-        self.startTimeLabel.userInteractionEnabled = true
-        self.endTimeLabel.userInteractionEnabled = true
     }
     
     @IBAction func showAddClipDetails(sender: AnyObject) {
@@ -39,13 +32,33 @@ class PVClipperViewController: UIViewController {
     }
 
     func updateUI() {
-        self.startTimeLabel.text = PVUtility.convertNSNumberToHHMMSSString(NSNumber(double: startTime))
+        let hms = PVUtility.secondsToHoursMinutesSeconds(Int(startTime))
+        startHourTextField.text = "\(hms.0)"
+        startMinuteTextField.text = "\(hms.1)"
+        startSecTextField.text = "\(hms.2)"
     }
     
-    func showTimePicker() {
-        if let delegate = self.delegate {
-            delegate.displayTimePicker()
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "show_add_clipTitle" {
+
+            var hours = 0
+            var minutes = 0
+            var secs = 0
+            endTime = totalDuration
+            
+            //Start Time
+            if let hourText = startHourTextField.text where hourText.characters.count != 0 {
+                hours = Int(hourText)!
+            }
+            if let minText = startMinuteTextField.text where minText.characters.count != 0 {
+                minutes = Int(minText)!
+            }
+            if let secText = startSecTextField.text where secText.characters.count != 0 {
+                secs = Int(secText)!
+            }
+            
+            (segue.destinationViewController as! PVClipperAddInfoViewController).clipTime = totalDuration - PVUtility.hoursMinutesSecondsToSeconds(hours, minutes: minutes, seconds: secs)
         }
     }
-    
+
 }
