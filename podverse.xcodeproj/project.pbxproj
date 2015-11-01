@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3010F39C1BC9B64E001DFFF6 /* PVMediaPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */; settings = {ASSET_TAGS = (); }; };
-		3010F39E1BC9D2F0001DFFF6 /* PVClipper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3010F39D1BC9D2F0001DFFF6 /* PVClipper.swift */; settings = {ASSET_TAGS = (); }; };
-		3081B6BD1BB7431C00233E08 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3081B6BC1BB7431C00233E08 /* Extensions.swift */; settings = {ASSET_TAGS = (); }; };
+		3010F39C1BC9B64E001DFFF6 /* PVMediaPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */; };
+		3010F39E1BC9D2F0001DFFF6 /* PVClipperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3010F39D1BC9D2F0001DFFF6 /* PVClipperViewController.swift */; };
+		3081B6BD1BB7431C00233E08 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3081B6BC1BB7431C00233E08 /* Extensions.swift */; };
 		812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
 		812A094F1B42375F00E8F070 /* podverse.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 818615971B1E84CE006C9731 /* podverse.xcdatamodeld */; };
 		813FC8101B5CA992006248BC /* PVSubscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 813FC80F1B5CA992006248BC /* PVSubscriber.swift */; };
@@ -43,13 +43,15 @@
 		81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578D1B21619F00D67634 /* PVFeedParser.swift */; };
 		81E357901B21624500D67634 /* PVUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578F1B21624500D67634 /* PVUtility.swift */; };
 		81E4FE671B2E11D600A10A77 /* fontawesome-webfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */; };
-		EF3799D21BD4981E00211419 /* CustomFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF3799D11BD4981E00211419 /* CustomFeedParser.swift */; settings = {ASSET_TAGS = (); }; };
-		EF59CECA1BD07AB6002D9DDF /* FeedChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC41BD07AB6002D9DDF /* FeedChannel.swift */; settings = {ASSET_TAGS = (); }; };
-		EF59CECB1BD07AB6002D9DDF /* FeedEnclosure.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC51BD07AB6002D9DDF /* FeedEnclosure.swift */; settings = {ASSET_TAGS = (); }; };
-		EF59CECC1BD07AB6002D9DDF /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC61BD07AB6002D9DDF /* FeedItem.swift */; settings = {ASSET_TAGS = (); }; };
-		EF59CECD1BD07AB6002D9DDF /* FeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC71BD07AB6002D9DDF /* FeedParser.swift */; settings = {ASSET_TAGS = (); }; };
-		EF59CECE1BD07AB6002D9DDF /* NSDate+FeedsDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC81BD07AB6002D9DDF /* NSDate+FeedsDate.swift */; settings = {ASSET_TAGS = (); }; };
-		EF59CECF1BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC91BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift */; settings = {ASSET_TAGS = (); }; };
+		EF3799D21BD4981E00211419 /* CustomFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF3799D11BD4981E00211419 /* CustomFeedParser.swift */; };
+		EF59CECA1BD07AB6002D9DDF /* FeedChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC41BD07AB6002D9DDF /* FeedChannel.swift */; };
+		EF59CECB1BD07AB6002D9DDF /* FeedEnclosure.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC51BD07AB6002D9DDF /* FeedEnclosure.swift */; };
+		EF59CECC1BD07AB6002D9DDF /* FeedItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC61BD07AB6002D9DDF /* FeedItem.swift */; };
+		EF59CECD1BD07AB6002D9DDF /* FeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC71BD07AB6002D9DDF /* FeedParser.swift */; };
+		EF59CECE1BD07AB6002D9DDF /* NSDate+FeedsDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC81BD07AB6002D9DDF /* NSDate+FeedsDate.swift */; };
+		EF59CECF1BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC91BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift */; };
+		EFB3249E1BE59127000936B6 /* PVClipperAddInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB3249D1BE59127000936B6 /* PVClipperAddInfoViewController.swift */; };
+		EFB324A01BE5913A000936B6 /* PVClipperConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB3249F1BE5913A000936B6 /* PVClipperConfirmationViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,7 +66,7 @@
 
 /* Begin PBXFileReference section */
 		3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVMediaPlayer.swift; sourceTree = "<group>"; };
-		3010F39D1BC9D2F0001DFFF6 /* PVClipper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipper.swift; sourceTree = "<group>"; };
+		3010F39D1BC9D2F0001DFFF6 /* PVClipperViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipperViewController.swift; sourceTree = "<group>"; };
 		3081B6BC1BB7431C00233E08 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		812A094E1B422AB300E8F070 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
 		813FC80F1B5CA992006248BC /* PVSubscriber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVSubscriber.swift; sourceTree = "<group>"; };
@@ -110,6 +112,8 @@
 		EF59CEC71BD07AB6002D9DDF /* FeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedParser.swift; sourceTree = "<group>"; };
 		EF59CEC81BD07AB6002D9DDF /* NSDate+FeedsDate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDate+FeedsDate.swift"; sourceTree = "<group>"; };
 		EF59CEC91BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+RemoveHTMLCharacters.swift"; sourceTree = "<group>"; };
+		EFB3249D1BE59127000936B6 /* PVClipperAddInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipperAddInfoViewController.swift; sourceTree = "<group>"; };
+		EFB3249F1BE5913A000936B6 /* PVClipperConfirmationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipperConfirmationViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,7 +168,7 @@
 				817C54071B4B6976007258F8 /* Constants.swift */,
 				3081B6BC1BB7431C00233E08 /* Extensions.swift */,
 				818615BF1B1E950D006C9731 /* CoreDataHelper.swift */,
-				3010F39D1BC9D2F0001DFFF6 /* PVClipper.swift */,
+				EFB324A11BE59142000936B6 /* PVClipper VCs */,
 				81623C281B35D3A100E906FE /* PVDownloader.swift */,
 				81E3578D1B21619F00D67634 /* PVFeedParser.swift */,
 				3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */,
@@ -253,6 +257,16 @@
 				EF59CEC91BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift */,
 			);
 			name = SwiftFeedParse;
+			sourceTree = "<group>";
+		};
+		EFB324A11BE59142000936B6 /* PVClipper VCs */ = {
+			isa = PBXGroup;
+			children = (
+				3010F39D1BC9D2F0001DFFF6 /* PVClipperViewController.swift */,
+				EFB3249D1BE59127000936B6 /* PVClipperAddInfoViewController.swift */,
+				EFB3249F1BE5913A000936B6 /* PVClipperConfirmationViewController.swift */,
+			);
+			name = "PVClipper VCs";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -390,15 +404,17 @@
 				815A2E331B50D002002A21A7 /* FindSearchTableViewCell.swift in Sources */,
 				EF59CECD1BD07AB6002D9DDF /* FeedParser.swift in Sources */,
 				81E357901B21624500D67634 /* PVUtility.swift in Sources */,
+				EFB3249E1BE59127000936B6 /* PVClipperAddInfoViewController.swift in Sources */,
 				81623C291B35D3A100E906FE /* PVDownloader.swift in Sources */,
 				81DDBE5D1B24AC8100EF3B9C /* PodcastsTableCell.swift in Sources */,
-				3010F39E1BC9D2F0001DFFF6 /* PVClipper.swift in Sources */,
+				3010F39E1BC9D2F0001DFFF6 /* PVClipperViewController.swift in Sources */,
 				818615C01B1E950D006C9731 /* CoreDataHelper.swift in Sources */,
 				813FC8101B5CA992006248BC /* PVSubscriber.swift in Sources */,
 				818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */,
 				81DD2CCA1B549C4D00432E0C /* Episode.swift in Sources */,
 				3010F39C1BC9B64E001DFFF6 /* PVMediaPlayer.swift in Sources */,
 				81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */,
+				EFB324A01BE5913A000936B6 /* PVClipperConfirmationViewController.swift in Sources */,
 				EF59CECE1BD07AB6002D9DDF /* NSDate+FeedsDate.swift in Sources */,
 				3081B6BD1BB7431C00233E08 /* Extensions.swift in Sources */,
 			);

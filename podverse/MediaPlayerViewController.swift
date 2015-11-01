@@ -12,6 +12,17 @@ import AVFoundation
 
 class MediaPlayerViewController: UIViewController {
     
+    let makeClipString = "Make Clip"
+    let hideClipper = "Hide Clipper"
+    let buttonMakeClip: UIButton = UIButton(type : UIButtonType.System)
+    var secondsArray = [String]()
+    var minutesArray = [String]()
+    var hoursArray = [String]()
+    var clipper:PVClipperViewController?
+    
+    @IBOutlet weak var timePickerToolBar: UIToolbar!
+    var pickerData: [[String]] = [[String]]()
+    
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
     var moc: NSManagedObjectContext! {
@@ -26,6 +37,7 @@ class MediaPlayerViewController: UIViewController {
     
     var returnToNowPlaying: Bool! = false
     
+    @IBOutlet weak var timePicker: UIPickerView!
     @IBOutlet weak var mediaPlayerImage: UIImageView!
     @IBOutlet weak var podcastTitle: UILabel!
     @IBOutlet weak var episodeTitle: UILabel!
@@ -41,6 +53,65 @@ class MediaPlayerViewController: UIViewController {
     
     @IBOutlet weak var nowPlayingSlider: UISlider!
     
+    @IBOutlet weak var makeClipContainerView: UIView!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        for i in 1...60 {
+            secondsArray.append("\(i)")
+            minutesArray.append("\(i)")
+        }
+        for i in 1...24 {
+            hoursArray.append("\(i)")
+        }
+        pickerData = [hoursArray,minutesArray,secondsArray]
+        
+        self.clipper = ((self.childViewControllers.first as! UINavigationController).topViewController as? PVClipperViewController)
+        self.clipper?.delegate = self
+        timePicker.hidden = true
+        timePickerToolBar.hidden = true
+        
+        // Create and add the Make Clip button to the UI
+        buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
+        buttonMakeClip.setTitle(makeClipString, forState: .Normal)
+        buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
+        let rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
+        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
+        
+        makeClipContainerView.hidden = true
+        
+        // Populate the Media Player UI with the current episode's information
+        if let imageData = pvMediaPlayer.nowPlayingEpisode.podcast.imageData {
+            mediaPlayerImage.image = UIImage(data: imageData)
+        }
+        else if let itunesImageData = pvMediaPlayer.nowPlayingEpisode.podcast.itunesImage {
+            mediaPlayerImage.image = UIImage(data: itunesImageData)
+        }
+        podcastTitle?.text = pvMediaPlayer.nowPlayingEpisode.podcast.title
+        episodeTitle?.text = pvMediaPlayer.nowPlayingEpisode.title
+        if let nowPlayingEpisodeDuration = pvMediaPlayer.nowPlayingEpisode.duration {
+            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(nowPlayingEpisodeDuration) as String
+        }
+        if let episodeSummary = pvMediaPlayer.nowPlayingEpisode.summary {
+            summary?.text = PVUtility.removeHTMLFromString(episodeSummary)
+        }
+        else {
+            summary.text = ""
+        }
+        
+        // If the user is not returning to the Media Player via the Now Playing button, load and start a new episode or clip.
+        if returnToNowPlaying != true {
+            // Load the Episode into the AVPlayer
+            pvMediaPlayer.loadEpisodeMediaFileOrStream(pvMediaPlayer.nowPlayingEpisode)
+            
+            // TODO: Load the Clip into the AVPlayer
+            
+            pvMediaPlayer.avPlayer.play()
+            playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+        }
+    }
+
     @IBAction func sliderTimeChange(sender: UISlider) {
         let currentSliderValue = Float64(sender.value)
         let totalTime = Float64(pvMediaPlayer.nowPlayingEpisode.duration!)
@@ -126,53 +197,6 @@ class MediaPlayerViewController: UIViewController {
             playPauseButton.setTitle("\u{f04b}", forState: .Normal)
         }
     }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        // Create and add the Make Clip button to the UI
-        let buttonMakeClip: UIButton = UIButton(type : UIButtonType.System)
-        buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
-        buttonMakeClip.setTitle("Make Clip", forState: UIControlState.Normal)
-        buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
-        let rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
-        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
-        
-        // Hide the Make Clip menu when the Media Player first loads
-        makeClipViewTime.hidden = true
-        makeClipViewTitle.hidden = true
-        makeClipViewShare.hidden = true
-        
-        // Populate the Media Player UI with the current episode's information
-        if let imageData = pvMediaPlayer.nowPlayingEpisode.podcast.imageData {
-            mediaPlayerImage.image = UIImage(data: imageData)
-        }
-        else if let itunesImageData = pvMediaPlayer.nowPlayingEpisode.podcast.itunesImage {
-            mediaPlayerImage.image = UIImage(data: itunesImageData)
-        }
-        podcastTitle?.text = pvMediaPlayer.nowPlayingEpisode.podcast.title
-        episodeTitle?.text = pvMediaPlayer.nowPlayingEpisode.title
-        if let nowPlayingEpisodeDuration = pvMediaPlayer.nowPlayingEpisode.duration {
-            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(nowPlayingEpisodeDuration) as String
-        }
-        if let episodeSummary = pvMediaPlayer.nowPlayingEpisode.summary {
-            summary?.text = PVUtility.removeHTMLFromString(episodeSummary)
-        }
-        else {
-            summary.text = ""
-        }
-        
-        // If the user is not returning to the Media Player via the Now Playing button, load and start a new episode or clip.
-        if returnToNowPlaying != true {
-            // Load the Episode into the AVPlayer
-            pvMediaPlayer.loadEpisodeMediaFileOrStream(pvMediaPlayer.nowPlayingEpisode)
-            
-            // TODO: Load the Clip into the AVPlayer
-            
-            pvMediaPlayer.avPlayer.play()
-            playPauseButton.setTitle("\u{f04c}", forState: .Normal)
-        }
-    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -189,112 +213,66 @@ class MediaPlayerViewController: UIViewController {
         nowPlayingCurrentTimeTimer.invalidate()
     }
     
-    
-    
-    // TODO: Make Clip features are below. They should probably be decoupled from the MediaPlayerViewController.
-    var newClip: Clip!
-    
-    @IBOutlet weak var makeClipViewTime: UIView!
-    @IBOutlet weak var makeClipViewTimeStartButton: UIButton!
-    @IBOutlet weak var makeClipViewTimeStart: UITextField!
-    @IBOutlet weak var makeClipViewTimeEndButton: UIButton!
-    @IBOutlet weak var makeClipViewTimeEnd: UITextField!
-    
-    @IBOutlet weak var makeClipViewTitle: UIView!
-    @IBOutlet weak var makeClipViewTitleField: UITextView!
-    
-    @IBOutlet weak var makeClipViewShare: UIView!
-    @IBOutlet weak var makeClipViewShareTitle: UILabel!
-    @IBOutlet weak var makeClipViewShareDuration: UILabel!
-    @IBOutlet weak var makeClipViewShareButton: UIButton!
-    
-    var makeClipButtonState: Int = 0
-    @IBOutlet weak var makeClipButtonNextSaveDone: UIButton!
-    @IBOutlet weak var makeClipButtonCancelBackEdit: UIButton!
-    
-    @IBAction func makeClipNextSaveDone(sender: AnyObject) {
-        makeClipButtonState++
-        if makeClipButtonState == 2 {
-            displayMakeClipViewTitle(sender as! UIButton)
-            makeClipButtonNextSaveDone.setTitle("Save", forState: .Normal)
-            makeClipButtonCancelBackEdit.setTitle("Back", forState: .Normal)
-        } else if makeClipButtonState == 3 {
-            saveClip(sender as! UIButton)
-            displayMakeClipViewShare(sender as! UIButton)
-            makeClipButtonNextSaveDone.setTitle("Done", forState: .Normal)
-            makeClipButtonCancelBackEdit.setTitle("Edit", forState: .Normal)
-        } else if makeClipButtonState == 4 {
-            closeMakeClipView(sender as! UIButton)
-            makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
-            makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
-            makeClipButtonState = 0
-        }
-    }
-    
-    @IBAction func makeClipCancelBackEdit(sender: AnyObject) {
-        makeClipButtonState--
-        if makeClipButtonState == 0 {
-            closeMakeClipView(sender as! UIButton)
-        } else if makeClipButtonState == 1 {
-            displayMakeClipViewTime(sender as! UIButton)
-            makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
-            makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
-        } else if makeClipButtonState == 2 {
-            displayMakeClipViewTime(sender as! UIButton)
-            makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
-            makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
-            makeClipButtonState = 1
-        }
-    }
-    
-    func closeMakeClipView(sender: UIButton!) {
-        newClip = CoreDataHelper.insertManagedObject("Clip", managedObjectContext: self.moc) as! Clip
-        makeClipViewTime.hidden = true
-        makeClipViewTitle.hidden = true
-        makeClipViewShare.hidden = true
-    }
-    
     func toggleMakeClipView(sender: UIButton!) {
-        if makeClipButtonState == 0 {
-            makeClipButtonState = 1
-            displayMakeClipViewTime(sender as UIButton!)
-        } else if makeClipButtonState == 1 || makeClipButtonState == 2 || makeClipButtonState == 3 {
-            closeMakeClipView(sender as UIButton!)
-            makeClipButtonState = 0
-            makeClipButtonNextSaveDone.setTitle("Next", forState: .Normal)
-            makeClipButtonCancelBackEdit.setTitle("Cancel", forState: .Normal)
+        makeClipContainerView.hidden = !makeClipContainerView.hidden
+
+        if makeClipContainerView.hidden == true {
+            buttonMakeClip.setTitle(makeClipString, forState: .Normal)
+            for viewController in self.childViewControllers {
+                if viewController.isKindOfClass(UINavigationController) {
+                    (viewController as! UINavigationController).popToRootViewControllerAnimated(false)
+                }
+            }
+        }
+        else {
+            if let PVClipper = self.clipper {
+                PVClipper.startTime = CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime())
+                PVClipper.updateUI()
+            }
+            buttonMakeClip.setTitle(hideClipper, forState: .Normal)
+        }
+    }
+}
+
+extension MediaPlayerViewController:UIPickerViewDataSource, UIPickerViewDelegate,ClipperDelegate {
+    func showTimePicker() {
+        self.parentViewController?.view.addSubview(timePicker)
+    }
+    
+    func numberOfComponentsInPickerView(pickerView: UIPickerView) -> Int {
+        return 3
+    }
+    
+    func pickerView(pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return pickerData[component].count
+    }
+    
+    func pickerView(pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        let timeValue = pickerData[component][row]
+        switch component {
+        case 0:
+            return "Hour: " + timeValue
+        case 1:
+            return "Min: " + timeValue
+        case 2:
+            return "Sec: " + timeValue
+        default:
+            return timeValue
         }
     }
     
-    func displayMakeClipViewTime(sender: UIButton!) {
-        makeClipViewTime.hidden = false
-        makeClipViewTitle.hidden = true
-        makeClipViewShare.hidden = true
+    func pickerView(pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        // This method is triggered whenever the user makes a change to the picker selection.
+        // The parameter named row and component represents what was selected.
     }
     
-    func saveClip(sender: UIButton!) {
+    func displayTimePicker() {
+        timePicker.hidden = false
+        timePickerToolBar.hidden = false
     }
     
-    func displayMakeClipViewTitle(sender: UIButton!) {
-        makeClipViewTime.hidden = false
-        makeClipViewTitle.hidden = false
-        makeClipViewShare.hidden = true
+    @IBAction func timeChosen(sender: AnyObject) {
+        timePicker.hidden = true
+        timePickerToolBar.hidden = true
     }
-    
-    func displayMakeClipViewShare(sender: UIButton!) {
-        makeClipViewTime.hidden = false
-        makeClipViewTitle.hidden = false
-        makeClipViewShare.hidden = false
-    }
-    
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the current object to the new view controller.
-    }
-    */
-
 }
