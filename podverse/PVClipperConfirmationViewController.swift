@@ -13,17 +13,19 @@ class PVClipperConfirmationViewController: UIViewController {
     @IBOutlet weak var clipTitleLabel: UILabel!
     
     @IBOutlet weak var clipDuration: UILabel!
-    
-    @IBOutlet weak var shareButton: UIButton!
-    
+
     var clip:Clip?
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        let doneButton = UIBarButtonItem(title: "Save", style: .Plain, target: self, action: "saveClip")
-        self.navigationItem.rightBarButtonItem = doneButton
+        let shareButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: "shareClip")
+        self.navigationItem.rightBarButtonItem = shareButton
+        
+        let editButton = UIBarButtonItem(title: "Edit", style: .Plain, target: self, action: "popToRoot")
+        self.navigationItem.leftBarButtonItem = editButton
+
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -36,16 +38,11 @@ class PVClipperConfirmationViewController: UIViewController {
         clipTitleLabel.text = clip?.title
     }
     
-    func saveClip () {
-        // Save
-        do {
-            try Constants.moc.save()
-        } catch let error as NSError {
-            print(error)
-        }
+    func popToRoot() {
+        self.navigationController?.popToRootViewControllerAnimated(true)
     }
     
-    @IBAction func shareClip(sender: AnyObject) {
+    func shareClip() {
         let textToShare = "Share clips somewhere"
         let objectsToShare = [textToShare]
         let activityVC = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)

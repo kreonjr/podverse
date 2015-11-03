@@ -1235,14 +1235,6 @@
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DTd-QE-HEQ">
-                                <rect key="frame" x="539" y="63" width="47" height="34"/>
-                                <animations/>
-                                <state key="normal" title="Share"/>
-                                <connections>
-                                    <action selector="shareClip:" destination="LtY-t6-gFy" eventType="touchUpInside" id="1wv-AN-tVp"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Duration:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yaX-5M-C79">
                                 <rect key="frame" x="20" y="119" width="70" height="21"/>
                                 <animations/>
@@ -1255,9 +1247,7 @@
                         <color key="backgroundColor" red="0.87492028060000004" green="0.87492028060000004" blue="0.87492028060000004" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="yfw-go-DcV" firstAttribute="top" secondItem="PYP-Yj-2va" secondAttribute="top" id="0fi-Ih-3Qe"/>
-                            <constraint firstAttribute="trailingMargin" secondItem="DTd-QE-HEQ" secondAttribute="trailing" constant="-6" id="4FU-qL-yve"/>
                             <constraint firstItem="PYP-Yj-2va" firstAttribute="leading" secondItem="4me-uN-Lbh" secondAttribute="leading" constant="20" id="8Mf-eR-QAE"/>
-                            <constraint firstItem="DTd-QE-HEQ" firstAttribute="centerY" secondItem="4me-uN-Lbh" secondAttribute="centerY" id="9ic-gS-VMK"/>
                             <constraint firstAttribute="trailingMargin" relation="greaterThanOrEqual" secondItem="yfw-go-DcV" secondAttribute="trailing" constant="50" id="K2S-l0-u8C"/>
                             <constraint firstItem="tm5-VG-rMd" firstAttribute="leading" secondItem="yaX-5M-C79" secondAttribute="trailing" constant="20" id="cYm-iP-1LZ"/>
                             <constraint firstItem="tm5-VG-rMd" firstAttribute="bottom" secondItem="yaX-5M-C79" secondAttribute="bottom" id="esP-Dc-eaL"/>
@@ -1270,7 +1260,6 @@
                     <connections>
                         <outlet property="clipDuration" destination="tm5-VG-rMd" id="JYL-fH-1Uj"/>
                         <outlet property="clipTitleLabel" destination="yfw-go-DcV" id="zs6-s1-KZM"/>
-                        <outlet property="shareButton" destination="DTd-QE-HEQ" id="w9D-HJ-gxj"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QtM-1F-rFE" userLabel="First Responder" sceneMemberID="firstResponder"/>

@@ -80,7 +80,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
                 for episodeDownloadTask in downloadTasks {
                     if episodeDownloadTask.taskIdentifier == taskIdentifier.integerValue {
-                        episodeDownloadTask.cancelByProducingResumeData() {[unowned self] resumeData in
+                        episodeDownloadTask.cancelByProducingResumeData() {resumeData in
                             if (resumeData != nil) {
                                 episode.taskResumeData = resumeData
                                 episode.taskIdentifier = nil

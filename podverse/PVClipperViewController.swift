@@ -15,8 +15,7 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     var endTime = 0
     var totalDuration = 0
     var clipDuration = 0
-    
-    var clip:Clip = (CoreDataHelper.insertManagedObject("Clip", managedObjectContext: Constants.moc) as! Clip)
+    var currentEpisode:Episode?
     
     @IBOutlet weak var startHourTextField: UITextField!
     @IBOutlet weak var startMinuteTextField: UITextField!
@@ -24,11 +23,6 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var endHourTextField: UITextField!
     @IBOutlet weak var endMinuteTextField: UITextField!
     @IBOutlet weak var endSecTextField: UITextField!
-    
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-    }
     
     @IBAction func showAddClipDetails(sender: AnyObject) {
         self.performSegueWithIdentifier("show_add_clipTitle", sender: self)
@@ -43,7 +37,17 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "show_add_clipTitle" {
+            let clip:Clip = (CoreDataHelper.insertManagedObject("Clip", managedObjectContext: Constants.moc) as! Clip)
 
+            if let episode = currentEpisode {
+                clip.episode = episode
+                clip.podcast = episode.podcast
+                
+                if let duration = episode.duration {
+                    endTime = duration.integerValue
+                }
+            }
+            
             var startHours = 0
             var startMinutes = 0
             var startSecs = 0
@@ -75,7 +79,8 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
                 endSecs = Int(secText)!
             }
             
-            endTime = PVUtility.hoursMinutesSecondsToSeconds(endHours, minutes: endMinutes, seconds: endSecs)
+            let customEndTime = PVUtility.hoursMinutesSecondsToSeconds(endHours, minutes: endMinutes, seconds: endSecs)
+            endTime = (customEndTime == 0) ? endTime : customEndTime
             clip.startTime = NSNumber(integer:startTime)
             clip.endTime = NSNumber(integer: endTime)
             clip.duration = NSNumber(integer:endTime - startTime)

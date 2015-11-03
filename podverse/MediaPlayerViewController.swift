@@ -197,11 +197,11 @@ class MediaPlayerViewController: UIViewController {
         makeClipContainerView.hidden = !makeClipContainerView.hidden
 
         if makeClipContainerView.hidden == true {
+            self.view.endEditing(true)
             buttonMakeClip.setTitle(makeClipString, forState: .Normal)
             for viewController in self.childViewControllers {
                 if viewController.isKindOfClass(UINavigationController) {
                     (viewController as! UINavigationController).popToRootViewControllerAnimated(false)
-                    self.view.endEditing(true)
                 }
             }
         }
@@ -209,6 +209,7 @@ class MediaPlayerViewController: UIViewController {
             if let PVClipper = self.clipper {
                 PVClipper.startTime = Int(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()))
                 PVClipper.updateUI()
+                PVClipper.currentEpisode = pvMediaPlayer.nowPlayingEpisode
             }
             buttonMakeClip.setTitle(hideClipper, forState: .Normal)
         }
