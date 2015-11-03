@@ -23,6 +23,7 @@ class PodcastsTableViewController: UITableViewController {
     
     func loadData() {
         podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
+        podcastArray.sortInPlace({ $0.title < $1.title })
         self.tableView.reloadData()
     }
     
@@ -126,67 +127,10 @@ class PodcastsTableViewController: UITableViewController {
     // Override to support editing the table view.
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            
             let podcast = podcastArray[indexPath.row]
-            
-            // Get all episodes with this podcast as a parent, then delete those episodes from CoreData and the episodeDownloadArray
-            let episodeToRemovePredicate = NSPredicate(format: "podcast == %@", podcast)
-            let episodeToRemoveArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: episodeToRemovePredicate)
-            
-            // Get the downloadSession and the downloadTasks, and make downloadTasks available to parent
-            let downloadSession = PVDownloader.sharedInstance.downloadSession
-            var downloadTasksArray = [NSURLSessionDownloadTask]()
-            downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
-                downloadTasksArray = downloadTasks
-            }
-            
-            // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
-            for var i = 0; i < episodeToRemoveArray.count; i++ {
-                let episodeToRemove = episodeToRemoveArray[i] as! Episode
-                if let fileName = episodeToRemove.fileName {
-                    PVUtility.deleteEpisodeFromDiskWithName(fileName)
-                }
-                
-                Constants.moc.deleteObject(episodeToRemove)
-                
-                // If the episodeToRemove is currently downloading, then retrieve and cancel the download
-                if episodeToRemove.taskIdentifier != nil {
-                    for episodeDownloadTask in downloadTasksArray {
-                        if episodeDownloadTask.taskIdentifier == episodeToRemove.taskIdentifier {
-                            episodeDownloadTask.cancel()
-                        }
-                    }
-                }
-                
-                // If the episodeToRemove is in the episodeDownloadArray, then remove the episodeToRemove from the episodeDownloadArray
-                if appDelegate.episodeDownloadArray.contains(episodeToRemove) {
-                    let episodeDownloadArrayIndex = appDelegate.episodeDownloadArray.indexOf(episodeToRemove)
-                    appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
-                }
-                
-                // If the episodeToRemove is currently now playing, then remove the now playing episode, and remove the Player button from the navbar
-                if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-                    if episodeToRemove == nowPlayingEpisode {
-                        PVMediaPlayer.sharedInstance.avPlayer.pause()
-                        PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
-                        self.navigationItem.rightBarButtonItem = nil
-                    }
-                }
-                
-            }
-            
-            // Delete podcast from CoreData, then update UI
-            Constants.moc.deleteObject(podcast)
+            PVSubscriber.sharedInstance.unsubscribeFromPodcast(podcast)
             podcastArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-            
-            // Save
-            do {
-                try Constants.moc.save()
-                print("podcast and it's episodes deleted")
-            } catch let error as NSError {
-                print(error)
-            }
         }
     }
 
