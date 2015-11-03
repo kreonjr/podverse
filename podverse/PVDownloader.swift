@@ -42,21 +42,22 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     
     func startDownloadingEpisode (episode: Episode) {
         episode.downloadProgress = 0
-        let downloadSourceURL = NSURL(string: episode.mediaURL! as String)
-        let downloadTask = downloadSession.downloadTaskWithURL(downloadSourceURL!)
-        episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
-        
-        if !appDelegate.episodeDownloadArray.contains(episode) {
-            appDelegate.episodeDownloadArray.append(episode)
+        if let downloadSourceStringURL = episode.mediaURL, let downloadSourceURL = NSURL(string: downloadSourceStringURL) {
+            let downloadTask = downloadSession.downloadTaskWithURL(downloadSourceURL)
+            episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
+            
+            if !appDelegate.episodeDownloadArray.contains(episode) {
+                appDelegate.episodeDownloadArray.append(episode)
+            }
+            
+            do {
+                try self.moc.save()
+            } catch {
+                print(error)
+            }
+            
+            downloadTask.resume()
         }
-        
-        do {
-            try self.moc.save()
-        } catch {
-            print(error)
-        }
-        
-        downloadTask.resume()
     }
     
     func pauseOrResumeDownloadingEpisode(episode: Episode) {
@@ -66,17 +67,19 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
         // Else if the episode download is paused, then resume the download
         else if episode.taskResumeData != nil {
-            let downloadTask = downloadSession.downloadTaskWithResumeData(episode.taskResumeData!)
-            episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
-            episode.taskResumeData = nil
-
-            do {
-                try moc.save()
-            } catch let error as NSError {
-                print(error)
+            if let downloadTaskResumeData = episode.taskResumeData {
+                let downloadTask = downloadSession.downloadTaskWithResumeData(downloadTaskResumeData)
+                episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
+                episode.taskResumeData = nil
+                
+                do {
+                    try moc.save()
+                } catch let error as NSError {
+                    print(error)
+                }
+                
+                downloadTask.resume()
             }
-            
-            downloadTask.resume()
         }
         // Else if the episode is currently downloading, then pause the download
         else if let taskIdentifier = episode.taskIdentifier {
@@ -160,10 +163,12 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 self.docDirectoryURL = URLs[0]
                 let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName)
                 
-                do {
-                    try fileManager.removeItemAtPath(destinationURL!.path!)
-                } catch {
-                    print(error)
+                if let destination = destinationURL, let path = destination.path {
+                    do {
+                        try fileManager.removeItemAtPath(path)
+                    } catch {
+                        print(error)
+                    }
                 }
             }
             
@@ -171,31 +176,34 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             let currentDateTime = NSDate()
             let formatter = NSDateFormatter()
             formatter.dateFormat = "ddMMyyyy-HHmmss"
-            let destinationFilename = formatter.stringFromDate(currentDateTime)
+            // TODO: why must we add .mp3 to the end of the file name in order for the media player to play the file? What would happen if a downloaded file is not actually an .mp3?
+            let destinationFilename = formatter.stringFromDate(currentDateTime) + ".mp3"
             let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(destinationFilename)
             
             do {
-                try fileManager.copyItemAtURL(location, toURL: destinationURL!)
-                
-                episode.downloadComplete = true
-                episode.taskResumeData = nil
-                
-                // Add the file destination to the episode object for playback and retrieval
-                episode.fileName = destinationFilename
-
-                // Reset the episode.downloadTask to nil before saving, or the app will crash
-                episode.taskIdentifier = nil
-                
-                // Save the downloadedMediaFileDestination with the object
-                do {
-                    try self.moc.save()
-                } catch {
-                    print(error)
+                if let destination = destinationURL {
+                    try fileManager.copyItemAtURL(location, toURL: destination)
+                    
+                    episode.downloadComplete = true
+                    episode.taskResumeData = nil
+                    
+                    // Add the file destination to the episode object for playback and retrieval
+                    episode.fileName = destinationFilename
+                    
+                    // Reset the episode.downloadTask to nil before saving, or the app will crash
+                    episode.taskIdentifier = nil
+                    
+                    // Save the downloadedMediaFileDestination with the object
+                    do {
+                        try self.moc.save()
+                    } catch {
+                        print(error)
+                    }
+                    
+                    let downloadHasFinishedUserInfo = ["episode":episode]
+                    
+                    NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
                 }
-
-                let downloadHasFinishedUserInfo = ["episode":episode]
-                
-                NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
             } catch {
                 print(error)
             }
