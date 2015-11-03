@@ -12,12 +12,6 @@ import CoreData
 class PVFeedParser: NSObject, FeedParserDelegate {
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var moc: NSManagedObjectContext! {
-        get {
-            return appDelegate.managedObjectContext
-        }
-    }
-    
     var feedURL: NSURL!
     var podcast: Podcast!
     var episode: Episode!
@@ -46,12 +40,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     func feedParser(parser: FeedParser, didParseChannel channel: FeedChannel) {
         if let feedURLString = channel.channelURL {
             let predicate = NSPredicate(format: "feedURL == %@", feedURLString)
-            let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate) as! [Podcast]
+            let podcastSet = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: predicate) as! [Podcast]
             if podcastSet.count > 0 {
                 podcast = podcastSet[0]
             }
             else {
-                podcast = CoreDataHelper.insertManagedObject("Podcast", managedObjectContext: self.moc) as! Podcast
+                podcast = CoreDataHelper.insertManagedObject("Podcast", managedObjectContext: Constants.moc) as! Podcast
             }
         }
         
@@ -90,13 +84,13 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             }
         }
         
-        let episodeSet = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: predicate) as! [Episode]
+        let episodeSet = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: predicate) as! [Episode]
         if episodeSet.count > 0 {
             episode = episodeSet[0]
             episodeAlreadySaved = true
         }
         else {
-            episode = CoreDataHelper.insertManagedObject("Episode", managedObjectContext: self.moc) as! Episode
+            episode = CoreDataHelper.insertManagedObject("Episode", managedObjectContext: Constants.moc) as! Episode
             episodeAlreadySaved = false
         }
         
@@ -133,7 +127,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         if self.shouldGetMostRecentEpisode == true {
             if let newestFeedEpisode = latestEpisodeInFeed {
                 let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-                let mostRecentEpisode = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: podcastPredicate)[0] as! Episode
+                let mostRecentEpisode = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: Constants.moc, predicate: podcastPredicate)[0] as! Episode
                 
                     if latestEpisodeInFeed != mostRecentEpisode {
                         shouldGetMostRecentEpisode = false
@@ -148,7 +142,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         // Save the parsed podcast and episode information
         dispatch_async(dispatch_get_main_queue()) { () -> Void in
             do {
-                try self.moc.save()
+                try Constants.moc.save()
             } catch {
                 print(error)
             }
@@ -161,7 +155,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         // If subscribing to a podcast, then get the latest episode and begin downloading
         if shouldSubscribeToPodcast == true {
             let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-            let latestEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: self.moc, predicate: podcastPredicate)
+            let latestEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: Constants.moc, predicate: podcastPredicate)
             
             // If there is an episode in the array, then download the episode
             if latestEpisodeArray.count > 0 {
@@ -172,7 +166,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         // Save the parsed podcast and episode information
         dispatch_async(dispatch_get_main_queue()) { () -> Void in
             do {
-                try self.moc.save()
+                try Constants.moc.save()
             } catch {
                 print(error)
             }

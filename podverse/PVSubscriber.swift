@@ -10,17 +10,9 @@ import UIKit
 import CoreData
 
 class PVSubscriber: NSObject {
-    
-    static let sharedInstance = PVSubscriber()
-    
-    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
 
-    var moc: NSManagedObjectContext! {
-        get {
-            return appDelegate.managedObjectContext
-        }
-    }
-    
+    static let sharedInstance = PVSubscriber()
+
     func subscribeToPodcast(feedURLString: String) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
             let feedParser = PVFeedParser(shouldGetMostRecent: false, shouldSubscribe: true)

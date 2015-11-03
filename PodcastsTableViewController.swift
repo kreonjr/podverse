@@ -14,12 +14,6 @@ class PodcastsTableViewController: UITableViewController {
     @IBOutlet var myPodcastsTableView: UITableView!
     
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    
-    var moc: NSManagedObjectContext! {
-        get {
-            return appDelegate.managedObjectContext
-        }
-    }
 
     var podcastArray = [Podcast]()
     
@@ -28,7 +22,7 @@ class PodcastsTableViewController: UITableViewController {
     }
     
     func loadData() {
-        podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: moc, predicate: nil) as! [Podcast]
+        podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
         self.tableView.reloadData()
     }
     
@@ -100,7 +94,7 @@ class PodcastsTableViewController: UITableViewController {
         let itunesImageData = podcast.itunesImage
         
         let totalEpisodesDownloadedPredicate = NSPredicate(format: "podcast == %@ && downloadComplete == true", podcast)
-        let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: totalEpisodesDownloadedPredicate)
+        let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: totalEpisodesDownloadedPredicate)
         cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded, 12 in progress"
         
         if let lastPubDate = podcast.lastPubDate {
@@ -137,7 +131,7 @@ class PodcastsTableViewController: UITableViewController {
             
             // Get all episodes with this podcast as a parent, then delete those episodes from CoreData and the episodeDownloadArray
             let episodeToRemovePredicate = NSPredicate(format: "podcast == %@", podcast)
-            let episodeToRemoveArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: episodeToRemovePredicate)
+            let episodeToRemoveArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: episodeToRemovePredicate)
             
             // Get the downloadSession and the downloadTasks, and make downloadTasks available to parent
             let downloadSession = PVDownloader.sharedInstance.downloadSession
@@ -153,7 +147,7 @@ class PodcastsTableViewController: UITableViewController {
                     PVUtility.deleteEpisodeFromDiskWithName(fileName)
                 }
                 
-                moc.deleteObject(episodeToRemove)
+                Constants.moc.deleteObject(episodeToRemove)
                 
                 // If the episodeToRemove is currently downloading, then retrieve and cancel the download
                 if episodeToRemove.taskIdentifier != nil {
@@ -182,13 +176,13 @@ class PodcastsTableViewController: UITableViewController {
             }
             
             // Delete podcast from CoreData, then update UI
-            moc.deleteObject(podcast)
+            Constants.moc.deleteObject(podcast)
             podcastArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             
             // Save
             do {
-                try moc.save()
+                try Constants.moc.save()
                 print("podcast and it's episodes deleted")
             } catch let error as NSError {
                 print(error)

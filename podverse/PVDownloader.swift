@@ -12,12 +12,6 @@ import CoreData
 class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
 
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-
-    var moc: NSManagedObjectContext! {
-        get {
-            return appDelegate.managedObjectContext
-        }
-    }
     
     var docDirectoryURL: NSURL?
     var downloadSession: NSURLSession!
@@ -51,7 +45,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
         
         do {
-            try self.moc.save()
+            try Constants.moc.save()
         } catch {
             print(error)
         }
@@ -71,7 +65,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             episode.taskResumeData = nil
 
             do {
-                try moc.save()
+                try Constants.moc.save()
             } catch let error as NSError {
                 print(error)
             }
@@ -88,7 +82,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                                 episode.taskResumeData = resumeData
                                 episode.taskIdentifier = nil
                                 do {
-                                    try self.moc.save()
+                                    try Constants.moc.save()
                                 } catch {
                                     print(error)
                                 }
@@ -111,7 +105,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             if let resumeData = error?.userInfo[NSURLSessionDownloadTaskResumeData] as? NSData {
                 episode.taskResumeData = resumeData
                 do {
-                    try self.moc.save()
+                    try Constants.moc.save()
                 } catch {
                     print(error)
                 }
@@ -188,7 +182,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 
                 // Save the downloadedMediaFileDestination with the object
                 do {
-                    try self.moc.save()
+                    try Constants.moc.save()
                 } catch {
                     print(error)
                 }

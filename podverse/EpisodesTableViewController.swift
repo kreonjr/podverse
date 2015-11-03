@@ -18,11 +18,6 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     @IBOutlet weak var headerSummaryLabel: UILabel!
     @IBOutlet weak var headerShadowView: UIView!
-    var moc: NSManagedObjectContext! {
-        get {
-            return appDelegate.managedObjectContext
-        }
-    }
     
     var selectedPodcast: Podcast!
     
@@ -304,13 +299,13 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 PVUtility.deleteEpisodeFromDiskWithName(fileName)
             }
 
-            moc.deleteObject(episodeToRemove)
+            Constants.moc.deleteObject(episodeToRemove)
             episodesArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             
             // Save
             do {
-                try moc.save()
+                try Constants.moc.save()
             } catch let error as NSError {
                 print(error)
             } catch {

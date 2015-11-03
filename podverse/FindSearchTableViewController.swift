@@ -19,8 +19,6 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var moc: NSManagedObjectContext!
-    
     func searchItunesFor(searchText: String) {
         appDelegate.iTunesSearchPodcastFeedURLArray.removeAll(keepCapacity: false)
         appDelegate.iTunesSearchPodcastArray.removeAll(keepCapacity: false)
@@ -55,7 +53,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                             
                             if searchResultPodcast.feedURL != nil {
                                 let predicate = NSPredicate(format: "feedURL == %@", searchResultPodcast.feedURL!)
-                                let podcastAlreadySubscribedTo = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate)
+                                let podcastAlreadySubscribedTo = CoreDataHelper.fetchEntities("Podcast", managedObjectContext:Constants.moc, predicate: predicate)
                                 
                                 if podcastAlreadySubscribedTo.count != 0 {
                                     searchResultPodcast.isSubscribed = true
@@ -105,7 +103,6 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
             }
             
             task.resume()
-            
         }
     }
     
@@ -113,9 +110,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         self.performSegueWithIdentifier("Find Search to Now Playing", sender: nil)
     }
     
-    override func viewDidAppear(animated: Bool) {
-        moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext
-        
+    override func viewDidAppear(animated: Bool) {        
         // If there is a now playing episode, add Now Playing button to navigation bar
         if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")

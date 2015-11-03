@@ -10,10 +10,8 @@ import UIKit
 import CoreData
 
 class DownloadsTableViewController: UITableViewController {
-        
+
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    
-    var moc: NSManagedObjectContext!
     
     var reloadDataTimer: NSTimer!
     
@@ -29,11 +27,6 @@ class DownloadsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
-            self.moc = context
-        }
-        
         // Style the navigation bar
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
