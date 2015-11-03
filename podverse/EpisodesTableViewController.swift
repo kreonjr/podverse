@@ -92,7 +92,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: kDownloadHasFinished, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: Constants.kDownloadHasFinished, object: nil)
         
         if let imageData = selectedPodcast.imageData, image = UIImage(data: imageData)  {
             headerImageView.image = image

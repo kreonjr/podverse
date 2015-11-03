@@ -16,9 +16,7 @@ class PVClipperConfirmationViewController: UIViewController {
     
     @IBOutlet weak var shareButton: UIButton!
     
-    var clipTime:Int = 0
-    
-    var moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+    var clip:Clip?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,23 +29,28 @@ class PVClipperConfirmationViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        self.clipDuration.text = PVUtility.convertNSNumberToHHMMSSString(NSNumber(integer: clipTime))
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        if let duration = clip?.duration {
+            clipDuration.text = PVUtility.convertNSNumberToHHMMSSString(duration)
+        }
+        
+        clipTitleLabel.text = clip?.title
     }
     
     func saveClip () {
-        let clip = CoreDataHelper.insertManagedObject("Clip", managedObjectContext: moc) as! Clip
-        clip.episode = PVMediaPlayer.sharedInstance.nowPlayingEpisode
-        
         // Save
         do {
-            try moc.save()
+            try Constants.moc.save()
         } catch let error as NSError {
             print(error)
         }
     }
+    
+    @IBAction func shareClip(sender: AnyObject) {
+        let textToShare = "Share clips somewhere"
+        let objectsToShare = [textToShare]
+        let activityVC = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
+
+        self.presentViewController(activityVC, animated: true, completion: nil)
+    }
+    
 }

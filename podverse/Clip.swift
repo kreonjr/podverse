@@ -12,8 +12,9 @@ import CoreData
 
 class Clip: NSManagedObject {
 
-    @NSManaged var endTime: NSNumber?
+    @NSManaged var duration: NSNumber?
     @NSManaged var startTime: NSNumber
+    @NSManaged var endTime: NSNumber?
     @NSManaged var title: String?
     @NSManaged var episode: Episode
     @NSManaged var podcast: Podcast

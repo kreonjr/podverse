@@ -139,7 +139,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 // TODO: Is this Notification actually doing anything? I don't see the downloadHasProgressed notification getting used anywhere...
                 let downloadHasProgressedUserInfo = ["episode":episode]
                 
-                NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
+                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
             }
         }
     }
@@ -195,7 +195,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
 
                 let downloadHasFinishedUserInfo = ["episode":episode]
                 
-                NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
+                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
             } catch {
                 print(error)
             }

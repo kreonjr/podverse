@@ -17,14 +17,6 @@ class MediaPlayerViewController: UIViewController {
     let buttonMakeClip: UIButton = UIButton(type : UIButtonType.System)
     var clipper:PVClipperViewController?
     
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    
-    var moc: NSManagedObjectContext! {
-        get {
-            return appDelegate.managedObjectContext
-        }
-    }
-    
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
     
     var nowPlayingCurrentTimeTimer: NSTimer!
@@ -51,6 +43,7 @@ class MediaPlayerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "dismissKeyboard"))
         self.clipper = ((self.childViewControllers.first as! UINavigationController).topViewController as? PVClipperViewController)
         self.clipper?.totalDuration = Int(pvMediaPlayer.nowPlayingEpisode.duration!)
 
@@ -92,6 +85,10 @@ class MediaPlayerViewController: UIViewController {
             pvMediaPlayer.avPlayer.play()
             playPauseButton.setTitle("\u{f04c}", forState: .Normal)
         }
+    }
+    
+    func dismissKeyboard (){
+        self.view.endEditing(true)
     }
 
     @IBAction func sliderTimeChange(sender: UISlider) {
@@ -158,7 +155,8 @@ class MediaPlayerViewController: UIViewController {
         super.viewWillAppear(animated)
         
         // Call updateNowPlayingCurrentTime whenever the now playing current time changes
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateNowPlayingCurrentTime:", name: kNowPlayingTimeHasChanged, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateNowPlayingCurrentTime:", name:
+            Constants.kNowPlayingTimeHasChanged, object: nil)
         
         // Start timer to check every second if the now playing current time has changed
         nowPlayingCurrentTimeTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "updateNowPlayingCurrentTimeNotification", userInfo: nil, repeats: true)
@@ -189,7 +187,7 @@ class MediaPlayerViewController: UIViewController {
         super.viewWillDisappear(animated)
         
         // Stop calling updateNowPlayingCurrentTime whenever the now playing current time changes
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: kNowPlayingTimeHasChanged, object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kNowPlayingTimeHasChanged, object: nil)
         
         // Stop timer that checks every second if the now playing current time has changed
         nowPlayingCurrentTimeTimer.invalidate()
@@ -203,6 +201,7 @@ class MediaPlayerViewController: UIViewController {
             for viewController in self.childViewControllers {
                 if viewController.isKindOfClass(UINavigationController) {
                     (viewController as! UINavigationController).popToRootViewControllerAnimated(false)
+                    self.view.endEditing(true)
                 }
             }
         }
