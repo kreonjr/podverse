@@ -59,7 +59,8 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
                                 searchResultPodcast.feedURL = NSURL(string: feedURLString)
                                 
                                 let predicate = NSPredicate(format: "feedURL == %@", searchResultPodcast.feedURL!)
-                                let podcastAlreadySubscribedTo = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: predicate)
+                                let podcastAlreadySubscribedTo = CoreDataHelper.fetchEntities("Podcast", managedObjectContext:Constants.moc, predicate: predicate)
+                                
                                 if podcastAlreadySubscribedTo.count != 0 {
                                     searchResultPodcast.isSubscribed = true
                                 } else {
@@ -108,7 +109,6 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
             }
             
             task.resume()
-            
         }
     }
     

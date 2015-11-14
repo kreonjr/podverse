@@ -12,12 +12,6 @@ import CoreData
 class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
 
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-
-    var moc: NSManagedObjectContext! {
-        get {
-            return appDelegate.managedObjectContext
-        }
-    }
     
     var docDirectoryURL: NSURL?
     var downloadSession: NSURLSession!
@@ -51,7 +45,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             }
             
             do {
-                try self.moc.save()
+                try Constants.moc.save()
             } catch {
                 print(error)
             }
@@ -73,7 +67,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 episode.taskResumeData = nil
                 
                 do {
-                    try moc.save()
+                    try Constants.moc.save()
                 } catch let error as NSError {
                     print(error)
                 }
@@ -86,12 +80,12 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
                 for episodeDownloadTask in downloadTasks {
                     if episodeDownloadTask.taskIdentifier == taskIdentifier.integerValue {
-                        episodeDownloadTask.cancelByProducingResumeData() {[unowned self] resumeData in
+                        episodeDownloadTask.cancelByProducingResumeData() {resumeData in
                             if (resumeData != nil) {
                                 episode.taskResumeData = resumeData
                                 episode.taskIdentifier = nil
                                 do {
-                                    try self.moc.save()
+                                    try Constants.moc.save()
                                 } catch {
                                     print(error)
                                 }
@@ -114,7 +108,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             if let resumeData = error?.userInfo[NSURLSessionDownloadTaskResumeData] as? NSData {
                 episode.taskResumeData = resumeData
                 do {
-                    try self.moc.save()
+                    try Constants.moc.save()
                 } catch {
                     print(error)
                 }
@@ -142,7 +136,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 // TODO: Is this Notification actually doing anything? I don't see the downloadHasProgressed notification getting used anywhere...
                 let downloadHasProgressedUserInfo = ["episode":episode]
                 
-                NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
+                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
             }
         }
     }
@@ -195,14 +189,14 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     
                     // Save the downloadedMediaFileDestination with the object
                     do {
-                        try self.moc.save()
+                        try Constants.moc.save()
                     } catch {
                         print(error)
                     }
                     
                     let downloadHasFinishedUserInfo = ["episode":episode]
                     
-                    NSNotificationCenter.defaultCenter().postNotificationName(kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
                 }
             } catch {
                 print(error)

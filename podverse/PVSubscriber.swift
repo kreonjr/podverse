@@ -10,15 +10,10 @@ import UIKit
 import CoreData
 
 class PVSubscriber: NSObject {
-    
+
     static let sharedInstance = PVSubscriber()
-    let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    var moc: NSManagedObjectContext! {
-        get {
-            return appDelegate.managedObjectContext
-        }
-    }
-    
+
+    var appDelegate = (UIApplication.sharedApplication().delegate as! AppDelegate)
     func subscribeToPodcast(feedURLString: String) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
             let feedParser = PVFeedParser(shouldGetMostRecent: false, shouldSubscribe: true)
@@ -29,7 +24,7 @@ class PVSubscriber: NSObject {
     func unsubscribeFromPodcast(podcast:Podcast) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
             let episodeToRemovePredicate = NSPredicate(format: "podcast == %@", podcast)
-            let episodeToRemoveArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: self.moc, predicate: episodeToRemovePredicate)
+            let episodeToRemoveArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: episodeToRemovePredicate)
             
             // Get the downloadSession and the downloadTasks, and make downloadTasks available to parent
             let downloadSession = PVDownloader.sharedInstance.downloadSession
@@ -45,7 +40,7 @@ class PVSubscriber: NSObject {
                     PVUtility.deleteEpisodeFromDiskWithName(fileName)
                 }
                 
-                self.moc.deleteObject(episodeToRemove)
+                Constants.moc.deleteObject(episodeToRemove)
                 
                 // If the episodeToRemove is currently downloading, then retrieve and cancel the download
                 if episodeToRemove.taskIdentifier != nil {
@@ -73,10 +68,10 @@ class PVSubscriber: NSObject {
             }
             
             // Delete podcast from CoreData, then update UI
-            self.moc.deleteObject(podcast)
+            Constants.moc.deleteObject(podcast)
             // Save
             do {
-                try self.moc.save()
+                try Constants.moc.save()
                 print("podcast and it's episodes deleted")
             } catch let error as NSError {
                 print(error)

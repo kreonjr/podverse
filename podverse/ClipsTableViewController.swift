@@ -15,12 +15,11 @@ class ClipsTableViewController: UITableViewController {
     
     var currentEpisode: Episode!
     
-    var moc: NSManagedObjectContext!
     var clipArray = [Clip]()
     
     func loadData() {
         clipArray = [Clip]()
-        clipArray = CoreDataHelper.fetchEntities("Clip", managedObjectContext: moc, predicate: nil) as! [Clip]
+        clipArray = CoreDataHelper.fetchEntities("Clip", managedObjectContext: Constants.moc, predicate: nil) as! [Clip]
         
         let unsortedClips = NSMutableArray()
 
@@ -48,10 +47,6 @@ class ClipsTableViewController: UITableViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        if let context = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext {
-            moc = context
-        }
         
         loadData()
         

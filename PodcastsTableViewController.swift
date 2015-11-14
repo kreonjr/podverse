@@ -14,12 +14,6 @@ class PodcastsTableViewController: UITableViewController {
     @IBOutlet var myPodcastsTableView: UITableView!
     
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    
-    var moc: NSManagedObjectContext! {
-        get {
-            return appDelegate.managedObjectContext
-        }
-    }
 
     var podcastArray = [Podcast]()
     
@@ -28,7 +22,7 @@ class PodcastsTableViewController: UITableViewController {
     }
     
     func loadData() {
-        podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: moc, predicate: nil) as! [Podcast]
+        podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
         podcastArray.sortInPlace({ $0.title < $1.title })
         self.tableView.reloadData()
     }
@@ -101,7 +95,7 @@ class PodcastsTableViewController: UITableViewController {
         let itunesImageData = podcast.itunesImage
         
         let totalEpisodesDownloadedPredicate = NSPredicate(format: "podcast == %@ && downloadComplete == true", podcast)
-        let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: moc, predicate: totalEpisodesDownloadedPredicate)
+        let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: totalEpisodesDownloadedPredicate)
         cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded, 12 in progress"
         
         if let lastPubDate = podcast.lastPubDate {

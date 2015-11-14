@@ -59,7 +59,7 @@ class PVMediaPlayer: NSObject {
     func updateNowPlayingCurrentTimeNotification() {
         let nowPlayingCurrentTime = CMTimeGetSeconds(avPlayer.currentTime())
         let nowPlayingTimeHasChangedUserInfo = ["nowPlayingCurrentTime":nowPlayingCurrentTime]
-        NSNotificationCenter.defaultCenter().postNotificationName(kNowPlayingTimeHasChanged, object: self, userInfo: nowPlayingTimeHasChangedUserInfo)
+        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kNowPlayingTimeHasChanged, object: self, userInfo: nowPlayingTimeHasChangedUserInfo)
     }
     
     func loadEpisodeMediaFileOrStream(episode: Episode) {
