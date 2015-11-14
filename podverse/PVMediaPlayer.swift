@@ -21,6 +21,20 @@ class PVMediaPlayer: NSObject {
     var nowPlayingClip: Clip!
     
     func playOrPause() -> (Bool) {
+        
+        // Make sure the media player will keep playing in the background and on the lock screen
+        // TODO: should this be somewhere else?
+        do {
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
+            do {
+                try AVAudioSession.sharedInstance().setActive(true)
+            } catch let error as NSError {
+                print(error.localizedDescription)
+            }
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+        
         if avPlayer.rate == 0 {
             avPlayer.play()
             return true
