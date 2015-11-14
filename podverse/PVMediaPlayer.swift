@@ -10,7 +10,7 @@ import UIKit
 import AVFoundation
 
 class PVMediaPlayer: NSObject {
-
+    
     static let sharedInstance = PVMediaPlayer()
     
     var avPlayer = AVPlayer()
@@ -20,10 +20,10 @@ class PVMediaPlayer: NSObject {
     var nowPlayingEpisode: Episode!
     var nowPlayingClip: Clip!
     
-    func playOrPause() -> (Bool) {
-        
-        // Make sure the media player will keep playing in the background and on the lock screen
-        // TODO: should this be somewhere else?
+    override init() {
+        super.init()
+
+        // Enable the media player to continue playing in the background and on the lock screen
         do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
             do {
@@ -34,7 +34,9 @@ class PVMediaPlayer: NSObject {
         } catch let error as NSError {
             print(error.localizedDescription)
         }
-        
+    }
+    
+    func playOrPause() -> (Bool) {        
         if avPlayer.rate == 0 {
             avPlayer.play()
             return true
