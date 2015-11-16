@@ -31,6 +31,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var timer: dispatch_source_t!
     
+    override func remoteControlReceivedWithEvent(event: UIEvent?) {
+        if let evt = event {
+            PVMediaPlayer.sharedInstance.remoteControlReceivedWithEvent(evt)
+        }
+    }
+    
     // This function runs once on app load, then runs in the background every 30 minutes.
     // Check if a new episode is available for a subscribed podcast; if true, download that episode.
     // TODO: shouldn't we check via push notifications? Rather than a timer that continuously runs in the background?
