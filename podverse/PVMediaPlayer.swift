@@ -47,12 +47,19 @@ class PVMediaPlayer: NSObject {
         }
     }
     
-    func playOrPause() -> (Bool) {        
+    func playOrPause() -> (Bool) {
         if avPlayer.rate == 0 {
+            if let clipTitle = self.nowPlayingEpisode.title {
+                
+            } else {
+                let clipTitle = ""
+            }
+            self.setPlayingInfo(self.nowPlayingEpisode.podcast.title, clipTitle: self.nowPlayingEpisode.title!)
             avPlayer.play()
             return true
 
         } else {
+            self.setPlayingInfo(self.nowPlayingEpisode.podcast.title, clipTitle: "title here")
             avPlayer.pause()
             return false
         }
@@ -71,6 +78,10 @@ class PVMediaPlayer: NSObject {
                 break
             }
         }
+    }
+    
+    func setPlayingInfo(podcastTitle: String, clipTitle: String) {
+        MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: clipTitle]
     }
     
     func goToTime(seconds: Float64) {

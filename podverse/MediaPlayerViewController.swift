@@ -82,7 +82,7 @@ class MediaPlayerViewController: UIViewController {
             
             // TODO: Load the Clip into the AVPlayer
             
-            pvMediaPlayer.avPlayer.play()
+            PVMediaPlayer.sharedInstance.playOrPause()
             playPauseButton.setTitle("\u{f04c}", forState: .Normal)
         }
     }
