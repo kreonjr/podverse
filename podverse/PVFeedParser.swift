@@ -12,7 +12,7 @@ import CoreData
 class PVFeedParser: NSObject, FeedParserDelegate {
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var feedURL: NSURL!
+    var feedURL: String!
     var podcast: Podcast!
     
     var shouldGetMostRecentEpisode: Bool
@@ -26,6 +26,8 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func parsePodcastFeed(feedURLString: String) {
+        feedURL = feedURLString
+        
         // Create, configure, and start the feedParser
         let feedParser = CustomFeedParser(feedURL: feedURLString)
         feedParser.delegate = self
@@ -56,9 +58,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             podcast.summary = summary
         }
         
-        if let feedURL = channel.channelLink {
-            podcast.feedURL = feedURL
-        }
+        podcast.feedURL = feedURL
         
         //Look into maybe adding it in the library manually
         //if let itunesAuthor = channel.itunesAuthor { podcast.itunesAuthor = itunesAuthor }

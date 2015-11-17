@@ -43,27 +43,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func startCheckSubscriptionsForNewEpisodesTimer() {
         
         // TODO: Should I or should I not be using dispatch_get_main_queue here?
-        timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue())
-        
-        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 600 * NSEC_PER_SEC, 1 * NSEC_PER_SEC)
-        
-        dispatch_source_set_event_handler(timer) {
-            
-            let podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
-            for var i = 0; i < podcastArray.count; i++ {
-                let feedURL = NSURL(string: podcastArray[i].feedURL)
-                
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
-                    let feedParser = PVFeedParser(shouldGetMostRecent: true, shouldSubscribe:false )
-                    if let feedURLString = feedURL?.absoluteString {
-                        feedParser.parsePodcastFeed(feedURLString)
-                    }
-                }
-            }
-            
-        }
-        
-        dispatch_resume(timer)
+//        timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue())
+//        
+//        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 600 * NSEC_PER_SEC, 1 * NSEC_PER_SEC)
+//        
+//        dispatch_source_set_event_handler(timer) {
+//            
+//            let podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
+//            for var i = 0; i < podcastArray.count; i++ {
+//                let feedURL = NSURL(string: podcastArray[i].feedURL)
+//                
+//                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
+//                    let feedParser = PVFeedParser(shouldGetMostRecent: true, shouldSubscribe:false )
+//                    if let feedURLString = feedURL?.absoluteString {
+//                        feedParser.parsePodcastFeed(feedURLString)
+//                    }
+//                }
+//            }
+//            
+//        }
+//        
+//        dispatch_resume(timer)
         
     }
 

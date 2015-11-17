@@ -25,6 +25,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var showAllAvailableEpisodes: Bool = false
     
+    var refreshControl: UIRefreshControl!
+    
     func loadData() {
         
         // Clear the episodes array, then retrieve and sort the full episode or downloaded episode array
@@ -82,12 +84,22 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
             }
         }
-        
+    }
+    
+    func refresh() {
+        let feedParser = PVFeedParser(shouldGetMostRecent: false, shouldSubscribe: false)
+        feedParser.parsePodcastFeed(selectedPodcast.feedURL)
+        // TODO: call self.refreshControl.endRefreshing() after parsePodcastFeed has finished
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: Constants.kDownloadHasFinished, object: nil)
+        
+        self.refreshControl = UIRefreshControl()
+        self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh episodes")
+        self.refreshControl.addTarget(self, action: "refresh", forControlEvents: UIControlEvents.ValueChanged)
+        self.tableView.addSubview(refreshControl)
         
         if let imageData = selectedPodcast.imageData, image = UIImage(data: imageData)  {
             headerImageView.image = image
