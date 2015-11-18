@@ -14,7 +14,7 @@ class MediaPlayerViewController: UIViewController {
     
     let makeClipString = "Make Clip"
     let hideClipper = "Hide Clipper"
-    let buttonMakeClip: UIButton = UIButton(type : UIButtonType.System)
+    let buttonMakeClip: UIButton = UIButton(type : UIButtonType.Custom)
     var clipper:PVClipperViewController?
     
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
@@ -48,11 +48,12 @@ class MediaPlayerViewController: UIViewController {
         self.clipper?.totalDuration = Int(pvMediaPlayer.nowPlayingEpisode.duration!)
 
         // Create and add the Make Clip button to the UI
-        buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
+        buttonMakeClip.frame = CGRectMake(0, 0, 100, 90)
         buttonMakeClip.setTitle(makeClipString, forState: .Normal)
+        buttonMakeClip.titleLabel!.font = UIFont(name: "System", size: 18)
         buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
         let rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
-        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
+        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: false)
         
         makeClipContainerView.hidden = true
         
