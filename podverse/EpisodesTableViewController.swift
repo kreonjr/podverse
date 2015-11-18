@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, PVFeedParserDelegate {
     @IBOutlet weak var tableView: UITableView!
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -88,8 +88,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     func refresh() {
         let feedParser = PVFeedParser(shouldGetMostRecent: false, shouldSubscribe: false)
+        feedParser.delegate = self
         feedParser.parsePodcastFeed(selectedPodcast.feedURL)
-        // TODO: call self.refreshControl.endRefreshing() after parsePodcastFeed has finished
     }
     
     override func viewDidLoad() {
@@ -359,5 +359,10 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
+    }
+    
+    func feedParsingComplete() {
+        self.refreshControl.endRefreshing()
+        tableView.reloadData()
     }
 }

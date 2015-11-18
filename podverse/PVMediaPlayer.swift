@@ -50,11 +50,11 @@ class PVMediaPlayer: NSObject {
     func playOrPause() -> (Bool) {
         if avPlayer.rate == 0 {
             if let clipTitle = self.nowPlayingEpisode.title {
-                
+                self.setPlayingInfo(self.nowPlayingEpisode.podcast.title, clipTitle: clipTitle)
             } else {
-                let clipTitle = ""
+                self.setPlayingInfo(self.nowPlayingEpisode.podcast.title, clipTitle: "")
             }
-            self.setPlayingInfo(self.nowPlayingEpisode.podcast.title, clipTitle: self.nowPlayingEpisode.title!)
+            
             avPlayer.play()
             return true
 

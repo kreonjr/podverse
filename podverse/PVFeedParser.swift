@@ -9,6 +9,10 @@
 import UIKit
 import CoreData
 
+protocol PVFeedParserDelegate {
+   func feedParsingComplete()
+}
+
 class PVFeedParser: NSObject, FeedParserDelegate {
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
@@ -19,6 +23,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     var shouldSubscribeToPodcast: Bool
     var latestEpisodeInFeed: Episode?
     var downloadedEpisodes = []
+    var delegate:PVFeedParserDelegate?
     
     init(shouldGetMostRecent:Bool, shouldSubscribe:Bool) {
         shouldGetMostRecentEpisode = shouldGetMostRecent
@@ -169,6 +174,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             }
         }
         
+        delegate?.feedParsingComplete()
         print("feed parser has finished!")
     }
     

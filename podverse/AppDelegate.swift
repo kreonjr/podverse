@@ -21,6 +21,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
+    let REFRESH_PODCAST_TIME:Double = 3600
+    
     var nowPlayingEpisode: Episode?
     
     var episodeDownloadArray = [Episode]()
@@ -41,30 +43,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Check if a new episode is available for a subscribed podcast; if true, download that episode.
     // TODO: shouldn't we check via push notifications? Rather than a timer that continuously runs in the background?
     func startCheckSubscriptionsForNewEpisodesTimer() {
-        
-        // TODO: Should I or should I not be using dispatch_get_main_queue here?
-//        timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue())
-//        
-//        dispatch_source_set_timer(timer, DISPATCH_TIME_NOW, 600 * NSEC_PER_SEC, 1 * NSEC_PER_SEC)
-//        
-//        dispatch_source_set_event_handler(timer) {
-//            
-//            let podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
-//            for var i = 0; i < podcastArray.count; i++ {
-//                let feedURL = NSURL(string: podcastArray[i].feedURL)
-//                
-//                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
-//                    let feedParser = PVFeedParser(shouldGetMostRecent: true, shouldSubscribe:false )
-//                    if let feedURLString = feedURL?.absoluteString {
-//                        feedParser.parsePodcastFeed(feedURLString)
-//                    }
-//                }
-//            }
-//            
-//        }
-//        
-//        dispatch_resume(timer)
-        
+        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: "refreshPodcastFeed", userInfo: nil, repeats: true)
+    }
+    
+    func refreshPodcastFeed () {
+        let podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
+        for var i = 0; i < podcastArray.count; i++ {
+            let feedURL = NSURL(string: podcastArray[i].feedURL)
+            
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
+                let feedParser = PVFeedParser(shouldGetMostRecent: true, shouldSubscribe:false )
+                if let feedURLString = feedURL?.absoluteString {
+                    feedParser.parsePodcastFeed(feedURLString)
+                }
+            }
+        }
     }
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
@@ -73,7 +66,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge], categories: nil))  // types are UIUserNotificationType members
 
         startCheckSubscriptionsForNewEpisodesTimer()
-        
         return true
     }
 
@@ -84,6 +76,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+        UIApplication.sharedApplication().applicationIconBadgeNumber = 0
+        self.refreshPodcastFeed()
     }
 
     func applicationDidBecomeActive(application: UIApplication) {
