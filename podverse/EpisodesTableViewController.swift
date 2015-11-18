@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, PVFeedParserDelegate {
     @IBOutlet weak var tableView: UITableView!
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
@@ -24,6 +24,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     var episodesArray = [Episode]()
     
     var showAllAvailableEpisodes: Bool = false
+    
+    var refreshControl: UIRefreshControl!
     
     func loadData() {
         
@@ -82,12 +84,22 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
             }
         }
-        
+    }
+    
+    func refresh() {
+        let feedParser = PVFeedParser(shouldGetMostRecent: false, shouldSubscribe: false)
+        feedParser.delegate = self
+        feedParser.parsePodcastFeed(selectedPodcast.feedURL)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: Constants.kDownloadHasFinished, object: nil)
+        
+        self.refreshControl = UIRefreshControl()
+        self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh episodes")
+        self.refreshControl.addTarget(self, action: "refresh", forControlEvents: UIControlEvents.ValueChanged)
+        self.tableView.addSubview(refreshControl)
         
         if let imageData = selectedPodcast.imageData, image = UIImage(data: imageData)  {
             headerImageView.image = image
@@ -347,5 +359,10 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
+    }
+    
+    func feedParsingComplete() {
+        self.refreshControl.endRefreshing()
+        tableView.reloadData()
     }
 }

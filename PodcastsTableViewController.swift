@@ -127,10 +127,59 @@ class PodcastsTableViewController: UITableViewController {
     // Override to support editing the table view.
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            let podcast = podcastArray[indexPath.row]
-            PVSubscriber.sharedInstance.unsubscribeFromPodcast(podcast)
+            let podcastToRemove = podcastArray[indexPath.row]
+            
+            // Loop through each episode and handle deletion properly
+            for episode in podcastToRemove.episodes {
+                let episodeToRemove = episode as! Episode
+                // Get the downloadSession, and if there is a downloadSession with a matching taskIdentifier as episode's taskIdentifier, then cancel the downloadSession
+                let downloadSession = PVDownloader.sharedInstance.downloadSession
+                downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
+                    for episodeDownloadTask in downloadTasks {
+                        if episodeDownloadTask.taskIdentifier == episodeToRemove.taskIdentifier {
+                            episodeDownloadTask.cancel()
+                        }
+                    }
+                }
+                
+                // If the episode is currently in the episodeDownloadArray, then delete the episode from the episodeDownloadArray
+                if appDelegate.episodeDownloadArray.contains(episodeToRemove) {
+                    let episodeDownloadArrayIndex = appDelegate.episodeDownloadArray.indexOf(episodeToRemove)
+                    appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
+                }
+                
+                // If the episodeToRemove is currently now playing, then remove the now playing episode, and remove the Player button from the navbar
+                if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+                    if episodeToRemove == nowPlayingEpisode {
+                        PVMediaPlayer.sharedInstance.avPlayer.pause()
+                        PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
+                        self.navigationItem.rightBarButtonItem = nil
+                    }
+                }
+                
+                // Delete the episode from CoreData and the disk, and update the UI
+                if let fileName = episodeToRemove.fileName {
+                    PVUtility.deleteEpisodeFromDiskWithName(fileName)
+                }
+                
+                Constants.moc.deleteObject(episodeToRemove)
+            }
+            
+            PVSubscriber.sharedInstance.unsubscribeFromPodcast(podcastToRemove)
             podcastArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            
+            Constants.moc.deleteObject(podcastToRemove)
+            
+            // Save
+            do {
+                try Constants.moc.save()
+            } catch let error as NSError {
+                print(error)
+            } catch {
+                print("why is this catch necessary?")
+            }
+            
         }
     }
 

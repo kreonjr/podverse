@@ -14,7 +14,7 @@ class MediaPlayerViewController: UIViewController {
     
     let makeClipString = "Make Clip"
     let hideClipper = "Hide Clipper"
-    let buttonMakeClip: UIButton = UIButton(type : UIButtonType.System)
+    let buttonMakeClip: UIButton = UIButton(type : UIButtonType.Custom)
     var clipper:PVClipperViewController?
     
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
@@ -48,11 +48,12 @@ class MediaPlayerViewController: UIViewController {
         self.clipper?.totalDuration = Int(pvMediaPlayer.nowPlayingEpisode.duration!)
 
         // Create and add the Make Clip button to the UI
-        buttonMakeClip.frame = CGRectMake(0, 0, 90, 90)
+        buttonMakeClip.frame = CGRectMake(0, 0, 100, 90)
         buttonMakeClip.setTitle(makeClipString, forState: .Normal)
+        buttonMakeClip.titleLabel!.font = UIFont(name: "System", size: 18)
         buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
         let rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
-        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: true)
+        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: false)
         
         makeClipContainerView.hidden = true
         
@@ -75,6 +76,9 @@ class MediaPlayerViewController: UIViewController {
             summary.text = ""
         }
         
+        // Make sure the Play/Pause button displays properly after returning from background
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setPlayPauseIcon", name: UIApplicationWillEnterForegroundNotification, object: nil)
+        
         // If the user is not returning to the Media Player via the Now Playing button, load and start a new episode or clip.
         if returnToNowPlaying != true {
             // Load the Episode into the AVPlayer
@@ -82,7 +86,7 @@ class MediaPlayerViewController: UIViewController {
             
             // TODO: Load the Clip into the AVPlayer
             
-            pvMediaPlayer.avPlayer.play()
+            PVMediaPlayer.sharedInstance.playOrPause()
             playPauseButton.setTitle("\u{f04c}", forState: .Normal)
         }
     }
@@ -168,6 +172,10 @@ class MediaPlayerViewController: UIViewController {
             currentTime?.text = "00:00"
         }
         
+        setPlayPauseIcon()
+    }
+    
+    func setPlayPauseIcon() {
         // Check if a clip or episode is loaded. If it is, then display either Play or Pause icon.
         if pvMediaPlayer.avPlayer.rate == 1 {
             // If playing, then display Play icon.

@@ -197,6 +197,12 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     let downloadHasFinishedUserInfo = ["episode":episode]
                     
                     NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
+                    let notification = UILocalNotification()
+                    notification.applicationIconBadgeNumber = UIApplication.sharedApplication().applicationIconBadgeNumber + 1
+                    notification.alertBody = "Episode Downloaded" // text that will be displayed in the notification
+                    notification.alertAction = "open"
+                    notification.soundName = UILocalNotificationDefaultSoundName // play default sound
+                    UIApplication.sharedApplication().scheduleLocalNotification(notification)
                 }
             } catch {
                 print(error)
