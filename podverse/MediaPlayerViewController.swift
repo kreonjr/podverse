@@ -75,6 +75,9 @@ class MediaPlayerViewController: UIViewController {
             summary.text = ""
         }
         
+        // Make sure the Play/Pause button displays properly after returning from background
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setPlayPauseIcon", name: UIApplicationWillEnterForegroundNotification, object: nil)
+        
         // If the user is not returning to the Media Player via the Now Playing button, load and start a new episode or clip.
         if returnToNowPlaying != true {
             // Load the Episode into the AVPlayer
@@ -168,6 +171,10 @@ class MediaPlayerViewController: UIViewController {
             currentTime?.text = "00:00"
         }
         
+        setPlayPauseIcon()
+    }
+    
+    func setPlayPauseIcon() {
         // Check if a clip or episode is loaded. If it is, then display either Play or Pause icon.
         if pvMediaPlayer.avPlayer.rate == 1 {
             // If playing, then display Play icon.

@@ -59,7 +59,7 @@ class PVMediaPlayer: NSObject {
             return true
 
         } else {
-            self.setPlayingInfo(self.nowPlayingEpisode.podcast.title, clipTitle: "title here")
+            self.setPlayingInfo(self.nowPlayingEpisode.podcast.title, clipTitle: self.nowPlayingEpisode.title!)
             avPlayer.pause()
             return false
         }
