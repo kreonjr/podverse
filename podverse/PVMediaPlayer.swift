@@ -60,8 +60,20 @@ class PVMediaPlayer: NSObject {
 
         } else {
             self.setPlayingInfo(self.nowPlayingEpisode.podcast.title, clipTitle: self.nowPlayingEpisode.title!)
+            saveCurrentTimeAsPlaybackPosition()
             avPlayer.pause()
             return false
+        }
+    }
+    
+    func saveCurrentTimeAsPlaybackPosition() {
+        self.nowPlayingEpisode.playbackPosition = CMTimeGetSeconds(avPlayer.currentTime())
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            do {
+                try Constants.moc.save()
+            } catch {
+                print(error)
+            }
         }
     }
     

@@ -78,6 +78,9 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         if let indexPath = self.tableView.indexPathForCell(cell) {
             let selectedEpisode = episodesArray[indexPath.row]
             if selectedEpisode.fileName != nil {
+                if PVMediaPlayer.sharedInstance.avPlayer.rate == 1 {
+                    PVMediaPlayer.sharedInstance.saveCurrentTimeAsPlaybackPosition()
+                }
                 self.performSegueWithIdentifier("Quick Play Downloaded Episode", sender: selectedEpisode)
             } else {
                 PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)

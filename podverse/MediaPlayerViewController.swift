@@ -84,10 +84,16 @@ class MediaPlayerViewController: UIViewController {
             // Load the Episode into the AVPlayer
             pvMediaPlayer.loadEpisodeMediaFileOrStream(pvMediaPlayer.nowPlayingEpisode)
             
-            // TODO: Load the Clip into the AVPlayer
-            
-            PVMediaPlayer.sharedInstance.playOrPause()
-            playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+            // If the episode has a playback position, then continue from that point
+            if let playbackPosition = pvMediaPlayer.nowPlayingEpisode.playbackPosition {
+                PVMediaPlayer.sharedInstance.goToTime(Float64(playbackPosition))
+                playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+            }
+            // Else start playing from the beginning
+            else {
+                PVMediaPlayer.sharedInstance.playOrPause()
+                playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+            }
         }
     }
     
