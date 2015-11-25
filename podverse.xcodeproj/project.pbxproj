@@ -38,7 +38,6 @@
 		81DD2CCB1B549C4D00432E0C /* Podcast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DD2CC81B549C4D00432E0C /* Podcast.swift */; };
 		81DDBE5D1B24AC8100EF3B9C /* PodcastsTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE5C1B24AC8100EF3B9C /* PodcastsTableCell.swift */; };
 		81DDBE5F1B24BAF300EF3B9C /* EpisodesTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE5E1B24BAF300EF3B9C /* EpisodesTableCell.swift */; };
-		81DDBE611B253C7000EF3B9C /* ClipsTableHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE601B253C7000EF3B9C /* ClipsTableHeaderCell.swift */; };
 		81DDBE631B253C9200EF3B9C /* ClipsTableCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81DDBE621B253C9200EF3B9C /* ClipsTableCell.swift */; };
 		81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578D1B21619F00D67634 /* PVFeedParser.swift */; };
 		81E357901B21624500D67634 /* PVUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578F1B21624500D67634 /* PVUtility.swift */; };
@@ -100,7 +99,6 @@
 		81DD2CC81B549C4D00432E0C /* Podcast.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Podcast.swift; sourceTree = "<group>"; };
 		81DDBE5C1B24AC8100EF3B9C /* PodcastsTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PodcastsTableCell.swift; sourceTree = "<group>"; };
 		81DDBE5E1B24BAF300EF3B9C /* EpisodesTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EpisodesTableCell.swift; sourceTree = "<group>"; };
-		81DDBE601B253C7000EF3B9C /* ClipsTableHeaderCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipsTableHeaderCell.swift; sourceTree = "<group>"; };
 		81DDBE621B253C9200EF3B9C /* ClipsTableCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClipsTableCell.swift; sourceTree = "<group>"; };
 		81E3578D1B21619F00D67634 /* PVFeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVFeedParser.swift; sourceTree = "<group>"; };
 		81E3578F1B21624500D67634 /* PVUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVUtility.swift; sourceTree = "<group>"; };
@@ -179,7 +177,6 @@
 				818615CB1B1EB10E006C9731 /* EpisodesTableViewController.swift */,
 				81DDBE5E1B24BAF300EF3B9C /* EpisodesTableCell.swift */,
 				818615CF1B1EB144006C9731 /* ClipsTableViewController.swift */,
-				81DDBE601B253C7000EF3B9C /* ClipsTableHeaderCell.swift */,
 				81DDBE621B253C9200EF3B9C /* ClipsTableCell.swift */,
 				818615D11B1EB206006C9731 /* MediaPlayerViewController.swift */,
 				81A3B5151B3A60F5007D9A96 /* DownloadsTableViewController.swift */,
@@ -381,7 +378,6 @@
 			files = (
 				815A2E311B50C099002A21A7 /* FindTableViewController.swift in Sources */,
 				EF3799D21BD4981E00211419 /* CustomFeedParser.swift in Sources */,
-				81DDBE611B253C7000EF3B9C /* ClipsTableHeaderCell.swift in Sources */,
 				818615D21B1EB206006C9731 /* MediaPlayerViewController.swift in Sources */,
 				815A2E371B50D855002A21A7 /* FindSearchTableViewController.swift in Sources */,
 				818615D01B1EB144006C9731 /* ClipsTableViewController.swift in Sources */,

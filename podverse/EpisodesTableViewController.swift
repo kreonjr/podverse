@@ -95,8 +95,19 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         feedParser.parsePodcastFeed(selectedPodcast.feedURL)
     }
     
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        // If there is a now playing episode, add Now Playing button to navigation bar
+        if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.title = selectedPodcast.title
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: Constants.kDownloadHasFinished, object: nil)
         
         self.refreshControl = UIRefreshControl()
@@ -113,19 +124,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         
         headerSummaryLabel.text = selectedPodcast.summary
         
-        self.title = selectedPodcast.title
-        
         loadData()
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-
-        
-        // If there is a now playing episode, add Now Playing button to navigation bar
-        if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
-            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
-        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -240,7 +239,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             let totalClips = "(123)"
             
             episodeActions.addAction(UIAlertAction(title: "Show Clips \(totalClips)", style: .Default, handler: { action in
-                self.performSegueWithIdentifier("showClips", sender: self)
+                self.performSegueWithIdentifier("Show Clips", sender: self)
             }))
             
             episodeActions.addAction(UIAlertAction (title: "Episode Info", style: .Default, handler: nil))
@@ -346,10 +345,11 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
-        else if segue.identifier == "showClips" {
+        else if segue.identifier == "Show Clips" {
             let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
             let index = self.tableView.indexPathForSelectedRow!
-            clipsTableViewController.currentEpisode = episodesArray[index.row]
+            clipsTableViewController.selectedPodcast = selectedPodcast
+            clipsTableViewController.selectedEpisode = episodesArray[index.row]
             navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
         else if segue.identifier == "streamEpisode" {
