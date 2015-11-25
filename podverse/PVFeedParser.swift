@@ -66,9 +66,15 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         podcast.feedURL = feedURL
         
         //Look into maybe adding it in the library manually
-        //if let itunesAuthor = channel.itunesAuthor { podcast.itunesAuthor = itunesAuthor }
+
         if let imageUrlString = channel.channelLogoURL, let imageUrl = NSURL(string:imageUrlString) {
+            self.podcast.imageURL = imageUrl.absoluteString
             self.podcast.imageData = NSData(contentsOfURL: imageUrl)
+        }
+        
+        if let iTunesImageUrlString = channel.channeliTunesLogoURL, let itunesImageUrl = NSURL(string:iTunesImageUrlString) {
+            self.podcast.itunesImageURL = itunesImageUrl.absoluteString
+            self.podcast.itunesImage = NSData(contentsOfURL: itunesImageUrl)
         }
         
         if let lastModifiedDate = channel.channelDateOfLastChange {
