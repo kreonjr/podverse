@@ -103,13 +103,7 @@
                             <outlet property="delegate" destination="E8r-Op-yJY" id="3yS-wg-7Pq"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Podverse" id="KYR-Xa-7ve">
-                        <barButtonItem key="leftBarButtonItem" title="Add" id="ByJ-eV-sTa">
-                            <connections>
-                                <action selector="addPodcast:" destination="E8r-Op-yJY" id="DNT-MR-dDw"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" title="Podverse" id="KYR-Xa-7ve"/>
                     <connections>
                         <outlet property="myPodcastsTableView" destination="TWZ-nK-tJj" id="rAf-P0-bPn"/>
                         <segue destination="jDs-me-457" kind="show" identifier="Podcasts to Now Playing" id="4Uo-DI-SEB"/>
@@ -609,7 +603,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Bpm-pc-Wru">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bpm-pc-Wru">
                                 <rect key="frame" x="20" y="66" width="90" height="90"/>
                                 <animations/>
                                 <constraints>
@@ -617,21 +611,21 @@
                                     <constraint firstAttribute="width" constant="90" id="d9h-0Y-JkC"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Title" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CXq-ex-zyD">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Podcast Title" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CXq-ex-zyD">
                                 <rect key="frame" x="118" y="66" width="462" height="17"/>
                                 <animations/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Episode Title" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S5e-uh-gwH">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Episode Title" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S5e-uh-gwH">
                                 <rect key="frame" x="118" y="91" width="462" height="20"/>
                                 <animations/>
                                 <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3Ny-HB-6Yl">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="00:00" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3Ny-HB-6Yl">
                                 <rect key="frame" x="534" y="32" width="46" height="21"/>
                                 <animations/>
                                 <constraints>
@@ -641,7 +635,7 @@
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="00:00" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hda-cH-Mse">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="00:00" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hda-cH-Mse">
                                 <rect key="frame" x="20" y="32" width="46" height="21"/>
                                 <animations/>
                                 <constraints>
@@ -651,7 +645,7 @@
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b3j-as-jbT">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" misplaced="YES" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b3j-as-jbT">
                                 <rect key="frame" x="20" y="164" width="560" height="320"/>
                                 <animations/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
@@ -865,7 +859,7 @@
                                     <constraint firstItem="8hZ-se-BnP" firstAttribute="leading" secondItem="7Ed-Wd-M4c" secondAttribute="trailing" constant="8" id="zGb-m5-vlB"/>
                                 </constraints>
                             </view>
-                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="hQf-zg-87M">
+                            <slider opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="hQf-zg-87M">
                                 <rect key="frame" x="72" y="28" width="456" height="31"/>
                                 <animations/>
                                 <constraints>
@@ -875,7 +869,7 @@
                                     <action selector="sliderTimeChange:" destination="jDs-me-457" eventType="valueChanged" id="vyy-cN-hs9"/>
                                 </connections>
                             </slider>
-                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nWu-cn-Z3a">
+                            <containerView opaque="NO" contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nWu-cn-Z3a">
                                 <rect key="frame" x="0.0" y="65" width="600" height="160"/>
                                 <animations/>
                                 <constraints>
@@ -1566,6 +1560,6 @@
         <image name="Blank52" width="48" height="48"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="TGC-Eq-beX"/>
+        <segue reference="4Uo-DI-SEB"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -17,10 +17,6 @@ class PodcastsTableViewController: UITableViewController {
 
     var podcastArray = [Podcast]()
     
-    @IBAction func addPodcast(sender: AnyObject) {
-        print("does nothing for now :)")
-    }
-    
     func loadData() {
         podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
         podcastArray.sortInPlace({ $0.title < $1.title })
