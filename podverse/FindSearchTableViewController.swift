@@ -212,11 +212,13 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
             if let index = self.tableView.indexPathForSelectedRow {
                 podcastProfileViewController.searchResultPodcast = iTunesSearchPodcastArray[index.row]
             }
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
         else if segue.identifier == "Find Search to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
     }
 }

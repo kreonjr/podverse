@@ -338,12 +338,13 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             let index = self.tableView.indexPathForSelectedRow!
             PVMediaPlayer.sharedInstance.nowPlayingEpisode = episodesArray[index.row]
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
         else if segue.identifier == "Quick Play Downloaded Episode" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             PVMediaPlayer.sharedInstance.nowPlayingEpisode = sender as! Episode
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
-            
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
         else if segue.identifier == "showClips" {
             let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
@@ -356,11 +357,13 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             let index = self.tableView.indexPathForSelectedRow!
             PVMediaPlayer.sharedInstance.nowPlayingEpisode = episodesArray[index.row]
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
         else if segue.identifier == "Episodes to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
+            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
     }
     
