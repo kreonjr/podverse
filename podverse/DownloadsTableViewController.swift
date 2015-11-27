@@ -93,17 +93,16 @@ class DownloadsTableViewController: UITableViewController {
             }
         }
         
-        if let downloadProgress = episode.downloadProgress {
+        if let downloadProgress = episode.downloadProgress, let totalMediaBytes = episode.mediaBytes {
+            // Format the total bytes into a human readable KB or MB number
+            let dataFormatter = NSByteCountFormatter()
+            
             cell.progress.progress = Float(downloadProgress)
+            let currentBytesDownloaded = Int64(Float(downloadProgress) * Float(totalMediaBytes))
+            let formattedCurrentBytesDownloaded = dataFormatter.stringFromByteCount(currentBytesDownloaded)
+            let formattedTotalFileBytes = dataFormatter.stringFromByteCount(Int64(Float(totalMediaBytes)))
+            cell.progressBytes.text = "\(formattedCurrentBytesDownloaded) / \(formattedTotalFileBytes)"
         }
-        
-        // Format the total bytes into a human readable KB or MB number
-        let dataFormatter = NSByteCountFormatter()
-        let currentBytesDownloaded = Int64(Float(episode.downloadProgress!) * Float(episode.mediaBytes!))
-        let formattedCurrentBytesDownloaded = dataFormatter.stringFromByteCount(currentBytesDownloaded)
-        let formattedTotalFileBytes = dataFormatter.stringFromByteCount(Int64(Float(episode.mediaBytes!)))
-        
-        cell.progressBytes.text = "\(formattedCurrentBytesDownloaded) / \(formattedTotalFileBytes)"
         
         if episode.downloadComplete == true {
             cell.downloadStatus.text = "Finished"
