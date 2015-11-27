@@ -93,7 +93,9 @@ class DownloadsTableViewController: UITableViewController {
             }
         }
         
-        cell.progress.progress = Float(episode.downloadProgress!)
+        if let downloadProgress = episode.downloadProgress {
+            cell.progress.progress = Float(downloadProgress)
+        }
         
         // Format the total bytes into a human readable KB or MB number
         let dataFormatter = NSByteCountFormatter()
