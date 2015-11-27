@@ -151,6 +151,12 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         if let episodeDownloadIndex = getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier) {
             let episode = appDelegate.episodeDownloadArray[episodeDownloadIndex.integerValue]
             
+            var mp3OrOggFileExtension = ".mp3"
+            
+            if ((episode.mediaURL?.hasSuffix(".ogg")) == true) {
+                mp3OrOggFileExtension = ".ogg"
+            }
+            
             // If file is already downloaded for this episode, remove the old file before saving the new one
             if let fileName = episode.fileName {
                 var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
@@ -170,8 +176,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             let currentDateTime = NSDate()
             let formatter = NSDateFormatter()
             formatter.dateFormat = "ddMMyyyy-HHmmss"
-            // TODO: why must we add .mp3 to the end of the file name in order for the media player to play the file? What would happen if a downloaded file is not actually an .mp3?
-            let destinationFilename = formatter.stringFromDate(currentDateTime) + ".mp3"
+            // TODO: why must we add .mp3 or .ogg to the end of the file name in order for the media player to play the file? What would happen if a downloaded file is not actually an .mp3 or .ogg?
+            let destinationFilename = formatter.stringFromDate(currentDateTime) + mp3OrOggFileExtension
             let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(destinationFilename)
             
             do {
