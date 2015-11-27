@@ -106,6 +106,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         newEpisode.mediaBytes = NSNumber(integer: item.feedEnclosures[0].length)
         if let guid = item.feedIdentifier { newEpisode.guid = guid }
         
+        // If only parsing for the latest episode, stop parsing after parsing the first episode.
+        if shouldGetMostRecentEpisode == true {
+            latestEpisodeInFeed = newEpisode
+            parser.abortParsing()
+        }
+        
         // If episode already exists in the database, do not insert new episode, instead update existing episode
         for var existingEpisode in downloadedEpisodes {
             if newEpisode.mediaURL == existingEpisode.mediaURL {
@@ -120,12 +126,6 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         // If episode is not already saved, then add episode to the podcast object
         if !episodeAlreadySaved {
             podcast.addEpisodeObject(newEpisode)
-        }
-        
-        // If only parsing for the latest episode, stop parsing after parsing the first episode.
-        if shouldGetMostRecentEpisode == true {
-            latestEpisodeInFeed = newEpisode
-            parser.abortParsing()
         }
     }
     
