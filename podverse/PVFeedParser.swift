@@ -135,26 +135,31 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         if self.shouldGetMostRecentEpisode == true {
             if let newestFeedEpisode = latestEpisodeInFeed {
                 let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+                // TODO: BUGGY - the most recent pub date is not a reliable way to check if the 1st episode in the current feed is newer than the 1st episode in the feed stored in CoreData. One way to fix this would be to fix the FeedParser issues that are preventing some podcast and episode date/time information from being grabbed successfully.
                 let mostRecentEpisode = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: Constants.moc, predicate: podcastPredicate)[0] as! Episode
                 
-                    if latestEpisodeInFeed != mostRecentEpisode {
+                if let latestEpisodeInRSSFeed = latestEpisodeInFeed {
+                    // TODO: BUGGY - this conditional will always be TRUE in the case of Dan Carlin's podcasts. Our parser is not correctly grabbing the pubDate of the episodes, and the default behavior of the FeedParser is to return the current date/time is a valid pubDate format is not found.
+                    if latestEpisodeInRSSFeed.pubDate != mostRecentEpisode.pubDate {
                         shouldGetMostRecentEpisode = false
                         PVDownloader.sharedInstance.startDownloadingEpisode(newestFeedEpisode)
                         parsePodcastFeed(podcast.feedURL)
                     }
+                }
             }
         } else {
             print("no newer episode available, don't download")
         }
         
         // Save the parsed podcast and episode information
-        dispatch_async(dispatch_get_main_queue()) { () -> Void in
-            do {
-                try Constants.moc.save()
-            } catch {
-                print(error)
-            }
-        }
+        // TODO: Do we actually want this save to happen when the podcast feed parser is aborted? I think
+//        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+//            do {
+//                try Constants.moc.save()
+//            } catch {
+//                print(error)
+//            }
+//        }
         
     }
     
