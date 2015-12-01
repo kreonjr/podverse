@@ -93,7 +93,21 @@ class FindTableViewController: UITableViewController {
                 self.performSegueWithIdentifier("Search for Podcasts", sender: tableView)
             }
             else {
-                self.performSegueWithIdentifier("Add Podcast by RSS", sender: tableView)
+                tableView.deselectRowAtIndexPath(indexPath, animated: false)
+                var addByRSSAlert = UIAlertController(title: "Add Podcast by RSS Feed", message: "Type the RSS feed URL below.", preferredStyle: UIAlertControllerStyle.Alert)
+                
+                addByRSSAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
+                    textField.placeholder = "https://rssfeed.example.com/"
+                })
+                
+                addByRSSAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
+                
+                addByRSSAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
+                    let textField = addByRSSAlert.textFields![0] as UITextField
+                    PVSubscriber.sharedInstance.subscribeToPodcast(textField.text!)
+                }))
+                
+                presentViewController(addByRSSAlert, animated: true, completion: nil)
             }
         }
         else {
