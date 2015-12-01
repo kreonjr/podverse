@@ -1108,9 +1108,11 @@
                     </navigationItem>
                     <connections>
                         <outlet property="endHourTextField" destination="V9I-wy-3Y1" id="HbL-xe-lQ7"/>
+                        <outlet property="endLabel" destination="Wn8-1m-tUR" id="mQJ-Zq-8ei"/>
                         <outlet property="endMinuteTextField" destination="n0F-xd-zJU" id="nwL-rX-5Q8"/>
                         <outlet property="endSecTextField" destination="HXd-Bi-flD" id="Mm9-67-1Mj"/>
                         <outlet property="startHourTextField" destination="i4v-D5-zTV" id="MIK-HP-qNT"/>
+                        <outlet property="startLabel" destination="Drp-5u-1os" id="jj0-Zd-yMB"/>
                         <outlet property="startMinuteTextField" destination="jEy-ph-YKy" id="qJS-DC-pc5"/>
                         <outlet property="startSecTextField" destination="d8r-g8-hsI" id="xgo-pk-Xke"/>
                         <segue destination="Rsg-Eg-5M8" kind="show" identifier="show_add_clipTitle" id="WwC-gn-RYa"/>
