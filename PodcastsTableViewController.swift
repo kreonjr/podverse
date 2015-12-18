@@ -17,10 +17,6 @@ class PodcastsTableViewController: UITableViewController {
 
     var podcastArray = [Podcast]()
     
-    @IBAction func addPodcast(sender: AnyObject) {
-        print("does nothing for now :)")
-    }
-    
     func loadData() {
         podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
         podcastArray.sortInPlace({ $0.title < $1.title })
@@ -33,6 +29,8 @@ class PodcastsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
         // If there are any unfinished downloads in the appDelegate.episodeDownloadArray, then resume those downloads
         for episode:Episode in appDelegate.episodeDownloadArray {
@@ -190,7 +188,6 @@ class PodcastsTableViewController: UITableViewController {
             if let index = self.tableView.indexPathForSelectedRow {
                 episodesTableViewController.selectedPodcast = podcastArray[index.row]
             }
-            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         } else if segue.identifier == "Podcasts to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.returnToNowPlaying = true

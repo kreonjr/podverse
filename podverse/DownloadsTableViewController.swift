@@ -32,6 +32,8 @@ class DownloadsTableViewController: UITableViewController {
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -93,15 +95,16 @@ class DownloadsTableViewController: UITableViewController {
             }
         }
         
-        cell.progress.progress = Float(episode.downloadProgress!)
-        
-        // Format the total bytes into a human readable KB or MB number
-        let dataFormatter = NSByteCountFormatter()
-        let currentBytesDownloaded = Int64(Float(episode.downloadProgress!) * Float(episode.mediaBytes!))
-        let formattedCurrentBytesDownloaded = dataFormatter.stringFromByteCount(currentBytesDownloaded)
-        let formattedTotalFileBytes = dataFormatter.stringFromByteCount(Int64(Float(episode.mediaBytes!)))
-        
-        cell.progressBytes.text = "\(formattedCurrentBytesDownloaded) / \(formattedTotalFileBytes)"
+        if let downloadProgress = episode.downloadProgress, let totalMediaBytes = episode.mediaBytes {
+            // Format the total bytes into a human readable KB or MB number
+            let dataFormatter = NSByteCountFormatter()
+            
+            cell.progress.progress = Float(downloadProgress)
+            let currentBytesDownloaded = Int64(Float(downloadProgress) * Float(totalMediaBytes))
+            let formattedCurrentBytesDownloaded = dataFormatter.stringFromByteCount(currentBytesDownloaded)
+            let formattedTotalFileBytes = dataFormatter.stringFromByteCount(Int64(Float(totalMediaBytes)))
+            cell.progressBytes.text = "\(formattedCurrentBytesDownloaded) / \(formattedTotalFileBytes)"
+        }
         
         if episode.downloadComplete == true {
             cell.downloadStatus.text = "Finished"

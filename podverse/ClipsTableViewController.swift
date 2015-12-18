@@ -9,34 +9,37 @@
 import UIKit
 import CoreData
 
-class ClipsTableViewController: UITableViewController {
+class ClipsTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+    
+    @IBOutlet weak var tableView: UITableView!
     
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var currentEpisode: Episode!
+    @IBOutlet weak var headerView: UIView!
+    @IBOutlet weak var headerImageView: UIImageView!
     
-    var clipArray = [Clip]()
+    @IBOutlet weak var headerSummaryLabel: UILabel!
+    @IBOutlet weak var headerShadowView: UITableView!
+    
+    var selectedPodcast: Podcast!
+    var selectedEpisode: Episode!
+    
+    var clipsArray = [Clip]()
     
     func loadData() {
-        clipArray = [Clip]()
-        clipArray = CoreDataHelper.fetchEntities("Clip", managedObjectContext: Constants.moc, predicate: nil) as! [Clip]
         
+        // Clear the clips array, then retrieve and sort the clips array
+        self.clipsArray = [Clip]()
         let unsortedClips = NSMutableArray()
-
-        for singleClip in currentEpisode.clips {
+        
+        for singleClip in selectedEpisode.clips {
             let loopClip = singleClip as! Clip
             unsortedClips.addObject(loopClip)
         }
         
         let sortDescriptor = NSSortDescriptor(key: "startTime", ascending: false)
         
-//        var fullEpisodeClip = CoreDataHelper.insertManagedObject(NSStringFromClass(Clip), managedObjectContext: self.moc) as! Clip
-//        
-//        fullEpisodeClip.title = "Play Full Episode"
-//        fullEpisodeClip.startTime = "0:00"
-//        fullEpisodeClip.endTime = "12:34:56"
-        
-        clipArray = unsortedClips.sortedArrayUsingDescriptors([sortDescriptor]) as! [Clip]
+        self.clipsArray = unsortedClips.sortedArrayUsingDescriptors([sortDescriptor]) as! [Clip]
         
         self.tableView.reloadData()
     }
@@ -47,11 +50,6 @@ class ClipsTableViewController: UITableViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        loadData()
-        
-        self.title = currentEpisode.title
-        
         // If there is a now playing episode, add Now Playing button to navigation bar
         if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
@@ -60,6 +58,21 @@ class ClipsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.title = self.selectedEpisode.title
+        
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        
+        if let imageData = selectedPodcast.imageData, image = UIImage(data: imageData) {
+            headerImageView.image = image
+        }
+        else if let itunesImageData = selectedPodcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
+            headerImageView.image = itunesImage
+        }
+        
+        headerSummaryLabel.text = selectedEpisode.summary
+        
+        loadData()
     }
 
     override func didReceiveMemoryWarning() {
@@ -67,68 +80,39 @@ class ClipsTableViewController: UITableViewController {
     }
 
     // MARK: - Table view data source
-
-    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerCell = tableView.dequeueReusableCellWithIdentifier("HeaderCell") as! ClipsTableHeaderCell
-        
-        let imageData = currentEpisode.podcast.imageData
-        let itunesImageData = currentEpisode.podcast.itunesImage
-        
-        if imageData != nil {
-            let image = UIImage(data: imageData!)
-            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
-            if image!.size.height != 0.0 {
-                headerCell.pvImage?.image = image
-            }
-        }
-        else {
-            if itunesImageData != nil {
-                let itunesImage = UIImage(data: itunesImageData!)
-                
-                if itunesImage!.size.height != 0.0 {
-                    headerCell.pvImage?.image = itunesImage
-                }
-            }
-        }
-        
-        headerCell.summary!.text = PVUtility.removeHTMLFromString(currentEpisode.summary!)
-        
-        return headerCell
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return clipsArray.count
     }
     
-    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 100
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return 90
     }
     
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
-    }
-
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return clipArray.count + 1
-    }
-
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! ClipsTableCell
         
-        if indexPath.row == 0 {
-            cell.title?.text = "PLAY FULL EPISODE"
-            cell.startTimeEndTime?.text = "2:34:56"
-            cell.totalTime?.text = ""
-            cell.score?.text = "1234"
-        } else {
-            cell.title?.text = clipArray[indexPath.row].title
-            cell.startTimeEndTime?.text = "1:12:34 - 1:23:45"
-            cell.totalTime?.text = "10m 11s"
-            cell.score?.text = "1234"
+        let clip = clipsArray[indexPath.row]
+        
+        if let title = clip.title {
+            cell.title?.text = title
         }
         
+        if let duration = clip.duration {
+            cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(duration)
+        }
+        
+        var startTime: String
+        var endTime: String?
+        startTime = clip.startTime.stringValue
+        if let endT = clip.endTime {
+            endTime = " - " + endT.stringValue
+        }
+        cell.startTimeEndTime.text = startTime + endTime!
+        
+        cell.sharesTotal.text = "Shares: 123"
+        
         return cell
-    }
-    
-    override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 100
     }
 
     /*
@@ -175,12 +159,10 @@ class ClipsTableViewController: UITableViewController {
             
             let index = self.tableView.indexPathForSelectedRow!
             if index.row == 0 {
-                PVMediaPlayer.sharedInstance.nowPlayingEpisode = currentEpisode
+                PVMediaPlayer.sharedInstance.nowPlayingEpisode = selectedEpisode
             } else {
-                PVMediaPlayer.sharedInstance.nowPlayingClip = clipArray[index.row]
+                PVMediaPlayer.sharedInstance.nowPlayingClip = clipsArray[index.row]
             }
-            
-            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
             
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         } else if segue.identifier == "Clips to Now Playing" {

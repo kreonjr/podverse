@@ -84,10 +84,16 @@ class MediaPlayerViewController: UIViewController {
             // Load the Episode into the AVPlayer
             pvMediaPlayer.loadEpisodeMediaFileOrStream(pvMediaPlayer.nowPlayingEpisode)
             
-            // TODO: Load the Clip into the AVPlayer
-            
-            PVMediaPlayer.sharedInstance.playOrPause()
-            playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+            // If the episode has a playback position, then continue from that point
+            if let playbackPosition = pvMediaPlayer.nowPlayingEpisode.playbackPosition {
+                PVMediaPlayer.sharedInstance.goToTime(Float64(playbackPosition))
+                playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+            }
+            // Else start playing from the beginning
+            else {
+                PVMediaPlayer.sharedInstance.playOrPause()
+                playPauseButton.setTitle("\u{f04c}", forState: .Normal)
+            }
         }
     }
     
@@ -162,8 +168,8 @@ class MediaPlayerViewController: UIViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateNowPlayingCurrentTime:", name:
             Constants.kNowPlayingTimeHasChanged, object: nil)
         
-        // Start timer to check every second if the now playing current time has changed
-        nowPlayingCurrentTimeTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: "updateNowPlayingCurrentTimeNotification", userInfo: nil, repeats: true)
+        // Start timer to check every half second if the now playing current time has changed
+        nowPlayingCurrentTimeTimer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "updateNowPlayingCurrentTimeNotification", userInfo: nil, repeats: true)
         
         // If currentTime != 0.0, then immediately insert the currentTime in its label; else manually set the currentTime label to 00:00.
         if CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()) != 0.0 {

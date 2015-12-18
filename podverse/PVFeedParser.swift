@@ -31,16 +31,16 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func parsePodcastFeed(feedURLString: String) {
-        feedURL = feedURLString
-        
-        // Create, configure, and start the feedParser
-        let feedParser = CustomFeedParser(feedURL: feedURLString)
-        feedParser.delegate = self
-        feedParser.parsingType = .Full
-
-        feedParser.parse()
-        
-        print("feedParser did start")
+        // Parse podcast feeds on the reentrantAvoidanceQueue in order to prevent the "NSXMLParser does not support reentrant parsing" issue.
+        let reentrantAvoidanceQueue = dispatch_queue_create("reentrantAvoidanceQueue", DISPATCH_QUEUE_SERIAL);
+        dispatch_async(reentrantAvoidanceQueue){
+            self.feedURL = feedURLString
+            let feedParser = CustomFeedParser(feedURL: feedURLString)
+            feedParser.delegate = self
+            feedParser.parsingType = .Full
+            feedParser.parse()
+            print("feedParser did start")
+        }
     }
     
     func feedParser(parser: FeedParser, didParseChannel channel: FeedChannel) {
@@ -66,9 +66,15 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         podcast.feedURL = feedURL
         
         //Look into maybe adding it in the library manually
-        //if let itunesAuthor = channel.itunesAuthor { podcast.itunesAuthor = itunesAuthor }
+
         if let imageUrlString = channel.channelLogoURL, let imageUrl = NSURL(string:imageUrlString) {
+            self.podcast.imageURL = imageUrl.absoluteString
             self.podcast.imageData = NSData(contentsOfURL: imageUrl)
+        }
+        
+        if let iTunesImageUrlString = channel.channeliTunesLogoURL, let itunesImageUrl = NSURL(string:iTunesImageUrlString) {
+            self.podcast.itunesImageURL = itunesImageUrl.absoluteString
+            self.podcast.itunesImage = NSData(contentsOfURL: itunesImageUrl)
         }
         
         if let lastModifiedDate = channel.channelDateOfLastChange {
@@ -100,6 +106,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         newEpisode.mediaBytes = NSNumber(integer: item.feedEnclosures[0].length)
         if let guid = item.feedIdentifier { newEpisode.guid = guid }
         
+        // If only parsing for the latest episode, stop parsing after parsing the first episode.
+        if shouldGetMostRecentEpisode == true {
+            latestEpisodeInFeed = newEpisode
+            parser.abortParsing()
+        }
+        
         // If episode already exists in the database, do not insert new episode, instead update existing episode
         for var existingEpisode in downloadedEpisodes {
             if newEpisode.mediaURL == existingEpisode.mediaURL {
@@ -115,12 +127,6 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         if !episodeAlreadySaved {
             podcast.addEpisodeObject(newEpisode)
         }
-        
-        // If only parsing for the latest episode, stop parsing after parsing the first episode.
-        if shouldGetMostRecentEpisode == true {
-            latestEpisodeInFeed = newEpisode
-            parser.abortParsing()
-        }
     }
     
     func feedParserParsingAborted(parser: FeedParser) {
@@ -129,26 +135,31 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         if self.shouldGetMostRecentEpisode == true {
             if let newestFeedEpisode = latestEpisodeInFeed {
                 let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+                // TODO: BUGGY - the most recent pub date is not a reliable way to check if the 1st episode in the current feed is newer than the 1st episode in the feed stored in CoreData. One way to fix this would be to fix the FeedParser issues that are preventing some podcast and episode date/time information from being grabbed successfully.
                 let mostRecentEpisode = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: Constants.moc, predicate: podcastPredicate)[0] as! Episode
                 
-                    if latestEpisodeInFeed != mostRecentEpisode {
+                if let latestEpisodeInRSSFeed = latestEpisodeInFeed {
+                    // TODO: BUGGY - this conditional will always be TRUE in the case of Dan Carlin's podcasts. Our parser is not correctly grabbing the pubDate of the episodes, and the default behavior of the FeedParser is to return the current date/time is a valid pubDate format is not found.
+                    if latestEpisodeInRSSFeed.pubDate != mostRecentEpisode.pubDate {
                         shouldGetMostRecentEpisode = false
                         PVDownloader.sharedInstance.startDownloadingEpisode(newestFeedEpisode)
                         parsePodcastFeed(podcast.feedURL)
                     }
+                }
             }
         } else {
             print("no newer episode available, don't download")
         }
         
         // Save the parsed podcast and episode information
-        dispatch_async(dispatch_get_main_queue()) { () -> Void in
-            do {
-                try Constants.moc.save()
-            } catch {
-                print(error)
-            }
-        }
+        // TODO: Do we actually want this save to happen when the podcast feed parser is aborted? I think
+//        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+//            do {
+//                try Constants.moc.save()
+//            } catch {
+//                print(error)
+//            }
+//        }
         
     }
     

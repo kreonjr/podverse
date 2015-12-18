@@ -25,10 +25,17 @@ class FindTableViewController: UITableViewController {
         if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
+        
+        // Set navigation bar styles
+        self.navigationItem.title = "Find"
+        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
+        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
     }
 
     override func didReceiveMemoryWarning() {
@@ -87,7 +94,21 @@ class FindTableViewController: UITableViewController {
                 self.performSegueWithIdentifier("Search for Podcasts", sender: tableView)
             }
             else {
-                self.performSegueWithIdentifier("Add Podcast by RSS", sender: tableView)
+                tableView.deselectRowAtIndexPath(indexPath, animated: false)
+                var addByRSSAlert = UIAlertController(title: "Add Podcast by RSS Feed", message: "Type the RSS feed URL below.", preferredStyle: UIAlertControllerStyle.Alert)
+                
+                addByRSSAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
+                    textField.placeholder = "https://rssfeed.example.com/"
+                })
+                
+                addByRSSAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
+                
+                addByRSSAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
+                    let textField = addByRSSAlert.textFields![0] as UITextField
+                    PVSubscriber.sharedInstance.subscribeToPodcast(textField.text!)
+                }))
+                
+                presentViewController(addByRSSAlert, animated: true, completion: nil)
             }
         }
         else {
@@ -134,10 +155,7 @@ class FindTableViewController: UITableViewController {
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "Search For Podcasts" {
-            
-        }
-        else if segue.identifier == "Find to Now Playing" {
+        if segue.identifier == "Find to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true

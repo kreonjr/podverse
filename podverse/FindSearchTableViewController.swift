@@ -125,6 +125,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
     }
     
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {

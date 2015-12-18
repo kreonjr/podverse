@@ -29,6 +29,12 @@ class CustomFeedParser:FeedParser {
         else if self.currentPath == "/rss/channel/image/url"{
             self.currentFeedChannel?.channelLogoURL = self.currentElementContent
         }
+        else if self.currentPath == "/rss/channel/itunes:image" {
+            let currentAttributes = self.currentElementAttributes
+            if let channeliTunesLogoURL = currentAttributes["href"] {
+                self.currentFeedChannel?.channeliTunesLogoURL = channeliTunesLogoURL as? String
+            }
+        }
         else if self.currentPath == "/rss/channel/item/itunes:duration" {
             // if the : is present, then the duration is in hh:mm:ss
             if self.currentElementContent.containsString(":") {
