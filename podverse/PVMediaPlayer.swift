@@ -48,18 +48,14 @@ class PVMediaPlayer: NSObject {
     }
     
     func playOrPause() -> (Bool) {
+       
+        self.setPlayingInfo(self.nowPlayingEpisode)
+        
         if avPlayer.rate == 0 {
-            if let clipTitle = self.nowPlayingEpisode.title {
-                self.setPlayingInfo(self.nowPlayingEpisode.podcast.title, clipTitle: clipTitle)
-            } else {
-                self.setPlayingInfo(self.nowPlayingEpisode.podcast.title, clipTitle: "")
-            }
-            
             avPlayer.play()
             return true
 
         } else {
-            self.setPlayingInfo(self.nowPlayingEpisode.podcast.title, clipTitle: self.nowPlayingEpisode.title!)
             saveCurrentTimeAsPlaybackPosition()
             avPlayer.pause()
             return false
@@ -92,8 +88,26 @@ class PVMediaPlayer: NSObject {
         }
     }
     
-    func setPlayingInfo(podcastTitle: String, clipTitle: String) {
-        MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: clipTitle]
+    func setPlayingInfo(episode: Episode) {
+        var podcastTitle: String!
+        var episodeTitle: String!
+        var mpImage: MPMediaItemArtwork!
+        
+        podcastTitle = self.nowPlayingEpisode.podcast.title
+        
+        if let eTitle = self.nowPlayingEpisode.title {
+            episodeTitle = eTitle
+        }
+        
+        if let podcastiTunesImageData = self.nowPlayingEpisode.podcast.itunesImage {
+            let podcastiTunesImage = UIImage(data: podcastiTunesImageData)
+            mpImage = MPMediaItemArtwork(image: podcastiTunesImage!)
+        } else if let podcastImageData = self.nowPlayingEpisode.podcast.imageData {
+            let podcastImage = UIImage(data: podcastImageData)
+            mpImage = MPMediaItemArtwork(image: podcastImage!)
+        }
+        
+        MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: episodeTitle, MPMediaItemPropertyArtwork: mpImage]
     }
     
     func goToTime(seconds: Float64) {
@@ -129,6 +143,8 @@ class PVMediaPlayer: NSObject {
     
     func loadEpisodeMediaFileOrStream(episode: Episode) {
         nowPlayingEpisode = episode
+        
+        self.setPlayingInfo(nowPlayingEpisode)
         
         if episode.fileName != nil {
             var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
