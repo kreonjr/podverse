@@ -50,7 +50,9 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 print(error)
             }
             
+            let task = beginBackgroundTask()
             downloadTask.resume()
+            endBackgroundTask(task)
         }
     }
     
@@ -247,5 +249,20 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         
         return nil
     }
+    
+    func executeIfBackground(synchronousFunction: () -> ()) {
+        
+    }
+    
+    
+    func beginBackgroundTask() -> UIBackgroundTaskIdentifier {
+        return UIApplication.sharedApplication().beginBackgroundTaskWithExpirationHandler({})
+    }
+
+    func endBackgroundTask(taskID: UIBackgroundTaskIdentifier) {
+        UIApplication.sharedApplication().endBackgroundTask(taskID)
+    }
+    
+    
     
 }
