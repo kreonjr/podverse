@@ -917,8 +917,8 @@
                                     <segue destination="bYg-qw-sLf" kind="embed" identifier="show_clip_maker" id="Rg6-zu-quq"/>
                                 </connections>
                             </containerView>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b3j-as-jbT">
-                                <rect key="frame" x="20" y="208" width="560" height="184"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b3j-as-jbT">
+                                <rect key="frame" x="20" y="208" width="560" height="287"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                 <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -929,11 +929,13 @@
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="3Ny-HB-6Yl" firstAttribute="trailing" secondItem="dap-xu-mj6" secondAttribute="trailingMargin" id="47n-Pt-oLt"/>
+                            <constraint firstItem="b3j-as-jbT" firstAttribute="leading" secondItem="dap-xu-mj6" secondAttribute="leadingMargin" id="7sr-f7-8sH"/>
                             <constraint firstItem="hQf-zg-87M" firstAttribute="leading" secondItem="Hda-cH-Mse" secondAttribute="trailing" constant="8" id="9DR-Uq-o6z"/>
                             <constraint firstItem="HuG-Be-hwC" firstAttribute="bottom" secondItem="dap-xu-mj6" secondAttribute="bottomMargin" id="AIX-XY-tPf"/>
                             <constraint firstItem="HuG-Be-hwC" firstAttribute="leading" secondItem="dap-xu-mj6" secondAttribute="leadingMargin" constant="-16" id="F3w-zq-IM9"/>
                             <constraint firstItem="3Ny-HB-6Yl" firstAttribute="leading" secondItem="hQf-zg-87M" secondAttribute="trailing" constant="8" id="Mly-5G-VVz"/>
                             <constraint firstItem="hQf-zg-87M" firstAttribute="top" secondItem="PKb-Gm-sAU" secondAttribute="bottom" constant="8" id="P77-Zo-2cp"/>
+                            <constraint firstItem="b3j-as-jbT" firstAttribute="top" secondItem="Bpm-pc-Wru" secondAttribute="bottom" constant="8" id="QVm-VF-QzE"/>
                             <constraint firstItem="Bpm-pc-Wru" firstAttribute="leading" secondItem="dap-xu-mj6" secondAttribute="leadingMargin" id="SxB-9V-LEY"/>
                             <constraint firstItem="Hda-cH-Mse" firstAttribute="leading" secondItem="dap-xu-mj6" secondAttribute="leadingMargin" id="Tqf-5K-ChP"/>
                             <constraint firstItem="S5e-uh-gwH" firstAttribute="trailing" secondItem="dap-xu-mj6" secondAttribute="trailingMargin" id="Uq8-mf-2sI"/>
@@ -944,8 +946,10 @@
                             <constraint firstItem="S5e-uh-gwH" firstAttribute="top" secondItem="CXq-ex-zyD" secondAttribute="bottom" constant="8" id="iwj-04-cEe"/>
                             <constraint firstItem="Bpm-pc-Wru" firstAttribute="top" secondItem="hQf-zg-87M" secondAttribute="bottom" constant="8" id="lVP-vq-5Ze"/>
                             <constraint firstItem="Hda-cH-Mse" firstAttribute="top" secondItem="PKb-Gm-sAU" secondAttribute="bottom" constant="12" id="mdw-bL-Zpb"/>
+                            <constraint firstItem="b3j-as-jbT" firstAttribute="trailing" secondItem="dap-xu-mj6" secondAttribute="trailingMargin" id="q3k-dS-6DW"/>
                             <constraint firstAttribute="bottomMargin" secondItem="Q0k-LP-hIb" secondAttribute="bottom" constant="57" id="u5C-Uv-1Bu"/>
                             <constraint firstItem="3Ny-HB-6Yl" firstAttribute="top" secondItem="PKb-Gm-sAU" secondAttribute="bottom" constant="12" id="uRx-d0-Fwn"/>
+                            <constraint firstItem="Q0k-LP-hIb" firstAttribute="top" secondItem="b3j-as-jbT" secondAttribute="bottom" constant="8" id="udX-2e-rdV"/>
                             <constraint firstItem="CXq-ex-zyD" firstAttribute="leading" secondItem="Bpm-pc-Wru" secondAttribute="trailing" constant="8" id="vWJ-hM-IjA"/>
                             <constraint firstAttribute="trailingMargin" secondItem="HuG-Be-hwC" secondAttribute="trailing" constant="-16" id="vym-RX-kRZ"/>
                         </constraints>
