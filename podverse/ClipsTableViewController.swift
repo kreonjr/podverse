@@ -61,6 +61,8 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
         
         self.title = self.selectedEpisode.title
         
+        self.automaticallyAdjustsScrollViewInsets = false
+        
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
         if let imageData = selectedPodcast.imageData, image = UIImage(data: imageData) {
