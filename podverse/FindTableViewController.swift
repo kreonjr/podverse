@@ -95,7 +95,7 @@ class FindTableViewController: UITableViewController {
             }
             else {
                 tableView.deselectRowAtIndexPath(indexPath, animated: false)
-                var addByRSSAlert = UIAlertController(title: "Add Podcast by RSS Feed", message: "Type the RSS feed URL below.", preferredStyle: UIAlertControllerStyle.Alert)
+                let addByRSSAlert = UIAlertController(title: "Add Podcast by RSS Feed", message: "Type the RSS feed URL below.", preferredStyle: UIAlertControllerStyle.Alert)
                 
                 addByRSSAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
                     textField.placeholder = "https://rssfeed.example.com/"
