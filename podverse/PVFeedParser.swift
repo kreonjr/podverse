@@ -123,6 +123,9 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             }
         }
         
+        // TODO: I'm not sure why I need to do this to get the rest of the app to work. By setting the taskIdentifier = nil it allows for checking whether the taskIdentifier is nil or not in other places in the app.
+        newEpisode.taskIdentifier = nil
+        
         // If episode is not already saved, then add episode to the podcast object
         if !episodeAlreadySaved {
             podcast.addEpisodeObject(newEpisode)

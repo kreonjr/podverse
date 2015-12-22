@@ -80,6 +80,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let playCommand = rcc.playCommand
         playCommand.addTarget(self, action: "playOrPauseEvent")
         
+        // TODO: Currently we are setting taskIdentifier values = nil on app launch. This will probably need to change once we add crash handling for resuming downloads
+        let episodeArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: nil) as! [Episode]
+        for episode in episodeArray {
+            episode.taskIdentifier = nil
+        }
+        
         startCheckSubscriptionsForNewEpisodesTimer()
         
         return true

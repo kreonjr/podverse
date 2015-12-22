@@ -74,7 +74,7 @@ class EpisodesShowAllViewController: UIViewController, UITableViewDataSource, UI
                 self.performSegueWithIdentifier("Quick Play Downloaded Episode", sender: selectedEpisode)
             } else {
                 PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
-                cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
+                cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
             }
         }
     }
@@ -159,16 +159,16 @@ class EpisodesShowAllViewController: UIViewController, UITableViewDataSource, UI
         // Set icon conditionally if is downloaded, is downloading, or has not downloaded
         // If filename exists, then episode is downloaded and display play button
         if episode.fileName != nil {
-            cell.downloadPlayButton.setTitle("\u{f04b}", forState: .Normal)
+            cell.downloadPlayButton.setTitle("Play", forState: .Normal)
         }
             // Else if episode is downloading, then display downloading icon
             // TODO: why is the taskIdentifier sometimes getting turned into -1???
         else if (episode.taskIdentifier != nil) {
-            cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
+            cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
         }
             // Else display the start download icon
         else {
-            cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
+            cell.downloadPlayButton.setTitle("DL", forState: .Normal)
         }
         
         cell.downloadPlayButton.addTarget(self, action: "downloadPlay:", forControlEvents: .TouchUpInside)
@@ -187,7 +187,6 @@ class EpisodesShowAllViewController: UIViewController, UITableViewDataSource, UI
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        // If not the last item in the array, then perform selected episode actions
         if indexPath.row < episodesArray.count {
             let episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
             let selectedEpisode = episodesArray[indexPath.row]
@@ -196,21 +195,19 @@ class EpisodesShowAllViewController: UIViewController, UITableViewDataSource, UI
                     self.performSegueWithIdentifier("playDownloadedEpisode", sender: nil)
                 }))
             } else {
-                episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
-                    
-                    PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
-                    
-                    let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
-                    
-                    if (selectedEpisode.taskIdentifier != nil) {
-                        cell.downloadPlayButton.setTitle("\u{f110}", forState: .Normal)
-                    } else {
-                        cell.downloadPlayButton.setTitle("\u{f019}", forState: .Normal)
-                    }
-                    dispatch_async(dispatch_get_main_queue()) {
-                        self.tableView.reloadData()
-                    }
-                }))
+                if selectedEpisode.fileName != nil {
+                    episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
+                        self.performSegueWithIdentifier("playDownloadedEpisode", sender: nil)
+                    }))
+                } else if selectedEpisode.taskIdentifier != nil {
+                    episodeActions.addAction(UIAlertAction(title: "Downloading Episode", style: .Default, handler: nil))
+                } else {
+                    episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
+                        PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
+                        let cell = tableView.cellForRowAtIndexPath(indexPath) as! EpisodesTableCell
+                        cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
+                    }))
+                }
             }
             
             let totalClips = "(123)"
@@ -228,10 +225,6 @@ class EpisodesShowAllViewController: UIViewController, UITableViewDataSource, UI
             episodeActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
             
             self.presentViewController(episodeActions, animated: true, completion: nil)
-        }
-            // Else segue to show All Episodes controller
-        else {
-            self.performSegueWithIdentifier("Show All Episodes", sender: nil)
         }
     }
     
