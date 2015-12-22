@@ -78,10 +78,10 @@ class PVMediaPlayer: NSObject {
             switch event.subtype {
             case UIEventSubtype.RemoteControlPlay:
                 self.playOrPause()
+                break
             case UIEventSubtype.RemoteControlPause:
                 self.playOrPause()
-            case UIEventSubtype.RemoteControlTogglePlayPause:
-                self.playOrPause()
+                break
             default:
                 break
             }
