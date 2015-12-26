@@ -14,8 +14,6 @@ class FindTableViewController: UITableViewController {
     
     var findSearchArray = ["Search for Podcasts", "Add Podcast by RSS"]
     
-    var findBrowseArray = ["All", "ABC", "DEF", "GHI"]
-    
     func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Find to Now Playing", sender: nil)
     }
@@ -46,18 +44,11 @@ class FindTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 2
+        return 1
     }
     
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        
-        if (section == 0) {
-            return ""
-        }
-        else {
-            return "Browse"
-        }
-        
+        return ""
     }
     
     override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -65,25 +56,14 @@ class FindTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if (section == 0) {
-            return findSearchArray.count
-        }
-        else {
-            return findBrowseArray.count
-        }
+        return findSearchArray.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
 
-        if indexPath.section == 0 {
-            let title = findSearchArray[indexPath.row]
-            cell.textLabel!.text = title
-        }
-        else {
-            let title = findBrowseArray[indexPath.row]
-            cell.textLabel!.text = title
-        }
+        let title = findSearchArray[indexPath.row]
+        cell.textLabel!.text = title
 
         return cell
     }
