@@ -77,8 +77,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             self.podcast.itunesImage = NSData(contentsOfURL: itunesImageUrl)
         }
         
-        if let lastModifiedDate = channel.channelDateOfLastChange {
-            self.podcast.lastPubDate = lastModifiedDate
+        if let lastBuildDate = channel.channelLastBuildDate {
+            self.podcast.lastBuildDate = lastBuildDate
+        }
+        
+        if let lastPubDate = channel.channelLastPubDate {
+            self.podcast.lastPubDate = lastPubDate
         }
         
         podcast.isSubscribed = self.shouldSubscribeToPodcast

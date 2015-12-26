@@ -48,10 +48,10 @@ class CustomFeedParser:FeedParser {
             }
         }
         else if self.currentPath == "/rss/channel/lastBuildDate" {
-            self.currentFeedChannel?.channelDateOfLastChange = NSDate(fromString: self.currentElementContent, format: .ISO8601)
+            self.currentFeedChannel?.channelLastBuildDate = NSDate(fromString: self.currentElementContent, format: .RFC822)
         }
         else if self.currentPath == "/rss/channel/pubDate" {
-            self.currentFeedItem?.feedPubDate = NSDate(fromString: self.currentElementContent, format: .ISO8601)
+            self.currentFeedChannel?.channelLastPubDate = NSDate(fromString: self.currentElementContent, format: .RFC822)
         }
         
         

@@ -20,7 +20,8 @@ class FeedChannel: NSObject {
     var channeliTunesLogoURL: String?
     var channeliTunesLogo: UIImage?
     var channelLanguage: String?
-    var channelDateOfLastChange: NSDate?
+    var channelLastBuildDate: NSDate?
+    var channelLastPubDate: NSDate?
     var channelCategory: String?
     var channelID: Int? // from the READY API
     
@@ -51,7 +52,8 @@ class FeedChannel: NSObject {
         if (channelLogoURL != nil) { desc += "\t- Logo URL: \(channelLogoURL)\n" }
         if (channeliTunesLogoURL != nil) { desc += "\t- iTunes Logo URL: \(channeliTunesLogoURL)\n" }
         if (channelLanguage != nil) { desc += "\t- Language: \(channelLanguage)\n" }
-        if (channelDateOfLastChange != nil) { desc += "\t- Date of last change: \(channelDateOfLastChange)\n" }
+        if (channelLastBuildDate != nil) { desc += "\t- Date of last build: \(channelLastBuildDate)\n" }
+        if (channelLastPubDate != nil) { desc += "\t- Date of last pub: \(channelLastPubDate)\n" }
         if (channelCategory != nil) { desc += "\t- Category: \(channelCategory)\n" }
         
         return desc + "\n"

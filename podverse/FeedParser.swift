@@ -302,7 +302,7 @@ class FeedParser: NSObject, NSXMLParserDelegate {
             
         // pub date
         else if self.currentPath == "/feed/updated" {
-            self.currentFeedChannel?.channelDateOfLastChange = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
+            self.currentFeedChannel?.channelLastBuildDate = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
         }
         else if self.currentPath == "/feed/entry/updated" {
             self.currentFeedItem?.feedPubDate = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
@@ -378,7 +378,7 @@ class FeedParser: NSObject, NSXMLParserDelegate {
             
         // pub date
         else if self.currentPath == "/rss/channel/item/lastBuildDate" {
-            self.currentFeedChannel?.channelDateOfLastChange = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
+            self.currentFeedChannel?.channelLastBuildDate = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
         }
         else if self.currentPath == "/rss/channel/item/pubDate" {
             self.currentFeedItem?.feedPubDate = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
@@ -480,7 +480,7 @@ class FeedParser: NSObject, NSXMLParserDelegate {
             
         // pub date
         else if self.currentPath == "/rdf:RDF/channel/dc:date" {
-            self.currentFeedChannel?.channelDateOfLastChange = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
+            self.currentFeedChannel?.channelLastBuildDate = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
         }
         else if self.currentPath == "/rdf:RDF/item/dc:date" {
             self.currentFeedItem?.feedPubDate = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
