@@ -48,23 +48,73 @@ extension NSDate {
                 
             case .RFC822:
                 
-                var s  = string
-                if string.hasSuffix("Z") {
-                    s = s.substringToIndex(s.length-1) + "GMT"
-                } else if string.hasSuffix("+0000") {
-                    s = s.substringToIndex(s.length-5) + "GMT"
-                } else if string.hasSuffix("+00:00") {
-                    s = s.substringToIndex(s.length-6) + "GMT"
-                }
+// PODVERSE: the block of code was commented out below and replaced with the uncommented block below it.
+//                var s  = string
+//                if string.hasSuffix("Z") {
+//                    s = s.substringToIndex(s.length-1) + "GMT"
+//                } else if string.hasSuffix("+0000") {
+//                    s = s.substringToIndex(s.length-5) + "GMT"
+//                } else if string.hasSuffix("+00:00") {
+//                    s = s.substringToIndex(s.length-6) + "GMT"
+//                }
+//                let formatter = NSDateFormatter()
+//                formatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
+//                formatter.dateFormat = "EEE, d MMM yyyy HH:mm:ss ZZZ"
+//                if let date = formatter.dateFromString(string as String) {
+//                    self.init(timeInterval:0, sinceDate:date)
+//                } else {
+//                    self.init()
+//                }
+                
+                // PODVERSE: this block of code was implemented based on the Stack Overflow answer at http://stackoverflow.com/questions/1850824/parsing-a-rfc-822-date-with-nsdateformatter
+                var date: NSDate!
+                let RFC822String = string.uppercaseString
                 let formatter = NSDateFormatter()
                 formatter.locale = NSLocale(localeIdentifier: "en_US_POSIX")
-                formatter.dateFormat = "EEE, d MMM yyyy HH:mm:ss ZZZ"
-                if let date = formatter.dateFromString(string as String) {
+                
+                if string.rangeOfString(",").location != NSNotFound {
+                    if (date == nil) { // Sun, 19 May 2002 15:21:36 GMT
+                        formatter.dateFormat = "EEE, d MMM yyyy HH:mm:ss zzz"
+                        date = formatter.dateFromString(RFC822String)
+                    }
+                    if (date == nil) { // Sun, 19 May 2002 15:21 GMT
+                        formatter.dateFormat = "EEE, d MMM yyyy HH:mm zzz"
+                        date = formatter.dateFromString(RFC822String)
+                    }
+                    if (date == nil) { // Sun, 19 May 2002 15:21:36
+                        formatter.dateFormat = "EEE, d MMM yyyy HH:mm:ss"
+                        date = formatter.dateFromString(RFC822String)
+                    }
+                    if (date == nil) { // Sun, 19 May 2002 15:21
+                        formatter.dateFormat = "EEE, d MMM yyyy HH:mm"
+                        date = formatter.dateFromString(RFC822String)
+                    }
+                } else {
+                    if (date == nil) { // 19 May 2002 15:21:36 GMT
+                        formatter.dateFormat = "d MMM yyyy HH:mm:ss zzz"
+                        date = formatter.dateFromString(RFC822String)
+                    }
+                    if (date == nil) { // 19 May 2002 15:21 GMT
+                        formatter.dateFormat = "d MMM yyyy HH:mm zzz"
+                        date = formatter.dateFromString(RFC822String)
+                    }
+                    if (date == nil) { // 19 May 2002 15:21:36
+                        formatter.dateFormat = "d MMM yyyy HH:mm:ss"
+                        date = formatter.dateFromString(RFC822String)
+                    }
+                    if (date == nil) { // 19 May 2002 15:21
+                        formatter.dateFormat = "d MMM yyyy HH:mm"
+                        date = formatter.dateFromString(RFC822String)
+                    }
+                }
+
+                if (date != nil) {
                     self.init(timeInterval:0, sinceDate:date)
                 } else {
+                    NSLog("Could not parse RFC822 date: \"%@\" Possibly invalid format.", string);
                     self.init()
                 }
-            
+
             case .IncompleteRFC822:
                 
                 var s  = string
