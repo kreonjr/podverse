@@ -978,7 +978,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gtd-Og-dc0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4531" y="1021"/>
+            <point key="canvasLocation" x="4510" y="1021"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="jNn-5c-44i">
@@ -1085,40 +1085,40 @@
                                 </subviews>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" misplaced="YES" distribution="fillEqually" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="kyG-vS-Uez">
-                                <rect key="frame" x="20" y="49" width="560" height="360000000000"/>
+                                <rect key="frame" x="20" y="49" width="560" height="36000000000"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Start Time" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZiT-Ad-sPE">
-                                        <rect key="frame" x="0.0" y="0.0" width="89" height="360000000000"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="89" height="36000000000"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Hour" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="I2O-58-tB4">
-                                        <rect key="frame" x="94" y="0.0" width="90" height="360000000000"/>
+                                        <rect key="frame" x="94" y="0.0" width="90" height="36000000000"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text=" " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jHA-Td-9V0">
-                                        <rect key="frame" x="189" y="0.0" width="89" height="360000000000"/>
+                                        <rect key="frame" x="189" y="0.0" width="89" height="36000000000"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Min" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JaU-g9-5A6">
-                                        <rect key="frame" x="283" y="0.0" width="89" height="360000000000"/>
+                                        <rect key="frame" x="283" y="0.0" width="89" height="36000000000"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hWt-Ob-2nq">
-                                        <rect key="frame" x="377" y="0.0" width="90" height="360000000000"/>
+                                        <rect key="frame" x="377" y="0.0" width="90" height="36000000000"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Sec" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u7u-Tb-s7n">
-                                        <rect key="frame" x="471" y="0.0" width="89" height="360000000000"/>
+                                        <rect key="frame" x="471" y="0.0" width="89" height="36000000000"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
@@ -1320,88 +1320,107 @@
                         <barButtonItem key="backBarButtonItem" title=" " id="ju5-3M-fuB"/>
                     </navigationItem>
                     <connections>
-                        <segue destination="Zus-al-Nm1" kind="show" identifier="Search for Podcasts" id="nj9-9n-9wD"/>
                         <segue destination="jDs-me-457" kind="show" identifier="Find to Now Playing" id="TGC-Eq-beX"/>
+                        <segue destination="RGb-c9-5c2" kind="show" identifier="Search for Podcasts" id="3FJ-Fu-qtZ"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sKU-bf-j6c" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2382" y="1765"/>
         </scene>
-        <!--Search for Podcasts-->
-        <scene sceneID="u37-jq-EDV">
+        <!--Find Podcasts-->
+        <scene sceneID="yYP-K2-f7A">
             <objects>
-                <tableViewController title="Search for Podcasts" id="Zus-al-Nm1" customClass="FindSearchTableViewController" customModule="podverse" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="100" sectionHeaderHeight="22" sectionFooterHeight="22" id="TFW-Dg-W6k">
+                <viewController storyboardIdentifier="Find Search View Controller" title="Find Podcasts" automaticallyAdjustsScrollViewInsets="NO" id="RGb-c9-5c2" customClass="FindSearchTableViewController" customModule="podverse" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="nom-NU-ede"/>
+                        <viewControllerLayoutGuide type="bottom" id="jTT-fg-X4h"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="Uek-aW-JxX">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <searchBar key="tableHeaderView" contentMode="redraw" id="fUv-R6-hrd">
-                            <rect key="frame" x="0.0" y="64" width="600" height="44"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
-                            <textInputTraits key="textInputTraits"/>
-                            <connections>
-                                <outlet property="delegate" destination="Zus-al-Nm1" id="iQb-Md-wxn"/>
-                            </connections>
-                        </searchBar>
-                        <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" rowHeight="100" id="Dgi-ob-iwI" customClass="FindSearchTableViewCell" customModule="podverse" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="130" width="600" height="100"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Dgi-ob-iwI" id="0kH-gH-62x">
-                                    <rect key="frame" x="0.0" y="0.0" width="600" height="99.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Title" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f7t-2z-hmL">
-                                            <rect key="frame" x="99" y="8" width="493" height="18"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
-                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="dHC-hP-IBU">
-                                            <rect key="frame" x="8" y="8" width="83" height="83"/>
+                        <subviews>
+                            <searchBar contentMode="redraw" text="" translatesAutoresizingMaskIntoConstraints="NO" id="JA2-8J-nh6">
+                                <rect key="frame" x="0.0" y="64" width="600" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="YLM-5B-u8k"/>
+                                </constraints>
+                                <textInputTraits key="textInputTraits"/>
+                            </searchBar>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="100" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Fb6-Sb-O07">
+                                <rect key="frame" x="0.0" y="108" width="600" height="443"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="100" id="eSz-IU-2In" customClass="FindSearchTableViewCell" customModule="podverse" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="28" width="600" height="100"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="eSz-IU-2In" id="uMr-Se-Xrh">
+                                            <rect key="frame" x="0.0" y="0.0" width="600" height="99.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="5Sr-MD-ObL">
+                                                    <rect key="frame" x="8" y="8" width="83" height="83"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="83" id="2qN-qc-rDC"/>
+                                                        <constraint firstAttribute="height" constant="83" id="3w1-bn-yCC"/>
+                                                    </constraints>
+                                                </imageView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nax-gk-1nQ">
+                                                    <rect key="frame" x="99" y="8" width="493" height="20"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Artist/s" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2k9-XW-QtM">
+                                                    <rect key="frame" x="99" y="36" width="493" height="17"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
                                             <constraints>
-                                                <constraint firstAttribute="height" constant="83" id="ijd-43-gor"/>
-                                                <constraint firstAttribute="width" constant="83" id="w7l-6e-bqG"/>
+                                                <constraint firstItem="2k9-XW-QtM" firstAttribute="leading" secondItem="5Sr-MD-ObL" secondAttribute="trailing" constant="8" id="4Q2-aG-9g9"/>
+                                                <constraint firstItem="Nax-gk-1nQ" firstAttribute="top" secondItem="uMr-Se-Xrh" secondAttribute="topMargin" id="4aN-oX-WwO"/>
+                                                <constraint firstItem="5Sr-MD-ObL" firstAttribute="top" secondItem="uMr-Se-Xrh" secondAttribute="topMargin" id="6Q4-bW-F5r"/>
+                                                <constraint firstItem="2k9-XW-QtM" firstAttribute="top" secondItem="Nax-gk-1nQ" secondAttribute="bottom" constant="8" id="Gmp-Br-EQD"/>
+                                                <constraint firstItem="Nax-gk-1nQ" firstAttribute="leading" secondItem="5Sr-MD-ObL" secondAttribute="trailing" constant="8" id="GzR-d0-VHH"/>
+                                                <constraint firstItem="Nax-gk-1nQ" firstAttribute="trailing" secondItem="uMr-Se-Xrh" secondAttribute="trailingMargin" id="Lb2-8o-arE"/>
+                                                <constraint firstItem="5Sr-MD-ObL" firstAttribute="leading" secondItem="uMr-Se-Xrh" secondAttribute="leadingMargin" id="Z6t-ae-9ZI"/>
+                                                <constraint firstItem="2k9-XW-QtM" firstAttribute="trailing" secondItem="uMr-Se-Xrh" secondAttribute="trailingMargin" id="s3y-TH-dea"/>
                                             </constraints>
-                                        </imageView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Podcast Summary" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b1O-KZ-htg">
-                                            <rect key="frame" x="99" y="34" width="493" height="17"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                            <color key="textColor" red="0.43529411764705883" green="0.44313725490196076" blue="0.47450980392156861" alpha="1" colorSpace="calibratedRGB"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstItem="dHC-hP-IBU" firstAttribute="top" secondItem="0kH-gH-62x" secondAttribute="topMargin" id="A3F-ui-phL"/>
-                                        <constraint firstItem="dHC-hP-IBU" firstAttribute="leading" secondItem="0kH-gH-62x" secondAttribute="leadingMargin" id="FO9-Qb-r1s"/>
-                                        <constraint firstItem="b1O-KZ-htg" firstAttribute="top" secondItem="f7t-2z-hmL" secondAttribute="bottom" constant="8" id="mfO-SE-hcN"/>
-                                        <constraint firstItem="f7t-2z-hmL" firstAttribute="trailing" secondItem="0kH-gH-62x" secondAttribute="trailingMargin" id="rga-ou-CXe"/>
-                                        <constraint firstItem="b1O-KZ-htg" firstAttribute="trailing" secondItem="0kH-gH-62x" secondAttribute="trailingMargin" id="uM3-Vh-EuR"/>
-                                        <constraint firstItem="b1O-KZ-htg" firstAttribute="leading" secondItem="dHC-hP-IBU" secondAttribute="trailing" constant="8" id="ugK-uT-V4G"/>
-                                        <constraint firstItem="f7t-2z-hmL" firstAttribute="top" secondItem="0kH-gH-62x" secondAttribute="topMargin" id="yww-ta-m7O"/>
-                                        <constraint firstItem="f7t-2z-hmL" firstAttribute="leading" secondItem="dHC-hP-IBU" secondAttribute="trailing" constant="8" id="zs2-Jk-wsy"/>
-                                    </constraints>
-                                </tableViewCellContentView>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="artist" destination="2k9-XW-QtM" id="tXq-8y-nFL"/>
+                                            <outlet property="pvImage" destination="5Sr-MD-ObL" id="usH-Yy-QP4"/>
+                                            <outlet property="title" destination="Nax-gk-1nQ" id="aye-Sx-2UA"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
                                 <connections>
-                                    <outlet property="pvImage" destination="dHC-hP-IBU" id="goM-yh-2H7"/>
-                                    <outlet property="summary" destination="b1O-KZ-htg" id="C7F-bT-xI2"/>
-                                    <outlet property="title" destination="f7t-2z-hmL" id="MVt-YB-8g6"/>
+                                    <outlet property="dataSource" destination="RGb-c9-5c2" id="7vF-oG-pxc"/>
+                                    <outlet property="delegate" destination="RGb-c9-5c2" id="7pi-6K-xD2"/>
                                 </connections>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="Zus-al-Nm1" id="Tej-Xa-JE3"/>
-                            <outlet property="delegate" destination="Zus-al-Nm1" id="Xwr-5R-9Ro"/>
-                        </connections>
-                    </tableView>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="Fb6-Sb-O07" firstAttribute="top" secondItem="JA2-8J-nh6" secondAttribute="bottom" id="3zN-lc-ipm"/>
+                            <constraint firstItem="JA2-8J-nh6" firstAttribute="leading" secondItem="Uek-aW-JxX" secondAttribute="leadingMargin" constant="-20" id="IcV-as-fFZ"/>
+                            <constraint firstItem="jTT-fg-X4h" firstAttribute="top" secondItem="Fb6-Sb-O07" secondAttribute="bottom" id="aMe-1r-PeU"/>
+                            <constraint firstItem="Fb6-Sb-O07" firstAttribute="leading" secondItem="Uek-aW-JxX" secondAttribute="leadingMargin" constant="-20" id="jkT-mf-ic8"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Fb6-Sb-O07" secondAttribute="trailing" constant="-20" id="kZV-mS-Q3c"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="JA2-8J-nh6" secondAttribute="trailing" constant="-20" id="slA-zC-2fM"/>
+                            <constraint firstItem="JA2-8J-nh6" firstAttribute="top" secondItem="nom-NU-ede" secondAttribute="bottom" id="uBm-iu-LaT"/>
+                        </constraints>
+                    </view>
                     <connections>
-                        <outlet property="searchBar" destination="fUv-R6-hrd" id="g1k-PY-voe"/>
-                        <segue destination="pXc-eT-gZd" kind="show" identifier="Show Podcast Profile" id="m8V-g9-2RE"/>
-                        <segue destination="jDs-me-457" kind="show" identifier="Find Search to Now Playing" id="ueq-kl-s1Y"/>
+                        <outlet property="searchBar" destination="JA2-8J-nh6" id="YZb-f6-Qts"/>
+                        <outlet property="tableView" destination="Fb6-Sb-O07" id="1y7-Gv-Vav"/>
+                        <segue destination="pXc-eT-gZd" kind="show" identifier="Show Podcast Profile" id="YZs-t6-IMw"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="Find Search to Now Playing" id="ltZ-MZ-73u"/>
                     </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="0A6-As-5s1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="pHl-D1-pLL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3087" y="1765"/>
         </scene>
@@ -1553,7 +1572,7 @@
         <image name="Blank52" width="48" height="48"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="ug1-KO-0I5"/>
+        <segue reference="ltZ-MZ-73u"/>
         <segue reference="Vxi-eO-V9n"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -9,9 +9,11 @@
 import UIKit
 import CoreData
 
-class FindSearchTableViewController: UITableViewController, UISearchBarDelegate {
+class FindSearchTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
     
     @IBOutlet weak var searchBar: UISearchBar!
+    
+    @IBOutlet weak var tableView: UITableView!
     
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
@@ -25,6 +27,20 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
     
     var iTunesSearchPodcastArray = [SearchResultPodcast]()
     var iTunesSearchPodcastFeedURLArray: [NSURL] = []
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        searchBar.delegate = self
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        // If there is a now playing episode, add Now Playing button to navigation bar
+        if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+        }
+    }
     
     func searchItunesFor(searchText: String) {
         iTunesSearchPodcastFeedURLArray.removeAll(keepCapacity: false)
@@ -129,18 +145,6 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         self.performSegueWithIdentifier("Find Search to Now Playing", sender: nil)
     }
     
-    override func viewDidAppear(animated: Bool) {        
-        // If there is a now playing episode, add Now Playing button to navigation bar
-        if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
-            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
-        }
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
-    }
-    
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         searchItunesFor(searchBar.text!)
     }
@@ -152,22 +156,22 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return iTunesSearchPodcastArray.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! FindSearchTableViewCell
         
         let podcast = iTunesSearchPodcastArray[indexPath.row]
         
         cell.title?.text = podcast.title
-        cell.summary?.text = podcast.artistName
+        cell.artist?.text = podcast.artistName
         cell.pvImage?.image = UIImage(named: "Blank52")
 
         if let imageData = podcast.image {
@@ -181,7 +185,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         return cell
     }
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let searchResultPodcastActions = UIAlertController(title: "Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
         
         let iTunesSearchPodcast = iTunesSearchPodcastArray[indexPath.row]
@@ -214,7 +218,7 @@ class FindSearchTableViewController: UITableViewController, UISearchBarDelegate 
         
         searchResultPodcastActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
         
-        self.presentViewController(searchResultPodcastActions, animated: true, completion: nil)
+        self.presentViewController(searchResultPodcastActions, animated: false, completion: nil)
     }
 
     // MARK: - Navigation
