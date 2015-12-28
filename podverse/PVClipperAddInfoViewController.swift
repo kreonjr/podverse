@@ -37,9 +37,8 @@ class PVClipperAddInfoViewController: UIViewController {
     }
     
     func saveAndGoToReview () {
-        clip?.title = clipTitleTextField.text
-        if let clipTitle = clip?.title where clipTitle.characters.count > 0 {
-            saveClip()
+        if let clipTitle = clipTitleTextField.text where clipTitle.characters.count > 0 {
+            saveClipWithTitle(clipTitle)
             self.performSegueWithIdentifier("show_confirm_clip", sender: self)
         }
         else {
@@ -51,11 +50,13 @@ class PVClipperAddInfoViewController: UIViewController {
         }
     }
     
-    func saveClip () {
+    func saveClipWithTitle(clipTitle:String) {
         if clip == nil {
             clip = (CoreDataHelper.insertManagedObject("Clip", managedObjectContext: Constants.moc) as! Clip)
             clip?.episode = episode
         }
+        
+        clip?.title = clipTitle
         
         if let clipStart = startTime {
             clip?.startTime = NSNumber(integer: clipStart)
