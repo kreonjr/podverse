@@ -108,6 +108,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         
         self.title = selectedPodcast.title
         
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: Constants.kDownloadHasFinished, object: nil)
         
         self.refreshControl = UIRefreshControl()
@@ -337,33 +339,28 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             let index = self.tableView.indexPathForSelectedRow!
             PVMediaPlayer.sharedInstance.nowPlayingEpisode = episodesArray[index.row]
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
-            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
         else if segue.identifier == "Quick Play Downloaded Episode" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             PVMediaPlayer.sharedInstance.nowPlayingEpisode = sender as! Episode
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
-            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
         else if segue.identifier == "Show Clips" {
             let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
             let index = self.tableView.indexPathForSelectedRow!
             clipsTableViewController.selectedPodcast = selectedPodcast
             clipsTableViewController.selectedEpisode = episodesArray[index.row]
-            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
         else if segue.identifier == "streamEpisode" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             let index = self.tableView.indexPathForSelectedRow!
             PVMediaPlayer.sharedInstance.nowPlayingEpisode = episodesArray[index.row]
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
-            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
         else if segue.identifier == "Episodes to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
-            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
     }
     

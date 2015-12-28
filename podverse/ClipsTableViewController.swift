@@ -53,6 +53,8 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
         
         self.title = self.selectedEpisode.title
         
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        
         if let imageData = selectedPodcast.imageData, image = UIImage(data: imageData) {
             headerImageView.image = image
         }
@@ -153,14 +155,11 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
                 PVMediaPlayer.sharedInstance.nowPlayingClip = clipsArray[index.row]
             }
             
-            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
-            
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         } else if segue.identifier == "Clips to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
-            navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         }
     }
 }
