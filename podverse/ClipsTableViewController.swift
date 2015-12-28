@@ -27,21 +27,13 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
     var clipsArray = [Clip]()
     
     func loadData() {
+        if let clipsArray = selectedEpisode.clips.allObjects as? [Clip] {
+            self.clipsArray = clipsArray.sort {
+                $0.startTime.compare($1.startTime) == NSComparisonResult.OrderedAscending
+            }
         
-        // Clear the clips array, then retrieve and sort the clips array
-        self.clipsArray = [Clip]()
-        let unsortedClips = NSMutableArray()
-        
-        for singleClip in selectedEpisode.clips {
-            let loopClip = singleClip as! Clip
-            unsortedClips.addObject(loopClip)
+            self.tableView.reloadData()
         }
-        
-        let sortDescriptor = NSSortDescriptor(key: "startTime", ascending: false)
-        
-        self.clipsArray = unsortedClips.sortedArrayUsingDescriptors([sortDescriptor]) as! [Clip]
-        
-        self.tableView.reloadData()
     }
     
     func segueToNowPlaying(sender: UIBarButtonItem) {
@@ -71,7 +63,6 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
         }
         
         headerSummaryLabel.text = selectedEpisode.summary
-        
         loadData()
     }
 
@@ -104,9 +95,9 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
         
         var startTime: String
         var endTime: String?
-        startTime = clip.startTime.stringValue
+        startTime = PVUtility.convertNSNumberToHHMMSSString(clip.startTime)
         if let endT = clip.endTime {
-            endTime = " - " + endT.stringValue
+            endTime = " - " + PVUtility.convertNSNumberToHHMMSSString(endT)
         }
         cell.startTimeEndTime.text = startTime + endTime!
         
