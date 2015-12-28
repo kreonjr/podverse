@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import AVFoundation
+import MediaPlayer
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -64,11 +65,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Ask for permission for Podverse to use push notifications
         application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge], categories: nil))  // types are UIUserNotificationType members
-
+        
+        // Add skip or back 15 seconds to the lock screen media player
+        let rcc = MPRemoteCommandCenter.sharedCommandCenter()
+        
+        let skipBackwardIntervalCommand = rcc.skipBackwardCommand
+        skipBackwardIntervalCommand.addTarget(self, action: "skipBackwardEvent")
+        
+        let skipForwardIntervalCommand = rcc.skipForwardCommand
+        skipForwardIntervalCommand.addTarget(self, action: "skipForwardEvent")
+        
+        let pauseCommand = rcc.pauseCommand
+        pauseCommand.addTarget(self, action: "playOrPauseEvent")
+        let playCommand = rcc.playCommand
+        playCommand.addTarget(self, action: "playOrPauseEvent")
+        
+        // TODO: Currently we are setting taskIdentifier values = nil on app launch. This will probably need to change once we add crash handling for resuming downloads
+        let episodeArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: nil) as! [Episode]
+        for episode in episodeArray {
+            episode.taskIdentifier = nil
+        }
+        
         startCheckSubscriptionsForNewEpisodesTimer()
+        
         return true
     }
-
+    
+    func skipBackwardEvent() {
+        PVMediaPlayer.sharedInstance.previousTime(15)
+    }
+    
+    func skipForwardEvent() {
+        PVMediaPlayer.sharedInstance.skipTime(15)
+    }
+    
+    func playOrPauseEvent() {
+        print("remote play or pause happened")
+    }
+    
+    
+    
     func applicationDidEnterBackground(application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.

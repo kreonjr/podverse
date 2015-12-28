@@ -145,7 +145,13 @@ class FeedParser: NSObject, NSXMLParserDelegate {
     /** Did start element. */
     func parser(parser: NSXMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName qName: String?, attributes attributeDict: [String : String]) {
         autoreleasepool {
-            self.currentPath = NSURL(fileURLWithPath: self.currentPath).URLByAppendingPathComponent(qName!).path!
+            if let qualName = qName {
+                if let path = NSURL(fileURLWithPath: self.currentPath).URLByAppendingPathComponent(qualName).path {
+                    self.currentPath = path
+                }
+            }
+            // PODVERSE EDIT: We were occasionally experiencing an error when restarting the app where it would try to force unwrap a nil value and crash, so we edited the 5 lines above to use if let statements.
+            //  self.currentPath = NSURL(fileURLWithPath: self.currentPath).URLByAppendingPathComponent(qName!).path!
             self.currentElementIdentifier = elementName
             self.currentElementAttributes = attributeDict
             self.currentElementContent = ""
@@ -296,7 +302,7 @@ class FeedParser: NSObject, NSXMLParserDelegate {
             
         // pub date
         else if self.currentPath == "/feed/updated" {
-            self.currentFeedChannel?.channelDateOfLastChange = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
+            self.currentFeedChannel?.channelLastBuildDate = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
         }
         else if self.currentPath == "/feed/entry/updated" {
             self.currentFeedItem?.feedPubDate = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
@@ -372,7 +378,7 @@ class FeedParser: NSObject, NSXMLParserDelegate {
             
         // pub date
         else if self.currentPath == "/rss/channel/item/lastBuildDate" {
-            self.currentFeedChannel?.channelDateOfLastChange = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
+            self.currentFeedChannel?.channelLastBuildDate = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
         }
         else if self.currentPath == "/rss/channel/item/pubDate" {
             self.currentFeedItem?.feedPubDate = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
@@ -474,7 +480,7 @@ class FeedParser: NSObject, NSXMLParserDelegate {
             
         // pub date
         else if self.currentPath == "/rdf:RDF/channel/dc:date" {
-            self.currentFeedChannel?.channelDateOfLastChange = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
+            self.currentFeedChannel?.channelLastBuildDate = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)
         }
         else if self.currentPath == "/rdf:RDF/item/dc:date" {
             self.currentFeedItem?.feedPubDate = self.retrieveDateFromDateString(self.currentElementContent, feedType: self.feedType)

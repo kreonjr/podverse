@@ -14,8 +14,6 @@ class FindTableViewController: UITableViewController {
     
     var findSearchArray = ["Search for Podcasts", "Add Podcast by RSS"]
     
-    var findBrowseArray = ["All", "ABC", "DEF", "GHI"]
-    
     func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Find to Now Playing", sender: nil)
     }
@@ -25,17 +23,17 @@ class FindTableViewController: UITableViewController {
         if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
         // Set navigation bar styles
         self.navigationItem.title = "Find"
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
     }
 
     override func didReceiveMemoryWarning() {
@@ -46,18 +44,11 @@ class FindTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 2
+        return 1
     }
     
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        
-        if (section == 0) {
-            return ""
-        }
-        else {
-            return "Browse"
-        }
-        
+        return ""
     }
     
     override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -65,25 +56,14 @@ class FindTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if (section == 0) {
-            return findSearchArray.count
-        }
-        else {
-            return findBrowseArray.count
-        }
+        return findSearchArray.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
 
-        if indexPath.section == 0 {
-            let title = findSearchArray[indexPath.row]
-            cell.textLabel!.text = title
-        }
-        else {
-            let title = findBrowseArray[indexPath.row]
-            cell.textLabel!.text = title
-        }
+        let title = findSearchArray[indexPath.row]
+        cell.textLabel!.text = title
 
         return cell
     }
@@ -95,7 +75,7 @@ class FindTableViewController: UITableViewController {
             }
             else {
                 tableView.deselectRowAtIndexPath(indexPath, animated: false)
-                var addByRSSAlert = UIAlertController(title: "Add Podcast by RSS Feed", message: "Type the RSS feed URL below.", preferredStyle: UIAlertControllerStyle.Alert)
+                let addByRSSAlert = UIAlertController(title: "Add Podcast by RSS Feed", message: "Type the RSS feed URL below.", preferredStyle: UIAlertControllerStyle.Alert)
                 
                 addByRSSAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
                     textField.placeholder = "https://rssfeed.example.com/"

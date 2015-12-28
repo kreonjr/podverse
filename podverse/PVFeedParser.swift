@@ -77,8 +77,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             self.podcast.itunesImage = NSData(contentsOfURL: itunesImageUrl)
         }
         
-        if let lastModifiedDate = channel.channelDateOfLastChange {
-            self.podcast.lastPubDate = lastModifiedDate
+        if let lastBuildDate = channel.channelLastBuildDate {
+            self.podcast.lastBuildDate = lastBuildDate
+        }
+        
+        if let lastPubDate = channel.channelLastPubDate {
+            self.podcast.lastPubDate = lastPubDate
         }
         
         podcast.isSubscribed = self.shouldSubscribeToPodcast
@@ -122,6 +126,9 @@ class PVFeedParser: NSObject, FeedParserDelegate {
                 break
             }
         }
+        
+        // TODO: I'm not sure why I need to do this to get the rest of the app to work. By setting the taskIdentifier = nil it allows for checking whether the taskIdentifier is nil or not in other places in the app.
+        newEpisode.taskIdentifier = nil
         
         // If episode is not already saved, then add episode to the podcast object
         if !episodeAlreadySaved {
