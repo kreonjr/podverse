@@ -11,7 +11,6 @@ import UIKit
 class PVClipperConfirmationViewController: UIViewController {
 
     @IBOutlet weak var clipTitleLabel: UILabel!
-    
     @IBOutlet weak var clipDuration: UILabel!
 
     var clip:Clip?
@@ -39,6 +38,10 @@ class PVClipperConfirmationViewController: UIViewController {
     }
     
     func popToRoot() {
+        if let rootVC = navigationController?.viewControllers.first as? PVClipperViewController {
+            rootVC.clip = clip
+        }
+        
         self.navigationController?.popToRootViewControllerAnimated(true)
     }
     

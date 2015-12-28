@@ -11,9 +11,14 @@ import UIKit
 class PVClipperAddInfoViewController: UIViewController {
 
     var clipTime:Int = 0
-     var clip:Clip?
+    var startTime:Int?
+    var endTime:Int?
+    var clip:Clip?
+    var episode:Episode!
+    var isEditingClip:Bool = false
     
     @IBOutlet weak var clipTitleTextField: UITextField!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -23,24 +28,51 @@ class PVClipperAddInfoViewController: UIViewController {
         
         let backButton = UIBarButtonItem(title: "Back", style: .Plain, target: self, action: "popViewController")
         self.navigationItem.leftBarButtonItem = backButton
+        
+        clipTitleTextField.text = clip?.title
     }
     
     func popViewController() {
         self.navigationController?.popViewControllerAnimated(true)
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
     
     func saveAndGoToReview () {
-        saveClip()
-        self.performSegueWithIdentifier("show_confirm_clip", sender: self)
+        clip?.title = clipTitleTextField.text
+        if let clipTitle = clip?.title where clipTitle.characters.count > 0 {
+            saveClip()
+            self.performSegueWithIdentifier("show_confirm_clip", sender: self)
+        }
+        else {
+            let timingAlert = UIAlertController(title: "Error", message: "A clip title is necessary to save the clip.", preferredStyle:.Alert)
+            
+            timingAlert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            
+            self.presentViewController(timingAlert, animated: true, completion: nil)
+        }
     }
     
     func saveClip () {
-        clip?.title = clipTitleTextField.text
+        if clip == nil {
+            clip = (CoreDataHelper.insertManagedObject("Clip", managedObjectContext: Constants.moc) as! Clip)
+            clip?.episode = episode
+        }
+        
+        if let clipStart = startTime {
+            clip?.startTime = NSNumber(integer: clipStart)
+        } else {
+            clip?.startTime = NSNumber(integer: 0)
+        }
+        
+        if let clipEnd = endTime {
+            clip?.endTime = NSNumber(integer: clipEnd)
+        } else {
+            clip?.endTime = episode.duration
+        }
+        
+        if let clipEnd = clip?.endTime, clipStart = clip?.startTime {
+            let clipDuration = NSNumber(integer: clipEnd.integerValue - clipStart.integerValue)
+            clip?.duration = clipDuration
+        }
         
         // Save
         do {
