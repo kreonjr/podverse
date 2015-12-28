@@ -47,6 +47,13 @@ class PVMediaPlayer: NSObject {
         }
     }
     
+    func playForSeconds(startTime:Double, endTime:Double) {
+        self.playOrPause()
+        avPlayer.seekToTime(CMTime(seconds: startTime, preferredTimescale: 1)) { (seeked) -> Void in
+            self.playOrPause()
+        }
+    }
+    
     func playOrPause() -> (Bool) {
        
         self.setPlayingInfo(self.nowPlayingEpisode)
@@ -110,14 +117,14 @@ class PVMediaPlayer: NSObject {
         MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: episodeTitle, MPMediaItemPropertyArtwork: mpImage]
     }
     
-    func goToTime(seconds: Float64) {
+    func goToTime(seconds: Double) {
         let resultTime = CMTimeMakeWithSeconds(seconds, 1)
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
         avPlayer.play()
     }
     
-    func skipTime(seconds: Float64) {
+    func skipTime(seconds: Double) {
         let currentTime = avPlayer.currentTime()
         let timeAdjust = CMTimeMakeWithSeconds(seconds, 1)
         let resultTime = CMTimeAdd(currentTime, timeAdjust)
@@ -126,7 +133,7 @@ class PVMediaPlayer: NSObject {
         avPlayer.play()
     }
     
-    func previousTime(seconds: Float64) {
+    func previousTime(seconds: Double) {
         let currentTime = avPlayer.currentTime()
         let timeAdjust = CMTimeMakeWithSeconds(seconds, 1)
         let resultTime = CMTimeSubtract(currentTime, timeAdjust)
