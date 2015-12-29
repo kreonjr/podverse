@@ -398,7 +398,7 @@ class FeedParser: NSObject, NSXMLParserDelegate {
         else if self.currentPath == "/rss/channel/item/enclosure" {
             let type:String? = self.currentElementAttributes?["type"] as? String
             let content: String? = self.currentElementAttributes?["url"] as? String
-            let length:Int? = Int((self.currentElementAttributes?["length"] as? String)!)
+            let length:Int? = Int((self.currentElementAttributes?["length"] as? String) ?? "0")
             if content != nil && type != nil && length != nil {
                 let feedEnclosure = FeedEnclosure(url: content!, type: type!, length: length!)
                 self.currentFeedItem?.feedEnclosures.append(feedEnclosure)
