@@ -95,7 +95,7 @@ class PodcastsTableViewController: UITableViewController {
         
         let totalEpisodesDownloadedPredicate = NSPredicate(format: "podcast == %@ && downloadComplete == true", podcast)
         let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: totalEpisodesDownloadedPredicate)
-        cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded, 12 in progress"
+        cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded"
         
         if let lastPubDate = podcast.lastPubDate {
             cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
