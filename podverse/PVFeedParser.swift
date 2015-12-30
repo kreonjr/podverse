@@ -172,6 +172,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     
     func feedParser(parser: FeedParser, successfullyParsedURL url: String) {
         
+        // If podcast is nil, then the RSS feed was invalid for the parser, and we should return out of successfullyParsedURL
+        if podcast == nil {
+           delegate?.feedParsingComplete()
+            return
+        }
+        
         // If subscribing to a podcast, then get the latest episode and begin downloading
         if shouldSubscribeToPodcast == true {
             let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
