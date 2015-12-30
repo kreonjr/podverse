@@ -138,6 +138,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     
     func feedParserParsingAborted(parser: FeedParser) {
         
+        // If podcast is nil, then the RSS feed was invalid for the parser, and we should return out of successfullyParsedURL
+        if podcast == nil {
+            delegate?.feedParsingComplete()
+            return
+        }
+        
         // If the parser is only returning the latest episode, then if the podcast's latest episode returned is not the same as the latest episode saved locally, parse the entire feed again, then download and save the latest episode
         if self.shouldGetMostRecentEpisode == true {
             if let newestFeedEpisode = latestEpisodeInFeed {
