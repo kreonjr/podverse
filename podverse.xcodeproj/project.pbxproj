@@ -52,6 +52,8 @@
 		EF59CECF1BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC91BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift */; };
 		EFB3249E1BE59127000936B6 /* PVClipperAddInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB3249D1BE59127000936B6 /* PVClipperAddInfoViewController.swift */; };
 		EFB324A01BE5913A000936B6 /* PVClipperConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB3249F1BE5913A000936B6 /* PVClipperConfirmationViewController.swift */; };
+		EFD1D4E71C3106FB00666912 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD1D4E51C3106FA00666912 /* Fabric.framework */; };
+		EFD1D4E81C3106FB00666912 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD1D4E61C3106FB00666912 /* Crashlytics.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -114,6 +116,8 @@
 		EF59CEC91BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+RemoveHTMLCharacters.swift"; sourceTree = "<group>"; };
 		EFB3249D1BE59127000936B6 /* PVClipperAddInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipperAddInfoViewController.swift; sourceTree = "<group>"; };
 		EFB3249F1BE5913A000936B6 /* PVClipperConfirmationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipperConfirmationViewController.swift; sourceTree = "<group>"; };
+		EFD1D4E51C3106FA00666912 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
+		EFD1D4E61C3106FB00666912 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +125,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EFD1D4E81C3106FB00666912 /* Crashlytics.framework in Frameworks */,
+				EFD1D4E71C3106FB00666912 /* Fabric.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,6 +207,8 @@
 		818615931B1E84CE006C9731 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				EFD1D4E51C3106FA00666912 /* Fabric.framework */,
+				EFD1D4E61C3106FB00666912 /* Crashlytics.framework */,
 				EF3799D01BD497FB00211419 /* Subclasses */,
 				EF59CED01BD07AE5002D9DDF /* SwiftFeedParse */,
 				81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */,
@@ -279,6 +287,7 @@
 				8186158C1B1E84CE006C9731 /* Sources */,
 				8186158D1B1E84CE006C9731 /* Frameworks */,
 				8186158E1B1E84CE006C9731 /* Resources */,
+				EFD1D4E41C3106DC00666912 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -319,7 +328,7 @@
 				TargetAttributes = {
 					8186158F1B1E84CE006C9731 = {
 						CreatedOnToolsVersion = 6.3.2;
-						DevelopmentTeam = VRUTXA3F6E;
+						DevelopmentTeam = FT95H5P84J;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -373,6 +382,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		EFD1D4E41C3106DC00666912 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "./Fabric.framework/run 1e8acf44eea863611b305f70346f0bb5fcc6071f 5ff0c38dc6e5034ade8a97910cdabf1d0756485017f7709814be73edcf0061a0";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8186158C1B1E84CE006C9731 /* Sources */ = {
@@ -475,6 +500,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Creon Creonopoulos (C2E4C4E63Y)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -522,6 +548,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer: Creon Creonopoulos (C2E4C4E63Y)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -550,6 +577,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/podverse",
+				);
 				INFOPLIST_FILE = podverse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "fm.podverse.$(PRODUCT_NAME:rfc1034identifier)";
@@ -564,6 +595,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/podverse",
+				);
 				INFOPLIST_FILE = podverse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "fm.podverse.$(PRODUCT_NAME:rfc1034identifier)";
