@@ -19,7 +19,8 @@ class PodcastsTableViewController: UITableViewController {
     
     func loadData() {
         podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
-        podcastArray.sortInPlace({ $0.title < $1.title })
+        podcastArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+        
         self.tableView.reloadData()
     }
     
@@ -94,7 +95,7 @@ class PodcastsTableViewController: UITableViewController {
         
         let totalEpisodesDownloadedPredicate = NSPredicate(format: "podcast == %@ && downloadComplete == true", podcast)
         let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: totalEpisodesDownloadedPredicate)
-        cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded, 12 in progress"
+        cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded"
         
         if let lastPubDate = podcast.lastPubDate {
             cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
@@ -148,4 +149,22 @@ class PodcastsTableViewController: UITableViewController {
         }
     }
 
+}
+
+extension String {
+    func removeArticles() -> String {
+        var words = self.componentsSeparatedByString(" ")
+        
+        //Only one word so count it as sortable
+        if(words.count <= 1) {
+            return self
+        }
+        
+        if( words[0].lowercaseString == "a" || words[0].lowercaseString == "the" || words[0].lowercaseString == "an" ) {
+            words.removeFirst()
+            return words.joinWithSeparator(" ")
+        }
+        
+        return self
+    }
 }
