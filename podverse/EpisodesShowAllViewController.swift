@@ -33,7 +33,7 @@ class EpisodesShowAllViewController: UIViewController, UITableViewDataSource, UI
         let unsortedEpisodes = NSMutableArray()
         
         // Retreive then Show all episodes in the RSS feed
-        let allEpisodesArray = selectedPodcast.episodes
+        let allEpisodesArray = Array(selectedPodcast.episodes.allObjects)
         
         for singleEpisode in allEpisodesArray {
             let loopEpisode = singleEpisode as! Episode
