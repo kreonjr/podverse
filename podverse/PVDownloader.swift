@@ -21,14 +21,13 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     override init() {
         super.init()
         
-        let sessionConfiguration = NSURLSessionConfiguration.defaultSessionConfiguration()
-    
+        let sessionConfiguration = NSURLSessionConfiguration.backgroundSessionConfigurationWithIdentifier("podverse.download.episodes")
+        
         var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
         docDirectoryURL = URLs[0]
         
         // Initialize the session configuration, then create the session
-        
-        sessionConfiguration.HTTPMaximumConnectionsPerHost = 5
+        sessionConfiguration.HTTPMaximumConnectionsPerHost = 3
         sessionConfiguration.allowsCellularAccess = false
         
         downloadSession = NSURLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)

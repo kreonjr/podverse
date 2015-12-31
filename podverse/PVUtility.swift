@@ -25,19 +25,25 @@ class PVUtility: NSObject {
     // TODO: why do I need to use two ! ! for durationStringArray.last!.toInt()!?
     static func convertHHMMSSStringToNSNumber (durationString : String) -> (NSNumber) {
         var durationStringArray = durationString.componentsSeparatedByString(":").reverse().map() { String($0) }
-        var seconds = Int()
-        var minutes = Int()
-        var hours = Int()
+        var seconds = Int(0)
+        var minutes = Int(0)
+        var hours = Int(0)
         if durationStringArray.first != nil {
-            seconds = Int(durationStringArray.first!)!
+            if let s = Int(durationStringArray.first!) {
+                seconds = s
+            }
             durationStringArray.removeAtIndex(0)
         }
         if durationStringArray.first != nil {
-            minutes = Int(durationStringArray.first!)!
+            if let m = Int(durationStringArray.first!) {
+                minutes = m
+            }
             durationStringArray.removeAtIndex(0)
         }
         if durationStringArray.first != nil {
-            hours = Int(durationStringArray.first!)!
+            if let h = Int(durationStringArray.first!) {
+                hours = h
+            }
             durationStringArray.removeAtIndex(0)
         }
         
