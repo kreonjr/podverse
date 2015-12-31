@@ -6,6 +6,7 @@
 //  Copyright (c) 2015 Mitchell Downey. All rights reserved.
 //
 import UIKit
+import CoreData
 
 struct Constants {
 
@@ -17,4 +18,5 @@ struct Constants {
     
     static var moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
 
+    static let saveQueue = dispatch_queue_create("MOC_SERIAL_SAVE_QUEUE", DISPATCH_QUEUE_SERIAL)
 }

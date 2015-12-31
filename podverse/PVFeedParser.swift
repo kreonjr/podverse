@@ -122,12 +122,11 @@ class PVFeedParser: NSObject, FeedParserDelegate {
                 existingEpisode = newEpisode
                 episodeAlreadySaved = true
                 //Remove the created entity from core data if it already exists
-                CoreDataHelper.removeManagedObjectFromClass("Episode", managedObjectContext: Constants.moc, object: newEpisode)
+                CoreDataHelper.deleteItemFromCoreData(newEpisode,completionBlock: nil)
                 break
             }
         }
         
-        // TODO: I'm not sure why I need to do this to get the rest of the app to work. By setting the taskIdentifier = nil it allows for checking whether the taskIdentifier is nil or not in other places in the app.
         newEpisode.taskIdentifier = nil
         
         // If episode is not already saved, then add episode to the podcast object
@@ -148,13 +147,11 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         if self.shouldGetMostRecentEpisode == true {
             if let newestFeedEpisode = latestEpisodeInFeed {
                 let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-                // TODO: BUGGY - the most recent pub date is not a reliable way to check if the 1st episode in the current feed is newer than the 1st episode in the feed stored in CoreData. One way to fix this would be to fix the FeedParser issues that are preventing some podcast and episode date/time information from being grabbed successfully.
                 
                 let mostRecentEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: Constants.moc, predicate: podcastPredicate)
                 
                 if mostRecentEpisodeArray.count > 0 {
                     if let latestEpisodeInRSSFeed = latestEpisodeInFeed {
-                        // TODO: BUGGY - this conditional will always be TRUE in the case of Dan Carlin's podcasts. Our parser is not correctly grabbing the pubDate of the episodes, and the default behavior of the FeedParser is to return the current date/time is a valid pubDate format is not found.
                         if latestEpisodeInRSSFeed.pubDate != mostRecentEpisodeArray[0].pubDate {
                             shouldGetMostRecentEpisode = false
                             PVDownloader.sharedInstance.startDownloadingEpisode(newestFeedEpisode)
@@ -167,24 +164,13 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         } else {
             print("no newer episode available, don't download")
         }
-        
-        // Save the parsed podcast and episode information
-        // TODO: Do we actually want this save to happen when the podcast feed parser is aborted? I think
-//        dispatch_async(dispatch_get_main_queue()) { () -> Void in
-//            do {
-//                try Constants.moc.save()
-//            } catch {
-//                print(error)
-//            }
-//        }
-        
     }
     
     func feedParser(parser: FeedParser, successfullyParsedURL url: String) {
         
         // If podcast is nil, then the RSS feed was invalid for the parser, and we should return out of successfullyParsedURL
         if podcast == nil {
-           delegate?.feedParsingComplete()
+            delegate?.feedParsingComplete()
             return
         }
         
@@ -199,12 +185,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             }
         }
         
-        // Save the parsed podcast and episode information
-        do {
-            try Constants.moc.save()
-        } catch {
-            print(error)
-        }
+        CoreDataHelper.saveCoreData(nil)
         
         delegate?.feedParsingComplete()
         print("feed parser has finished!")

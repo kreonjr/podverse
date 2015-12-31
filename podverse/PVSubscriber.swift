@@ -40,7 +40,7 @@ class PVSubscriber: NSObject {
                     PVUtility.deleteEpisodeFromDiskWithName(fileName)
                 }
                 
-                Constants.moc.deleteObject(episodeToRemove)
+                CoreDataHelper.deleteItemFromCoreData(episodeToRemove, completionBlock: nil)
                 
                 // If the episodeToRemove is currently downloading, then retrieve and cancel the download
                 if episodeToRemove.taskIdentifier != nil {
@@ -67,15 +67,9 @@ class PVSubscriber: NSObject {
                 
             }
             
-            // Delete podcast from CoreData, then update UI
-            Constants.moc.deleteObject(podcast)
-            // Save
-            do {
-                try Constants.moc.save()
-                print("podcast and it's episodes deleted")
-            } catch let error as NSError {
-                print(error)
-            }
+            CoreDataHelper.deleteItemFromCoreData(podcast, completionBlock: { () -> Void in
+                CoreDataHelper.saveCoreData(nil)
+            })
         }
     }
 }

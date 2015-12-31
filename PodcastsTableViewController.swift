@@ -90,9 +90,6 @@ class PodcastsTableViewController: UITableViewController {
         cell.title?.text = podcast.title
         cell.pvImage?.image = UIImage(named: "Blank52")
         
-        let imageData = podcast.imageData
-        let itunesImageData = podcast.itunesImage
-        
         let totalEpisodesDownloadedPredicate = NSPredicate(format: "podcast == %@ && downloadComplete == true", podcast)
         let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: totalEpisodesDownloadedPredicate)
         cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded"
@@ -103,15 +100,13 @@ class PodcastsTableViewController: UITableViewController {
             cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
         }
 
-        if imageData != nil {
-            let image = UIImage(data: imageData!)
-            if image!.size.height != 0.0 {
+        if let imageData = podcast.imageData {
+            if let image = UIImage(data: imageData) {
                 cell.pvImage?.image = image
             }
         }
-        else if itunesImageData != nil {
-            let itunesImage = UIImage(data: itunesImageData!)
-            if itunesImage!.size.height != 0.0 {
+        else if let itunesImageData = podcast.itunesImage {
+            if let itunesImage = UIImage(data: itunesImageData) {
                 cell.pvImage?.image = itunesImage
             }
         }

@@ -75,12 +75,7 @@ class PVClipperAddInfoViewController: UIViewController {
             clip?.duration = clipDuration
         }
         
-        // Save
-        do {
-            try Constants.moc.save()
-        } catch let error as NSError {
-            print(error)
-        }
+        CoreDataHelper.saveCoreData(nil)
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {

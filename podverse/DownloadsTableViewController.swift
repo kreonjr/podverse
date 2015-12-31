@@ -20,9 +20,7 @@ class DownloadsTableViewController: UITableViewController {
     }
     
     func reloadDownloadTableData() {
-        dispatch_async(dispatch_get_main_queue()) {
-            self.tableView.reloadData()
-        }
+        self.tableView.reloadData()
     }
     
     override func viewDidLoad() {
