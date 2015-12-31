@@ -122,7 +122,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
                 existingEpisode = newEpisode
                 episodeAlreadySaved = true
                 //Remove the created entity from core data if it already exists
-                CoreDataHelper.removeManagedObjectFromClass("Episode", managedObjectContext: Constants.moc, object: newEpisode)
+                CoreDataHelper.deleteItemFromCoreData(newEpisode,completionBlock: nil)
                 break
             }
         }
@@ -183,14 +183,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             }
         }
         
-        // Save the parsed podcast and episode information
-        dispatch_async(dispatch_get_main_queue()) { () -> Void in
-            do {
-                try Constants.moc.save()
-            } catch {
-                print(error)
-            }
-        }
+        CoreDataHelper.saveCoreData(nil)
         
         delegate?.feedParsingComplete()
         print("feed parser has finished!")

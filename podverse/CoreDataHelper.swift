@@ -17,10 +17,6 @@ class CoreDataHelper: NSObject {
         return managedObject
     }
     
-    class func removeManagedObjectFromClass(className:String, managedObjectContext: NSManagedObjectContext, object:NSManagedObject) {
-        managedObjectContext.deleteObject(object)
-    }
-    
     class func fetchEntities (className: NSString, managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> NSArray {
         let fetchRequest = NSFetchRequest()
         let entityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: managedObjectContext)
@@ -67,7 +63,33 @@ class CoreDataHelper: NSObject {
         }
 
         return mostRecentItemByPubDate
-
     }
     
+    static func saveCoreData(completionBlock:((saved:Bool)->Void)?) {
+        dispatch_async(Constants.saveQueue) { () -> Void in
+            if Constants.moc.hasChanges {
+                do {
+                    try Constants.moc.save()
+                    if let completion = completionBlock {
+                        completion(saved:true)
+                    }
+                }
+                catch {
+                    if let completion = completionBlock {
+                        completion(saved:false)
+                    }
+                    print(error)
+                }
+            }
+        }
+    }
+    
+    static func deleteItemFromCoreData(deleteObject:NSManagedObject, completionBlock:(()->Void)?) {
+        dispatch_async(Constants.saveQueue) { () -> Void in
+            Constants.moc.deleteObject(deleteObject)
+            if let completion = completionBlock {
+                completion()
+            }
+        }
+    }
 }

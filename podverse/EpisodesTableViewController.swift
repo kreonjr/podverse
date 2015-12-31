@@ -302,18 +302,11 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 PVUtility.deleteEpisodeFromDiskWithName(fileName)
             }
 
-            Constants.moc.deleteObject(episodeToRemove)
+            CoreDataHelper.deleteItemFromCoreData(episodeToRemove, completionBlock: { () -> Void in
+                CoreDataHelper.saveCoreData(nil)
+            })
             episodesArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-            
-            // Save
-            do {
-                try Constants.moc.save()
-            } catch let error as NSError {
-                print(error)
-            } catch {
-                print("why is this catch necessary?")
-            }
         }
     }
     

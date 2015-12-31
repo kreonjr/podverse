@@ -44,12 +44,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 appDelegate.episodeDownloadArray.append(episode)
             }
             
-            do {
-                try Constants.moc.save()
-            } catch {
-                print(error)
-            }
-            
+            CoreDataHelper.saveCoreData(nil)
             let task = beginBackgroundTask()
             downloadTask.resume()
             endBackgroundTask(task)
@@ -68,11 +63,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
                 episode.taskResumeData = nil
                 
-                do {
-                    try Constants.moc.save()
-                } catch let error as NSError {
-                    print(error)
-                }
+                CoreDataHelper.saveCoreData(nil)
                 
                 downloadTask.resume()
             }
@@ -86,11 +77,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                             if (resumeData != nil) {
                                 episode.taskResumeData = resumeData
                                 episode.taskIdentifier = nil
-                                do {
-                                    try Constants.moc.save()
-                                } catch {
-                                    print(error)
-                                }
+                                CoreDataHelper.saveCoreData(nil)
                             }
                         }
                     }
@@ -109,11 +96,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             
             if let resumeData = error?.userInfo[NSURLSessionDownloadTaskResumeData] as? NSData {
                 episode.taskResumeData = resumeData
-                do {
-                    try Constants.moc.save()
-                } catch {
-                    print(error)
-                }
+                CoreDataHelper.saveCoreData(nil)
             }
         }
     }
