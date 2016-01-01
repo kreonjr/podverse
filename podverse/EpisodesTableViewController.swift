@@ -26,19 +26,26 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var refreshControl: UIRefreshControl!
     
+    var showAllEpisodes: Bool!
+    
     func loadData() {
         
         // Clear the episodes array, then retrieve and sort the full episode or downloaded episode array
         self.episodesArray = [Episode]()
         let unsortedEpisodes = NSMutableArray()
         
-        // Show all downloaded or currently downloading episodes
-        let downloadedEpisodesArrayPredicate = NSPredicate(format: "fileName != nil || taskIdentifier != nil", [])
-
-        let downloadedEpisodesArray = selectedPodcast.episodes.filteredSetUsingPredicate(downloadedEpisodesArrayPredicate)
+        var episodesArray: NSSet!
         
-        for singleEpisode in downloadedEpisodesArray {
-            let loopEpisode = singleEpisode as! Episode
+        // If showAllEpisodes is false, then only retrieve the downloaded episodes
+        if showAllEpisodes == false {
+            let downloadedEpisodesArrayPredicate = NSPredicate(format: "fileName != nil || taskIdentifier != nil", [])
+            episodesArray = selectedPodcast.episodes.filteredSetUsingPredicate(downloadedEpisodesArrayPredicate)
+        } else {
+            episodesArray = selectedPodcast.episodes
+        }
+        
+        for singleEpisode in episodesArray {
+            let loopEpisode = singleEpisode
             unsortedEpisodes.addObject(loopEpisode)
         }
         
@@ -54,13 +61,13 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func updateDownloadFinishedButton(notification: NSNotification) {
-//        let userInfo : Dictionary<String,Episode> = notification.userInfo as! Dictionary<String,Episode>
+        //        let userInfo : Dictionary<String,Episode> = notification.userInfo as! Dictionary<String,Episode>
         
         //  TOASK: Could this be more efficient? Should we only reload the proper cell, and not all with reloadData?
         dispatch_async(dispatch_get_main_queue()) {
             self.tableView.reloadData()
         }
-
+        
     }
     
     func downloadPlay(sender: UIButton) {
@@ -123,21 +130,21 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         
         loadData()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
+    
     // MARK: - Table view data source
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
-
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return episodesArray.count + 1
     }
-
+    
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         // If not the last cell, then insert episode information into cell
@@ -157,7 +164,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             if let duration = episode.duration {
                 cell.totalTimeLeft?.text = PVUtility.convertNSNumberToHHMMSSString(duration)
             }
-
+            
             if let pubDate = episode.pubDate {
                 cell.pubDate?.text = PVUtility.formatDateToString(pubDate)
             }
@@ -167,12 +174,12 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             if episode.fileName != nil {
                 cell.downloadPlayButton.setTitle("Play", forState: .Normal)
             }
-            // Else if episode is downloading, then display downloading icon
-            // TODO: why is the taskIdentifier sometimes getting turned into -1???
+                // Else if episode is downloading, then display downloading icon
+                // TODO: why is the taskIdentifier sometimes getting turned into -1???
             else if (episode.taskIdentifier != nil) {
                 cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
             }
-            // Else display the start download icon
+                // Else display the start download icon
             else {
                 cell.downloadPlayButton.setTitle("DL", forState: .Normal)
             }
@@ -181,13 +188,17 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             
             return cell
         }
-        // Return the Show All Available Episodes button
+            // Return the Show All Available Episodes button
         else {
-            let cell = tableView.dequeueReusableCellWithIdentifier("showAllEpisodesCell", forIndexPath: indexPath)
-            
+            if showAllEpisodes == false {
+                let cell = tableView.dequeueReusableCellWithIdentifier("showAllEpisodesCell", forIndexPath: indexPath)
                 cell.textLabel!.text = "Show All Episodes"
-            
-            return cell
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCellWithIdentifier("showAllEpisodesCell", forIndexPath: indexPath)
+                cell.textLabel!.text = "Show Downloaded Episodes"
+                return cell
+            }
         }
     }
     
@@ -222,7 +233,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                         PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
                         let cell = tableView.cellForRowAtIndexPath(indexPath) as! EpisodesTableCell
                         cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
-                        }))
+                    }))
                 }
             }
             
@@ -242,10 +253,17 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             
             self.presentViewController(episodeActions, animated: true, completion: nil)
         }
-        // Else segue to show All Episodes controller
+            // Else Show All Episodes or Show Downloaded Episodes
         else {
-            self.performSegueWithIdentifier("Show All Episodes", sender: nil)
+            toggleShowAllEpisodes()
         }
+    }
+    
+    func toggleShowAllEpisodes() {
+        let vc = self.storyboard?.instantiateViewControllerWithIdentifier("episodesTableViewController") as! EpisodesTableViewController
+        vc.selectedPodcast = selectedPodcast
+        vc.showAllEpisodes = !showAllEpisodes
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     // Override to support conditional editing of the table view.
@@ -301,7 +319,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             if let fileName = episodeToRemove.fileName {
                 PVUtility.deleteEpisodeFromDiskWithName(fileName)
             }
-
+            
             CoreDataHelper.deleteItemFromCoreData(episodeToRemove, completionBlock: { () -> Void in
                 CoreDataHelper.saveCoreData(nil)
             })
@@ -311,14 +329,10 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     // MARK: - Navigation
-
+    
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "Show All Episodes" {
-            let episodesShowAllViewController = segue.destinationViewController as! EpisodesShowAllViewController
-                episodesShowAllViewController.selectedPodcast = selectedPodcast
-        }
-        else if segue.identifier == "playDownloadedEpisode" {
+        if segue.identifier == "playDownloadedEpisode" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             let index = self.tableView.indexPathForSelectedRow!
             PVMediaPlayer.sharedInstance.nowPlayingEpisode = episodesArray[index.row]
