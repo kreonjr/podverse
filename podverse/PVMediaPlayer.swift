@@ -15,7 +15,7 @@ protocol PVMediaPlayerDelegate {
 }
 
 class PVMediaPlayer: NSObject {
-    
+
     static let sharedInstance = PVMediaPlayer()
     
     var avPlayer = AVPlayer()
@@ -24,6 +24,8 @@ class PVMediaPlayer: NSObject {
     
     var nowPlayingEpisode: Episode!
     var nowPlayingClip: Clip!
+    
+    var mediaPlayerIsPlaying = false
     
     var delegate: PVMediaPlayerDelegate?
     
@@ -51,6 +53,8 @@ class PVMediaPlayer: NSObject {
         } catch let error as NSError {
                 print(error.localizedDescription)
         }
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "playInterrupted:", name: AVAudioSessionInterruptionNotification, object: AVAudioSession.sharedInstance())
     }
     
     func playForSeconds(startTime:Double, endTime:Double) {
@@ -63,14 +67,16 @@ class PVMediaPlayer: NSObject {
     func playOrPause() -> (Bool) {
        
         self.setPlayingInfo(self.nowPlayingEpisode)
-        
+    
         if avPlayer.rate == 0 {
             avPlayer.play()
+            mediaPlayerIsPlaying = true
             return true
 
         } else {
             saveCurrentTimeAsPlaybackPosition()
             avPlayer.pause()
+            mediaPlayerIsPlaying = false
             return false
         }
     }
@@ -128,6 +134,7 @@ class PVMediaPlayer: NSObject {
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
         avPlayer.play()
+        mediaPlayerIsPlaying = true
     }
     
     func skipTime(seconds: Double) {
@@ -137,6 +144,7 @@ class PVMediaPlayer: NSObject {
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
         avPlayer.play()
+        mediaPlayerIsPlaying = true
     }
     
     func previousTime(seconds: Double) {
@@ -146,6 +154,7 @@ class PVMediaPlayer: NSObject {
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
         avPlayer.play()
+        mediaPlayerIsPlaying = true
     }
     
     func updateNowPlayingCurrentTimeNotification() {
@@ -170,6 +179,27 @@ class PVMediaPlayer: NSObject {
         } else {
             if let urlString = episode.mediaURL, let url = NSURL(string: urlString) {
                 avPlayer = AVPlayer(URL:url)
+            }
+        }
+    }
+    
+    func playInterrupted(notification: NSNotification) {
+        if notification.name == AVAudioSessionInterruptionNotification && notification.userInfo != nil {
+            var info = notification.userInfo!
+            var intValue: UInt = 0
+            
+            (info[AVAudioSessionInterruptionTypeKey] as! NSValue).getValue(&intValue)
+            
+            if let type = AVAudioSessionInterruptionType(rawValue: intValue) {
+                switch type {
+                case .Began:
+                    break
+                case .Ended:
+                    if mediaPlayerIsPlaying == true {
+                        playOrPause()
+                    }
+                    break
+                }
             }
         }
     }

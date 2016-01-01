@@ -42,7 +42,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         pvMediaPlayer.delegate = self
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "dismissKeyboard"))
