@@ -10,6 +10,10 @@ import UIKit
 import AVFoundation
 import MediaPlayer
 
+protocol PVMediaPlayerDelegate {
+    func setMediaPlayerVCPlayPauseIcon()
+}
+
 class PVMediaPlayer: NSObject {
     
     static let sharedInstance = PVMediaPlayer()
@@ -20,6 +24,8 @@ class PVMediaPlayer: NSObject {
     
     var nowPlayingEpisode: Episode!
     var nowPlayingClip: Clip!
+    
+    var delegate: PVMediaPlayerDelegate?
     
     override init() {
         super.init()
@@ -79,12 +85,16 @@ class PVMediaPlayer: NSObject {
             switch event.subtype {
             case UIEventSubtype.RemoteControlPlay:
                 self.playOrPause()
+                delegate?.setMediaPlayerVCPlayPauseIcon()
                 break
             case UIEventSubtype.RemoteControlPause:
                 self.playOrPause()
+                delegate?.setMediaPlayerVCPlayPauseIcon()
                 break
             case UIEventSubtype.RemoteControlTogglePlayPause:
                 self.playOrPause()
+                delegate?.setMediaPlayerVCPlayPauseIcon()
+                break
             default:
                 break
             }

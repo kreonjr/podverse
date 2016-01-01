@@ -10,7 +10,7 @@ import UIKit
 import CoreData
 import AVFoundation
 
-class MediaPlayerViewController: UIViewController {
+class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     let makeClipString = "Make Clip"
     let hideClipper = "Hide Clipper"
@@ -42,6 +42,8 @@ class MediaPlayerViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        pvMediaPlayer.delegate = self
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "dismissKeyboard"))
         self.clipper = ((self.childViewControllers.first as! UINavigationController).topViewController as? PVClipperViewController)
@@ -227,5 +229,9 @@ class MediaPlayerViewController: UIViewController {
             }
             buttonMakeClip.setTitle(hideClipper, forState: .Normal)
         }
+    }
+    
+    func setMediaPlayerVCPlayPauseIcon() {
+        setPlayPauseIcon()
     }
 }
