@@ -47,10 +47,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Check if a new episode is available for a subscribed podcast; if true, download that episode.
     // TODO: shouldn't we check via push notifications? Rather than a timer that continuously runs in the background?
     func startCheckSubscriptionsForNewEpisodesTimer() {
-        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: "refreshPodcastFeed", userInfo: nil, repeats: true)
+        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: "refreshPodcastFeeds", userInfo: nil, repeats: true)
     }
     
-    func refreshPodcastFeed () {
+    func refreshPodcastFeeds () {
         let podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
         for var i = 0; i < podcastArray.count; i++ {
             let feedURL = NSURL(string: podcastArray[i].feedURL)
@@ -116,7 +116,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-        self.refreshPodcastFeed()
+        self.refreshPodcastFeeds()
     }
 
     func applicationDidBecomeActive(application: UIApplication) {
