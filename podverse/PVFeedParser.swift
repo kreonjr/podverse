@@ -87,7 +87,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         
         podcast.isSubscribed = self.shouldSubscribeToPodcast
         
-        downloadedEpisodes = Array(podcast.episodes)
+        downloadedEpisodes = Array(podcast.episodes.allObjects)
     }
     
     func feedParser(parser: FeedParser, didParseItem item: FeedItem) {
