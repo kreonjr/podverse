@@ -38,15 +38,14 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         
         // If showAllEpisodes is false, then only retrieve the downloaded episodes
         if showAllEpisodes == false {
-            let downloadedEpisodesArrayPredicate = NSPredicate(format: "fileName != nil || taskIdentifier != nil", [])
+            let downloadedEpisodesArrayPredicate = NSPredicate(format: "fileName != nil || taskIdentifier != nil", argumentArray: nil)
             episodesArray = selectedPodcast.episodes.filteredSetUsingPredicate(downloadedEpisodesArrayPredicate)
         } else {
             episodesArray = selectedPodcast.episodes
         }
         
         for singleEpisode in episodesArray {
-            let loopEpisode = singleEpisode
-            unsortedEpisodes.addObject(loopEpisode)
+            unsortedEpisodes.addObject(singleEpisode)
         }
         
         let sortDescriptor = NSSortDescriptor(key: "pubDate", ascending: false)
@@ -146,10 +145,10 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
         
         // If not the last cell, then insert episode information into cell
         if indexPath.row < episodesArray.count {
-            let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
             
             let episode = episodesArray[indexPath.row]
             
@@ -185,21 +184,18 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             }
             
             cell.downloadPlayButton.addTarget(self, action: "downloadPlay:", forControlEvents: .TouchUpInside)
-            
-            return cell
         }
             // Return the Show All Available Episodes button
         else {
             if showAllEpisodes == false {
-                let cell = tableView.dequeueReusableCellWithIdentifier("showAllEpisodesCell", forIndexPath: indexPath)
                 cell.textLabel!.text = "Show All Episodes"
-                return cell
+
             } else {
-                let cell = tableView.dequeueReusableCellWithIdentifier("showAllEpisodesCell", forIndexPath: indexPath)
                 cell.textLabel!.text = "Show Downloaded Episodes"
-                return cell
             }
         }
+        
+        return cell
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
