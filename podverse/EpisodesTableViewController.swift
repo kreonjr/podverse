@@ -145,10 +145,11 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
+        
         
         // If not the last cell, then insert episode information into cell
         if indexPath.row < episodesArray.count {
+            let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! EpisodesTableCell
             
             let episode = episodesArray[indexPath.row]
             
@@ -184,18 +185,22 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             }
             
             cell.downloadPlayButton.addTarget(self, action: "downloadPlay:", forControlEvents: .TouchUpInside)
+            
+            return cell
         }
             // Return the Show All Available Episodes button
         else {
+            let cell = tableView.dequeueReusableCellWithIdentifier("showAllEpisodesCell", forIndexPath: indexPath)
+
             if showAllEpisodes == false {
                 cell.textLabel!.text = "Show All Episodes"
 
             } else {
                 cell.textLabel!.text = "Show Downloaded Episodes"
             }
+            
+            return cell
         }
-        
-        return cell
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
