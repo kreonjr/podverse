@@ -32,8 +32,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     
     func parsePodcastFeed(feedURLString: String) {
         // Parse podcast feeds on the reentrantAvoidanceQueue in order to prevent the "NSXMLParser does not support reentrant parsing" issue.
-        let reentrantAvoidanceQueue = dispatch_queue_create("reentrantAvoidanceQueue", DISPATCH_QUEUE_SERIAL);
-        dispatch_async(reentrantAvoidanceQueue){
+        dispatch_async(Constants.reentrantAvoidanceQueue){
             self.feedURL = feedURLString
             let feedParser = CustomFeedParser(feedURL: feedURLString)
             feedParser.delegate = self
@@ -87,14 +86,15 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         
         podcast.isSubscribed = self.shouldSubscribeToPodcast
         
-        downloadedEpisodes = Array(podcast.episodes)
+        downloadedEpisodes = Array(podcast.episodes.allObjects)
     }
     
     func feedParser(parser: FeedParser, didParseItem item: FeedItem) {
+        //Do not parse episode if it does not contain feedEnclosures.
         if item.feedEnclosures.count <= 0 {
-            //Do not parse episode if it does not contain feedEnclosures.
             return
         }
+        
         var episodeAlreadySaved = false
         let newEpisode = CoreDataHelper.insertManagedObject("Episode", managedObjectContext: Constants.moc) as! Episode
         
@@ -109,6 +109,8 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         newEpisode.mediaType = item.feedEnclosures[0].type
         newEpisode.mediaBytes = NSNumber(integer: item.feedEnclosures[0].length)
         if let guid = item.feedIdentifier { newEpisode.guid = guid }
+        
+        newEpisode.taskIdentifier = nil
         
         // If only parsing for the latest episode, stop parsing after parsing the first episode.
         if shouldGetMostRecentEpisode == true {
@@ -126,8 +128,6 @@ class PVFeedParser: NSObject, FeedParserDelegate {
                 break
             }
         }
-        
-        newEpisode.taskIdentifier = nil
         
         // If episode is not already saved, then add episode to the podcast object
         if !episodeAlreadySaved {

@@ -70,7 +70,9 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                                 let addByRSSAlert = UIAlertController(title: "No results found", message: "Please try a different search.", preferredStyle: UIAlertControllerStyle.Alert)
                                 
                                 addByRSSAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
-                                self.presentViewController(addByRSSAlert, animated: true, completion: nil)
+                                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                                	self.presentViewController(addByRSSAlert, animated: true, completion: nil)
+                            	})
                             } else {
                                 for (var i = 0; i < results.count; i++) {
                                     
