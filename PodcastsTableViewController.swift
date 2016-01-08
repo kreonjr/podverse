@@ -38,18 +38,15 @@ class PodcastsTableViewController: UITableViewController {
             PVDownloader.sharedInstance.startDownloadingEpisode(episode)
         }
         
+        self.refreshControl!.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
+    }
+    
+    func refreshPodcastFeeds() {
+        appDelegate.refreshPodcastFeeds()
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        // Alert the user to enable background notifications
-        // TODO: Shouldn't this be moved to somewhere like the AppDelegate?
-        let registerUserNotificationSettings = UIApplication.instancesRespondToSelector("registerUserNotificationSettings:")
-        if registerUserNotificationSettings {
-            let types: UIUserNotificationType = [.Alert , .Sound]
-            UIApplication.sharedApplication().registerUserNotificationSettings(UIUserNotificationSettings(forTypes: types, categories: nil))
-        }
         
         loadData()
         
@@ -143,6 +140,11 @@ class PodcastsTableViewController: UITableViewController {
             mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
+    }
+    
+    func feedParsingComplete() {
+        self.refreshControl!.endRefreshing()
+        tableView.reloadData()
     }
 
 }

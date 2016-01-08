@@ -61,77 +61,85 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                 }
                 
                 do {
-                    let jsonResult = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers) as! NSDictionary
-                    if let results: NSArray = jsonResult["results"] as? NSArray {
-                        
-                        // If no results, then show the "No results found" message. Else show the results.
-                        if results.count < 1 {
-                            let addByRSSAlert = UIAlertController(title: "No results found", message: "Please try a different search.", preferredStyle: UIAlertControllerStyle.Alert)
+                    if let d = data {
+                        let jsonResult = try NSJSONSerialization.JSONObjectWithData(d, options: NSJSONReadingOptions.MutableContainers) as! NSDictionary
+                        if let results: NSArray = jsonResult["results"] as? NSArray {
                             
-                            addByRSSAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
-                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                                self.presentViewController(addByRSSAlert, animated: true, completion: nil)
-                            })
-                        } else {
-                            for (var i = 0; i < results.count; i++) {
+                            // If no results, then show the "No results found" message. Else show the results.
+                            if results.count < 1 {
+                                let addByRSSAlert = UIAlertController(title: "No results found", message: "Please try a different search.", preferredStyle: UIAlertControllerStyle.Alert)
                                 
-                                let podcastJSON: AnyObject = results[i]
-                                
-                                let searchResultPodcast = SearchResultPodcast()
-                                
-                                searchResultPodcast.artistName = podcastJSON["artistName"] as? String
-                                
-                                if let feedURLString = podcastJSON["feedUrl"] as? String {
-                                    searchResultPodcast.feedURL = NSURL(string: feedURLString)
+                                addByRSSAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
+                                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                                	self.presentViewController(addByRSSAlert, animated: true, completion: nil)
+                            	})
+                            } else {
+                                for (var i = 0; i < results.count; i++) {
                                     
-                                    let predicate = NSPredicate(format: "feedURL == %@", searchResultPodcast.feedURL!)
-                                    let podcastsAlreadySubscribedTo = CoreDataHelper.fetchEntities("Podcast", managedObjectContext:Constants.moc, predicate: predicate)
+                                    let podcastJSON: AnyObject = results[i]
                                     
-                                    if podcastsAlreadySubscribedTo.count != 0 {
-                                        searchResultPodcast.isSubscribed = true
-                                    } else {
-                                        searchResultPodcast.isSubscribed = false
-                                    }
-                                }
-                                
-                                if let imageURLString = podcastJSON["artworkUrl100"] as? String {
-                                    let imgURL = NSURL(string: imageURLString)
-                                    let request = NSURLRequest(URL: imgURL!)
-                                    NSURLConnection.sendAsynchronousRequest(
-                                        request, queue: NSOperationQueue.mainQueue(),
-                                        completionHandler: { response, data, error in
-                                            if error == nil {
-                                                searchResultPodcast.image = data
-                                                self.tableView.reloadData()
-                                            } else {
-                                                print(error)
-                                            }
+                                    let searchResultPodcast = SearchResultPodcast()
+                                    
+                                    searchResultPodcast.artistName = podcastJSON["artistName"] as? String
+                                    
+                                    if let feedURLString = podcastJSON["feedUrl"] as? String {
+                                        searchResultPodcast.feedURL = NSURL(string: feedURLString)
+                                        
+                                        let predicate = NSPredicate(format: "feedURL == %@", searchResultPodcast.feedURL!)
+                                        let podcastsAlreadySubscribedTo = CoreDataHelper.fetchEntities("Podcast", managedObjectContext:Constants.moc, predicate: predicate)
+                                        
+                                        if podcastsAlreadySubscribedTo.count != 0 {
+                                            searchResultPodcast.isSubscribed = true
+                                        } else {
+                                            searchResultPodcast.isSubscribed = false
                                         }
-                                    )
+                                    }
+                                    
+                                    if let imageURLString = podcastJSON["artworkUrl100"] as? String {
+                                        let imgURL = NSURL(string: imageURLString)
+                                        let request = NSURLRequest(URL: imgURL!)
+                                        NSURLConnection.sendAsynchronousRequest(
+                                            request, queue: NSOperationQueue.mainQueue(),
+                                            completionHandler: { response, data, error in
+                                                if error == nil {
+                                                    searchResultPodcast.image = data
+                                                    self.tableView.reloadData()
+                                                } else {
+                                                    print(error)
+                                                }
+                                            }
+                                        )
+                                    }
+                                    
+                                    // Grab the releaseDate, then convert into NSDate
+                                    if let lastPubDateString = podcastJSON["releaseDate"] as? String {
+                                        var modifiedPubDateString = lastPubDateString.stringByReplacingOccurrencesOfString("T", withString: " ", options: NSStringCompareOptions.LiteralSearch, range: nil)
+                                        modifiedPubDateString = modifiedPubDateString.stringByReplacingOccurrencesOfString("Z", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
+                                        let dateFormatter = NSDateFormatter()
+                                        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+                                        searchResultPodcast.lastPubDate = dateFormatter.dateFromString(modifiedPubDateString)
+                                    }
+                                    
+                                    searchResultPodcast.primaryGenreName = podcastJSON["primaryGenreName"] as? String
+                                    
+                                    searchResultPodcast.title = podcastJSON["collectionName"] as? String
+                                    
+                                    self.iTunesSearchPodcastArray.append(searchResultPodcast)
+                                    dispatch_async(dispatch_get_main_queue()) {
+                                        self.tableView.reloadData()
+                                    }
+                                    
                                 }
-                                
-                                // Grab the releaseDate, then convert into NSDate
-                                if let lastPubDateString = podcastJSON["releaseDate"] as? String {
-                                    var modifiedPubDateString = lastPubDateString.stringByReplacingOccurrencesOfString("T", withString: " ", options: NSStringCompareOptions.LiteralSearch, range: nil)
-                                    modifiedPubDateString = modifiedPubDateString.stringByReplacingOccurrencesOfString("Z", withString: "", options: NSStringCompareOptions.LiteralSearch, range: nil)
-                                    let dateFormatter = NSDateFormatter()
-                                    dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
-                                    searchResultPodcast.lastPubDate = dateFormatter.dateFromString(modifiedPubDateString)
-                                }
-                                
-                                searchResultPodcast.primaryGenreName = podcastJSON["primaryGenreName"] as? String
-                                
-                                searchResultPodcast.title = podcastJSON["collectionName"] as? String
-                                
-                                self.iTunesSearchPodcastArray.append(searchResultPodcast)
-                                dispatch_async(dispatch_get_main_queue()) {
-                                    self.tableView.reloadData()
-                                }
-                                
                             }
                         }
+                    } else {
+                        dispatch_async(dispatch_get_main_queue()) {
+                            let addByRSSAlert = UIAlertController(title: "No internet connection", message: "Please connect to the internet to search.", preferredStyle: UIAlertControllerStyle.Alert)
+                            
+                            addByRSSAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
+                            self.presentViewController(addByRSSAlert, animated: true, completion: nil)
+                        }
                     }
-                    
                 } catch let error as NSError {
                     print(error)
                 }
