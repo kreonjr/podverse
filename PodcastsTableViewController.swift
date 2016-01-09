@@ -38,7 +38,7 @@ class PodcastsTableViewController: UITableViewController {
             PVDownloader.sharedInstance.startDownloadingEpisode(episode)
         }
         
-        self.refreshControl!.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl?.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
     }
     
     func refreshPodcastFeeds() {
