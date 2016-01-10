@@ -74,6 +74,10 @@ class PodcastsTableViewController: UITableViewController {
         // Return the number of sections.
         return 1
     }
+    
+    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "My Subscribed Podcasts"
+    }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete method implementation.
