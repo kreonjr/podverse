@@ -264,7 +264,12 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         let vc = self.storyboard?.instantiateViewControllerWithIdentifier("episodesTableViewController") as! EpisodesTableViewController
         vc.selectedPodcast = selectedPodcast
         vc.showAllEpisodes = !showAllEpisodes
-        self.navigationController?.pushViewController(vc, animated: true)
+        if showAllEpisodes == false {
+            self.navigationController?.pushViewController(vc, animated: true)
+        } else {
+            navigationController?.popViewControllerAnimated(true)
+        }
+
     }
     
     // Override to support conditional editing of the table view.
