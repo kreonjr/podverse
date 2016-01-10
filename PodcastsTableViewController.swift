@@ -126,8 +126,16 @@ class PodcastsTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             let podcastToRemove = podcastArray[indexPath.row]
+
+            // Remove Player button if the now playing episode was one of the podcast's episodes
+            let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
+            if allPodcastEpisodes.contains(PVMediaPlayer.sharedInstance.nowPlayingEpisode) {
+                self.navigationItem.rightBarButtonItem = nil
+            }
+            
             PVSubscriber.sharedInstance.unsubscribeFromPodcast(podcastToRemove)
             podcastArray.removeAtIndex(indexPath.row)
+            
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
         }
     }
