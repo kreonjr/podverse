@@ -129,8 +129,10 @@ class PodcastsTableViewController: UITableViewController {
 
             // Remove Player button if the now playing episode was one of the podcast's episodes
             let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
-            if allPodcastEpisodes.contains(PVMediaPlayer.sharedInstance.nowPlayingEpisode) {
-                self.navigationItem.rightBarButtonItem = nil
+            if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+                if allPodcastEpisodes.contains(nowPlayingEpisode) {
+                    self.navigationItem.rightBarButtonItem = nil
+                }
             }
             
             PVSubscriber.sharedInstance.unsubscribeFromPodcast(podcastToRemove)
