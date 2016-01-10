@@ -17,12 +17,6 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var moc: NSManagedObjectContext! {
-        get {
-            return appDelegate.managedObjectContext
-        }
-    }
-    
     var jsonTableData = []
     
     var iTunesSearchPodcastArray = [SearchResultPodcast]()
