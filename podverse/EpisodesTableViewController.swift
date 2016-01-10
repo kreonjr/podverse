@@ -140,6 +140,14 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         return 1
     }
     
+    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if showAllEpisodes == false {
+            return "Downloaded"
+        } else {
+            return "All Available Episodes"
+        }
+    }
+    
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return episodesArray.count + 1
     }
