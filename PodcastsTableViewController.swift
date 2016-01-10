@@ -86,14 +86,15 @@ class PodcastsTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
         let podcast = podcastArray[indexPath.row]
         cell.title?.text = podcast.title
         cell.pvImage?.image = UIImage(named: "Blank52")
         
-        let totalEpisodesDownloadedPredicate = NSPredicate(format: "podcast == %@ && downloadComplete == true", podcast)
-        let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: totalEpisodesDownloadedPredicate)
-        cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded"
+        let episodes = podcast.episodes.allObjects as! [Episode]
+        let episodesDownloaded = episodes.filter{ $0.downloadComplete == true }
+        cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
         
         if let lastPubDate = podcast.lastPubDate {
             cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
