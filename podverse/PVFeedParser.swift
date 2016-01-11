@@ -87,6 +87,8 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         podcast.isSubscribed = self.shouldSubscribeToPodcast
         
         downloadedEpisodes = Array(podcast.episodes.allObjects)
+        
+        CoreDataHelper.saveCoreData(nil)
     }
     
     func feedParser(parser: FeedParser, didParseItem item: FeedItem) {
@@ -136,6 +138,8 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         if !episodeAlreadySaved {
             podcast.addEpisodeObject(newEpisode)
         }
+        
+        CoreDataHelper.saveCoreData(nil)
     }
     
     func feedParserParsingAborted(parser: FeedParser) {
