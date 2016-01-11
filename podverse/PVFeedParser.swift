@@ -124,7 +124,10 @@ class PVFeedParser: NSObject, FeedParserDelegate {
                 existingEpisode = newEpisode
                 episodeAlreadySaved = true
                 //Remove the created entity from core data if it already exists
-                CoreDataHelper.deleteItemFromCoreData(newEpisode,completionBlock: nil)
+                CoreDataHelper.deleteItemFromCoreData(newEpisode, completionBlock: { () -> Void in
+                    CoreDataHelper.saveCoreData(nil)
+                })
+
                 break
             }
         }

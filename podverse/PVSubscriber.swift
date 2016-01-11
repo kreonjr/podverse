@@ -39,7 +39,10 @@ class PVSubscriber: NSObject {
                     PVUtility.deleteEpisodeFromDiskWithName(fileName)
                 }
                 
-                CoreDataHelper.deleteItemFromCoreData(episodeToRemove, completionBlock: nil)
+                CoreDataHelper.deleteItemFromCoreData(episodeToRemove, completionBlock: { () -> Void in
+                    CoreDataHelper.saveCoreData(nil)
+                })
+
                 
                 // If the episodeToRemove is currently downloading, then retrieve and cancel the download
                 if episodeToRemove.taskIdentifier != nil {
