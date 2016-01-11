@@ -180,11 +180,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     episode.taskIdentifier = nil
                     
                     // Save the downloadedMediaFileDestination with the object
-                    do {
-                        try Constants.moc.save()
-                    } catch {
-                        print(error)
-                    }
+                    CoreDataHelper.saveCoreData(nil)
                     
                     let downloadHasFinishedUserInfo = ["episode":episode]
                     

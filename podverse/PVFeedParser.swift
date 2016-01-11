@@ -31,8 +31,8 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func parsePodcastFeed(feedURLString: String) {
-        // Parse podcast feeds on the reentrantAvoidanceQueue in order to prevent the "NSXMLParser does not support reentrant parsing" issue.
-        dispatch_async(Constants.reentrantAvoidanceQueue){
+        // Parse podcast feeds on the saveQueue (serial queue) in order to prevent the "NSXMLParser does not support reentrant parsing" issue.
+        dispatch_async(Constants.saveQueue){
             self.feedURL = feedURLString
             let feedParser = CustomFeedParser(feedURL: feedURLString)
             feedParser.delegate = self
