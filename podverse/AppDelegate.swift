@@ -51,7 +51,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func refreshPodcastFeeds () {
-        let podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: self.moc, predicate: nil) as! [Podcast]
+        let podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
         for var i = 0; i < podcastArray.count; i++ {
             let feedURL = NSURL(string: podcastArray[i].feedURL)
             

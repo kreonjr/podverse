@@ -108,19 +108,21 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         else {
             // Get the corresponding episode object by its taskIdentifier value
             if let episodeDownloadIndex = getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier) {
-                let episode = appDelegate.episodeDownloadArray[episodeDownloadIndex.integerValue]
-                
-                let totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
-                
-                episode.downloadProgress = Float(totalProgress)
-                episode.mediaBytes = Float(totalBytesExpectedToWrite)
-                
-                // TODO: Should we call a moc.save() within the didWriteData?
-                
-                // TODO: Is this Notification actually doing anything? I don't see the downloadHasProgressed notification getting used anywhere...
-                let downloadHasProgressedUserInfo = ["episode":episode]
-                
-                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
+                if episodeDownloadIndex.integerValue < appDelegate.episodeDownloadArray.count {
+                    let episode = appDelegate.episodeDownloadArray[episodeDownloadIndex.integerValue]
+                    
+                    let totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
+                    
+                    episode.downloadProgress = Float(totalProgress)
+                    episode.mediaBytes = Float(totalBytesExpectedToWrite)
+                    
+                    // TODO: Should we call a moc.save() within the didWriteData?
+                    
+                    // TODO: Is this Notification actually doing anything? I don't see the downloadHasProgressed notification getting used anywhere...
+                    let downloadHasProgressedUserInfo = ["episode":episode]
+                    
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
+                }
             }
         }
     }
@@ -178,11 +180,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     episode.taskIdentifier = nil
                     
                     // Save the downloadedMediaFileDestination with the object
-                    do {
-                        try Constants.moc.save()
-                    } catch {
-                        print(error)
-                    }
+                    CoreDataHelper.saveCoreData(nil)
                     
                     let downloadHasFinishedUserInfo = ["episode":episode]
                     

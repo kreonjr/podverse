@@ -124,6 +124,9 @@ class PVMediaPlayer: NSObject {
         } else if let podcastImageData = self.nowPlayingEpisode.podcast.imageData {
             let podcastImage = UIImage(data: podcastImageData)
             mpImage = MPMediaItemArtwork(image: podcastImage!)
+        } else {
+            // TODO: Replace Blank52 with a square Podverse logo
+            mpImage = MPMediaItemArtwork(image: UIImage(named: "Blank52")!)
         }
         
         MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: episodeTitle, MPMediaItemPropertyArtwork: mpImage]

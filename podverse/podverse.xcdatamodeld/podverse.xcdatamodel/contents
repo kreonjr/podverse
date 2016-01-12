@@ -43,7 +43,7 @@
         <attribute name="summary" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="clips" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Clip" inverseName="podcast" inverseEntity="Clip" syncable="YES"/>
-        <relationship name="episodes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Episode" inverseName="podcast" inverseEntity="Episode" syncable="YES"/>
+        <relationship name="episodes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Episode" inverseName="podcast" inverseEntity="Episode" syncable="YES"/>
     </entity>
     <elements>
         <element name="Clip" positionX="-20" positionY="-387" width="128" height="135"/>

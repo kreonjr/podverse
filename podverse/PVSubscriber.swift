@@ -23,8 +23,7 @@ class PVSubscriber: NSObject {
     
     func unsubscribeFromPodcast(podcast:Podcast) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
-            let episodeToRemovePredicate = NSPredicate(format: "podcast == %@", podcast)
-            let episodeToRemoveArray = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: episodeToRemovePredicate)
+            let episodesToRemove = podcast.episodes.allObjects as! [Episode]
             
             // Get the downloadSession and the downloadTasks, and make downloadTasks available to parent
             let downloadSession = PVDownloader.sharedInstance.downloadSession
@@ -34,13 +33,16 @@ class PVSubscriber: NSObject {
             }
             
             // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
-            for var i = 0; i < episodeToRemoveArray.count; i++ {
-                let episodeToRemove = episodeToRemoveArray[i] as! Episode
+            for var i = 0; i < episodesToRemove.count; i++ {
+                let episodeToRemove = episodesToRemove[i]
                 if let fileName = episodeToRemove.fileName {
                     PVUtility.deleteEpisodeFromDiskWithName(fileName)
                 }
                 
-                CoreDataHelper.deleteItemFromCoreData(episodeToRemove, completionBlock: nil)
+                CoreDataHelper.deleteItemFromCoreData(episodeToRemove, completionBlock: { () -> Void in
+                    CoreDataHelper.saveCoreData(nil)
+                })
+
                 
                 // If the episodeToRemove is currently downloading, then retrieve and cancel the download
                 if episodeToRemove.taskIdentifier != nil {

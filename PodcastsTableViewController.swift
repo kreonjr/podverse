@@ -38,7 +38,7 @@ class PodcastsTableViewController: UITableViewController {
             PVDownloader.sharedInstance.startDownloadingEpisode(episode)
         }
         
-        self.refreshControl!.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl?.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
     }
     
     func refreshPodcastFeeds() {
@@ -74,6 +74,10 @@ class PodcastsTableViewController: UITableViewController {
         // Return the number of sections.
         return 1
     }
+    
+    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "My Subscribed Podcasts"
+    }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete method implementation.
@@ -82,14 +86,15 @@ class PodcastsTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
         let podcast = podcastArray[indexPath.row]
         cell.title?.text = podcast.title
         cell.pvImage?.image = UIImage(named: "Blank52")
         
-        let totalEpisodesDownloadedPredicate = NSPredicate(format: "podcast == %@ && downloadComplete == true", podcast)
-        let totalEpisodesDownloaded = CoreDataHelper.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: totalEpisodesDownloadedPredicate)
-        cell.episodesDownloadedOrStarted?.text = "\(totalEpisodesDownloaded.count) downloaded"
+        let episodes = podcast.episodes.allObjects as! [Episode]
+        let episodesDownloaded = episodes.filter{ $0.downloadComplete == true }
+        cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
         
         if let lastPubDate = podcast.lastPubDate {
             cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
@@ -121,8 +126,18 @@ class PodcastsTableViewController: UITableViewController {
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
             let podcastToRemove = podcastArray[indexPath.row]
+
+            // Remove Player button if the now playing episode was one of the podcast's episodes
+            let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
+            if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+                if allPodcastEpisodes.contains(nowPlayingEpisode) {
+                    self.navigationItem.rightBarButtonItem = nil
+                }
+            }
+            
             PVSubscriber.sharedInstance.unsubscribeFromPodcast(podcastToRemove)
             podcastArray.removeAtIndex(indexPath.row)
+            
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
         }
     }

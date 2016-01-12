@@ -17,12 +17,6 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var moc: NSManagedObjectContext! {
-        get {
-            return appDelegate.managedObjectContext
-        }
-    }
-    
     var jsonTableData = []
     
     var iTunesSearchPodcastArray = [SearchResultPodcast]()
@@ -74,6 +68,9 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                                 	self.presentViewController(addByRSSAlert, animated: true, completion: nil)
                             	})
                             } else {
+                                // Get all podcasts in Core Data to use to determine if you're already subscribed to a search result podcast
+                                let allSubscribedPodcasts = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
+                                
                                 for (var i = 0; i < results.count; i++) {
                                     
                                     let podcastJSON: AnyObject = results[i]
@@ -85,10 +82,9 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                                     if let feedURLString = podcastJSON["feedUrl"] as? String {
                                         searchResultPodcast.feedURL = NSURL(string: feedURLString)
                                         
-                                        let predicate = NSPredicate(format: "feedURL == %@", searchResultPodcast.feedURL!)
-                                        let podcastsAlreadySubscribedTo = CoreDataHelper.fetchEntities("Podcast", managedObjectContext:Constants.moc, predicate: predicate)
+                                        let podcastAlreadySubscribedTo = allSubscribedPodcasts.filter{ $0.feedURL == feedURLString }
                                         
-                                        if podcastsAlreadySubscribedTo.count != 0 {
+                                        if podcastAlreadySubscribedTo.count != 0 {
                                             searchResultPodcast.isSubscribed = true
                                         } else {
                                             searchResultPodcast.isSubscribed = false

@@ -31,8 +31,8 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func parsePodcastFeed(feedURLString: String) {
-        // Parse podcast feeds on the reentrantAvoidanceQueue in order to prevent the "NSXMLParser does not support reentrant parsing" issue.
-        dispatch_async(Constants.reentrantAvoidanceQueue){
+        // Parse podcast feeds on the saveQueue (serial queue) in order to prevent the "NSXMLParser does not support reentrant parsing" issue.
+        dispatch_async(Constants.saveQueue){
             self.feedURL = feedURLString
             let feedParser = CustomFeedParser(feedURL: feedURLString)
             feedParser.delegate = self
@@ -87,6 +87,8 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         podcast.isSubscribed = self.shouldSubscribeToPodcast
         
         downloadedEpisodes = Array(podcast.episodes.allObjects)
+        
+        CoreDataHelper.saveCoreData(nil)
     }
     
     func feedParser(parser: FeedParser, didParseItem item: FeedItem) {
@@ -124,7 +126,10 @@ class PVFeedParser: NSObject, FeedParserDelegate {
                 existingEpisode = newEpisode
                 episodeAlreadySaved = true
                 //Remove the created entity from core data if it already exists
-                CoreDataHelper.deleteItemFromCoreData(newEpisode,completionBlock: nil)
+                CoreDataHelper.deleteItemFromCoreData(newEpisode, completionBlock: { () -> Void in
+                    CoreDataHelper.saveCoreData(nil)
+                })
+
                 break
             }
         }
@@ -133,6 +138,8 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         if !episodeAlreadySaved {
             podcast.addEpisodeObject(newEpisode)
         }
+        
+        CoreDataHelper.saveCoreData(nil)
     }
     
     func feedParserParsingAborted(parser: FeedParser) {
