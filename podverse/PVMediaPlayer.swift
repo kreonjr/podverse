@@ -111,6 +111,8 @@ class PVMediaPlayer: NSObject {
         var podcastTitle: String!
         var episodeTitle: String!
         var mpImage: MPMediaItemArtwork!
+        var mpDuration: NSNumber!
+        let mpRate = 1
         
         podcastTitle = self.nowPlayingEpisode.podcast.title
         
@@ -129,7 +131,11 @@ class PVMediaPlayer: NSObject {
             mpImage = MPMediaItemArtwork(image: UIImage(named: "Blank52")!)
         }
         
-        MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: episodeTitle, MPMediaItemPropertyArtwork: mpImage]
+        if let playbackDuration = nowPlayingEpisode.duration {
+            mpDuration = playbackDuration
+        }
+        
+        MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: episodeTitle, MPMediaItemPropertyArtwork: mpImage, MPMediaItemPropertyPlaybackDuration: mpDuration, MPNowPlayingInfoPropertyPlaybackRate: mpRate]
     }
     
     func goToTime(seconds: Double) {

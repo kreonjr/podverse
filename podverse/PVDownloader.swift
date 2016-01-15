@@ -116,8 +116,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     episode.downloadProgress = Float(totalProgress)
                     episode.mediaBytes = Float(totalBytesExpectedToWrite)
                     
-                    // TODO: Should we call a moc.save() within the didWriteData?
-                    
                     // TODO: Is this Notification actually doing anything? I don't see the downloadHasProgressed notification getting used anywhere...
                     let downloadHasProgressedUserInfo = ["episode":episode]
                     
