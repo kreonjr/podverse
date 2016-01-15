@@ -85,10 +85,10 @@ class PVMediaPlayer: NSObject {
     }
     
     func playerDidFinishPlaying(note: NSNotification) {
-        PVDeleter.sharedInstance.deleteEpisode(self.nowPlayingEpisode)
-        
-        //TODO: If the MediaPlayerViewController is currently displayed, then pop to Back page when playerDidFinishPlaying
-        // Possibly helpful http://stackoverflow.com/questions/11637709/get-the-current-displaying-uiviewcontroller-on-the-screen-in-appdelegate-m
+//        PVDeleter.sharedInstance.deleteEpisode(self.nowPlayingEpisode)
+//        
+//        //TODO: If the MediaPlayerViewController is currently displayed, then pop to Back page when playerDidFinishPlaying
+//        // Possibly helpful http://stackoverflow.com/questions/11637709/get-the-current-displaying-uiviewcontroller-on-the-screen-in-appdelegate-m
     }
     
     func saveCurrentTimeAsPlaybackPosition() {
