@@ -136,6 +136,7 @@ class PVMediaPlayer: NSObject {
         let resultTime = CMTimeMakeWithSeconds(seconds, 1)
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
+        saveCurrentTimeAsPlaybackPosition()
         avPlayer.play()
         mediaPlayerIsPlaying = true
     }
@@ -146,6 +147,7 @@ class PVMediaPlayer: NSObject {
         let resultTime = CMTimeAdd(currentTime, timeAdjust)
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
+        saveCurrentTimeAsPlaybackPosition()
         avPlayer.play()
         mediaPlayerIsPlaying = true
     }
@@ -156,6 +158,7 @@ class PVMediaPlayer: NSObject {
         let resultTime = CMTimeSubtract(currentTime, timeAdjust)
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
+        saveCurrentTimeAsPlaybackPosition()
         avPlayer.play()
         mediaPlayerIsPlaying = true
     }
