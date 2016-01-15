@@ -196,6 +196,7 @@ class PVMediaPlayer: NSObject {
             if let type = AVAudioSessionInterruptionType(rawValue: intValue) {
                 switch type {
                 case .Began:
+                    saveCurrentTimeAsPlaybackPosition()
                     break
                 case .Ended:
                     if mediaPlayerIsPlaying == true {
