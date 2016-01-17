@@ -97,6 +97,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             episode.taskIdentifier = nil
         }
         
+        self.refreshPodcastFeeds()
+        
         startCheckSubscriptionsForNewEpisodesTimer()
         
         Fabric.with([Crashlytics.self])
