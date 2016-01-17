@@ -92,8 +92,10 @@ class PVMediaPlayer: NSObject {
     }
     
     func saveCurrentTimeAsPlaybackPosition() {
-        self.nowPlayingEpisode.playbackPosition = CMTimeGetSeconds(avPlayer.currentTime())
-        CoreDataHelper.saveCoreData(nil)
+        if let playingEpisode = self.nowPlayingEpisode {
+            playingEpisode.playbackPosition = CMTimeGetSeconds(avPlayer.currentTime())
+            CoreDataHelper.saveCoreData(nil)
+        }
     }
     
     func remoteControlReceivedWithEvent(event: UIEvent) {
