@@ -147,7 +147,7 @@ class PVMediaPlayer: NSObject {
             var mpImage: MPMediaItemArtwork!
             var mpDuration: NSNumber!
             var mpElapsedPlaybackTime: NSNumber!
-            let mpRate = 1
+            let mpRate = avPlayer.rate
             
             podcastTitle = self.nowPlayingEpisode.podcast.title
             
@@ -179,9 +179,11 @@ class PVMediaPlayer: NSObject {
     
     func goToTime(seconds: Double) {
         let resultTime = CMTimeMakeWithSeconds(seconds, 1)
+        let currentRate = avPlayer.rate
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
         saveCurrentTimeAsPlaybackPosition()
+        avPlayer.rate = currentRate
         avPlayer.play()
         mediaPlayerIsPlaying = true
     }
@@ -190,10 +192,12 @@ class PVMediaPlayer: NSObject {
         let currentTime = avPlayer.currentTime()
         let timeAdjust = CMTimeMakeWithSeconds(seconds, 1)
         let resultTime = CMTimeAdd(currentTime, timeAdjust)
+        let currentRate = avPlayer.rate
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
         saveCurrentTimeAsPlaybackPosition()
         avPlayer.play()
+        avPlayer.rate = currentRate
         mediaPlayerIsPlaying = true
     }
     
@@ -201,10 +205,12 @@ class PVMediaPlayer: NSObject {
         let currentTime = avPlayer.currentTime()
         let timeAdjust = CMTimeMakeWithSeconds(seconds, 1)
         let resultTime = CMTimeSubtract(currentTime, timeAdjust)
+        let currentRate = avPlayer.rate
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
         saveCurrentTimeAsPlaybackPosition()
         avPlayer.play()
+        avPlayer.rate = currentRate
         mediaPlayerIsPlaying = true
     }
     
