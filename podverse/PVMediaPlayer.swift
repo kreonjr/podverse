@@ -55,6 +55,23 @@ class PVMediaPlayer: NSObject {
         }
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "playInterrupted:", name: AVAudioSessionInterruptionNotification, object: AVAudioSession.sharedInstance())
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "headphonesWereUnplugged:", name: AVAudioSessionRouteChangeNotification, object: AVAudioSession.sharedInstance())
+        
+    }
+    
+    func headphonesWereUnplugged(notification: NSNotification) {
+        if let info = notification.userInfo {
+            if let reasonKey = info[AVAudioSessionRouteChangeReasonKey] as? UInt {
+                let reason = AVAudioSessionRouteChangeReason(rawValue: reasonKey)
+                if reason == AVAudioSessionRouteChangeReason.OldDeviceUnavailable {
+                    // Headphones were unplugged and AVPlayer has paused, so set the Play/Pause icon to Pause
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.delegate?.setMediaPlayerVCPlayPauseIcon()
+                    }
+                }
+            }
+        }
     }
     
     func playForSeconds(startTime:Double, endTime:Double) {
