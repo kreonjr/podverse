@@ -124,34 +124,40 @@ class PVMediaPlayer: NSObject {
     }
     
     func setPlayingInfo(episode: Episode) {
-        var podcastTitle: String!
-        var episodeTitle: String!
-        var mpImage: MPMediaItemArtwork!
-        var mpDuration: NSNumber!
-        let mpRate = 1
-        
-        podcastTitle = self.nowPlayingEpisode.podcast.title
-        
-        if let eTitle = self.nowPlayingEpisode.title {
-            episodeTitle = eTitle
+        if nowPlayingEpisode != nil {
+            var podcastTitle: String!
+            var episodeTitle: String!
+            var mpImage: MPMediaItemArtwork!
+            var mpDuration: NSNumber!
+            var mpElapsedPlaybackTime: NSNumber!
+            let mpRate = 1
+            
+            podcastTitle = self.nowPlayingEpisode.podcast.title
+            
+            if let eTitle = self.nowPlayingEpisode.title {
+                episodeTitle = eTitle
+            }
+            
+            if let podcastiTunesImageData = self.nowPlayingEpisode.podcast.itunesImage {
+                let podcastiTunesImage = UIImage(data: podcastiTunesImageData)
+                mpImage = MPMediaItemArtwork(image: podcastiTunesImage!)
+            } else if let podcastImageData = self.nowPlayingEpisode.podcast.imageData {
+                let podcastImage = UIImage(data: podcastImageData)
+                mpImage = MPMediaItemArtwork(image: podcastImage!)
+            } else {
+                // TODO: Replace Blank52 with a square Podverse logo
+                mpImage = MPMediaItemArtwork(image: UIImage(named: "Blank52")!)
+            }
+            
+            if let playbackDuration = nowPlayingEpisode.duration {
+                mpDuration = playbackDuration
+            }
+            
+            let elapsedPlaybackCMTime = CMTimeGetSeconds(avPlayer.currentTime())
+            mpElapsedPlaybackTime = NSNumber(double: elapsedPlaybackCMTime)
+            
+            MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: episodeTitle, MPMediaItemPropertyArtwork: mpImage, MPMediaItemPropertyPlaybackDuration: mpDuration, MPNowPlayingInfoPropertyElapsedPlaybackTime: mpElapsedPlaybackTime, MPNowPlayingInfoPropertyPlaybackRate: mpRate]
         }
-        
-        if let podcastiTunesImageData = self.nowPlayingEpisode.podcast.itunesImage {
-            let podcastiTunesImage = UIImage(data: podcastiTunesImageData)
-            mpImage = MPMediaItemArtwork(image: podcastiTunesImage!)
-        } else if let podcastImageData = self.nowPlayingEpisode.podcast.imageData {
-            let podcastImage = UIImage(data: podcastImageData)
-            mpImage = MPMediaItemArtwork(image: podcastImage!)
-        } else {
-            // TODO: Replace Blank52 with a square Podverse logo
-            mpImage = MPMediaItemArtwork(image: UIImage(named: "Blank52")!)
-        }
-        
-        if let playbackDuration = nowPlayingEpisode.duration {
-            mpDuration = playbackDuration
-        }
-        
-        MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: episodeTitle, MPMediaItemPropertyArtwork: mpImage, MPMediaItemPropertyPlaybackDuration: mpDuration, MPNowPlayingInfoPropertyPlaybackRate: mpRate]
     }
     
     func goToTime(seconds: Double) {
@@ -194,8 +200,6 @@ class PVMediaPlayer: NSObject {
     func loadEpisodeMediaFileOrStream(episode: Episode) {
         nowPlayingEpisode = episode
         
-        self.setPlayingInfo(nowPlayingEpisode)
-        
         if episode.fileName != nil {
             var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
             self.docDirectoryURL = URLs[0]
@@ -209,6 +213,8 @@ class PVMediaPlayer: NSObject {
                 avPlayer = AVPlayer(URL:url)
             }
         }
+        
+        self.setPlayingInfo(nowPlayingEpisode)
     }
     
     func playInterrupted(notification: NSNotification) {

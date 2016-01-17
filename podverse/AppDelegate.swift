@@ -27,8 +27,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     let REFRESH_PODCAST_TIME:Double = 3600
     
-    var nowPlayingEpisode: Episode?
-    
     var episodeDownloadArray = [Episode]()
     
     var backgroundTransferCompletionHandler: (() -> Void)?
@@ -107,10 +105,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func skipBackwardEvent() {
         PVMediaPlayer.sharedInstance.previousTime(15)
+        PVMediaPlayer.sharedInstance.setPlayingInfo(PVMediaPlayer.sharedInstance.nowPlayingEpisode)
     }
     
     func skipForwardEvent() {
         PVMediaPlayer.sharedInstance.skipTime(15)
+        PVMediaPlayer.sharedInstance.setPlayingInfo(PVMediaPlayer.sharedInstance.nowPlayingEpisode)
     }
     
     func playOrPauseEvent() {
@@ -120,8 +120,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     
     func applicationDidEnterBackground(application: UIApplication) {
-        // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-        // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        // If the app has entered the background, then it may be the case that the device has locked, and we should update the MPNowPlayingInfoCenter with the latest information.
+        if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+            PVMediaPlayer.sharedInstance.setPlayingInfo(nowPlayingEpisode)
+        }
     }
 
     func applicationWillEnterForeground(application: UIApplication) {
