@@ -168,11 +168,9 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 if let destination = destinationURL {
                     try fileManager.copyItemAtURL(location, toURL: destination)
                     
-                    var episodeTitle: String!
+                    var episodeTitle = ""
                     if let title = episode.title {
                         episodeTitle = title
-                    } else {
-                        episodeTitle = ""
                     }
                     
                     episode.downloadComplete = true
