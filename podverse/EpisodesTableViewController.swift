@@ -167,7 +167,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 cell.summary?.text = PVUtility.removeHTMLFromString(summary)
             }
             
-            cell.totalClips?.text = String("123 clips")
+            let totalClips = String(episode.clips.count)
+            cell.totalClips?.text = String(totalClips + " clips")
             
             if let duration = episode.duration {
                 cell.totalTimeLeft?.text = PVUtility.convertNSNumberToHHMMSSString(duration)
@@ -246,9 +247,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 }
             }
             
-            let totalClips = "(123)"
-            
-            episodeActions.addAction(UIAlertAction(title: "Show Clips \(totalClips)", style: .Default, handler: { action in
+            let totalClips = String(selectedEpisode.clips.count)
+            episodeActions.addAction(UIAlertAction(title: "Show Clips (\(totalClips))", style: .Default, handler: { action in
                 self.performSegueWithIdentifier("Show Clips", sender: self)
             }))
             
