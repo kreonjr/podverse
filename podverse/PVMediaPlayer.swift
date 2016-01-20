@@ -220,19 +220,19 @@ class PVMediaPlayer: NSObject {
         NSNotificationCenter.defaultCenter().postNotificationName(Constants.kNowPlayingTimeHasChanged, object: self, userInfo: nowPlayingTimeHasChangedUserInfo)
     }
     
-    func loadEpisodeMediaFileOrStreamAndPlay(episode: Episode) {
+    func loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode: Episode) {
         nowPlayingEpisode = episode
         
-        if episode.fileName != nil {
+        if nowPlayingEpisode.fileName != nil {
             var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
             self.docDirectoryURL = URLs[0]
             
-            if let fileName = episode.fileName, let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName) {
+            if let fileName = nowPlayingEpisode.fileName, let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName) {
                 let playerItem = AVPlayerItem(URL: destinationURL)
                 avPlayer = AVPlayer(playerItem: playerItem)
             }
         } else {
-            if let urlString = episode.mediaURL, let url = NSURL(string: urlString) {
+            if let urlString = nowPlayingEpisode.mediaURL, let url = NSURL(string: urlString) {
                 avPlayer = AVPlayer(URL:url)
             }
         }
@@ -243,6 +243,44 @@ class PVMediaPlayer: NSObject {
         } else {
             playOrPause()
         }
+        
+        self.setPlayingInfo(nowPlayingEpisode)
+    }
+    
+    func loadClipDownloadedMediaFileOrStreamAndPlay(clip: Clip) {
+        nowPlayingClip = clip
+        nowPlayingEpisode = clip.episode
+        
+        if nowPlayingEpisode.fileName != nil {
+            var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
+            self.docDirectoryURL = URLs[0]
+            
+            if let fileName = nowPlayingEpisode.fileName, let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName) {
+                let playerItem = AVPlayerItem(URL: destinationURL)
+                avPlayer = AVPlayer(playerItem: playerItem)
+                // Set end time
+                
+                let endTime = CMTimeMakeWithSeconds(Double(clip.startTime), 1)
+                let endTimeValue = NSValue(CMTime: endTime)
+
+                avPlayer.addBoundaryTimeObserverForTimes([endTimeValue], queue: nil, usingBlock: {
+                    self.playOrPause()
+                })
+                goToTime(Double(clip.startTime))
+            }
+        } else {
+            if let urlString = nowPlayingEpisode.mediaURL, let url = NSURL(string: urlString) {
+                // Set start time
+                // Set end time
+                // Stream only the part of the clip needed
+                // Play the clip
+                avPlayer = AVPlayer(URL:url)
+            }
+        }
+        
+        
+        
+        
         
         self.setPlayingInfo(nowPlayingEpisode)
     }
