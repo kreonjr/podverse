@@ -258,14 +258,13 @@ class PVMediaPlayer: NSObject {
             if let fileName = nowPlayingEpisode.fileName, let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName) {
                 let playerItem = AVPlayerItem(URL: destinationURL)
                 avPlayer = AVPlayer(playerItem: playerItem)
-                // Set end time
                 
-                let endTime = CMTimeMakeWithSeconds(Double(clip.startTime), 1)
+                let endTime = CMTimeMakeWithSeconds(Double(clip.endTime!), 1)
                 let endTimeValue = NSValue(CMTime: endTime)
-
                 avPlayer.addBoundaryTimeObserverForTimes([endTimeValue], queue: nil, usingBlock: {
                     self.playOrPause()
                 })
+                
                 goToTime(Double(clip.startTime))
             }
         } else {
