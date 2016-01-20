@@ -130,6 +130,27 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     }
     
     @IBAction func speed(sender: AnyObject) {
+        // TODO: update the Speed icon when rate is changed
+        
+        let player = pvMediaPlayer.avPlayer
+        switch player.rate {
+        case 1.0:
+            player.rate = 1.25
+        case 1.25:
+            player.rate = 1.5
+        case 1.5:
+            player.rate = 2.0
+        case 2.0:
+            player.rate = 2.5
+        case 2.5:
+            player.rate = 0.75
+        case 0.75:
+            player.rate = 0.5
+        case 0.5:
+            player.rate = 1.0
+        default:
+            player.rate = 1.0
+        }
     }
     
     @IBAction func audio(sender: AnyObject) {

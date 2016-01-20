@@ -116,8 +116,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     episode.downloadProgress = Float(totalProgress)
                     episode.mediaBytes = Float(totalBytesExpectedToWrite)
                     
-                    // TODO: Should we call a moc.save() within the didWriteData?
-                    
                     // TODO: Is this Notification actually doing anything? I don't see the downloadHasProgressed notification getting used anywhere...
                     let downloadHasProgressedUserInfo = ["episode":episode]
                     
@@ -170,6 +168,11 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 if let destination = destinationURL {
                     try fileManager.copyItemAtURL(location, toURL: destination)
                     
+                    var episodeTitle = ""
+                    if let title = episode.title {
+                        episodeTitle = title
+                    }
+                    
                     episode.downloadComplete = true
                     episode.taskResumeData = nil
                     
@@ -187,7 +190,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
                     let notification = UILocalNotification()
                     notification.applicationIconBadgeNumber = UIApplication.sharedApplication().applicationIconBadgeNumber + 1
-                    notification.alertBody = "Episode Downloaded" // text that will be displayed in the notification
+                    notification.alertBody = episode.podcast.title + " - " + episodeTitle // text that will be displayed in the notification
                     notification.alertAction = "open"
                     notification.soundName = UILocalNotificationDefaultSoundName // play default sound
                     UIApplication.sharedApplication().scheduleLocalNotification(notification)

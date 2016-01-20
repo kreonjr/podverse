@@ -55,6 +55,23 @@ class PVMediaPlayer: NSObject {
         }
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "playInterrupted:", name: AVAudioSessionInterruptionNotification, object: AVAudioSession.sharedInstance())
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "headphonesWereUnplugged:", name: AVAudioSessionRouteChangeNotification, object: AVAudioSession.sharedInstance())
+        
+    }
+    
+    func headphonesWereUnplugged(notification: NSNotification) {
+        if let info = notification.userInfo {
+            if let reasonKey = info[AVAudioSessionRouteChangeReasonKey] as? UInt {
+                let reason = AVAudioSessionRouteChangeReason(rawValue: reasonKey)
+                if reason == AVAudioSessionRouteChangeReason.OldDeviceUnavailable {
+                    // Headphones were unplugged and AVPlayer has paused, so set the Play/Pause icon to Pause
+                    dispatch_async(dispatch_get_main_queue()) {
+                        self.delegate?.setMediaPlayerVCPlayPauseIcon()
+                    }
+                }
+            }
+        }
     }
     
     func playForSeconds(startTime:Double, endTime:Double) {
@@ -65,25 +82,41 @@ class PVMediaPlayer: NSObject {
     }
     
     func playOrPause() -> (Bool) {
-       
-        self.setPlayingInfo(self.nowPlayingEpisode)
-    
-        if avPlayer.rate == 0 {
-            avPlayer.play()
-            mediaPlayerIsPlaying = true
-            return true
-
-        } else {
-            saveCurrentTimeAsPlaybackPosition()
-            avPlayer.pause()
-            mediaPlayerIsPlaying = false
-            return false
+        if avPlayer.currentItem != nil {
+            self.setPlayingInfo(self.nowPlayingEpisode)
+            
+            if avPlayer.rate == 0 {
+                avPlayer.play()
+                mediaPlayerIsPlaying = true
+                
+                NSNotificationCenter.defaultCenter().addObserver(self, selector: "playerDidFinishPlaying:", name: AVPlayerItemDidPlayToEndTimeNotification, object: avPlayer.currentItem)
+                
+                return true
+                
+            } else {
+                saveCurrentTimeAsPlaybackPosition()
+                avPlayer.pause()
+                mediaPlayerIsPlaying = false
+                return false
+            }
         }
+        
+        mediaPlayerIsPlaying = false
+        return false
+    }
+    
+    func playerDidFinishPlaying(note: NSNotification) {
+//        PVDeleter.sharedInstance.deleteEpisode(self.nowPlayingEpisode)
+//        
+//        //TODO: If the MediaPlayerViewController is currently displayed, then pop to Back page when playerDidFinishPlaying
+//        // Possibly helpful http://stackoverflow.com/questions/11637709/get-the-current-displaying-uiviewcontroller-on-the-screen-in-appdelegate-m
     }
     
     func saveCurrentTimeAsPlaybackPosition() {
-        self.nowPlayingEpisode.playbackPosition = CMTimeGetSeconds(avPlayer.currentTime())
-        CoreDataHelper.saveCoreData(nil)
+        if let playingEpisode = self.nowPlayingEpisode {
+            playingEpisode.playbackPosition = CMTimeGetSeconds(avPlayer.currentTime())
+            CoreDataHelper.saveCoreData(nil)
+        }
     }
     
     func remoteControlReceivedWithEvent(event: UIEvent) {
@@ -108,34 +141,49 @@ class PVMediaPlayer: NSObject {
     }
     
     func setPlayingInfo(episode: Episode) {
-        var podcastTitle: String!
-        var episodeTitle: String!
-        var mpImage: MPMediaItemArtwork!
-        
-        podcastTitle = self.nowPlayingEpisode.podcast.title
-        
-        if let eTitle = self.nowPlayingEpisode.title {
-            episodeTitle = eTitle
+        if nowPlayingEpisode != nil {
+            var podcastTitle: String!
+            var episodeTitle: String!
+            var mpImage: MPMediaItemArtwork!
+            var mpDuration: NSNumber!
+            var mpElapsedPlaybackTime: NSNumber!
+            let mpRate = avPlayer.rate
+            
+            podcastTitle = self.nowPlayingEpisode.podcast.title
+            
+            if let eTitle = self.nowPlayingEpisode.title {
+                episodeTitle = eTitle
+            }
+            
+            if let podcastiTunesImageData = self.nowPlayingEpisode.podcast.itunesImage {
+                let podcastiTunesImage = UIImage(data: podcastiTunesImageData)
+                mpImage = MPMediaItemArtwork(image: podcastiTunesImage!)
+            } else if let podcastImageData = self.nowPlayingEpisode.podcast.imageData {
+                let podcastImage = UIImage(data: podcastImageData)
+                mpImage = MPMediaItemArtwork(image: podcastImage!)
+            } else {
+                // TODO: Replace Blank52 with a square Podverse logo
+                mpImage = MPMediaItemArtwork(image: UIImage(named: "Blank52")!)
+            }
+            
+            if let playbackDuration = nowPlayingEpisode.duration {
+                mpDuration = playbackDuration
+            }
+            
+            let elapsedPlaybackCMTime = CMTimeGetSeconds(avPlayer.currentTime())
+            mpElapsedPlaybackTime = NSNumber(double: elapsedPlaybackCMTime)
+            
+            MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: episodeTitle, MPMediaItemPropertyArtwork: mpImage, MPMediaItemPropertyPlaybackDuration: mpDuration, MPNowPlayingInfoPropertyElapsedPlaybackTime: mpElapsedPlaybackTime, MPNowPlayingInfoPropertyPlaybackRate: mpRate]
         }
-        
-        if let podcastiTunesImageData = self.nowPlayingEpisode.podcast.itunesImage {
-            let podcastiTunesImage = UIImage(data: podcastiTunesImageData)
-            mpImage = MPMediaItemArtwork(image: podcastiTunesImage!)
-        } else if let podcastImageData = self.nowPlayingEpisode.podcast.imageData {
-            let podcastImage = UIImage(data: podcastImageData)
-            mpImage = MPMediaItemArtwork(image: podcastImage!)
-        } else {
-            // TODO: Replace Blank52 with a square Podverse logo
-            mpImage = MPMediaItemArtwork(image: UIImage(named: "Blank52")!)
-        }
-        
-        MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: episodeTitle, MPMediaItemPropertyArtwork: mpImage]
     }
     
     func goToTime(seconds: Double) {
         let resultTime = CMTimeMakeWithSeconds(seconds, 1)
+        let currentRate = avPlayer.rate
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
+        saveCurrentTimeAsPlaybackPosition()
+        avPlayer.rate = currentRate
         avPlayer.play()
         mediaPlayerIsPlaying = true
     }
@@ -144,9 +192,12 @@ class PVMediaPlayer: NSObject {
         let currentTime = avPlayer.currentTime()
         let timeAdjust = CMTimeMakeWithSeconds(seconds, 1)
         let resultTime = CMTimeAdd(currentTime, timeAdjust)
+        let currentRate = avPlayer.rate
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
+        saveCurrentTimeAsPlaybackPosition()
         avPlayer.play()
+        avPlayer.rate = currentRate
         mediaPlayerIsPlaying = true
     }
     
@@ -154,9 +205,12 @@ class PVMediaPlayer: NSObject {
         let currentTime = avPlayer.currentTime()
         let timeAdjust = CMTimeMakeWithSeconds(seconds, 1)
         let resultTime = CMTimeSubtract(currentTime, timeAdjust)
+        let currentRate = avPlayer.rate
         avPlayer.pause()
         avPlayer.seekToTime(resultTime)
+        saveCurrentTimeAsPlaybackPosition()
         avPlayer.play()
+        avPlayer.rate = currentRate
         mediaPlayerIsPlaying = true
     }
     
@@ -168,8 +222,6 @@ class PVMediaPlayer: NSObject {
     
     func loadEpisodeMediaFileOrStream(episode: Episode) {
         nowPlayingEpisode = episode
-        
-        self.setPlayingInfo(nowPlayingEpisode)
         
         if episode.fileName != nil {
             var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
@@ -184,6 +236,8 @@ class PVMediaPlayer: NSObject {
                 avPlayer = AVPlayer(URL:url)
             }
         }
+        
+        self.setPlayingInfo(nowPlayingEpisode)
     }
     
     func playInterrupted(notification: NSNotification) {
@@ -196,6 +250,7 @@ class PVMediaPlayer: NSObject {
             if let type = AVAudioSessionInterruptionType(rawValue: intValue) {
                 switch type {
                 case .Began:
+                    saveCurrentTimeAsPlaybackPosition()
                     break
                 case .Ended:
                     if mediaPlayerIsPlaying == true {
