@@ -277,10 +277,6 @@ class PVMediaPlayer: NSObject {
             }
         }
         
-        
-        
-        
-        
         self.setPlayingInfo(nowPlayingEpisode)
     }
     
