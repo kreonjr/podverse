@@ -28,6 +28,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var showAllEpisodes: Bool!
     
+    var pvMediaPlayer = PVMediaPlayer.sharedInstance
+    
     func loadData() {
         
         // Clear the episodes array, then retrieve and sort the full episode or downloaded episode array
@@ -76,10 +78,10 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         if let indexPath = self.tableView.indexPathForCell(cell) {
             let selectedEpisode = episodesArray[indexPath.row]
             if selectedEpisode.fileName != nil {
-                if PVMediaPlayer.sharedInstance.avPlayer.rate == 1 {
-                    PVMediaPlayer.sharedInstance.saveCurrentTimeAsPlaybackPosition()
+                if pvMediaPlayer.avPlayer.rate == 1 {
+                    pvMediaPlayer.saveCurrentTimeAsPlaybackPosition()
                 }
-                PVMediaPlayer.sharedInstance.loadEpisodeMediaFileOrStreamAndPlay(selectedEpisode)
+                pvMediaPlayer.loadEpisodeMediaFileOrStreamAndPlay(selectedEpisode)
                 self.performSegueWithIdentifier("Show Media Player", sender: nil)
             } else {
                 PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
@@ -97,7 +99,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         // If there is a now playing episode, add Now Playing button to navigation bar
-        if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
+        if ((pvMediaPlayer.nowPlayingEpisode) != nil) {
             self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
         }
         loadData()
@@ -233,7 +235,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             
             if selectedEpisode.fileName != nil {
                 episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
-                    PVMediaPlayer.sharedInstance.loadEpisodeMediaFileOrStreamAndPlay(selectedEpisode)
+                    pvMediaPlayer.loadEpisodeMediaFileOrStreamAndPlay(selectedEpisode)
                     self.performSegueWithIdentifier("Show Media Player", sender: nil)
                 }))
             } else {
@@ -256,7 +258,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             episodeActions.addAction(UIAlertAction (title: "Episode Info", style: .Default, handler: nil))
             
             episodeActions.addAction(UIAlertAction (title: "Stream Episode", style: .Default, handler: { action in
-                PVMediaPlayer.sharedInstance.loadEpisodeMediaFileOrStreamAndPlay(selectedEpisode)
+                pvMediaPlayer.loadEpisodeMediaFileOrStreamAndPlay(selectedEpisode)
                 self.performSegueWithIdentifier("Show Media Player", sender: nil)
             }))
             
@@ -315,8 +317,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         if segue.identifier == "Show Media Player" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
-        }
-        else if segue.identifier == "Show Clips" {
+        } else if segue.identifier == "Show Clips" {
             let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
             let index = self.tableView.indexPathForSelectedRow!
             clipsTableViewController.selectedPodcast = selectedPodcast
