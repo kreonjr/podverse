@@ -310,7 +310,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "playDownloadedEpisode" {
+        if segue.identifier == "Play Downloaded Episode" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             let index = self.tableView.indexPathForSelectedRow!
             PVMediaPlayer.sharedInstance.nowPlayingEpisode = episodesArray[index.row]
@@ -327,7 +327,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             clipsTableViewController.selectedPodcast = selectedPodcast
             clipsTableViewController.selectedEpisode = episodesArray[index.row]
         }
-        else if segue.identifier == "streamEpisode" {
+        else if segue.identifier == "Stream Episode" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             let index = self.tableView.indexPathForSelectedRow!
             PVMediaPlayer.sharedInstance.nowPlayingEpisode = episodesArray[index.row]
