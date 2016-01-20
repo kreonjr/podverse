@@ -220,7 +220,7 @@ class PVMediaPlayer: NSObject {
         NSNotificationCenter.defaultCenter().postNotificationName(Constants.kNowPlayingTimeHasChanged, object: self, userInfo: nowPlayingTimeHasChangedUserInfo)
     }
     
-    func loadEpisodeMediaFileOrStream(episode: Episode) {
+    func loadEpisodeMediaFileOrStreamAndPlay(episode: Episode) {
         nowPlayingEpisode = episode
         
         if episode.fileName != nil {
@@ -235,6 +235,13 @@ class PVMediaPlayer: NSObject {
             if let urlString = episode.mediaURL, let url = NSURL(string: urlString) {
                 avPlayer = AVPlayer(URL:url)
             }
+        }
+        
+        // If the episode has a playback position, then continue from that point, else play from the beginning
+        if let playbackPosition = nowPlayingEpisode.playbackPosition {
+            goToTime(Double(playbackPosition))
+        } else {
+            playOrPause()
         }
         
         self.setPlayingInfo(nowPlayingEpisode)

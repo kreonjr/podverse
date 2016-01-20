@@ -237,7 +237,6 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         }
         else if segue.identifier == "Find Search to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }

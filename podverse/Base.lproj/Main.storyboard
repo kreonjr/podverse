@@ -296,10 +296,8 @@
                         <outlet property="headerSummaryLabel" destination="LOq-p7-G5w" id="LTS-gX-rvf"/>
                         <outlet property="headerView" destination="Sgy-kf-zDQ" id="eVX-5m-HMz"/>
                         <outlet property="tableView" destination="Zi8-pK-weV" id="0TF-9T-zJv"/>
-                        <segue destination="jDs-me-457" kind="show" identifier="streamEpisode" id="ogn-qm-sNM"/>
-                        <segue destination="jDs-me-457" kind="show" identifier="playDownloadedEpisode" id="4xo-uq-96V"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="Show Media Player" id="4xo-uq-96V"/>
                         <segue destination="jDs-me-457" kind="show" identifier="Episodes to Now Playing" id="ug1-KO-0I5"/>
-                        <segue destination="jDs-me-457" kind="show" identifier="Quick Play Downloaded Episode" id="mGV-eO-Q9e"/>
                         <segue destination="w0b-bb-hu2" kind="show" identifier="Show Clips" id="Vxi-eO-V9n"/>
                     </connections>
                 </viewController>
@@ -1445,6 +1443,6 @@
         <image name="Blank52" width="48" height="48"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="mGV-eO-Q9e"/>
+        <segue reference="ug1-KO-0I5"/>
     </inferredMetricsTieBreakers>
 </document>

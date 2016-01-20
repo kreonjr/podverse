@@ -21,8 +21,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     var nowPlayingCurrentTimeTimer: NSTimer!
     
-    var returnToNowPlaying: Bool! = false
-    
     @IBOutlet weak var mediaPlayerImage: UIImageView!
     @IBOutlet weak var podcastTitle: UILabel!
     @IBOutlet weak var episodeTitle: UILabel!
@@ -81,22 +79,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         // Make sure the Play/Pause button displays properly after returning from background
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "setPlayPauseIcon", name: UIApplicationWillEnterForegroundNotification, object: nil)
         
-        // If the user is not returning to the Media Player via the Now Playing button, load and start a new episode or clip.
-        if returnToNowPlaying != true {
-            // Load the Episode into the AVPlayer
-            pvMediaPlayer.loadEpisodeMediaFileOrStream(pvMediaPlayer.nowPlayingEpisode)
-            
-            // If the episode has a playback position, then continue from that point
-            if let playbackPosition = pvMediaPlayer.nowPlayingEpisode.playbackPosition {
-                PVMediaPlayer.sharedInstance.goToTime(Float64(playbackPosition))
-                playPauseButton.setTitle("\u{f04c}", forState: .Normal)
-            }
-            // Else start playing from the beginning
-            else {
-                PVMediaPlayer.sharedInstance.playOrPause()
-                playPauseButton.setTitle("\u{f04c}", forState: .Normal)
-            }
-        }
+        setPlayPauseIcon()
     }
     
     func dismissKeyboard (){

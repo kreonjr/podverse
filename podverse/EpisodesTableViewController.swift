@@ -79,7 +79,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 if PVMediaPlayer.sharedInstance.avPlayer.rate == 1 {
                     PVMediaPlayer.sharedInstance.saveCurrentTimeAsPlaybackPosition()
                 }
-                self.performSegueWithIdentifier("Quick Play Downloaded Episode", sender: selectedEpisode)
+                PVMediaPlayer.sharedInstance.loadEpisodeMediaFileOrStreamAndPlay(selectedEpisode)
+                self.performSegueWithIdentifier("Show Media Player", sender: nil)
             } else {
                 PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
                 cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
@@ -225,18 +226,18 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         
         // If not the last item in the array, then perform selected episode actions
         if indexPath.row < episodesArray.count {
-            let episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
+            
             let selectedEpisode = episodesArray[indexPath.row]
+            
+            let episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
+            
             if selectedEpisode.fileName != nil {
                 episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
-                    self.performSegueWithIdentifier("playDownloadedEpisode", sender: nil)
+                    PVMediaPlayer.sharedInstance.loadEpisodeMediaFileOrStreamAndPlay(selectedEpisode)
+                    self.performSegueWithIdentifier("Show Media Player", sender: nil)
                 }))
             } else {
-                if selectedEpisode.fileName != nil {
-                    episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
-                        self.performSegueWithIdentifier("playDownloadedEpisode", sender: nil)
-                    }))
-                } else if selectedEpisode.taskIdentifier != nil {
+                if selectedEpisode.taskIdentifier != nil {
                     episodeActions.addAction(UIAlertAction(title: "Downloading Episode", style: .Default, handler: nil))
                 } else {
                     episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
@@ -255,7 +256,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             episodeActions.addAction(UIAlertAction (title: "Episode Info", style: .Default, handler: nil))
             
             episodeActions.addAction(UIAlertAction (title: "Stream Episode", style: .Default, handler: { action in
-                self.performSegueWithIdentifier("streamEpisode", sender: self)
+                PVMediaPlayer.sharedInstance.loadEpisodeMediaFileOrStreamAndPlay(selectedEpisode)
+                self.performSegueWithIdentifier("Show Media Player", sender: nil)
             }))
             
             episodeActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
@@ -310,15 +312,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "Play Downloaded Episode" {
+        if segue.identifier == "Show Media Player" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            let index = self.tableView.indexPathForSelectedRow!
-            PVMediaPlayer.sharedInstance.nowPlayingEpisode = episodesArray[index.row]
-            mediaPlayerViewController.hidesBottomBarWhenPushed = true
-        }
-        else if segue.identifier == "Quick Play Downloaded Episode" {
-            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            PVMediaPlayer.sharedInstance.nowPlayingEpisode = sender as! Episode
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
         else if segue.identifier == "Show Clips" {
@@ -326,16 +321,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             let index = self.tableView.indexPathForSelectedRow!
             clipsTableViewController.selectedPodcast = selectedPodcast
             clipsTableViewController.selectedEpisode = episodesArray[index.row]
-        }
-        else if segue.identifier == "Stream Episode" {
+        } else if segue.identifier == "Episodes to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            let index = self.tableView.indexPathForSelectedRow!
-            PVMediaPlayer.sharedInstance.nowPlayingEpisode = episodesArray[index.row]
-            mediaPlayerViewController.hidesBottomBarWhenPushed = true
-        }
-        else if segue.identifier == "Episodes to Now Playing" {
-            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }

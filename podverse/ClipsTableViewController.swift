@@ -160,7 +160,6 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         } else if segue.identifier == "Clips to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }
