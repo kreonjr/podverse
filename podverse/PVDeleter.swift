@@ -21,7 +21,7 @@ class PVDeleter: NSObject {
         
         // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
         for var i = 0; i < episodesToRemove.count; i++ {
-            deleteEpisode(episodesToRemove[i])
+            deleteEpisode(episodesToRemove[i],completion: nil)
         }
         
         CoreDataHelper.deleteItemFromCoreData(podcast, completionBlock: { () -> Void in
@@ -30,7 +30,7 @@ class PVDeleter: NSObject {
 
     }
     
-    func deleteEpisode(episode: Episode) {
+    func deleteEpisode(episode: Episode, completion:(()->())? ) {
         
         // Get the downloadSession, and if there is a downloadSession with a matching taskIdentifier as episode's taskIdentifier, then cancel the downloadSession
         let downloadSession = PVDownloader.sharedInstance.downloadSession
@@ -65,7 +65,11 @@ class PVDeleter: NSObject {
         }
         
         CoreDataHelper.deleteItemFromCoreData(episode, completionBlock: { () -> Void in
-            CoreDataHelper.saveCoreData(nil)
+            CoreDataHelper.saveCoreData({ (saved) -> Void in
+                if let completion = completion {
+                    completion()
+                }
+            })
         })
 
     }
