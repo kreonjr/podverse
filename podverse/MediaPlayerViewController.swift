@@ -238,4 +238,12 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     func setMediaPlayerVCPlayPauseIcon() {
         setPlayPauseIcon()
     }
+    
+    func episodeFinishedPlaying(currentEpisode: Episode) {
+        PVDeleter.sharedInstance.deleteEpisode(currentEpisode,completion: {
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                self.navigationController?.popViewControllerAnimated(true)
+            })
+        })
+    }
 }

@@ -12,6 +12,7 @@ import MediaPlayer
 
 protocol PVMediaPlayerDelegate {
     func setMediaPlayerVCPlayPauseIcon()
+    func episodeFinishedPlaying(currentEpisode:Episode)
 }
 
 class PVMediaPlayer: NSObject {
@@ -60,6 +61,7 @@ class PVMediaPlayer: NSObject {
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "headphonesWereUnplugged:", name: AVAudioSessionRouteChangeNotification, object: AVAudioSession.sharedInstance())
         
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "playerDidFinishPlaying:", name: AVPlayerItemDidPlayToEndTimeNotification, object: avPlayer.currentItem)
     }
     
     func headphonesWereUnplugged(notification: NSNotification) {
@@ -90,9 +92,7 @@ class PVMediaPlayer: NSObject {
             if avPlayer.rate == 0 {
                 avPlayer.play()
                 mediaPlayerIsPlaying = true
-                
-                NSNotificationCenter.defaultCenter().addObserver(self, selector: "playerDidFinishPlaying:", name: AVPlayerItemDidPlayToEndTimeNotification, object: avPlayer.currentItem)
-                
+
                 return true
                 
             } else {
@@ -108,10 +108,7 @@ class PVMediaPlayer: NSObject {
     }
     
     func playerDidFinishPlaying(note: NSNotification) {
-//        PVDeleter.sharedInstance.deleteEpisode(self.nowPlayingEpisode)
-//        
-//        //TODO: If the MediaPlayerViewController is currently displayed, then pop to Back page when playerDidFinishPlaying
-//        // Possibly helpful http://stackoverflow.com/questions/11637709/get-the-current-displaying-uiviewcontroller-on-the-screen-in-appdelegate-m
+        self.delegate?.episodeFinishedPlaying(nowPlayingEpisode)
     }
     
     func saveCurrentTimeAsPlaybackPosition() {
