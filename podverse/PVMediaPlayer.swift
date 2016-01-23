@@ -29,6 +29,8 @@ class PVMediaPlayer: NSObject {
     
     var delegate: PVMediaPlayerDelegate?
     
+    var boundaryObserver:AnyObject?
+    
     override init() {
         super.init()
 
@@ -261,8 +263,11 @@ class PVMediaPlayer: NSObject {
                 
                 let endTime = CMTimeMakeWithSeconds(Double(clip.endTime!), 1)
                 let endTimeValue = NSValue(CMTime: endTime)
-                avPlayer.addBoundaryTimeObserverForTimes([endTimeValue], queue: nil, usingBlock: {
+                self.boundaryObserver = avPlayer.addBoundaryTimeObserverForTimes([endTimeValue], queue: nil, usingBlock: {
                     self.playOrPause()
+                    if let observer = self.boundaryObserver{
+                        self.avPlayer.removeTimeObserver(observer)
+                    }
                 })
                 
                 goToTime(Double(clip.startTime))
