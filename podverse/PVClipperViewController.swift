@@ -19,8 +19,10 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     var currentEpisode:Episode?
     var clip:Clip?
     
-    var playFromEndSeconds = 0.0
+    var boundaryObserver:AnyObject?
     var displayLink: CADisplayLink!
+    
+    var avPlayer = PVMediaPlayer.sharedInstance.avPlayer
     
     @IBOutlet weak var startLabel: UILabel!
     @IBOutlet weak var endLabel: UILabel!
@@ -97,23 +99,21 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     }
     
     func playFromEndTime() {
-        playFromEndSeconds = Double(getEndTimeFromTextFields() - 3)
-        if playFromEndSeconds > 0 {
-            PVMediaPlayer.sharedInstance.goToTime(playFromEndSeconds)
-            
-            // CADisplayLink is apparently the most precise timer we can use. It calls a function every 1/60th of a second.
-            displayLink = CADisplayLink(target: self, selector: "pauseIfEndTimeReached")
-            
-            displayLink.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-        }
-    }
-    
-    func pauseIfEndTimeReached() {
-        let nowPlayingCurrentTime = CMTimeGetSeconds(PVMediaPlayer.sharedInstance.avPlayer.currentTime())
-        if nowPlayingCurrentTime >= playFromEndSeconds + 3 {
+        let playFromEndDouble = Double(getEndTimeFromTextFields())
+        let playFromEndCMTime = CMTimeMakeWithSeconds(playFromEndDouble, 1)
+        let playFromEndValue = NSValue(CMTime: playFromEndCMTime)
+        
+        self.boundaryObserver = avPlayer.addBoundaryTimeObserverForTimes([playFromEndValue], queue: nil, usingBlock: {
             PVMediaPlayer.sharedInstance.playOrPause()
-            displayLink.invalidate()
-        }
+            if let observer = self.boundaryObserver{
+                self.avPlayer.removeTimeObserver(observer)
+            }
+        })
+        
+        let playFromEndPreviewDouble = playFromEndDouble - 3
+        
+
+        PVMediaPlayer.sharedInstance.goToTime(playFromEndPreviewDouble)
     }
     
     func getStartTimeFromTextFields() -> Int {
