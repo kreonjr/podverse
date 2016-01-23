@@ -41,7 +41,32 @@ class PVClipperAddInfoViewController: UIViewController {
             saveClipWithTitle(clipTitle)
         }
         else {
-            saveClipWithTitle("default title")
+            // If no clip title provided, then create and save a default clip title
+            let episodeTitle: String!
+            let startTimeString: String!
+            let endTimeString: String!
+            let defaultTitle: String!
+            
+            if let episodeT = episode.title {
+                episodeTitle = episodeT
+            } else {
+                episodeTitle = episode.podcast.title
+            }
+            
+            if let startT = startTime {
+                startTimeString = " - " + PVUtility.convertNSNumberToHHMMSSString(startT) + " start time"
+            } else {
+                startTimeString = ""
+            }
+            
+            if endTime != 0 && endTime != nil {
+                endTimeString = " to " + PVUtility.convertNSNumberToHHMMSSString(endTime!)
+            } else {
+                endTimeString = ""
+            }
+            
+            defaultTitle = episodeTitle + startTimeString + endTimeString
+            saveClipWithTitle(defaultTitle)
         }
         self.performSegueWithIdentifier("show_confirm_clip", sender: self)
     }
