@@ -170,21 +170,31 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        // Call updateNowPlayingCurrentTime whenever the now playing current time changes
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateNowPlayingCurrentTime:", name:
-            Constants.kNowPlayingTimeHasChanged, object: nil)
-        
-        // Start timer to check every half second if the now playing current time has changed
-        nowPlayingCurrentTimeTimer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "updateNowPlayingCurrentTimeNotification", userInfo: nil, repeats: true)
-        
-        // If currentTime != 0.0, then immediately insert the currentTime in its label; else manually set the currentTime label to 00:00.
-        if CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()) != 0.0 {
-            currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(Float(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime())))
+        // If loading the MediaPlayerVC when with no currentItem in the avPlayer, then nav back a page. Else load the MediaPlayerVC with the current item and related info.
+        if pvMediaPlayer.avPlayer.currentItem == nil {
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                self.navigationController?.popViewControllerAnimated(true)
+            })
         } else {
-            currentTime?.text = "00:00"
+            // Call updateNowPlayingCurrentTime whenever the now playing current time changes
+            if pvMediaPlayer.avPlayer.currentItem != nil {
+                
+            }
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateNowPlayingCurrentTime:", name:
+                Constants.kNowPlayingTimeHasChanged, object: nil)
+            
+            // Start timer to check every half second if the now playing current time has changed
+            nowPlayingCurrentTimeTimer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "updateNowPlayingCurrentTimeNotification", userInfo: nil, repeats: true)
+            
+            // If currentTime != 0.0, then immediately insert the currentTime in its label; else manually set the currentTime label to 00:00.
+            if CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()) != 0.0 {
+                currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(Float(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime())))
+            } else {
+                currentTime?.text = "00:00"
+            }
+            
+            setPlayPauseIcon()
         }
-        
-        setPlayPauseIcon()
     }
     
     func setPlayPauseIcon() {
@@ -240,6 +250,8 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     }
     
     func episodeFinishedPlaying(currentEpisode: Episode) {
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kNowPlayingTimeHasChanged, object: nil)
+        pvMediaPlayer.clearPlayingInfo()
         PVDeleter.sharedInstance.deleteEpisode(currentEpisode,completion: {
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
                 self.navigationController?.popViewControllerAnimated(true)

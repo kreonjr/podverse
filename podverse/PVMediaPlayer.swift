@@ -176,6 +176,10 @@ class PVMediaPlayer: NSObject {
         }
     }
     
+    func clearPlayingInfo() {
+        MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = nil
+    }
+    
     func goToTime(seconds: Double) {
         let resultTime = CMTimeMakeWithSeconds(seconds, 1)
         let currentRate = avPlayer.rate
