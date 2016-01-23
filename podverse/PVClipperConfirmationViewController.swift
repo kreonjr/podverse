@@ -31,7 +31,12 @@ class PVClipperConfirmationViewController: UIViewController {
         super.viewWillAppear(animated)
         
         if let duration = clip?.duration {
-            clipDuration.text = PVUtility.convertNSNumberToHHMMSSString(duration)
+            if clip?.endTime != 0 {
+                clipDuration.text = PVUtility.convertNSNumberToHHMMSSString(duration)
+            } else {
+                clipDuration.text = PVUtility.convertNSNumberToHHMMSSString(duration) + " (no end time set)"
+            }
+
         }
         
         clipTitleLabel.text = clip?.title

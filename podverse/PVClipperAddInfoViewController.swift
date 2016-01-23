@@ -39,15 +39,11 @@ class PVClipperAddInfoViewController: UIViewController {
     func saveAndGoToReview () {
         if let clipTitle = clipTitleTextField.text where clipTitle.characters.count > 0 {
             saveClipWithTitle(clipTitle)
-            self.performSegueWithIdentifier("show_confirm_clip", sender: self)
         }
         else {
-            let timingAlert = UIAlertController(title: "Error", message: "A clip title is necessary to save the clip.", preferredStyle:.Alert)
-            
-            timingAlert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-            
-            self.presentViewController(timingAlert, animated: true, completion: nil)
+            saveClipWithTitle("default title")
         }
+        self.performSegueWithIdentifier("show_confirm_clip", sender: self)
     }
     
     func saveClipWithTitle(clipTitle:String) {
@@ -67,12 +63,17 @@ class PVClipperAddInfoViewController: UIViewController {
         if let clipEnd = endTime {
             clip?.endTime = NSNumber(integer: clipEnd)
         } else {
-            clip?.endTime = episode.duration
+            clip?.endTime = 0
         }
         
-        if let clipEnd = clip?.endTime, clipStart = clip?.startTime {
-            let clipDuration = NSNumber(integer: clipEnd.integerValue - clipStart.integerValue)
-            clip?.duration = clipDuration
+        if let clipEnd = clip?.endTime, clipStart = clip?.startTime, episodeDuration = episode.duration {
+            if clipEnd != 0 {
+                let clipDuration = NSNumber(integer: Int(clipEnd) - clipStart.integerValue)
+                clip?.duration = clipDuration
+            } else {
+                let clipDuration = NSNumber(integer: Int(episodeDuration) - clipStart.integerValue)
+                clip?.duration = clipDuration
+            }
         }
         
         CoreDataHelper.saveCoreData(nil)
