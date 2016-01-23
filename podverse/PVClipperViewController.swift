@@ -61,13 +61,19 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
         startTime = getStartTimeFromTextFields()
         endTime = getEndTimeFromTextFields()
         
-        if endTime < startTime {
-            let timingAlert = UIAlertController(title: "Error", message: "Start time is set before End time. Would you like to set End time to the end of the Episode?", preferredStyle:.Alert)
-            timingAlert.addAction(UIAlertAction(title: "Set End Time", style: .Default, handler: { (alertAction) -> Void in
-
+        if endTime <= startTime && endTime != 0 {
+            let timingAlert = UIAlertController(title: "Invalid Time", message: "Please update the End Time so it is later than the Start Time.", preferredStyle:.Alert)
+            
+            timingAlert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            
+            self.presentViewController(timingAlert, animated: true, completion: nil)
+        } else if endTime == 0 {
+            let timingAlert = UIAlertController(title: "Clip End Time", message: "No End Time is set. Press OK to continue without an End Time, or Cancel to update it.", preferredStyle:.Alert)
+            timingAlert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { (alertAction) -> Void in
+                
                 if let duration = self.currentEpisode?.duration?.integerValue {
                     self.endTime = duration
-
+                    
                     self.performSegueWithIdentifier("show_add_clipTitle", sender: self)
                 }
             }))
@@ -75,8 +81,7 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
             timingAlert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
             
             self.presentViewController(timingAlert, animated: true, completion: nil)
-        }
-        else {
+        } else {
             self.performSegueWithIdentifier("show_add_clipTitle", sender: self)
         }
     }
