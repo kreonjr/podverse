@@ -65,11 +65,20 @@ class PVClipStreamer: NSObject, AVAssetResourceLoaderDelegate, NSURLConnectionDa
             
             // Get remote file total bytes
             let remoteFileSize = NSURL(string: mediaURLString)!.remoteSize
-            
-            // Calculate duration of remote file and use it to determine episode duration in seconds
+
             let calculateDurationAsset = AVURLAsset(URL: self.mediaURLWithCustomScheme(mediaURLString, scheme: "http"), options: nil)
-            episodeDuration = CMTimeGetSeconds(calculateDurationAsset.duration)
-            episodeDuration = floor(episodeDuration!)
+            
+            // If an episode.duration is availabe then use it. Else, calculate the episode duration.
+            if clip.episode.duration != nil {
+                episodeDuration = Double(clip.episode.duration!)
+            } else {
+                episodeDuration = CMTimeGetSeconds(calculateDurationAsset.duration)
+                episodeDuration = floor(episodeDuration!)
+            }
+            
+            // Since the calculated episodeDuration is sometimes different than the duration of the episode according to its RSS feed (see NPR TED Radio Hour; NPR Fresh Air; NPR etc.), override the episode.duration with the calculated episodeDuration and save
+//            clip.episode.duration = episodeDuration
+//            CoreDataHelper.saveCoreData(nil)
             
             // NOTE: if a media file has metadata in the beginning, the clip start/end times will be off. The following functions determine the mediadataBytesOffset based on the metadata, and adjusts the start/endByteRanges to include this offset.
             let metadataList = calculateDurationAsset.metadata

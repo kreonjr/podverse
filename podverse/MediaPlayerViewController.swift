@@ -45,6 +45,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "dismissKeyboard"))
         self.clipper = ((self.childViewControllers.first as! UINavigationController).topViewController as? PVClipperViewController)
+        
         self.clipper?.totalDuration = Int(pvMediaPlayer.nowPlayingEpisode.duration!)
 
         // Create and add the Make Clip button to the UI
@@ -66,8 +67,12 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         
         podcastTitle?.text = pvMediaPlayer.nowPlayingEpisode.podcast.title
         episodeTitle?.text = pvMediaPlayer.nowPlayingEpisode.title
-        if let nowPlayingEpisodeDuration = pvMediaPlayer.nowPlayingEpisode.duration {
-            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(nowPlayingEpisodeDuration) as String
+        
+        if let nowPlayingClip = pvMediaPlayer.nowPlayingClip {
+            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(nowPlayingClip.duration) as String
+        }
+        else {
+            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(pvMediaPlayer.nowPlayingEpisode.duration!) as String
         }
         if let episodeSummary = pvMediaPlayer.nowPlayingEpisode.summary {
             summary?.text = PVUtility.removeHTMLFromString(episodeSummary)
@@ -88,7 +93,14 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
 
     @IBAction func sliderTimeChange(sender: UISlider) {
         let currentSliderValue = Float64(sender.value)
-        let totalTime = Float64(pvMediaPlayer.nowPlayingEpisode.duration!)
+        let totalTime: Float64!
+        
+        if let clip = pvMediaPlayer.nowPlayingClip {
+            totalTime = Float64(clip.duration)
+        } else {
+            totalTime = Float64(pvMediaPlayer.nowPlayingEpisode.duration!)
+        }
+        
         let resultTime = totalTime * currentSliderValue
         pvMediaPlayer.goToTime(resultTime)
     }
@@ -158,7 +170,16 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     func updateNowPlayingCurrentTime(notification: NSNotification) {
         if let nowPlayingCurrentTime = notification.userInfo?["nowPlayingCurrentTime"] as? Float {
             currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(nowPlayingCurrentTime)
-            nowPlayingSlider.value = nowPlayingCurrentTime / Float(pvMediaPlayer.nowPlayingEpisode.duration!)
+            
+            let totalTime: Float
+            
+            if let clip = pvMediaPlayer.nowPlayingClip {
+                totalTime = Float(clip.duration)
+            } else {
+                totalTime = Float(pvMediaPlayer.nowPlayingEpisode.duration!)
+            }
+            
+            nowPlayingSlider.value = nowPlayingCurrentTime / totalTime
         }
     }
     
