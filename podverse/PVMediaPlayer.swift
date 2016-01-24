@@ -108,7 +108,9 @@ class PVMediaPlayer: NSObject {
     }
     
     func playerDidFinishPlaying(note: NSNotification) {
-        self.delegate?.episodeFinishedPlaying(nowPlayingEpisode)
+        if nowPlayingClip == nil {
+            self.delegate?.episodeFinishedPlaying(nowPlayingEpisode)   
+        }
     }
     
     func saveCurrentTimeAsPlaybackPosition() {
@@ -225,6 +227,7 @@ class PVMediaPlayer: NSObject {
     
     func loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode: Episode) {
         nowPlayingEpisode = episode
+        nowPlayingClip = nil
         
         if nowPlayingEpisode.fileName != nil {
             var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
@@ -251,37 +254,32 @@ class PVMediaPlayer: NSObject {
     }
     
     func loadClipDownloadedMediaFileOrStreamAndPlay(clip: Clip) {
-        nowPlayingClip = clip
         nowPlayingEpisode = clip.episode
+        nowPlayingClip = clip
         
-        if nowPlayingEpisode.fileName != nil {
-            var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
-            self.docDirectoryURL = URLs[0]
-            
-            if let fileName = nowPlayingEpisode.fileName, let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName) {
-                let playerItem = AVPlayerItem(URL: destinationURL)
-                avPlayer = AVPlayer(playerItem: playerItem)
-                
-                let endTime = CMTimeMakeWithSeconds(Double(clip.endTime!), 1)
-                let endTimeValue = NSValue(CMTime: endTime)
-                self.boundaryObserver = avPlayer.addBoundaryTimeObserverForTimes([endTimeValue], queue: nil, usingBlock: {
-                    self.playOrPause()
-                    if let observer = self.boundaryObserver{
-                        self.avPlayer.removeTimeObserver(observer)
-                    }
-                })
-                
-                goToTime(Double(clip.startTime))
-            }
-        } else {
-            if let urlString = nowPlayingEpisode.mediaURL, let url = NSURL(string: urlString) {
-                // Set start time
-                // Set end time
-                // Stream only the part of the clip needed
-                // Play the clip
-                avPlayer = AVPlayer(URL:url)
-            }
-        }
+//        if nowPlayingEpisode.fileName != nil {
+//            var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
+//            self.docDirectoryURL = URLs[0]
+//            
+//            if let fileName = nowPlayingEpisode.fileName, let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName) {
+//                let playerItem = AVPlayerItem(URL: destinationURL)
+//                avPlayer = AVPlayer(playerItem: playerItem)
+//                
+//                let endTime = CMTimeMakeWithSeconds(Double(clip.endTime!), 1)
+//                let endTimeValue = NSValue(CMTime: endTime)
+//                self.boundaryObserver = avPlayer.addBoundaryTimeObserverForTimes([endTimeValue], queue: nil, usingBlock: {
+//                    self.playOrPause()
+//                    if let observer = self.boundaryObserver{
+//                        self.avPlayer.removeTimeObserver(observer)
+//                    }
+//                })
+//                
+//                goToTime(Double(clip.startTime))
+//            }
+//        } else {
+            PVClipStreamer.sharedInstance.streamClip(nowPlayingClip)
+            playOrPause()
+//        }
         
         self.setPlayingInfo(nowPlayingEpisode)
     }

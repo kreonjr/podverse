@@ -93,16 +93,14 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
             cell.title?.text = title
         }
         
-        if let duration = clip.duration {
-            cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(duration)
-        }
+        cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(clip.duration)
+
         
         var startTime: String
         var endTime: String?
         startTime = PVUtility.convertNSNumberToHHMMSSString(clip.startTime)
-        if let endT = clip.endTime {
-            endTime = " - " + PVUtility.convertNSNumberToHHMMSSString(endT)
-        }
+        endTime = " - " + PVUtility.convertNSNumberToHHMMSSString(clip.endTime)
+
         cell.startTimeEndTime.text = startTime + endTime!
         
         cell.sharesTotal.text = "Shares: 123"
