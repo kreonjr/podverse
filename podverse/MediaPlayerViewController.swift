@@ -279,4 +279,12 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
             })
         })
     }
+    
+    func clipFinishedPlaying(currentClip: Clip) {
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kNowPlayingTimeHasChanged, object: nil)
+        pvMediaPlayer.clearPlayingInfo()
+        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            self.navigationController?.popViewControllerAnimated(true)
+        })
+    }
 }

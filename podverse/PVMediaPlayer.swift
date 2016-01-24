@@ -13,6 +13,7 @@ import MediaPlayer
 protocol PVMediaPlayerDelegate {
     func setMediaPlayerVCPlayPauseIcon()
     func episodeFinishedPlaying(currentEpisode:Episode)
+    func clipFinishedPlaying(currentClip:Clip)
 }
 
 class PVMediaPlayer: NSObject {
@@ -110,6 +111,8 @@ class PVMediaPlayer: NSObject {
     func playerDidFinishPlaying(note: NSNotification) {
         if nowPlayingClip == nil {
             self.delegate?.episodeFinishedPlaying(nowPlayingEpisode)   
+        } else {
+            self.delegate?.clipFinishedPlaying(nowPlayingClip)
         }
     }
     
