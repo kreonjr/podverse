@@ -75,7 +75,35 @@ class PVClipperAddInfoViewController: UIViewController {
             clip?.duration = clipDuration
         }
         
+        if let unwrappedClip = clip {
+            saveClip(unwrappedClip)
+        }
+        
         CoreDataHelper.saveCoreData(nil)
+    }
+    
+    final private func saveClip(clip:Clip) {
+        let saveClipWS = SaveClipToServer(clip: clip, completionBlock: { (response) -> Void in
+            self.clip?.clipUrl = response["clipUri"] as? String
+            CoreDataHelper.saveCoreData(nil)
+            
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                let alert = UIAlertController(title: "Clip saved with URL:", message: self.clip?.clipUrl, preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+                alert.addAction(UIAlertAction(title: "Copy", style: .Default, handler: { (action) -> Void in
+                    UIPasteboard.generalPasteboard().string = self.clip?.clipUrl ?? ""
+                }))
+                self.presentViewController(alert, animated: true, completion: nil)
+            })
+        }) { (error) -> Void in
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                let alert = UIAlertController(title: "Error", message: error?.localizedDescription, preferredStyle: .Alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
+            })
+        }
+        
+        saveClipWS.call()
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
