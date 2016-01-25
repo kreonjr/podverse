@@ -1,3 +1,6 @@
 [submodule "lib/SwiftFeedParser"]
 	path = lib/SwiftFeedParser
 	url = https://github.com/DigitalLeaves/SwiftFeedParser.git
+[submodule "lib/Alamofire"]
+	path = lib/Alamofire
+	url = https://github.com/Alamofire/Alamofire.git
