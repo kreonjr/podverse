@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="14F27" minimumToolsVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="15C50" minimumToolsVersion="Automatic">
     <entity name="Clip" representedClassName="Clip" syncable="YES">
+        <attribute name="clipUrl" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="duration" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="endTime" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="startTime" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
@@ -46,7 +47,7 @@
         <relationship name="episodes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Episode" inverseName="podcast" inverseEntity="Episode" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Clip" positionX="-20" positionY="-387" width="128" height="135"/>
+        <element name="Clip" positionX="-20" positionY="-387" width="128" height="148"/>
         <element name="Episode" positionX="-207" positionY="-526" width="128" height="360"/>
         <element name="Podcast" positionX="-398" positionY="-541" width="128" height="240"/>
     </elements>
