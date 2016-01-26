@@ -70,12 +70,12 @@ class DownloadsTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return self.appDelegate.episodeDownloadArray.count
+        return DLEpisodesList.shared.downloadingEpisodes.count
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell: DownloadsTableViewCell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! DownloadsTableViewCell
-        let episode = self.appDelegate.episodeDownloadArray[indexPath.row]
+        let episode = DLEpisodesList.shared.downloadingEpisodes[indexPath.row]
         
         cell.title!.text = episode.title
         
@@ -122,7 +122,7 @@ class DownloadsTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let episode = self.appDelegate.episodeDownloadArray[indexPath.row]
+        let episode = DLEpisodesList.shared.downloadingEpisodes[indexPath.row]
         PVDownloader.sharedInstance.pauseOrResumeDownloadingEpisode(episode)
     }
     

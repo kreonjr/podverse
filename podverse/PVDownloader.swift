@@ -39,8 +39,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             let downloadTask = downloadSession.downloadTaskWithURL(downloadSourceURL)
             episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
             
-            if !appDelegate.episodeDownloadArray.contains(episode) {
-                appDelegate.episodeDownloadArray.append(episode)
+            if !DLEpisodesList.shared.downloadingEpisodes.contains(episode) {
+                DLEpisodesList.shared.downloadingEpisodes.append(episode)
             }
             
             CoreDataHelper.saveCoreData(nil)
@@ -91,7 +91,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     
     func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
         if let episodeDownloadIndex = getDownloadingEpisodeIndexWithTaskIdentifier(task.taskIdentifier) {
-            let episode = appDelegate.episodeDownloadArray[episodeDownloadIndex.integerValue]
+            let episode = DLEpisodesList.shared.downloadingEpisodes[episodeDownloadIndex.integerValue]
             
             if let resumeData = error?.userInfo[NSURLSessionDownloadTaskResumeData] as? NSData {
                 episode.taskResumeData = resumeData
@@ -108,8 +108,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         else {
             // Get the corresponding episode object by its taskIdentifier value
             if let episodeDownloadIndex = getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier) {
-                if episodeDownloadIndex.integerValue < appDelegate.episodeDownloadArray.count {
-                    let episode = appDelegate.episodeDownloadArray[episodeDownloadIndex.integerValue]
+                if episodeDownloadIndex.integerValue < DLEpisodesList.shared.downloadingEpisodes.count {
+                    let episode = DLEpisodesList.shared.downloadingEpisodes[episodeDownloadIndex.integerValue]
                     
                     let totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
                     
@@ -133,7 +133,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         
         // Get the corresponding episode object by its taskIdentifier value
         if let episodeDownloadIndex = getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier) {
-            let episode = appDelegate.episodeDownloadArray[episodeDownloadIndex.integerValue]
+            let episode = DLEpisodesList.shared.downloadingEpisodes[episodeDownloadIndex.integerValue]
             
             var mp3OrOggFileExtension = ".mp3"
             
@@ -224,7 +224,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     }
     
     func getDownloadingEpisodeIndexWithTaskIdentifier(taskIdentifier: Int) -> NSNumber? {
-        for (index,episode) in appDelegate.episodeDownloadArray.enumerate() {
+        for (index,episode) in DLEpisodesList.shared.downloadingEpisodes.enumerate() {
             if taskIdentifier == episode.taskIdentifier?.integerValue {
                 return NSNumber(integer: index)
             }

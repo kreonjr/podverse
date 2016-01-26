@@ -54,6 +54,7 @@
 		EF59CECD1BD07AB6002D9DDF /* FeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC71BD07AB6002D9DDF /* FeedParser.swift */; };
 		EF59CECE1BD07AB6002D9DDF /* NSDate+FeedsDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC81BD07AB6002D9DDF /* NSDate+FeedsDate.swift */; };
 		EF59CECF1BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF59CEC91BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift */; };
+		EF70B0771C574BC800234FF2 /* DownloadingEpisodesList.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF70B0761C574BC800234FF2 /* DownloadingEpisodesList.swift */; };
 		EFB3249E1BE59127000936B6 /* PVClipperAddInfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB3249D1BE59127000936B6 /* PVClipperAddInfoViewController.swift */; };
 		EFB324A01BE5913A000936B6 /* PVClipperConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB3249F1BE5913A000936B6 /* PVClipperConfirmationViewController.swift */; };
 		EFD1D4E71C3106FB00666912 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD1D4E51C3106FA00666912 /* Fabric.framework */; };
@@ -191,6 +192,7 @@
 		EF59CEC71BD07AB6002D9DDF /* FeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedParser.swift; sourceTree = "<group>"; };
 		EF59CEC81BD07AB6002D9DDF /* NSDate+FeedsDate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSDate+FeedsDate.swift"; sourceTree = "<group>"; };
 		EF59CEC91BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+RemoveHTMLCharacters.swift"; sourceTree = "<group>"; };
+		EF70B0761C574BC800234FF2 /* DownloadingEpisodesList.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DownloadingEpisodesList.swift; sourceTree = "<group>"; };
 		EFB3249D1BE59127000936B6 /* PVClipperAddInfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipperAddInfoViewController.swift; sourceTree = "<group>"; };
 		EFB3249F1BE5913A000936B6 /* PVClipperConfirmationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipperConfirmationViewController.swift; sourceTree = "<group>"; };
 		EFD1D4E51C3106FA00666912 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
@@ -260,6 +262,7 @@
 				813FC80F1B5CA992006248BC /* PVSubscriber.swift */,
 				81E3578F1B21624500D67634 /* PVUtility.swift */,
 				818615CD1B1EB12C006C9731 /* PodcastsTableViewController.swift */,
+				EF70B0761C574BC800234FF2 /* DownloadingEpisodesList.swift */,
 				81DDBE5C1B24AC8100EF3B9C /* PodcastsTableCell.swift */,
 				818615CB1B1EB10E006C9731 /* EpisodesTableViewController.swift */,
 				81DDBE5E1B24BAF300EF3B9C /* EpisodesTableCell.swift */,
@@ -606,6 +609,7 @@
 				EFB324A01BE5913A000936B6 /* PVClipperConfirmationViewController.swift in Sources */,
 				EF59CECE1BD07AB6002D9DDF /* NSDate+FeedsDate.swift in Sources */,
 				3081B6BD1BB7431C00233E08 /* Extensions.swift in Sources */,
+				EF70B0771C574BC800234FF2 /* DownloadingEpisodesList.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

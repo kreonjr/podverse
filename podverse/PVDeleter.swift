@@ -9,10 +9,7 @@
 import UIKit
 import CoreData
 
-class PVDeleter: NSObject {
-    
-    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    
+class PVDeleter: NSObject {    
     static let sharedInstance = PVDeleter()
     
     func deletePodcast(podcast: Podcast) {
@@ -24,7 +21,7 @@ class PVDeleter: NSObject {
             deleteEpisode(episodesToRemove[i],completion: nil)
         }
         
-        CoreDataHelper.deleteItemFromCoreData(podcast, completionBlock: { () -> Void in
+        CoreDataHelper.sharedInstance.deleteItemFromCoreData(podcast, completionBlock: { () -> Void in
             CoreDataHelper.saveCoreData(nil)
         })
 
@@ -43,9 +40,9 @@ class PVDeleter: NSObject {
         }
         
         // If the episode is currently in the episodeDownloadArray, then delete the episode from the episodeDownloadArray
-        if appDelegate.episodeDownloadArray.contains(episode) {
-            let episodeDownloadArrayIndex = appDelegate.episodeDownloadArray.indexOf(episode)
-            appDelegate.episodeDownloadArray.removeAtIndex(episodeDownloadArrayIndex!)
+        if DLEpisodesList.shared.downloadingEpisodes.contains(episode) {
+            let episodeDownloadArrayIndex = DLEpisodesList.shared.downloadingEpisodes.indexOf(episode)
+            DLEpisodesList.shared.downloadingEpisodes.removeAtIndex(episodeDownloadArrayIndex!)
         }
         
         // If the episode is currently now playing, then remove the now playing episode, and remove the Player button from the navbar
@@ -64,7 +61,7 @@ class PVDeleter: NSObject {
             PVUtility.deleteEpisodeFromDiskWithName(fileName)
         }
         
-        CoreDataHelper.deleteItemFromCoreData(episode, completionBlock: { () -> Void in
+        CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode, completionBlock: { () -> Void in
             CoreDataHelper.saveCoreData({ (saved) -> Void in
                 if let completion = completion {
                     completion()
