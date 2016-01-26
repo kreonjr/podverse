@@ -14,13 +14,14 @@ class SaveClipToServer:WebService {
         
         setHttpMethod(.METHOD_POST)
         addHeaderWithKey("Content-Type", value: "application/json")
-        addParamWithKey("podcast", value: ["name":clip.episode.podcast.title ?? "",
-                                           "imageUrl":clip.episode.podcast.imageURL ?? "",
-                                            "episode": ["title":clip.episode.title ?? "",
-                                                        "pubDate":PVUtility.formatDateToString(clip.episode.pubDate!)],
-                                            "clip":["title": clip.title ?? "",
-                                                    "startTime": clip.startTime,
-                                                    "endTime":clip.endTime!,
-                                                    "duration":clip.duration ?? 0]])
+        addParamWithKey("podcast", value: ["title":clip.episode.podcast.title ?? "",
+                                           "imageURL":clip.episode.podcast.imageURL ?? ""])
+        addParamWithKey("episode", value: ["title":clip.episode.title ?? "",
+                                           "pubDate":PVUtility.formatDateToString(clip.episode.pubDate!),
+                                           "mediaURL":clip.episode.mediaURL ?? ""])
+        addParamWithKey("clip", value: ["title":clip.title ?? "",
+                                        "startTime":clip.startTime,
+                                        "endTime":clip.endTime,
+                                        "duration":clip.duration ?? 0])
     }
 }
