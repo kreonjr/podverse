@@ -147,7 +147,6 @@ class PodcastsTableViewController: UITableViewController {
             episodesTableViewController.showAllEpisodes = false
         } else if segue.identifier == "Podcasts to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }

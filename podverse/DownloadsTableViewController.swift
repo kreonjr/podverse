@@ -168,7 +168,6 @@ class DownloadsTableViewController: UITableViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "Downloads to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }

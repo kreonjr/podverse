@@ -14,6 +14,7 @@ class ClipsTableCell: UITableViewCell {
     @IBOutlet weak var startTimeEndTime: UILabel!
     @IBOutlet weak var duration: UILabel!
     @IBOutlet weak var sharesTotal: UILabel!
+    @IBOutlet weak var quickStart: UIButton!
     
     override func awakeFromNib() {
         super.awakeFromNib()

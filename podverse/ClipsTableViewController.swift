@@ -26,6 +26,8 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
     
     var clipsArray = [Clip]()
     
+    var pvMediaPlayer = PVMediaPlayer.sharedInstance
+    
     func loadData() {
         if let clipsArray = selectedEpisode.clips.allObjects as? [Clip] {
             self.clipsArray = clipsArray.sort {
@@ -78,7 +80,7 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 90
+        return 100
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -91,22 +93,27 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
             cell.title?.text = title
         }
         
-        if let duration = clip.duration {
-            cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(duration)
-        }
+        cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(clip.duration)
+
         
         var startTime: String
         var endTime: String?
         startTime = PVUtility.convertNSNumberToHHMMSSString(clip.startTime)
-        if let endT = clip.endTime {
-            endTime = " - " + PVUtility.convertNSNumberToHHMMSSString(endT)
-        }
+        endTime = " - " + PVUtility.convertNSNumberToHHMMSSString(clip.endTime)
+
         cell.startTimeEndTime.text = startTime + endTime!
         
         cell.sharesTotal.text = "Shares: 123"
         
         return cell
     }
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let selectedClip = clipsArray[indexPath.row]
+        self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(selectedClip)
+        self.performSegueWithIdentifier("Clips to Now Playing", sender: nil)
+    }
+
 
     /*
     // Override to support conditional editing of the table view.
@@ -147,20 +154,8 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "Play" {
+        if segue.identifier == "Clips to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            
-            let index = self.tableView.indexPathForSelectedRow!
-            if index.row == 0 {
-                PVMediaPlayer.sharedInstance.nowPlayingEpisode = selectedEpisode
-            } else {
-                PVMediaPlayer.sharedInstance.nowPlayingClip = clipsArray[index.row]
-            }
-            
-            mediaPlayerViewController.hidesBottomBarWhenPushed = true
-        } else if segue.identifier == "Clips to Now Playing" {
-            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            mediaPlayerViewController.returnToNowPlaying = true
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
     }

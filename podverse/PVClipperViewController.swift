@@ -19,8 +19,10 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     var currentEpisode:Episode?
     var clip:Clip?
     
-    var playFromEndSeconds = 0.0
+    var boundaryObserver:AnyObject?
     var displayLink: CADisplayLink!
+    
+    var avPlayer = PVMediaPlayer.sharedInstance.avPlayer
     
     @IBOutlet weak var startLabel: UILabel!
     @IBOutlet weak var endLabel: UILabel!
@@ -47,9 +49,7 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
         
         if let existingClip = clip {
             startTime = existingClip.startTime.integerValue
-            if let clipEndTime = existingClip.endTime?.integerValue {
-                endTime = clipEndTime
-            }
+            endTime = existingClip.endTime.integerValue 
         }
         
         updateUI()
@@ -59,22 +59,23 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
         startTime = getStartTimeFromTextFields()
         endTime = getEndTimeFromTextFields()
         
-        if endTime < startTime {
-            let timingAlert = UIAlertController(title: "Error", message: "Start time is set before End time. Would you like to set End time to the end of the Episode?", preferredStyle:.Alert)
-            timingAlert.addAction(UIAlertAction(title: "Set End Time", style: .Default, handler: { (alertAction) -> Void in
-
-                if let duration = self.currentEpisode?.duration?.integerValue {
-                    self.endTime = duration
-
+        if endTime <= startTime && endTime != 0 {
+            let timingAlert = UIAlertController(title: "Invalid Time", message: "Please update the End Time so it is later than the Start Time.", preferredStyle:.Alert)
+            
+            timingAlert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+            
+            self.presentViewController(timingAlert, animated: true, completion: nil)
+        } else if endTime == 0 {
+            let timingAlert = UIAlertController(title: "Clip End Time", message: "No End Time is set. Press OK to continue without an End Time, or Cancel to update it.", preferredStyle:.Alert)
+            timingAlert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { (alertAction) -> Void in
+                    self.endTime = 0
                     self.performSegueWithIdentifier("show_add_clipTitle", sender: self)
-                }
             }))
             
             timingAlert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
             
             self.presentViewController(timingAlert, animated: true, completion: nil)
-        }
-        else {
+        } else {
             self.performSegueWithIdentifier("show_add_clipTitle", sender: self)
         }
     }
@@ -97,23 +98,21 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     }
     
     func playFromEndTime() {
-        playFromEndSeconds = Double(getEndTimeFromTextFields() - 3)
-        if playFromEndSeconds > 0 {
-            PVMediaPlayer.sharedInstance.goToTime(playFromEndSeconds)
-            
-            // CADisplayLink is apparently the most precise timer we can use. It calls a function every 1/60th of a second.
-            displayLink = CADisplayLink(target: self, selector: "pauseIfEndTimeReached")
-            
-            displayLink.addToRunLoop(NSRunLoop.currentRunLoop(), forMode: NSDefaultRunLoopMode)
-        }
-    }
-    
-    func pauseIfEndTimeReached() {
-        let nowPlayingCurrentTime = CMTimeGetSeconds(PVMediaPlayer.sharedInstance.avPlayer.currentTime())
-        if nowPlayingCurrentTime >= playFromEndSeconds + 3 {
+        let playFromEndDouble = Double(getEndTimeFromTextFields())
+        let playFromEndCMTime = CMTimeMakeWithSeconds(playFromEndDouble, 1)
+        let playFromEndValue = NSValue(CMTime: playFromEndCMTime)
+        
+        self.boundaryObserver = avPlayer.addBoundaryTimeObserverForTimes([playFromEndValue], queue: nil, usingBlock: {
             PVMediaPlayer.sharedInstance.playOrPause()
-            displayLink.invalidate()
-        }
+            if let observer = self.boundaryObserver{
+                self.avPlayer.removeTimeObserver(observer)
+            }
+        })
+        
+        let playFromEndPreviewDouble = playFromEndDouble - 3
+        
+
+        PVMediaPlayer.sharedInstance.goToTime(playFromEndPreviewDouble)
     }
     
     func getStartTimeFromTextFields() -> Int {

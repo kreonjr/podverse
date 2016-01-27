@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3010F39C1BC9B64E001DFFF6 /* PVMediaPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */; };
 		3010F39E1BC9D2F0001DFFF6 /* PVClipperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3010F39D1BC9D2F0001DFFF6 /* PVClipperViewController.swift */; };
+		3047AC531C5462A300F484D5 /* PVClipStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3047AC521C5462A300F484D5 /* PVClipStreamer.swift */; };
 		3072BE2E1C48A2F000CA9C7F /* PVDeleter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3072BE2D1C48A2F000CA9C7F /* PVDeleter.swift */; };
 		3081B6BD1BB7431C00233E08 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3081B6BC1BB7431C00233E08 /* Extensions.swift */; };
 		812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
@@ -144,6 +145,7 @@
 /* Begin PBXFileReference section */
 		3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVMediaPlayer.swift; sourceTree = "<group>"; };
 		3010F39D1BC9D2F0001DFFF6 /* PVClipperViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipperViewController.swift; sourceTree = "<group>"; };
+		3047AC521C5462A300F484D5 /* PVClipStreamer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipStreamer.swift; sourceTree = "<group>"; };
 		3072BE2D1C48A2F000CA9C7F /* PVDeleter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVDeleter.swift; sourceTree = "<group>"; };
 		3081B6BC1BB7431C00233E08 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		812A094E1B422AB300E8F070 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
@@ -259,6 +261,7 @@
 				81623C281B35D3A100E906FE /* PVDownloader.swift */,
 				81E3578D1B21619F00D67634 /* PVFeedParser.swift */,
 				3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */,
+				3047AC521C5462A300F484D5 /* PVClipStreamer.swift */,
 				813FC80F1B5CA992006248BC /* PVSubscriber.swift */,
 				81E3578F1B21624500D67634 /* PVUtility.swift */,
 				818615CD1B1EB12C006C9731 /* PodcastsTableViewController.swift */,
@@ -576,6 +579,7 @@
 				818615D01B1EB144006C9731 /* ClipsTableViewController.swift in Sources */,
 				81DDBE631B253C9200EF3B9C /* ClipsTableCell.swift in Sources */,
 				EF59CECF1BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift in Sources */,
+				3047AC531C5462A300F484D5 /* PVClipStreamer.swift in Sources */,
 				81DD2CCB1B549C4D00432E0C /* Podcast.swift in Sources */,
 				81CCE4E21B52DB8B00DC8346 /* PodcastProfileViewController.swift in Sources */,
 				81DDBE5F1B24BAF300EF3B9C /* EpisodesTableCell.swift in Sources */,
