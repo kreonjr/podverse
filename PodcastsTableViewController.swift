@@ -34,6 +34,7 @@ class PodcastsTableViewController: UITableViewController {
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
         self.refreshControl?.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector:"reloadTable" , name: Constants.refreshPodcastTableDataNotification, object: nil)
     }
     
     func refreshPodcastFeeds() {
@@ -151,7 +152,7 @@ class PodcastsTableViewController: UITableViewController {
         }
     }
     
-    func feedParsingComplete() {
+    func reloadTable() {
         tableView.reloadData()
         self.refreshControl?.endRefreshing()
     }

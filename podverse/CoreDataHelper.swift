@@ -100,7 +100,7 @@ class CoreDataHelper: NSObject {
     
     func deleteItemFromCoreData(deleteObject:NSManagedObject, completionBlock:(()->Void)?) {
         dispatch_async(Constants.saveQueue) { () -> Void in
-            self.moc.deleteObject(deleteObject)
+            Constants.moc.deleteObject(deleteObject)
             if let completion = completionBlock {
                 completion()
             }
