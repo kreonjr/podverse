@@ -69,7 +69,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                             	})
                             } else {
                                 // Get all podcasts in Core Data to use to determine if you're already subscribed to a search result podcast
-                                let allSubscribedPodcasts = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
+                                let allSubscribedPodcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
                                 
                                 for (var i = 0; i < results.count; i++) {
                                     
@@ -91,21 +91,9 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                                         }
                                     }
                                     
-                                    if let imageURLString = podcastJSON["artworkUrl100"] as? String {
-                                        let imgURL = NSURL(string: imageURLString)
-                                        let request = NSURLRequest(URL: imgURL!)
-                                        NSURLConnection.sendAsynchronousRequest(
-                                            request, queue: NSOperationQueue.mainQueue(),
-                                            completionHandler: { response, data, error in
-                                                if error == nil {
-                                                    searchResultPodcast.image = data
-                                                    self.tableView.reloadData()
-                                                } else {
-                                                    print(error)
-                                                }
-                                            }
-                                        )
-                                    }
+                                    searchResultPodcast.itunesImageURL = podcastJSON["artworkUrl100"] as? String
+                                    
+                                    searchResultPodcast.imageURL = podcastJSON["artworkUrl100"] as? String
                                     
                                     // Grab the releaseDate, then convert into NSDate
                                     if let lastPubDateString = podcastJSON["releaseDate"] as? String {
@@ -178,12 +166,10 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         cell.artist?.text = podcast.artistName
         cell.pvImage?.image = UIImage(named: "Blank52")
 
-        if let imageData = podcast.image {
-            let image = UIImage(data: imageData)
-            cell.pvImage?.image = image
-        } else if let itunesImageData = podcast.itunesImage {
-            let itunesImage = UIImage(data: itunesImageData)
-            cell.pvImage?.image = itunesImage
+        if let imageUrl = NSURL(string:podcast.imageURL!) {
+            UIImage.downloadImageWithURL(imageUrl, completion: { (completed, image) -> () in
+                cell.pvImage?.image = image
+            })
         }
 
         return cell
@@ -239,5 +225,26 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
+    }
+}
+
+extension UIImage {
+    static func downloadImageWithURL(url:NSURL, completion:(completed:Bool, image:UIImage?) -> ()) {
+        let session = NSURLSession.sharedSession()
+        
+        let task = session.dataTaskWithURL(url) { (imageData, response, error) -> Void in
+            if error == nil {
+                if let data = imageData {
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        completion(completed: true, image: UIImage(data: data))
+                    })
+                }
+                else {
+                    completion(completed: false, image: nil)
+                }
+            }
+        }
+        
+        task.resume()
     }
 }
