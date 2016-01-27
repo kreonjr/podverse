@@ -193,9 +193,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         
         // If loading the MediaPlayerVC when with no currentItem in the avPlayer, then nav back a page. Else load the MediaPlayerVC with the current item and related info.
         if pvMediaPlayer.avPlayer.currentItem == nil {
-            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                self.navigationController?.popViewControllerAnimated(true)
-            })
+            self.navigationController?.popViewControllerAnimated(true)
         } else {
             // Call updateNowPlayingCurrentTime whenever the now playing current time changes
             if pvMediaPlayer.avPlayer.currentItem != nil {

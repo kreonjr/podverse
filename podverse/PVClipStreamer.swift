@@ -64,9 +64,15 @@ class PVClipStreamer: NSObject, AVAssetResourceLoaderDelegate, NSURLConnectionDa
         if let mediaURLString = clip.episode.mediaURL {
             
             // Get remote file total bytes
-            let remoteFileSize = NSURL(string: mediaURLString)!.remoteSize
+            guard let remoteFileSize = NSURL(string: mediaURLString)?.remoteSize else {
+                return
+            }
+            
+            guard let calcCustomMediaURL = self.mediaURLWithCustomScheme(mediaURLString, scheme: "http") else {
+                return
+            }
 
-            let calculateDurationAsset = AVURLAsset(URL: self.mediaURLWithCustomScheme(mediaURLString, scheme: "http"), options: nil)
+            let calculateDurationAsset = AVURLAsset(URL: calcCustomMediaURL, options: nil)
             
             // If an episode.duration is availabe then use it. Else, calculate the episode duration.
             if clip.episode.duration != nil {
@@ -113,7 +119,11 @@ class PVClipStreamer: NSObject, AVAssetResourceLoaderDelegate, NSURLConnectionDa
                 endBytesRange = Int(remoteFileSize)
             }
             
-            let asset = AVURLAsset(URL: self.mediaURLWithCustomScheme(mediaURLString, scheme: "streaming"), options: nil)
+            guard let customSchemeMediaURL = self.mediaURLWithCustomScheme(mediaURLString, scheme: "streaming") else {
+                return
+            }
+            
+            let asset = AVURLAsset(URL: customSchemeMediaURL, options: nil)
             
             asset.resourceLoader.setDelegate(self, queue: dispatch_get_main_queue())
             self.pendingRequests = []
@@ -124,11 +134,12 @@ class PVClipStreamer: NSObject, AVAssetResourceLoaderDelegate, NSURLConnectionDa
 
     
     // In order to override the Request header, we need to set a custom scheme
-    func mediaURLWithCustomScheme(URLString: String, scheme: String) -> NSURL {
-        let url = NSURL(string: URLString)
-        let components = NSURLComponents(URL: url!, resolvingAgainstBaseURL: false)!
+    func mediaURLWithCustomScheme(URLString: String, scheme: String) -> NSURL? {
+        guard let url = NSURL(string: URLString), let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: false) else {
+            return nil
+        }
         components.scheme = scheme
-        return components.URL!
+        return components.URL
     }
     
     func connection(connection: NSURLConnection, didReceiveResponse response: NSURLResponse) {
@@ -210,8 +221,10 @@ class PVClipStreamer: NSObject, AVAssetResourceLoaderDelegate, NSURLConnectionDa
     
     func resourceLoader(resourceLoader: AVAssetResourceLoader, shouldWaitForLoadingOfRequestedResource loadingRequest: AVAssetResourceLoadingRequest) -> Bool {
         if self.connection == nil {
-            let interceptedURL = loadingRequest.request.URL
-            let actualURLComponents = NSURLComponents(URL: interceptedURL!, resolvingAgainstBaseURL: false)
+            guard let interceptedURL = loadingRequest.request.URL else {
+                return false
+            }
+            let actualURLComponents = NSURLComponents(URL: interceptedURL, resolvingAgainstBaseURL: false)
             actualURLComponents!.scheme = "http"
             let actualURL = actualURLComponents!.URL!
 
