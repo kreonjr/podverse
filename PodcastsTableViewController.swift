@@ -18,7 +18,7 @@ class PodcastsTableViewController: UITableViewController {
     var podcastArray = [Podcast]()
     
     func loadData() {
-        podcastArray = CoreDataHelper.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
+        podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
         podcastArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
         
         self.tableView.reloadData()
@@ -32,11 +32,6 @@ class PodcastsTableViewController: UITableViewController {
         super.viewDidLoad()
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
-        
-        // If there are any unfinished downloads in the appDelegate.episodeDownloadArray, then resume those downloads
-        for episode:Episode in appDelegate.episodeDownloadArray {
-            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
-        }
         
         self.refreshControl?.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
     }
@@ -158,8 +153,8 @@ class PodcastsTableViewController: UITableViewController {
     }
     
     func feedParsingComplete() {
-        self.refreshControl!.endRefreshing()
         tableView.reloadData()
+        self.refreshControl?.endRefreshing()
     }
 
 }

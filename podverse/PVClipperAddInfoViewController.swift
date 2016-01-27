@@ -52,7 +52,7 @@ class PVClipperAddInfoViewController: UIViewController {
     
     func saveClipWithTitle(clipTitle:String) {
         if clip == nil {
-            clip = (CoreDataHelper.insertManagedObject("Clip", managedObjectContext: Constants.moc) as! Clip)
+            clip = (CoreDataHelper.sharedInstance.insertManagedObject("Clip", managedObjectContext: Constants.moc) as! Clip)
             clip?.episode = episode
         }
         

@@ -16,10 +16,10 @@ struct Constants {
 
     static let kNowPlayingTimeHasChanged = "nowPlayingTimeHasChanged"
     
-    static var moc = (UIApplication.sharedApplication().delegate as! AppDelegate).managedObjectContext!
+    static let moc = CoreDataHelper.sharedInstance.moc
 
     static let saveQueue = dispatch_queue_create("MOC_SERIAL_SAVE_QUEUE", DISPATCH_QUEUE_SERIAL)
     
-    static let reentrantAvoidanceQueue = dispatch_queue_create("reentrantAvoidanceQueue", DISPATCH_QUEUE_SERIAL);
+    static let feedParsingQueue = dispatch_queue_create("FEED_PARSER_QUEUE", DISPATCH_QUEUE_SERIAL);
 
 }

@@ -34,20 +34,21 @@ class PodcastProfileViewController: UIViewController {
         
         searchResultTitle.text = searchResultPodcast.title
         
-        let imageData = searchResultPodcast.image
-        if imageData != nil {
-            let image = UIImage(data: imageData!)
-            // TODO: below is probably definitely not the proper way to check for a nil value for an image, but I was stuck on it for a long time and moved on
-            if image!.size.height != 0.0 {
-                searchResultImage?.image = image
-            } else {
-                let itunesImageData = searchResultPodcast.itunesImage
-                let itunesImage = UIImage(data: itunesImageData!)
-                
-                if itunesImage!.size.height != 0.0 {
-                    searchResultImage?.image = itunesImage
+        if let imageUrlString = searchResultPodcast.imageURL, let imageUrl = NSURL(string: imageUrlString) {
+            UIImage.downloadImageWithURL(imageUrl, completion: { (completed, image) -> () in
+                if completed {
+                   self.searchResultImage?.image = image
                 }
-            }
+                else {
+                    if let itunesUrlString = self.searchResultPodcast.itunesImageURL, let itunesUrl = NSURL(string: itunesUrlString) {
+                        UIImage.downloadImageWithURL(itunesUrl, completion: { (completed, iTunesImage) -> () in
+                            if completed {
+                                self.searchResultImage?.image = iTunesImage
+                            }
+                        })
+                    }
+                }
+            })
         }
         
         searchResultTotalClips.text = "123 clips"

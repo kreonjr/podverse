@@ -67,7 +67,11 @@ class FeedItem: NSObject {
             // set or add new images
             if (self.imageURLsFromDescription == nil) {
                 self.imageURLsFromDescription = newImagesFromContent
-            } else { if (self.imageURLsFromDescription != nil) { self.imageURLsFromDescription! += newImagesFromContent } }
+            } else {
+                if (self.imageURLsFromDescription != nil) {
+                    self.imageURLsFromDescription! += newImagesFromContent
+                }
+            }
         })
     }
     

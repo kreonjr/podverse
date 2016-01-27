@@ -10,14 +10,47 @@ import UIKit
 import CoreData
 
 class CoreDataHelper: NSObject {
-
-    class func insertManagedObject(className: NSString, managedObjectContext: NSManagedObjectContext) -> AnyObject {
+    static let sharedInstance = CoreDataHelper()
+    var moc: NSManagedObjectContext
+    
+    override init() {
+        // This resource is the same name as your xcdatamodeld contained in your project.
+        guard let modelURL = NSBundle.mainBundle().URLForResource("podverse", withExtension: "momd") else {
+            fatalError("Error loading model from bundle")
+        }
+        // The managed object model for the application. It is a fatal error for the application not to be able to find and load its model.
+        guard let mom = NSManagedObjectModel(contentsOfURL: modelURL) else {
+            fatalError("Error initializing mom from: \(modelURL)")
+        }
+        
+        let psc = NSPersistentStoreCoordinator(managedObjectModel: mom)
+        self.moc = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+        self.moc.persistentStoreCoordinator = psc
+        
+        dispatch_async(Constants.saveQueue) {
+            let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
+            let docURL = urls[urls.endIndex-1]
+            /* The directory the application uses to store the Core Data store file.
+            This code uses a file named "DataModel.sqlite" in the application's documents directory.
+            */
+            let storeURL = docURL.URLByAppendingPathComponent("podverse.sqlite")
+            do {
+                try psc.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: [NSMigratePersistentStoresAutomaticallyOption: true, NSInferMappingModelAutomaticallyOption: true])
+            } catch {
+                fatalError("Error migrating store: \(error)")
+            }
+        }
+        
+        super.init()
+    }
+    
+    func insertManagedObject(className: NSString, managedObjectContext: NSManagedObjectContext) -> AnyObject {
         let managedObject = NSEntityDescription.insertNewObjectForEntityForName(className as String, inManagedObjectContext: managedObjectContext) 
         
         return managedObject
     }
     
-    class func fetchEntities (className: NSString, managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> NSArray {
+    func fetchEntities (className: NSString, managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> NSArray {
         let fetchRequest = NSFetchRequest()
         let entityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: managedObjectContext)
         
@@ -40,7 +73,7 @@ class CoreDataHelper: NSObject {
         
     }
     
-    class func fetchOnlyEntityWithMostRecentPubDate (className: NSString, managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> NSArray {
+    func fetchOnlyEntityWithMostRecentPubDate (className: NSString, managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> NSArray {
         let fetchRequest = NSFetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "pubDate", ascending: false)]
         fetchRequest.fetchLimit = 1
@@ -65,30 +98,28 @@ class CoreDataHelper: NSObject {
         return mostRecentItemByPubDate
     }
     
-    static func saveCoreData(completionBlock:((saved:Bool)->Void)?) {
+    func deleteItemFromCoreData(deleteObject:NSManagedObject, completionBlock:(()->Void)?) {
         dispatch_async(Constants.saveQueue) { () -> Void in
-            if Constants.moc.hasChanges {
-                do {
-                    try Constants.moc.save()
-                    if let completion = completionBlock {
-                        completion(saved:true)
-                    }
-                }
-                catch {
-                    if let completion = completionBlock {
-                        completion(saved:false)
-                    }
-                    print(error)
-                }
+            self.moc.deleteObject(deleteObject)
+            if let completion = completionBlock {
+                completion()
             }
         }
     }
     
-    static func deleteItemFromCoreData(deleteObject:NSManagedObject, completionBlock:(()->Void)?) {
-        dispatch_async(Constants.saveQueue) { () -> Void in
-            Constants.moc.deleteObject(deleteObject)
-            if let completion = completionBlock {
-                completion()
+    static func saveCoreData(completionBlock:((saved:Bool)->Void)?) {
+        if Constants.moc.hasChanges {
+            do {
+                try Constants.moc.save()
+                if let completion = completionBlock {
+                    completion(saved:true)
+                }
+            }
+            catch {
+                if let completion = completionBlock {
+                    completion(saved:false)
+                }
+                print(error)
             }
         }
     }
