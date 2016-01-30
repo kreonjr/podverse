@@ -125,21 +125,23 @@ class PVMediaPlayer: NSObject {
     
     func remoteControlReceivedWithEvent(event: UIEvent) {
         if event.type == UIEventType.RemoteControl {
-            switch event.subtype {
-            case UIEventSubtype.RemoteControlPlay:
-                self.playOrPause()
-                delegate?.setMediaPlayerVCPlayPauseIcon()
-                break
-            case UIEventSubtype.RemoteControlPause:
-                self.playOrPause()
-                delegate?.setMediaPlayerVCPlayPauseIcon()
-                break
-            case UIEventSubtype.RemoteControlTogglePlayPause:
-                self.playOrPause()
-                delegate?.setMediaPlayerVCPlayPauseIcon()
-                break
-            default:
-                break
+            if nowPlayingEpisode != nil || nowPlayingClip != nil {
+                switch event.subtype {
+                case UIEventSubtype.RemoteControlPlay:
+                    self.playOrPause()
+                    delegate?.setMediaPlayerVCPlayPauseIcon()
+                    break
+                case UIEventSubtype.RemoteControlPause:
+                    self.playOrPause()
+                    delegate?.setMediaPlayerVCPlayPauseIcon()
+                    break
+                case UIEventSubtype.RemoteControlTogglePlayPause:
+                    self.playOrPause()
+                    delegate?.setMediaPlayerVCPlayPauseIcon()
+                    break
+                default:
+                    break
+                }
             }
         }
     }
