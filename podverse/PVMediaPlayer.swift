@@ -308,4 +308,12 @@ class PVMediaPlayer: NSObject {
             }
         }
     }
+    
+    // If there is a now playing episode or clip, add Now Playing button to navigation bar
+    func addPlayerNavButton(vc: UIViewController) {
+        if nowPlayingEpisode != nil || nowPlayingClip != nil {
+            vc.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: vc, action: "segueToNowPlaying:")
+        }
+    }
+    
 }
