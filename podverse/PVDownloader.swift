@@ -175,6 +175,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     
                     episode.downloadComplete = true
                     episode.taskResumeData = nil
+                    episode.downloadProgress = 1
                     
                     // Add the file destination to the episode object for playback and retrieval
                     episode.fileName = destinationFilename
