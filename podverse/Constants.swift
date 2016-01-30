@@ -22,4 +22,5 @@ struct Constants {
     
     static let feedParsingQueue = dispatch_queue_create("FEED_PARSER_QUEUE", DISPATCH_QUEUE_SERIAL);
 
+    static let refreshPodcastTableDataNotification = "refreshPodcastTableDataNotification"
 }
