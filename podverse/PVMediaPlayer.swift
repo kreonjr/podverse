@@ -125,21 +125,23 @@ class PVMediaPlayer: NSObject {
     
     func remoteControlReceivedWithEvent(event: UIEvent) {
         if event.type == UIEventType.RemoteControl {
-            switch event.subtype {
-            case UIEventSubtype.RemoteControlPlay:
-                self.playOrPause()
-                delegate?.setMediaPlayerVCPlayPauseIcon()
-                break
-            case UIEventSubtype.RemoteControlPause:
-                self.playOrPause()
-                delegate?.setMediaPlayerVCPlayPauseIcon()
-                break
-            case UIEventSubtype.RemoteControlTogglePlayPause:
-                self.playOrPause()
-                delegate?.setMediaPlayerVCPlayPauseIcon()
-                break
-            default:
-                break
+            if nowPlayingEpisode != nil || nowPlayingClip != nil {
+                switch event.subtype {
+                case UIEventSubtype.RemoteControlPlay:
+                    self.playOrPause()
+                    delegate?.setMediaPlayerVCPlayPauseIcon()
+                    break
+                case UIEventSubtype.RemoteControlPause:
+                    self.playOrPause()
+                    delegate?.setMediaPlayerVCPlayPauseIcon()
+                    break
+                case UIEventSubtype.RemoteControlTogglePlayPause:
+                    self.playOrPause()
+                    delegate?.setMediaPlayerVCPlayPauseIcon()
+                    break
+                default:
+                    break
+                }
             }
         }
     }
@@ -308,4 +310,12 @@ class PVMediaPlayer: NSObject {
             }
         }
     }
+    
+    // If there is a now playing episode or clip, add Now Playing button to navigation bar
+    func addPlayerNavButton(vc: UIViewController) {
+        if nowPlayingEpisode != nil || nowPlayingClip != nil {
+            vc.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: vc, action: "segueToNowPlaying:")
+        }
+    }
+    
 }

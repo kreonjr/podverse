@@ -36,10 +36,7 @@ class DownloadsTableViewController: UITableViewController {
     
     override func viewWillAppear(animated: Bool) {
         
-        // If there is a now playing episode, add Now Playing button to navigation bar
-        if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
-            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
-        }
+        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
         
         reloadDownloadTableData()
         

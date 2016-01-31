@@ -19,10 +19,7 @@ class FindTableViewController: UITableViewController {
     }
     
     override func viewDidAppear(animated: Bool) {
-        // If there is a now playing episode, add Now Playing button to navigation bar
-        if ((PVMediaPlayer.sharedInstance.nowPlayingEpisode) != nil) {
-            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
-        }
+        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
     }
     
     override func viewDidLoad() {

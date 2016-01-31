@@ -98,10 +98,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        // If there is a now playing episode, add Now Playing button to navigation bar
-        if ((pvMediaPlayer.nowPlayingEpisode) != nil) {
-            self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
-        }
+        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
+        
         loadData()
     }
     

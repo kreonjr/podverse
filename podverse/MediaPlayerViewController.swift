@@ -271,6 +271,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     func episodeFinishedPlaying(currentEpisode: Episode) {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kNowPlayingTimeHasChanged, object: nil)
         pvMediaPlayer.clearPlayingInfo()
+        pvMediaPlayer.nowPlayingEpisode = nil
         PVDeleter.sharedInstance.deleteEpisode(currentEpisode,completion: {
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
                 self.navigationController?.popViewControllerAnimated(true)
@@ -281,6 +282,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     func clipFinishedPlaying(currentClip: Clip) {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kNowPlayingTimeHasChanged, object: nil)
         pvMediaPlayer.clearPlayingInfo()
+        pvMediaPlayer.nowPlayingClip = nil
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
             self.navigationController?.popViewControllerAnimated(true)
         })
