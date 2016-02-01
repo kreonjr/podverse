@@ -128,7 +128,7 @@ class PodcastsTableViewController: UITableViewController {
                 }
             }
             
-            PVSubscriber.sharedInstance.unsubscribeFromPodcast(podcastToRemove)
+            PVDeleter.sharedInstance.deletePodcast(podcastToRemove)
             podcastArray.removeAtIndex(indexPath.row)
             
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)

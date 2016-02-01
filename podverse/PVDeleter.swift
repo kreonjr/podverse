@@ -14,6 +14,8 @@ class PVDeleter: NSObject {
     
     func deletePodcast(podcast: Podcast) {
         
+        podcast.isSubscribed = false
+        
         let episodesToRemove = podcast.episodes.allObjects as! [Episode]
         
         // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
