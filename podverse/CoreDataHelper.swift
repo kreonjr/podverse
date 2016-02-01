@@ -108,18 +108,20 @@ class CoreDataHelper: NSObject {
     }
     
     static func saveCoreData(completionBlock:((saved:Bool)->Void)?) {
-        if Constants.moc.hasChanges {
-            do {
-                try Constants.moc.save()
-                if let completion = completionBlock {
-                    completion(saved:true)
+        dispatch_async(Constants.saveQueue) { () -> Void in
+            if Constants.moc.hasChanges {
+                do {
+                    try Constants.moc.save()
+                    if let completion = completionBlock {
+                        completion(saved:true)
+                    }
                 }
-            }
-            catch {
-                if let completion = completionBlock {
-                    completion(saved:false)
+                catch {
+                    if let completion = completionBlock {
+                        completion(saved:false)
+                    }
+                    print(error)
                 }
-                print(error)
             }
         }
     }
