@@ -63,49 +63,82 @@ class PodcastsTableViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        // #warning Potentially incomplete method implementation.
-        // Return the number of sections.
-        return 1
+        return 2
     }
     
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "My Subscribed Podcasts"
+        if section == 0 {
+            return "My Subscribed Podcasts"
+        } else {
+            return "My Playlists"
+        }
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
-        return podcastArray.count
+        if section == 0 {
+            return podcastArray.count
+        } else {
+            if let playlistArray = PVPlaylister.sharedInstance.allPlaylists {
+                return playlistArray.count
+            } else {
+                return 0
+            }
+        }
     }
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
-        let podcast = podcastArray[indexPath.row]
-        cell.title?.text = podcast.title
-        cell.pvImage?.image = UIImage(named: "Blank52")
         
-        let episodes = podcast.episodes.allObjects as! [Episode]
-        let episodesDownloaded = episodes.filter{ $0.downloadComplete == true }
-        cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
-        
-        if let lastPubDate = podcast.lastPubDate {
-            cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
-        } else if let lastBuildDate = podcast.lastBuildDate {
-            cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
-        }
+        if indexPath.section == 0 {
+            let podcast = podcastArray[indexPath.row]
+            cell.title?.text = podcast.title
+            cell.pvImage?.image = UIImage(named: "Blank52")
+            
+            let episodes = podcast.episodes.allObjects as! [Episode]
+            let episodesDownloaded = episodes.filter{ $0.downloadComplete == true }
+            cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
+            
+            if let lastPubDate = podcast.lastPubDate {
+                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
+            } else if let lastBuildDate = podcast.lastBuildDate {
+                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
+            }
+            
+            if let imageData = podcast.imageData {
+                if let image = UIImage(data: imageData) {
+                    cell.pvImage?.image = image
+                }
+            }
+            else if let itunesImageData = podcast.itunesImage {
+                if let itunesImage = UIImage(data: itunesImageData) {
+                    cell.pvImage?.image = itunesImage
+                }
+            }
 
-        if let imageData = podcast.imageData {
-            if let image = UIImage(data: imageData) {
-                cell.pvImage?.image = image
+        } else {
+            if let playlists = PVPlaylister.sharedInstance.allPlaylists {
+                let playlist = playlists[indexPath.row]
+                cell.title?.text = playlist.title
+                
+                var totalItems = 0
+                
+                if let podcastCount = playlist.podcasts?.allObjects.count {
+                    totalItems += podcastCount
+                }
+                
+                if let episodeCount = playlist.episodes?.allObjects.count {
+                    totalItems += episodeCount
+                }
+                
+                if let clipCount = playlist.clips?.allObjects.count {
+                    totalItems += clipCount
+                }
+                
+                cell.episodesDownloadedOrStarted?.text = String(totalItems)
             }
         }
-        else if let itunesImageData = podcast.itunesImage {
-            if let itunesImage = UIImage(data: itunesImageData) {
-                cell.pvImage?.image = itunesImage
-            }
-        }
-
+        
         return cell
     }
 

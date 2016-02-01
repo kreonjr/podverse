@@ -14,8 +14,11 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     let makeClipString = "Make Clip"
     let hideClipper = "Hide Clipper"
-    let buttonMakeClip: UIButton = UIButton(type : UIButtonType.Custom)
+    let buttonMakeClip = UIButton(type : UIButtonType.Custom)
     var clipper:PVClipperViewController?
+    
+    let addToList = "Add to List"
+    let buttonAddToList = UIButton(type: UIButtonType.Custom)
     
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
     
@@ -48,15 +51,21 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         
         self.clipper?.totalDuration = Int(pvMediaPlayer.nowPlayingEpisode.duration!)
 
-        // Create and add the Make Clip button to the UI
         buttonMakeClip.frame = CGRectMake(0, 0, 100, 90)
         buttonMakeClip.setTitle(makeClipString, forState: .Normal)
         buttonMakeClip.titleLabel!.font = UIFont(name: "System", size: 18)
         buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
         let rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
-        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: false)
         
         makeClipContainerView.hidden = true
+        
+        buttonAddToList.frame = CGRectMake(0, 0, 100, 90)
+        buttonAddToList.setTitle(addToList, forState: .Normal)
+        buttonAddToList.titleLabel!.font = UIFont(name: "System", size: 18)
+        buttonAddToList.addTarget(self, action: "addNowPlayingToList", forControlEvents: .TouchUpInside)
+        let rightBarButtonAddToList: UIBarButtonItem = UIBarButtonItem(customView: buttonAddToList)
+        
+        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip, rightBarButtonAddToList], animated: false)
         
         // Populate the Media Player UI with the current episode's information
         if let itunesImageData = pvMediaPlayer.nowPlayingEpisode.podcast.itunesImage {
@@ -261,6 +270,14 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
                 PVClipper.currentEpisode = pvMediaPlayer.nowPlayingEpisode
             }
             buttonMakeClip.setTitle(hideClipper, forState: .Normal)
+        }
+    }
+    
+    func addNowPlayingToList() {
+        if pvMediaPlayer.nowPlayingEpisode != nil {
+            PVPlaylister.sharedInstance.addEpisodeToPlaylist(pvMediaPlayer.nowPlayingEpisode)
+        } else if pvMediaPlayer.nowPlayingClip != nil {
+            PVPlaylister.sharedInstance.addClipToPlaylist(pvMediaPlayer.nowPlayingClip)
         }
     }
     

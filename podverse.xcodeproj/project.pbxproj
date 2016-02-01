@@ -10,6 +10,8 @@
 		3010F39C1BC9B64E001DFFF6 /* PVMediaPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */; };
 		3010F39E1BC9D2F0001DFFF6 /* PVClipperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3010F39D1BC9D2F0001DFFF6 /* PVClipperViewController.swift */; };
 		3047AC531C5462A300F484D5 /* PVClipStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3047AC521C5462A300F484D5 /* PVClipStreamer.swift */; };
+		3048B6811C5F045C00D1C2C7 /* PVPlaylister.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3048B6801C5F045C00D1C2C7 /* PVPlaylister.swift */; };
+		3048B6891C5F05FF00D1C2C7 /* Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3048B6881C5F05FF00D1C2C7 /* Playlist.swift */; };
 		3072BE2E1C48A2F000CA9C7F /* PVDeleter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3072BE2D1C48A2F000CA9C7F /* PVDeleter.swift */; };
 		3081B6BD1BB7431C00233E08 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3081B6BC1BB7431C00233E08 /* Extensions.swift */; };
 		812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
@@ -146,6 +148,8 @@
 		3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVMediaPlayer.swift; sourceTree = "<group>"; };
 		3010F39D1BC9D2F0001DFFF6 /* PVClipperViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipperViewController.swift; sourceTree = "<group>"; };
 		3047AC521C5462A300F484D5 /* PVClipStreamer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipStreamer.swift; sourceTree = "<group>"; };
+		3048B6801C5F045C00D1C2C7 /* PVPlaylister.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVPlaylister.swift; sourceTree = "<group>"; };
+		3048B6881C5F05FF00D1C2C7 /* Playlist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Playlist.swift; sourceTree = "<group>"; };
 		3072BE2D1C48A2F000CA9C7F /* PVDeleter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVDeleter.swift; sourceTree = "<group>"; };
 		3081B6BC1BB7431C00233E08 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		812A094E1B422AB300E8F070 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
@@ -257,11 +261,12 @@
 				3081B6BC1BB7431C00233E08 /* Extensions.swift */,
 				818615BF1B1E950D006C9731 /* CoreDataHelper.swift */,
 				EFB324A11BE59142000936B6 /* PVClipper VCs */,
+				3047AC521C5462A300F484D5 /* PVClipStreamer.swift */,
 				3072BE2D1C48A2F000CA9C7F /* PVDeleter.swift */,
 				81623C281B35D3A100E906FE /* PVDownloader.swift */,
 				81E3578D1B21619F00D67634 /* PVFeedParser.swift */,
 				3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */,
-				3047AC521C5462A300F484D5 /* PVClipStreamer.swift */,
+				3048B6801C5F045C00D1C2C7 /* PVPlaylister.swift */,
 				813FC80F1B5CA992006248BC /* PVSubscriber.swift */,
 				81E3578F1B21624500D67634 /* PVUtility.swift */,
 				EF70B0761C574BC800234FF2 /* DownloadingEpisodesList.swift */,
@@ -328,6 +333,7 @@
 				81DD2CC81B549C4D00432E0C /* Podcast.swift */,
 				81DD2CC71B549C4D00432E0C /* Episode.swift */,
 				81DD2CC61B549C4D00432E0C /* Clip.swift */,
+				3048B6881C5F05FF00D1C2C7 /* Playlist.swift */,
 				815A2E3A1B522467002A21A7 /* SearchResultPodcast.swift */,
 			);
 			name = Datamodel;
@@ -586,10 +592,12 @@
 				EF3980021C545B9900C91753 /* SaveClipToServer.swift in Sources */,
 				817C54081B4B6976007258F8 /* Constants.swift in Sources */,
 				81A3B5161B3A60F5007D9A96 /* DownloadsTableViewController.swift in Sources */,
+				3048B6811C5F045C00D1C2C7 /* PVPlaylister.swift in Sources */,
 				812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */,
 				EF397FFF1C5458A000C91753 /* BaseWebservice.swift in Sources */,
 				EF59CECC1BD07AB6002D9DDF /* FeedItem.swift in Sources */,
 				81A3B5181B3A614B007D9A96 /* DownloadsTableViewCell.swift in Sources */,
+				3048B6891C5F05FF00D1C2C7 /* Playlist.swift in Sources */,
 				3072BE2E1C48A2F000CA9C7F /* PVDeleter.swift in Sources */,
 				EF59CECA1BD07AB6002D9DDF /* FeedChannel.swift in Sources */,
 				818615CE1B1EB12C006C9731 /* PodcastsTableViewController.swift in Sources */,

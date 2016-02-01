@@ -18,4 +18,5 @@ class Clip: NSManagedObject {
     @NSManaged var title: String?
     @NSManaged var episode: Episode
     @NSManaged var clipUrl: String?
+    @NSManaged var playlists: NSSet?
 }
