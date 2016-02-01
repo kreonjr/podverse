@@ -24,7 +24,7 @@ class CoreDataHelper: NSObject {
         }
         
         let psc = NSPersistentStoreCoordinator(managedObjectModel: mom)
-        self.moc = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+        self.moc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
         self.moc.persistentStoreCoordinator = psc
         
         dispatch_async(Constants.saveQueue) {

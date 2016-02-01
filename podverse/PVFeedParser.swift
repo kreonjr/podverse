@@ -29,8 +29,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func parsePodcastFeed(feedURLString: String) {
-        // Parse podcast feeds on the saveQueue (serial queue) in order to prevent the "NSXMLParser does not support reentrant parsing" issue.
-        dispatch_async(Constants.feedParsingQueue) {
+        dispatch_async(Constants.saveQueue) {
             self.feedURL = feedURLString
             let feedParser = CustomFeedParser(feedURL: feedURLString)
             feedParser.delegate = self
@@ -155,14 +154,16 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             if let newestFeedEpisode = latestEpisodeInFeed {
                 let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
                 
-                let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: Constants.moc, predicate: podcastPredicate)
-                
-                if mostRecentEpisodeArray.count > 0 {
-                    if let latestEpisodeInRSSFeed = latestEpisodeInFeed {
-                        if latestEpisodeInRSSFeed.pubDate != mostRecentEpisodeArray[0].pubDate {
-                            shouldGetMostRecentEpisode = false
-                            PVDownloader.sharedInstance.startDownloadingEpisode(newestFeedEpisode)
-                            parsePodcastFeed(podcast.feedURL)
+                dispatch_async(Constants.saveQueue) { () -> Void in
+                    let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: Constants.moc, predicate: podcastPredicate)
+                    
+                    if mostRecentEpisodeArray.count > 0 {
+                        if let latestEpisodeInRSSFeed = self.latestEpisodeInFeed {
+                            if latestEpisodeInRSSFeed.pubDate != mostRecentEpisodeArray[0].pubDate {
+                                self.shouldGetMostRecentEpisode = false
+                                PVDownloader.sharedInstance.startDownloadingEpisode(newestFeedEpisode)
+                                self.parsePodcastFeed(self.podcast.feedURL)
+                            }
                         }
                     }
                 }

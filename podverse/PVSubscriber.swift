@@ -15,7 +15,7 @@ class PVSubscriber: NSObject {
 
     var appDelegate = (UIApplication.sharedApplication().delegate as! AppDelegate)
     func subscribeToPodcast(feedURLString: String) {
-        dispatch_async(Constants.feedParsingQueue) { () -> Void in
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) { () -> Void in
             let feedParser = PVFeedParser(shouldGetMostRecent: false, shouldSubscribe: true)
             feedParser.parsePodcastFeed(feedURLString)
         }
