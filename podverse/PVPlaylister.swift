@@ -27,9 +27,9 @@ class PVPlaylister: NSObject {
     }
     
     func addPodcastToPlaylist(podcast: Podcast) {
-        
         if let playlist = mySavedPodcastsPlaylist {
             playlist.lastUpdated = NSDate()
+            playlist.addPodcastObject(podcast)
             CoreDataHelper.saveCoreData(nil)
         }
     }
