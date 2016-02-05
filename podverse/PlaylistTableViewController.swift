@@ -24,7 +24,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         }
         if let clips = playlist.clips {
             playlistItems.append(clips.allObjects)
-        }
+        }        
         self.tableView.reloadData()
     }
     

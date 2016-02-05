@@ -9,17 +9,18 @@
 import UIKit
 import CoreData
 
-class PodcastsTableViewController: UITableViewController {
+class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
-    @IBOutlet var myPodcastsTableView: UITableView!
-    
+    @IBOutlet weak var tableView: UITableView!
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
 
-    var podcastArray = [Podcast]()
+    var podcastsArray = [Podcast]()
+    
+    var refreshControl: UIRefreshControl!
     
     func loadData() {
-        podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
-        podcastArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+        podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
+        podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
         
         self.tableView.reloadData()
     }
@@ -33,7 +34,11 @@ class PodcastsTableViewController: UITableViewController {
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
-        self.refreshControl?.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
+        refreshControl = UIRefreshControl()
+        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh all podcasts")
+        refreshControl.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
+        tableView.addSubview(refreshControl)
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector:"reloadTable" , name: Constants.refreshPodcastTableDataNotification, object: nil)
     }
     
@@ -62,11 +67,11 @@ class PodcastsTableViewController: UITableViewController {
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 2
     }
     
-    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == 0 {
             return "My Subscribed Podcasts"
         } else {
@@ -74,9 +79,9 @@ class PodcastsTableViewController: UITableViewController {
         }
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
-            return podcastArray.count
+            return podcastsArray.count
         } else {
             if let playlistArray = PVPlaylister.sharedInstance.allPlaylists {
                 return playlistArray.count
@@ -86,12 +91,12 @@ class PodcastsTableViewController: UITableViewController {
         }
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
         
         if indexPath.section == 0 {
-            let podcast = podcastArray[indexPath.row]
+            let podcast = podcastsArray[indexPath.row]
             cell.title?.text = podcast.title
             cell.pvImage?.image = UIImage(named: "Blank52")
             
@@ -141,17 +146,25 @@ class PodcastsTableViewController: UITableViewController {
         
         return cell
     }
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if indexPath.section == 0 {
+            self.performSegueWithIdentifier("Show Episodes", sender: nil)
+        } else {
+            self.performSegueWithIdentifier("Show Playlist", sender: nil)
+        }
+    }
 
     // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return NO if you do not want the specified item to be editable.
         return true
     }
     
     // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            let podcastToRemove = podcastArray[indexPath.row]
+            let podcastToRemove = podcastsArray[indexPath.row]
 
             // Remove Player button if the now playing episode was one of the podcast's episodes
             let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
@@ -162,7 +175,7 @@ class PodcastsTableViewController: UITableViewController {
             }
             
             PVDeleter.sharedInstance.deletePodcast(podcastToRemove)
-            podcastArray.removeAtIndex(indexPath.row)
+            podcastsArray.removeAtIndex(indexPath.row)
             
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
         }
@@ -170,12 +183,17 @@ class PodcastsTableViewController: UITableViewController {
 
     // MARK: - Navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "showEpisodes" {
+        if segue.identifier == "Show Episodes" {
             let episodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
-            if let index = self.tableView.indexPathForSelectedRow {
-                episodesTableViewController.selectedPodcast = podcastArray[index.row]
+            if let index = tableView.indexPathForSelectedRow {
+                episodesTableViewController.selectedPodcast = podcastsArray[index.row]
             }
             episodesTableViewController.showAllEpisodes = false
+        } else if segue.identifier == "Show Playlist" {
+            let playlistViewController = segue.destinationViewController as! PlaylistViewController
+            if let index = tableView.indexPathForSelectedRow, let playlists = PVPlaylister.sharedInstance.allPlaylists {
+                playlistViewController.playlist = playlists[index.row]
+            }
         } else if segue.identifier == "Podcasts to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
@@ -184,7 +202,7 @@ class PodcastsTableViewController: UITableViewController {
     
     func reloadTable() {
         tableView.reloadData()
-        self.refreshControl?.endRefreshing()
+        refreshControl?.endRefreshing()
     }
 
 }
