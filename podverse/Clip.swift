@@ -11,7 +11,6 @@ import CoreData
 @objc(Clip)
 
 class Clip: NSManagedObject {
-
     @NSManaged var duration: NSNumber
     @NSManaged var startTime: NSNumber
     @NSManaged var endTime: NSNumber
@@ -19,4 +18,5 @@ class Clip: NSManagedObject {
     @NSManaged var episode: Episode
     @NSManaged var clipUrl: String?
     @NSManaged var playlists: NSSet?
+    @NSManaged var dateCreated: NSDate?
 }

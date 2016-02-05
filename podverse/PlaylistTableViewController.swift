@@ -15,7 +15,10 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     var playlist:Playlist!
     var playlistItems = [AnyObject]()
     
+    let pvMediaPlayer = PVMediaPlayer.sharedInstance
+    
     func loadData() {
+        playlistItems = [AnyObject]()
         if let podcasts = playlist.podcasts {
             if podcasts.count > 0 {
                 for podcast in podcasts {
@@ -37,6 +40,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
                 }
             }
         }
+        
         tableView.reloadData()
     }
     
@@ -76,7 +80,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "Playlist Title"
+        return playlist.title
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -87,9 +91,6 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PlaylistTableViewCell
         
         let playlistItem = playlistItems[indexPath.row]
-        
-        let playlistItemMirror = Mirror(reflecting: playlistItem)
-        print(playlistItemMirror.subjectType)
                 
         if let episode = playlistItem as? Episode {
             
@@ -158,6 +159,17 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        let selectedItem = playlistItems[indexPath.row]
+        
+        if let episode = selectedItem as? Episode {
+            pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode)
+        } else if let clip = selectedItem as? Clip {
+            pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip)
+        }
+        
+        self.performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
+    
         
 //        // If not the last item in the array, then perform selected episode actions
 //        if indexPath.row < episodesArray.count {

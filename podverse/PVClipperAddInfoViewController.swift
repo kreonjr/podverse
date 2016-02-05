@@ -95,6 +95,8 @@ class PVClipperAddInfoViewController: UIViewController {
             }
         }
         
+        clip?.dateCreated = NSDate()
+        
         if let unwrappedClip = clip {
             saveClip(unwrappedClip)
         }
