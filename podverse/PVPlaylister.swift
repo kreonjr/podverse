@@ -20,7 +20,7 @@ class PVPlaylister: NSObject {
     
     override init() {
         super.init()
-        mySavedPodcastsPlaylist = retrieveSavedPodcastsPlaylist()
+        // mySavedPodcastsPlaylist = retrieveSavedPodcastsPlaylist()
         mySavedEpisodesPlaylist = retrieveSavedEpisodesPlaylist()
         mySavedClipsPlaylist = retrieveSavedClipsPlaylist()
         allPlaylists = retrieveAllPlaylists()

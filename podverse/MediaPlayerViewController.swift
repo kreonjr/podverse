@@ -274,10 +274,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     }
     
     func addNowPlayingToList() {
-        if pvMediaPlayer.nowPlayingEpisode != nil {
-            PVPlaylister.sharedInstance.addEpisodeToPlaylist(pvMediaPlayer.nowPlayingEpisode)
-        } else if pvMediaPlayer.nowPlayingClip != nil {
+        if pvMediaPlayer.nowPlayingClip != nil {
             PVPlaylister.sharedInstance.addClipToPlaylist(pvMediaPlayer.nowPlayingClip)
+        } else if pvMediaPlayer.nowPlayingEpisode != nil {
+            PVPlaylister.sharedInstance.addEpisodeToPlaylist(pvMediaPlayer.nowPlayingEpisode)
         }
     }
     

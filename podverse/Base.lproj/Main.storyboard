@@ -1330,7 +1330,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="100" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Lhk-s2-uMY">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="100" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Lhk-s2-uMY">
                                 <rect key="frame" x="0.0" y="64" width="600" height="487"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
@@ -1344,8 +1344,8 @@
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="faY-iy-V40">
                                                     <rect key="frame" x="99" y="8" width="493" height="83"/>
                                                     <subviews>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Played Status" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G5j-9C-3eC">
-                                                            <rect key="frame" x="202" y="66" width="89" height="17"/>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Status" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="G5j-9C-3eC">
+                                                            <rect key="frame" x="226" y="66" width="42" height="17"/>
                                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                             <color key="textColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
@@ -1406,12 +1406,12 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <outlet property="duration" destination="HAN-ia-0XA" id="Ug9-hf-9BW"/>
+                                            <outlet property="duration" destination="HAN-ia-0XA" id="Xby-l8-yyd"/>
                                             <outlet property="itemPubDate" destination="4kA-PN-1kc" id="WX1-CS-OhD"/>
                                             <outlet property="itemTitle" destination="CcE-ut-QFY" id="MLf-q8-zYL"/>
                                             <outlet property="podcastTitle" destination="Koe-1Y-rpf" id="o7q-NE-KM0"/>
                                             <outlet property="pvImage" destination="Sta-bt-n94" id="FIo-IH-Zkv"/>
-                                            <outlet property="status" destination="G5j-9C-3eC" id="fa1-dj-0Gu"/>
+                                            <outlet property="status" destination="G5j-9C-3eC" id="Lep-L1-lcd"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -1422,6 +1422,12 @@
                             </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="F0b-Oz-QIg" firstAttribute="top" secondItem="Lhk-s2-uMY" secondAttribute="bottom" id="UnW-14-yAM"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="Lhk-s2-uMY" secondAttribute="trailing" constant="-20" id="ZJU-pc-Ccq"/>
+                            <constraint firstItem="Lhk-s2-uMY" firstAttribute="top" secondItem="h2M-bi-QZe" secondAttribute="bottom" id="ZkQ-hy-y5H"/>
+                            <constraint firstItem="Lhk-s2-uMY" firstAttribute="leading" secondItem="6jk-jE-1tI" secondAttribute="leadingMargin" constant="-20" id="wuZ-fY-CQJ"/>
+                        </constraints>
                     </view>
                     <connections>
                         <outlet property="tableView" destination="Lhk-s2-uMY" id="QTy-11-7lx"/>

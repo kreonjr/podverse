@@ -17,19 +17,31 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func loadData() {
         if let podcasts = playlist.podcasts {
-            playlistItems.append(podcasts.allObjects)
+            if podcasts.count > 0 {
+                for podcast in podcasts {
+                    playlistItems.append(podcast as! Podcast)
+                }
+            }
         }
         if let episodes = playlist.episodes {
-            playlistItems.append(episodes.allObjects)
+            if episodes.count > 0 {
+                for episode in episodes {
+                    playlistItems.append(episode as! Episode)
+                }
+            }
         }
         if let clips = playlist.clips {
-            playlistItems.append(clips.allObjects)
-        }        
-        self.tableView.reloadData()
+            if clips.count > 0 {
+                for clip in clips {
+                    playlistItems.append(clip as! Clip)
+                }
+            }
+        }
+        tableView.reloadData()
     }
     
     func segueToNowPlaying(sender: UIBarButtonItem) {
-        self.performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
+        performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
     }
     
     override func viewDidLoad() {
@@ -44,10 +56,10 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         loadData()
         
         // Set navigation bar styles
-        self.navigationItem.title = "Playlist"
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
-        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
+        navigationItem.title = "Playlist"
+        navigationController?.navigationBar.barStyle = UIBarStyle.Black
+        navigationController?.navigationBar.tintColor = UIColor.whiteColor()
+        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
     }
@@ -76,6 +88,9 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         
         let playlistItem = playlistItems[indexPath.row]
         
+        let playlistItemMirror = Mirror(reflecting: playlistItem)
+        print(playlistItemMirror.subjectType)
+                
         if let episode = playlistItem as? Episode {
             
             if let itemTitle = episode.title {
@@ -90,10 +105,22 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
             }
             
             let status = "played/unplayed"
-            cell.duration?.text = status
+            cell.status?.text = status
             
             let pubDate = episode.pubDate
             cell.itemPubDate?.text = PVUtility.formatDateToString(pubDate!)
+            
+            cell.pvImage?.image = UIImage(named: "Blank52")
+            if let imageData = episode.podcast.imageData {
+                if let image = UIImage(data: imageData) {
+                    cell.pvImage?.image = image
+                }
+            }
+            else if let itunesImageData = episode.podcast.itunesImage {
+                if let itunesImage = UIImage(data: itunesImageData) {
+                    cell.pvImage?.image = itunesImage
+                }
+            }
         
         } else if let clip = playlistItem as? Clip {
             
@@ -112,6 +139,18 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
             
             let pubDate = clip.episode.pubDate
             cell.itemPubDate?.text = PVUtility.formatDateToString(pubDate!)
+            
+            cell.pvImage?.image = UIImage(named: "Blank52")
+            if let imageData = clip.episode.podcast.imageData {
+                if let image = UIImage(data: imageData) {
+                    cell.pvImage?.image = image
+                }
+            }
+            else if let itunesImageData = clip.episode.podcast.itunesImage {
+                if let itunesImage = UIImage(data: itunesImageData) {
+                    cell.pvImage?.image = itunesImage
+                }
+            }
             
         }
         
