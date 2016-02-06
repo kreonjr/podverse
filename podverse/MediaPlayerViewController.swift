@@ -46,6 +46,8 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
 
         pvMediaPlayer.delegate = self
         
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "dismissKeyboard"))
         self.clipper = ((self.childViewControllers.first as! UINavigationController).topViewController as? PVClipperViewController)
         
@@ -83,6 +85,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         else {
             totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(pvMediaPlayer.nowPlayingEpisode.duration!) as String
         }
+        
+        // TODO: wtf? Why do I have to set scrollEnabled = to false and then true? If I do not, then the summary UITextView has extra black space on the bottom, and the UITextView is not scrollable.
+        summary?.scrollEnabled = false
+        summary?.scrollEnabled = true
         if let episodeSummary = pvMediaPlayer.nowPlayingEpisode.summary {
             summary?.text = PVUtility.removeHTMLFromString(episodeSummary)
         }
@@ -274,11 +280,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     }
     
     func addNowPlayingToList() {
-        if pvMediaPlayer.nowPlayingClip != nil {
-            PVPlaylister.sharedInstance.addClipToPlaylist(pvMediaPlayer.nowPlayingClip)
-        } else if pvMediaPlayer.nowPlayingEpisode != nil {
-            PVPlaylister.sharedInstance.addEpisodeToPlaylist(pvMediaPlayer.nowPlayingEpisode)
-        }
+        self.performSegueWithIdentifier("Add to Playlist", sender: nil)
     }
     
     func setMediaPlayerVCPlayPauseIcon() {
@@ -304,4 +306,12 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
             self.navigationController?.popViewControllerAnimated(true)
         })
     }
+    
+    // MARK: - Navigation
+//    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+////        if segue.identifier == "Add to Playlist" {
+////            let addToPlaylistViewController = segue.destinationViewController as! AddToPlaylistViewController
+////            addToPlaylistViewController.hidesBottomBarWhenPushed = true
+////        }
+//    }
 }

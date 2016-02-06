@@ -83,11 +83,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         if section == 0 {
             return podcastsArray.count
         } else {
-            if let playlistArray = PVPlaylister.sharedInstance.allPlaylists {
-                return playlistArray.count
-            } else {
-                return 0
-            }
+            let allPlaylists = PVPlaylister.sharedInstance.retrieveAllPlaylists()
+            return allPlaylists.count
         }
     }
 
@@ -122,43 +119,32 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             }
 
         } else {
-            if let playlists = PVPlaylister.sharedInstance.allPlaylists {
+            let playlists = PVPlaylister.sharedInstance.retrieveAllPlaylists()
+            if playlists.count > 0 {
                 let playlist = playlists[indexPath.row]
                 cell.title?.text = playlist.title
                 
                 cell.episodesDownloadedOrStarted?.text = "something here"
                 
                 cell.lastPublishedDate?.text = "last updated date"
-//                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
+                //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
                 
-                var totalItems = 0
-                
-                if let podcastCount = playlist.podcasts?.allObjects.count {
-                    totalItems += podcastCount
-                }
-                
-                if let episodeCount = playlist.episodes?.allObjects.count {
-                    totalItems += episodeCount
-                }
-                
-                if let clipCount = playlist.clips?.allObjects.count {
-                    totalItems += clipCount
-                }
+                let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
                 
                 cell.totalClips?.text = String(totalItems)
                 
                 cell.pvImage?.image = UIImage(named: "Blank52")
                 // TODO: Retrieve the image of the podcast/episode/clip that was most recently added to the playlist
-//                if let imageData = podcast.imageData {
-//                    if let image = UIImage(data: imageData) {
-//                        cell.pvImage?.image = image
-//                    }
-//                }
-//                else if let itunesImageData = podcast.itunesImage {
-//                    if let itunesImage = UIImage(data: itunesImageData) {
-//                        cell.pvImage?.image = itunesImage
-//                    }
-//                }
+                //                if let imageData = podcast.imageData {
+                //                    if let image = UIImage(data: imageData) {
+                //                        cell.pvImage?.image = image
+                //                    }
+                //                }
+                //                else if let itunesImageData = podcast.itunesImage {
+                //                    if let itunesImage = UIImage(data: itunesImageData) {
+                //                        cell.pvImage?.image = itunesImage
+                //                    }
+                //                }
             }
         }
         
@@ -209,7 +195,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             episodesTableViewController.showAllEpisodes = false
         } else if segue.identifier == "Show Playlist" {
             let playlistViewController = segue.destinationViewController as! PlaylistViewController
-            if let index = tableView.indexPathForSelectedRow, let playlists = PVPlaylister.sharedInstance.allPlaylists {
+            if let index = tableView.indexPathForSelectedRow {
+                let playlists = PVPlaylister.sharedInstance.retrieveAllPlaylists()
                 playlistViewController.playlist = playlists[index.row]
             }
         } else if segue.identifier == "Podcasts to Now Playing" {

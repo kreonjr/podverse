@@ -26,28 +26,50 @@ class PVPlaylister: NSObject {
         allPlaylists = retrieveAllPlaylists()
     }
     
-    func addPodcastToPlaylist(podcast: Podcast) {
-        if let playlist = mySavedPodcastsPlaylist {
-            playlist.lastUpdated = NSDate()
-            playlist.addPodcastObject(podcast)
-            CoreDataHelper.saveCoreData(nil)
+    func createPlaylist(title: String) {
+        let predicate = NSPredicate(format: "title == %@", title)
+        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", managedObjectContext: Constants.moc, predicate: predicate) as! [Playlist]
+        if playlistSet.count > 0 {
+            print("send alert")
+        } else {
+            let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist", managedObjectContext: Constants.moc) as! Playlist
+                playlist.title = title
         }
+        CoreDataHelper.saveCoreData(nil)
     }
     
-    func addEpisodeToPlaylist(episode: Episode) {
-        if let playlist = mySavedEpisodesPlaylist {
-            playlist.lastUpdated = NSDate()
-            playlist.addEpisodeObject(episode)
-            CoreDataHelper.saveCoreData(nil)
-        }
+    func addPodcastToPlaylist(playlist: Playlist, podcast: Podcast) {
+        playlist.lastUpdated = NSDate()
+        playlist.addPodcastObject(podcast)
+        CoreDataHelper.saveCoreData(nil)
     }
     
-    func addClipToPlaylist(clip: Clip) {
-        if let playlist = mySavedClipsPlaylist {
-            playlist.lastUpdated = NSDate()
-            playlist.addClipObject(clip)
-            CoreDataHelper.saveCoreData(nil)
+    func addEpisodeToPlaylist(playlist: Playlist, episode: Episode) {
+        playlist.lastUpdated = NSDate()
+        playlist.addEpisodeObject(episode)
+        CoreDataHelper.saveCoreData(nil)
+    }
+    
+    func addClipToPlaylist(playlist: Playlist, clip: Clip) {
+        playlist.lastUpdated = NSDate()
+        playlist.addClipObject(clip)
+        CoreDataHelper.saveCoreData(nil)
+    }
+    
+    func countPlaylistItems(playlist: Playlist) -> Int {
+        var totalItems = 0
+        if let podcastCount = playlist.podcasts?.allObjects.count {
+            totalItems += podcastCount
         }
+        
+        if let episodeCount = playlist.episodes?.allObjects.count {
+            totalItems += episodeCount
+        }
+        
+        if let clipCount = playlist.clips?.allObjects.count {
+            totalItems += clipCount
+        }
+        return totalItems
     }
     
     func retrieveSavedPodcastsPlaylist() -> Playlist {
