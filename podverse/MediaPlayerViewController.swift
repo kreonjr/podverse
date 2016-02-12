@@ -51,7 +51,9 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "dismissKeyboard"))
         self.clipper = ((self.childViewControllers.first as! UINavigationController).topViewController as? PVClipperViewController)
         
-        self.clipper?.totalDuration = Int(pvMediaPlayer.nowPlayingEpisode.duration!)
+        if let duration = pvMediaPlayer.nowPlayingEpisode.duration {
+            self.clipper?.totalDuration = Int(duration)
+        }
 
         buttonMakeClip.frame = CGRectMake(0, 0, 100, 90)
         buttonMakeClip.setTitle(makeClipString, forState: .Normal)
