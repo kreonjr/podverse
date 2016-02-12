@@ -30,7 +30,7 @@ class PVPlaylister: NSObject {
         let predicate = NSPredicate(format: "title == %@", title)
         let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", managedObjectContext: Constants.moc, predicate: predicate) as! [Playlist]
         if playlistSet.count > 0 {
-            print("send alert")
+            print("playlist with that name already saved")
         } else {
             let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist", managedObjectContext: Constants.moc) as! Playlist
                 playlist.title = title
@@ -118,5 +118,4 @@ class PVPlaylister: NSObject {
         let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", managedObjectContext: Constants.moc, predicate: nil) as! [Playlist]
         return playlistSet
     }
-
 }

@@ -12,7 +12,7 @@ class FindTableViewController: UITableViewController {
     
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var findSearchArray = ["Search for Podcasts", "Add Podcast by RSS"]
+    var findSearchArray = ["Search", "Add Podcast by RSS"]
     
     func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Find to Now Playing", sender: nil)
@@ -45,11 +45,8 @@ class FindTableViewController: UITableViewController {
     }
     
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return ""
-    }
-    
-    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 40
+        return "Podcasts"
+
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

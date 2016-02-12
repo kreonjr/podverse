@@ -100,6 +100,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             let episodesDownloaded = episodes.filter{ $0.downloadComplete == true }
             cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
             
+            cell.totalClips?.text = String(podcast.clips.count) + " clips"
+            
             if let lastPubDate = podcast.lastPubDate {
                 cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
             } else if let lastBuildDate = podcast.lastBuildDate {
@@ -131,7 +133,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
                 
                 let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
                 
-                cell.totalClips?.text = String(totalItems)
+                cell.totalClips?.text = String(totalItems) + " items"
                 
                 cell.pvImage?.image = UIImage(named: "Blank52")
                 // TODO: Retrieve the image of the podcast/episode/clip that was most recently added to the playlist
