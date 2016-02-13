@@ -67,13 +67,8 @@ class PVDeleter: NSObject {
         // Set episode taskIdentifier to nil since it can't be currently downloading
         episode.taskIdentifier = nil
         
-        CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode, completionBlock: { () -> Void in
-            CoreDataHelper.saveCoreData({ (saved) -> Void in
-                if let completion = completion {
-                    completion()
-                }
-            })
-        })
+        // Do not delete episode completely from Core Data in order to keep it in the Show All Episodes list 
+        CoreDataHelper.saveCoreData(nil)
 
     }
     
