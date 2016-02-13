@@ -61,7 +61,11 @@ class PVDeleter: NSObject {
         // Delete the episode from CoreData and the disk, and update the UI
         if let fileName = episode.fileName {
             PVUtility.deleteEpisodeFromDiskWithName(fileName)
+            episode.fileName = nil
         }
+        
+        // Set episode taskIdentifier to nil since it can't be currently downloading
+        episode.taskIdentifier = nil
         
         CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode, completionBlock: { () -> Void in
             CoreDataHelper.saveCoreData({ (saved) -> Void in

@@ -48,6 +48,14 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
     }
     
+    func removePlayerNavButton(notification: NSNotification) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.loadData()
+            self.pvMediaPlayer.removePlayerNavButton(self)
+        }
+    }
+
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -66,6 +74,13 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func didReceiveMemoryWarning() {

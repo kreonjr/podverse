@@ -293,6 +293,9 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kNowPlayingTimeHasChanged, object: nil)
         pvMediaPlayer.clearPlayingInfo()
         pvMediaPlayer.nowPlayingEpisode = nil
+        
+        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+        
         PVDeleter.sharedInstance.deleteEpisode(currentEpisode,completion: {
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
                 self.navigationController?.popViewControllerAnimated(true)
@@ -304,10 +307,14 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kNowPlayingTimeHasChanged, object: nil)
         pvMediaPlayer.clearPlayingInfo()
         pvMediaPlayer.nowPlayingClip = nil
+        
+        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+        
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
             self.navigationController?.popViewControllerAnimated(true)
         })
     }
+    
     
     // MARK: - Navigation
 //    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {

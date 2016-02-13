@@ -71,6 +71,13 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         
     }
     
+    func removePlayerNavButton(notification: NSNotification) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.loadData()
+            self.pvMediaPlayer.removePlayerNavButton(self)
+        }
+    }
+    
     func downloadPlay(sender: UIButton) {
         let view = sender.superview!
         let cell = view.superview as! EpisodesTableCell
@@ -99,6 +106,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
         
         loadData()
     }
@@ -129,6 +138,11 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         headerSummaryLabel.text = selectedPodcast.summary
         
         loadData()
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func didReceiveMemoryWarning() {

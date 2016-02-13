@@ -42,9 +42,19 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
         self.performSegueWithIdentifier("Clips to Now Playing", sender: nil)
     }
     
+    func removePlayerNavButton(notification: NSNotification) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.loadData()
+            self.pvMediaPlayer.removePlayerNavButton(self)
+        }
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func viewDidLoad() {
@@ -65,6 +75,11 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
         
         headerSummaryLabel.text = selectedEpisode.summary
         loadData()
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
     }
 
     override func didReceiveMemoryWarning() {
