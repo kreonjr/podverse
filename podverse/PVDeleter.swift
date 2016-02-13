@@ -67,6 +67,9 @@ class PVDeleter: NSObject {
         // Set episode taskIdentifier to nil since it can't be currently downloading
         episode.taskIdentifier = nil
         
+        // Set episode playbackPosition to 0 so if downloaded again it starts from beginning
+        episode.playbackPosition = 0
+        
         CoreDataHelper.saveCoreData({ (saved) -> Void in
             if let completion = completion {
                 completion()
