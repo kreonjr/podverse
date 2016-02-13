@@ -116,10 +116,14 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             
             cell.totalClips?.text = String(podcast.clips.count) + " clips"
             
-            if let lastPubDate = podcast.lastPubDate {
-                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
-            } else if let lastBuildDate = podcast.lastBuildDate {
-                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
+            // Set pubdate in cell equal to most recent episode's pubdate
+            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+            let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: Constants.moc, predicate: podcastPredicate) as! [Episode]
+            cell.lastPublishedDate?.text = ""
+            if mostRecentEpisodeArray.count > 0 {
+                if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
+                    cell.lastPublishedDate?.text = PVUtility.formatDateToString(mostRecentEpisodePubDate)
+                }
             }
             
             cell.pvImage?.image = UIImage(named: "Blank52")
