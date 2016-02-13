@@ -111,7 +111,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             cell.title?.text = podcast.title
             
             let episodes = podcast.episodes.allObjects as! [Episode]
-            let episodesDownloaded = episodes.filter{ $0.downloadComplete == true }
+            let episodesDownloaded = episodes.filter{ $0.fileName != nil }
             cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
             
             cell.totalClips?.text = String(podcast.clips.count) + " clips"
