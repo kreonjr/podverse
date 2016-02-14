@@ -43,7 +43,12 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        // If no nowPlaying episode or clip exists, then nav back out of MediaPlayerVC
+        if pvMediaPlayer.nowPlayingEpisode == nil && pvMediaPlayer.nowPlayingClip == nil {
+            self.navigationController?.popViewControllerAnimated(true)
+        }
+        
         pvMediaPlayer.delegate = self
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
