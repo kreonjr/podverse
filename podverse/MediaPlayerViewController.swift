@@ -110,12 +110,14 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
 
     @IBAction func sliderTimeChange(sender: UISlider) {
         let currentSliderValue = Float64(sender.value)
-        let totalTime: Float64!
+        var totalTime: Float64 = 0.0
         
         if let clip = pvMediaPlayer.nowPlayingClip {
             totalTime = Float64(clip.duration)
         } else {
-            totalTime = Float64(pvMediaPlayer.nowPlayingEpisode.duration!)
+            if let duration = pvMediaPlayer.nowPlayingEpisode.duration {
+                totalTime = Float64(duration)
+            }
         }
         
         let resultTime = totalTime * currentSliderValue
