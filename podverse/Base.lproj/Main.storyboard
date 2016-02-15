@@ -125,7 +125,6 @@
         <!--Episodes Table View Controller-->
         <scene sceneID="Qs4-tz-r1H">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="cQ5-Y3-xnx" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <viewController storyboardIdentifier="episodesTableViewController" id="jfK-O4-nvL" customClass="EpisodesTableViewController" customModule="podverse" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="e8v-E1-z1W"/>
@@ -306,6 +305,7 @@
                         <segue destination="w0b-bb-hu2" kind="show" identifier="Show Clips" id="Vxi-eO-V9n"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cQ5-Y3-xnx" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2382" y="1021"/>
         </scene>

@@ -33,7 +33,8 @@ class PVPlaylister: NSObject {
             print("playlist with that name already saved")
         } else {
             let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist", managedObjectContext: Constants.moc) as! Playlist
-                playlist.title = title
+            playlist.title = title
+            playlist.isPublic = false
         }
         CoreDataHelper.saveCoreData(nil)
     }

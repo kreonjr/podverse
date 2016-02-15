@@ -48,9 +48,7 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
             }
             self.loadData()
         }))
-        
-        
-        
+    
         presentViewController(createPlaylistAlert, animated: true, completion: nil)
     }
     

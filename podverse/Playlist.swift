@@ -10,6 +10,7 @@ class Playlist: NSManagedObject {
     
     @NSManaged var title: String
     @NSManaged var url: String
+    @NSManaged var isPublic: Bool
     @NSManaged var lastUpdated: NSDate?
     @NSManaged var podcasts: NSSet?
     @NSManaged var episodes: NSSet?
