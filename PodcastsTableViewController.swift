@@ -18,6 +18,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var refreshControl: UIRefreshControl!
     
+    let playlists = PVPlaylister.sharedInstance.retrieveAllPlaylists()
+    
     func loadData() {
         podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
         podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
@@ -92,21 +94,30 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             return "My Playlists"
         }
     }
+    
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if indexPath.section == 1 && indexPath.row >= playlists.count {
+            return 60
+        } else {
+            return 100
+        }
+    }
 
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if section == 0 {
             return podcastsArray.count
         } else {
-            let allPlaylists = PVPlaylister.sharedInstance.retrieveAllPlaylists()
-            return allPlaylists.count
+            return playlists.count + 1
         }
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
         
         if indexPath.section == 0 {
+            
+            let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
+            
             let podcast = podcastsArray[indexPath.row]
             cell.title?.text = podcast.title
             
@@ -137,43 +148,55 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
                     cell.pvImage?.image = itunesImage
                 }
             }
+            
+            return cell
 
         } else {
-            let playlists = PVPlaylister.sharedInstance.retrieveAllPlaylists()
-            if playlists.count > 0 {
-                let playlist = playlists[indexPath.row]
-                cell.title?.text = playlist.title
+            if indexPath.row < playlists.count {
+                let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
+                if playlists.count > 0 {
+                    let playlist = playlists[indexPath.row]
+                    cell.title?.text = playlist.title
+                    
+                    cell.episodesDownloadedOrStarted?.text = "something here"
+                    
+                    cell.lastPublishedDate?.text = "last updated date"
+                    //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
+                    
+                    let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
+                    
+                    cell.totalClips?.text = String(totalItems) + " items"
+                    
+                    cell.pvImage?.image = UIImage(named: "Blank52")
+                    // TODO: Retrieve the image of the podcast/episode/clip that was most recently added to the playlist
+                    //                if let imageData = podcast.imageData {
+                    //                    if let image = UIImage(data: imageData) {
+                    //                        cell.pvImage?.image = image
+                    //                    }
+                    //                }
+                    //                else if let itunesImageData = podcast.itunesImage {
+                    //                    if let itunesImage = UIImage(data: itunesImageData) {
+                    //                        cell.pvImage?.image = itunesImage
+                    //                    }
+                    //                }
+                }
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCellWithIdentifier("addPlaylistByURLCell", forIndexPath: indexPath)
                 
-                cell.episodesDownloadedOrStarted?.text = "something here"
+                cell.textLabel?.text = "Add Playlist by URL"
                 
-                cell.lastPublishedDate?.text = "last updated date"
-                //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
-                
-                let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
-                
-                cell.totalClips?.text = String(totalItems) + " items"
-                
-                cell.pvImage?.image = UIImage(named: "Blank52")
-                // TODO: Retrieve the image of the podcast/episode/clip that was most recently added to the playlist
-                //                if let imageData = podcast.imageData {
-                //                    if let image = UIImage(data: imageData) {
-                //                        cell.pvImage?.image = image
-                //                    }
-                //                }
-                //                else if let itunesImageData = podcast.itunesImage {
-                //                    if let itunesImage = UIImage(data: itunesImageData) {
-                //                        cell.pvImage?.image = itunesImage
-                //                    }
-                //                }
+                return cell
             }
         }
-        
-        return cell
+
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.section == 0 {
             self.performSegueWithIdentifier("Show Episodes", sender: nil)
+        } else if indexPath.row >= playlists.count {
+            print("do add playlist by URL alert stuff here")
         } else {
             self.performSegueWithIdentifier("Show Playlist", sender: nil)
         }
@@ -216,7 +239,6 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         } else if segue.identifier == "Show Playlist" {
             let playlistViewController = segue.destinationViewController as! PlaylistViewController
             if let index = tableView.indexPathForSelectedRow {
-                let playlists = PVPlaylister.sharedInstance.retrieveAllPlaylists()
                 playlistViewController.playlist = playlists[index.row]
             }
         } else if segue.identifier == "Podcasts to Now Playing" {
