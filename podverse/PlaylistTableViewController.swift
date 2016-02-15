@@ -54,7 +54,15 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
             self.pvMediaPlayer.removePlayerNavButton(self)
         }
     }
-
+    
+    func showPlaylistLink(sender: UIBarButtonItem) {
+        let alert = UIAlertController(title: "Playlist saved at URL:", message: "playlist url goes here", preferredStyle: .Alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Copy", style: .Default, handler: { (action) -> Void in
+//            UIPasteboard.generalPasteboard().string = self.clip?.clipUrl ?? ""
+        }))
+        self.presentViewController(alert, animated: true, completion: nil)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -72,6 +80,15 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         navigationController?.navigationBar.barStyle = UIBarStyle.Black
         navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
+        
+        if pvMediaPlayer.nowPlayingEpisode != nil || pvMediaPlayer.nowPlayingClip != nil {
+            let linkBarButton = UIBarButtonItem(title: "Link", style: .Plain, target: self, action: "showPlaylistLink:")
+            let playerBarButton = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+            navigationItem.rightBarButtonItems = [playerBarButton, linkBarButton]
+        } else {
+            let linkBarButton = UIBarButtonItem(title: "Link", style: .Plain, target: self, action: "showPlaylistLink:")
+            navigationItem.rightBarButtonItem = linkBarButton
+        }
         
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
         
