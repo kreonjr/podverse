@@ -47,14 +47,12 @@ class PVDeleter: NSObject {
             DLEpisodesList.shared.downloadingEpisodes.removeAtIndex(episodeDownloadArrayIndex!)
         }
         
-        // If the episode is currently now playing, then remove the now playing episode, and remove the Player button from the navbar
+        // If the episode is currently now playing, then remove the now playing episode, and remove the Player button from the navbar using kPlayerHasNoItem
         if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
             if episode == nowPlayingEpisode {
                 PVMediaPlayer.sharedInstance.avPlayer.pause()
                 PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
-
-                // TODO: add a protocol that will remote the Player button when the currently playing episode is deleted
-                // self.navigationItem.rightBarButtonItem = nil
+                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
             }
         }
         
@@ -75,7 +73,7 @@ class PVDeleter: NSObject {
                 completion()
             }
         })
-
+        
     }
     
 }
