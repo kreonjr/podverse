@@ -303,10 +303,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         
         NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
         
-        PVDeleter.sharedInstance.deleteEpisode(currentEpisode,completion: {
-            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                self.navigationController?.popViewControllerAnimated(true)
-            })
+        PVDeleter.sharedInstance.deleteEpisode(currentEpisode,completion: nil)
+        
+        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            self.navigationController?.popViewControllerAnimated(true)
         })
     }
     
