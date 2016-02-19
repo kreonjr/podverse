@@ -21,10 +21,7 @@ class PVDeleter: NSObject {
             deleteEpisode(episodesToRemove[i],completion: nil)
         }
         
-        CoreDataHelper.sharedInstance.deleteItemFromCoreData(podcast, completionBlock: { () -> Void in
-            CoreDataHelper.saveCoreData(nil)
-        })
-
+        CoreDataHelper.sharedInstance.deleteItemFromCoreData(podcast)
     }
     
     func deleteEpisode(episode: Episode, completion:(()->())? ) {
@@ -61,14 +58,7 @@ class PVDeleter: NSObject {
             PVUtility.deleteEpisodeFromDiskWithName(fileName)
         }
         
-        CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode, completionBlock: { () -> Void in
-            CoreDataHelper.saveCoreData({ (saved) -> Void in
-                if let completion = completion {
-                    completion()
-                }
-            })
-        })
-
+        CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode)
     }
     
 }
