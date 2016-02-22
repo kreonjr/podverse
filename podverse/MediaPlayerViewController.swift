@@ -14,8 +14,11 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     let makeClipString = "Make Clip"
     let hideClipper = "Hide Clipper"
-    let buttonMakeClip: UIButton = UIButton(type : UIButtonType.Custom)
+    let buttonMakeClip = UIButton(type : UIButtonType.Custom)
     var clipper:PVClipperViewController?
+    
+    let addToList = "Add to List"
+    let buttonAddToList = UIButton(type: UIButtonType.Custom)
     
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
     
@@ -40,23 +43,38 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        // If no nowPlaying episode or clip exists, then nav back out of MediaPlayerVC
+        if pvMediaPlayer.nowPlayingEpisode == nil && pvMediaPlayer.nowPlayingClip == nil {
+            self.navigationController?.popViewControllerAnimated(true)
+        }
+        
         pvMediaPlayer.delegate = self
+        
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "dismissKeyboard"))
         self.clipper = ((self.childViewControllers.first as! UINavigationController).topViewController as? PVClipperViewController)
         
-        self.clipper?.totalDuration = Int(pvMediaPlayer.nowPlayingEpisode.duration!)
+        if let duration = pvMediaPlayer.nowPlayingEpisode.duration {
+            self.clipper?.totalDuration = Int(duration)
+        }
 
-        // Create and add the Make Clip button to the UI
         buttonMakeClip.frame = CGRectMake(0, 0, 100, 90)
         buttonMakeClip.setTitle(makeClipString, forState: .Normal)
         buttonMakeClip.titleLabel!.font = UIFont(name: "System", size: 18)
         buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
         let rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
-        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip], animated: false)
         
         makeClipContainerView.hidden = true
+        
+        buttonAddToList.frame = CGRectMake(0, 0, 100, 90)
+        buttonAddToList.setTitle(addToList, forState: .Normal)
+        buttonAddToList.titleLabel!.font = UIFont(name: "System", size: 18)
+        buttonAddToList.addTarget(self, action: "addNowPlayingToList", forControlEvents: .TouchUpInside)
+        let rightBarButtonAddToList: UIBarButtonItem = UIBarButtonItem(customView: buttonAddToList)
+        
+        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip, rightBarButtonAddToList], animated: false)
         
         // Populate the Media Player UI with the current episode's information
         if let itunesImageData = pvMediaPlayer.nowPlayingEpisode.podcast.itunesImage {
@@ -74,6 +92,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         else {
             totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(pvMediaPlayer.nowPlayingEpisode.duration!) as String
         }
+        
+        // TODO: wtf? Why do I have to set scrollEnabled = to false and then true? If I do not, then the summary UITextView has extra black space on the bottom, and the UITextView is not scrollable.
+        summary?.scrollEnabled = false
+        summary?.scrollEnabled = true
         if let episodeSummary = pvMediaPlayer.nowPlayingEpisode.summary {
             summary?.text = PVUtility.removeHTMLFromString(episodeSummary)
         }
@@ -93,12 +115,14 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
 
     @IBAction func sliderTimeChange(sender: UISlider) {
         let currentSliderValue = Float64(sender.value)
-        let totalTime: Float64!
+        var totalTime: Float64 = 0.0
         
         if let clip = pvMediaPlayer.nowPlayingClip {
             totalTime = Float64(clip.duration)
         } else {
-            totalTime = Float64(pvMediaPlayer.nowPlayingEpisode.duration!)
+            if let duration = pvMediaPlayer.nowPlayingEpisode.duration {
+                totalTime = Float64(duration)
+            }
         }
         
         let resultTime = totalTime * currentSliderValue
@@ -264,6 +288,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         }
     }
     
+    func addNowPlayingToList() {
+        self.performSegueWithIdentifier("Add to Playlist", sender: nil)
+    }
+    
     func setMediaPlayerVCPlayPauseIcon() {
         setPlayPauseIcon()
     }
@@ -272,10 +300,13 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kNowPlayingTimeHasChanged, object: nil)
         pvMediaPlayer.clearPlayingInfo()
         pvMediaPlayer.nowPlayingEpisode = nil
-        PVDeleter.sharedInstance.deleteEpisode(currentEpisode,completion: {
-            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                self.navigationController?.popViewControllerAnimated(true)
-            })
+        
+        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+        
+        PVDeleter.sharedInstance.deleteEpisode(currentEpisode,completion: nil)
+        
+        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            self.navigationController?.popViewControllerAnimated(true)
         })
     }
     
@@ -283,8 +314,20 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kNowPlayingTimeHasChanged, object: nil)
         pvMediaPlayer.clearPlayingInfo()
         pvMediaPlayer.nowPlayingClip = nil
+        
+        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+        
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
             self.navigationController?.popViewControllerAnimated(true)
         })
     }
+    
+    
+    // MARK: - Navigation
+//    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+////        if segue.identifier == "Add to Playlist" {
+////            let addToPlaylistViewController = segue.destinationViewController as! AddToPlaylistViewController
+////            addToPlaylistViewController.hidesBottomBarWhenPushed = true
+////        }
+//    }
 }

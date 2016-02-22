@@ -68,7 +68,7 @@ class PVClipperAddInfoViewController: UIViewController {
     func saveClipWithTitle(clipTitle:String) {
         if clip == nil {
             clip = (CoreDataHelper.sharedInstance.insertManagedObject("Clip") as! Clip)
-            clip?.episode = episode
+            episode.addClipObject(clip!)
         }
         
         clip?.title = clipTitle
@@ -94,6 +94,8 @@ class PVClipperAddInfoViewController: UIViewController {
                 clip?.duration = clipDuration
             }
         }
+        
+        clip?.dateCreated = NSDate()
         
         if let unwrappedClip = clip {
             saveClip(unwrappedClip)

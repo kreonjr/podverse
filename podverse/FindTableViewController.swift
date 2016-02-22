@@ -12,14 +12,22 @@ class FindTableViewController: UITableViewController {
     
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var findSearchArray = ["Search for Podcasts", "Add Podcast by RSS"]
+    var findSearchArray = ["Search", "Add Podcast by RSS"]
     
     func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Find to Now Playing", sender: nil)
     }
     
+    func removePlayerNavButton(notification: NSNotification) {
+        dispatch_async(dispatch_get_main_queue()) {
+            PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
+        }
+    }
+    
     override func viewDidAppear(animated: Bool) {
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func viewDidLoad() {
@@ -31,6 +39,11 @@ class FindTableViewController: UITableViewController {
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
+    }
+    
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
     }
 
     override func didReceiveMemoryWarning() {
@@ -45,11 +58,8 @@ class FindTableViewController: UITableViewController {
     }
     
     override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return ""
-    }
-    
-    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 40
+        return "Podcasts"
+
     }
 
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

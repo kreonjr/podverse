@@ -9,13 +9,16 @@
 import UIKit
 import CoreData
 
-class PodcastsTableViewController: UITableViewController {
+class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
-    @IBOutlet var myPodcastsTableView: UITableView!
-    
+    @IBOutlet weak var tableView: UITableView!
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
 
-    var podcastArray = [Podcast]()
+    var podcastsArray = [Podcast]()
+    
+    var refreshControl: UIRefreshControl!
+    
+    let playlists = PVPlaylister.sharedInstance.retrieveAllPlaylists()
     
     func loadData() {
         podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
@@ -33,7 +36,11 @@ class PodcastsTableViewController: UITableViewController {
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
-        self.refreshControl?.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
+        refreshControl = UIRefreshControl()
+        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh all podcasts")
+        refreshControl.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
+        tableView.addSubview(refreshControl)
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector:"reloadTable" , name: Constants.refreshPodcastTableDataNotification, object: nil)
     }
     
@@ -41,10 +48,15 @@ class PodcastsTableViewController: UITableViewController {
         appDelegate.refreshPodcastFeeds()
     }
     
+    func removePlayerNavButton(notification: NSNotification) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.loadData()
+            PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
+        }
+    }
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        loadData()
         
         // Set navigation bar styles
         self.navigationItem.title = "Podverse"
@@ -53,8 +65,17 @@ class PodcastsTableViewController: UITableViewController {
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+        
+        loadData()
     }
 
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -62,63 +83,135 @@ class PodcastsTableViewController: UITableViewController {
 
     // MARK: - Table view data source
 
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        // #warning Potentially incomplete method implementation.
-        // Return the number of sections.
-        return 1
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return 2
     }
     
-    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "My Subscribed Podcasts"
+    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if section == 0 {
+            return "My Subscribed Podcasts"
+        } else {
+            return "My Playlists"
+        }
+    }
+    
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if indexPath.section == 1 && indexPath.row >= playlists.count {
+            return 60
+        } else {
+            return 100
+        }
     }
 
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete method implementation.
-        // Return the number of rows in the section.
-        return podcastArray.count
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == 0 {
+            return podcastsArray.count
+        } else {
+            return playlists.count + 1
+        }
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
-        let podcast = podcastArray[indexPath.row]
-        cell.title?.text = podcast.title
-        cell.pvImage?.image = UIImage(named: "Blank52")
         
-        let episodes = podcast.episodes.allObjects as! [Episode]
-        let episodesDownloaded = episodes.filter{ $0.downloadComplete == true }
-        cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
-        
-        if let lastPubDate = podcast.lastPubDate {
-            cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
-        } else if let lastBuildDate = podcast.lastBuildDate {
-            cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
-        }
+        if indexPath.section == 0 {
+            
+            let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
+            
+            let podcast = podcastsArray[indexPath.row]
+            cell.title?.text = podcast.title
+            
+            let episodes = podcast.episodes.allObjects as! [Episode]
+            let episodesDownloaded = episodes.filter{ $0.fileName != nil }
+            cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
+            
+            cell.totalClips?.text = String(podcast.clips.count) + " clips"
+            
+            // Set pubdate in cell equal to most recent episode's pubdate
+            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+            let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: Constants.moc, predicate: podcastPredicate) as! [Episode]
+            cell.lastPublishedDate?.text = ""
+            if mostRecentEpisodeArray.count > 0 {
+                if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
+                    cell.lastPublishedDate?.text = PVUtility.formatDateToString(mostRecentEpisodePubDate)
+                }
+            }
+            
+            cell.pvImage?.image = UIImage(named: "Blank52")
+            if let imageData = podcast.imageData {
+                if let image = UIImage(data: imageData) {
+                    cell.pvImage?.image = image
+                }
+            }
+            else if let itunesImageData = podcast.itunesImage {
+                if let itunesImage = UIImage(data: itunesImageData) {
+                    cell.pvImage?.image = itunesImage
+                }
+            }
+            
+            return cell
 
-        if let imageData = podcast.imageData {
-            if let image = UIImage(data: imageData) {
-                cell.pvImage?.image = image
+        } else {
+            if indexPath.row < playlists.count {
+                let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
+                if playlists.count > 0 {
+                    let playlist = playlists[indexPath.row]
+                    cell.title?.text = playlist.title
+                    
+                    cell.episodesDownloadedOrStarted?.text = "something here"
+                    
+                    cell.lastPublishedDate?.text = "last updated date"
+                    //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
+                    
+                    let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
+                    
+                    cell.totalClips?.text = String(totalItems) + " items"
+                    
+                    cell.pvImage?.image = UIImage(named: "Blank52")
+                    // TODO: Retrieve the image of the podcast/episode/clip that was most recently added to the playlist
+                    //                if let imageData = podcast.imageData {
+                    //                    if let image = UIImage(data: imageData) {
+                    //                        cell.pvImage?.image = image
+                    //                    }
+                    //                }
+                    //                else if let itunesImageData = podcast.itunesImage {
+                    //                    if let itunesImage = UIImage(data: itunesImageData) {
+                    //                        cell.pvImage?.image = itunesImage
+                    //                    }
+                    //                }
+                }
+                return cell
+            } else {
+                let cell = tableView.dequeueReusableCellWithIdentifier("addPlaylistByURLCell", forIndexPath: indexPath)
+                
+                cell.textLabel?.text = "Add Playlist by URL"
+                
+                return cell
             }
         }
-        else if let itunesImageData = podcast.itunesImage {
-            if let itunesImage = UIImage(data: itunesImageData) {
-                cell.pvImage?.image = itunesImage
-            }
-        }
 
-        return cell
+    }
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if indexPath.section == 0 {
+            self.performSegueWithIdentifier("Show Episodes", sender: nil)
+        } else if indexPath.row >= playlists.count {
+            print("do add playlist by URL alert stuff here")
+        } else {
+            self.performSegueWithIdentifier("Show Playlist", sender: nil)
+        }
     }
 
     // Override to support conditional editing of the table view.
-    override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return NO if you do not want the specified item to be editable.
         return true
     }
     
     // Override to support editing the table view.
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            let podcastToRemove = podcastArray[indexPath.row]
+            let podcastToRemove = podcastsArray[indexPath.row]
 
             // Remove Player button if the now playing episode was one of the podcast's episodes
             let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
@@ -128,8 +221,8 @@ class PodcastsTableViewController: UITableViewController {
                 }
             }
             
-            PVSubscriber.sharedInstance.unsubscribeFromPodcast(podcastToRemove)
-            podcastArray.removeAtIndex(indexPath.row)
+            PVDeleter.sharedInstance.deletePodcast(podcastToRemove)
+            podcastsArray.removeAtIndex(indexPath.row)
             
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
         }
@@ -137,12 +230,17 @@ class PodcastsTableViewController: UITableViewController {
 
     // MARK: - Navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "showEpisodes" {
+        if segue.identifier == "Show Episodes" {
             let episodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
-            if let index = self.tableView.indexPathForSelectedRow {
-                episodesTableViewController.selectedPodcast = podcastArray[index.row]
+            if let index = tableView.indexPathForSelectedRow {
+                episodesTableViewController.selectedPodcast = podcastsArray[index.row]
             }
             episodesTableViewController.showAllEpisodes = false
+        } else if segue.identifier == "Show Playlist" {
+            let playlistViewController = segue.destinationViewController as! PlaylistViewController
+            if let index = tableView.indexPathForSelectedRow {
+                playlistViewController.playlist = playlists[index.row]
+            }
         } else if segue.identifier == "Podcasts to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
@@ -151,7 +249,7 @@ class PodcastsTableViewController: UITableViewController {
     
     func reloadTable() {
         tableView.reloadData()
-        self.refreshControl?.endRefreshing()
+        refreshControl?.endRefreshing()
     }
 
 }

@@ -23,6 +23,13 @@ class DownloadsTableViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
+    func removePlayerNavButton(notification: NSNotification) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.reloadDownloadTableData()
+            PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Style the navigation bar
@@ -38,6 +45,8 @@ class DownloadsTableViewController: UITableViewController {
         
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
         
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+        
         reloadDownloadTableData()
         
         // Create reloadDataTimer when this view appears to reload table data every second
@@ -50,6 +59,8 @@ class DownloadsTableViewController: UITableViewController {
             self.reloadDataTimer.invalidate()
             self.reloadDataTimer = nil
         }
+        
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
     }
 
     override func didReceiveMemoryWarning() {

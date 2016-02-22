@@ -19,8 +19,9 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     
     var shouldGetMostRecentEpisode: Bool
     var shouldSubscribeToPodcast: Bool
+    var shouldDownloadMostRecentEpisode = false
     var latestEpisodeInFeed: Episode?
-    var downloadedEpisodes = []
+    var savedFeedEpisodes = []
     var delegate:PVFeedParserDelegate?
     
     init(shouldGetMostRecent:Bool, shouldSubscribe:Bool) {
@@ -83,7 +84,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         
         podcast.isSubscribed = self.shouldSubscribeToPodcast
         
-        downloadedEpisodes = Array(podcast.episodes.allObjects)
+        savedFeedEpisodes = Array(podcast.episodes.allObjects)
         
         CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
@@ -115,10 +116,11 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         if shouldGetMostRecentEpisode == true {
             latestEpisodeInFeed = newEpisode
             parser.abortParsing()
+            return
         }
         
-        // If episode already exists in the database, do not insert new episode, instead update existing episode
-        for var existingEpisode in downloadedEpisodes {
+        // If episode already exists in the database, do not insert new episode
+        for var existingEpisode in savedFeedEpisodes {
             if newEpisode.mediaURL == existingEpisode.mediaURL {
                 existingEpisode = newEpisode
                 episodeAlreadySaved = true
@@ -128,9 +130,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             }
         }
         
-        // If episode is not already saved, then add episode to the podcast object
         if !episodeAlreadySaved {
             podcast.addEpisodeObject(newEpisode)
+            if shouldDownloadMostRecentEpisode == true {
+                PVDownloader.sharedInstance.startDownloadingEpisode(newEpisode)
+                shouldDownloadMostRecentEpisode = false
+            }
         }
         
         CoreDataHelper.sharedInstance.saveCoreData(nil)
@@ -154,14 +159,14 @@ class PVFeedParser: NSObject, FeedParserDelegate {
                 let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate)
                 
                 if mostRecentEpisodeArray.count > 0 {
-                    if let latestEpisodeInRSSFeed = self.latestEpisodeInFeed {
-                        if latestEpisodeInRSSFeed.pubDate != mostRecentEpisodeArray[0].pubDate {
-                            self.shouldGetMostRecentEpisode = false
-                            PVDownloader.sharedInstance.startDownloadingEpisode(newestFeedEpisode)
-                            self.parsePodcastFeed(self.podcast.feedURL)
+                        if let latestEpisodeInRSSFeed = self.latestEpisodeInFeed {
+                            if latestEpisodeInRSSFeed.pubDate != mostRecentEpisodeArray[0].pubDate {
+                                self.shouldGetMostRecentEpisode = false
+                                self.shouldDownloadMostRecentEpisode = true
+                                self.parsePodcastFeed(self.podcast.feedURL)
+                            }
                         }
                     }
-                }
             }
         } else {
             print("no newer episode available, don't download")

@@ -14,6 +14,8 @@ class PVDeleter: NSObject {
     
     func deletePodcast(podcast: Podcast) {
         
+        podcast.isSubscribed = false
+        
         let episodesToRemove = podcast.episodes.allObjects as! [Episode]
         
         // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
@@ -42,22 +44,27 @@ class PVDeleter: NSObject {
             DLEpisodesList.shared.downloadingEpisodes.removeAtIndex(episodeDownloadArrayIndex!)
         }
         
-        // If the episode is currently now playing, then remove the now playing episode, and remove the Player button from the navbar
+        // If the episode is currently now playing, then remove the now playing episode, and remove the Player button from the navbar using kPlayerHasNoItem
         if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
             if episode == nowPlayingEpisode {
                 PVMediaPlayer.sharedInstance.avPlayer.pause()
                 PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
-
-                // TODO: add a protocol that will remote the Player button when the currently playing episode is deleted
-                // self.navigationItem.rightBarButtonItem = nil
+                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
             }
         }
         
         // Delete the episode from CoreData and the disk, and update the UI
         if let fileName = episode.fileName {
             PVUtility.deleteEpisodeFromDiskWithName(fileName)
+            episode.fileName = nil
         }
+
+        // Set episode taskIdentifier to nil since it can't be currently downloading
+        episode.taskIdentifier = nil
         
+        // Set episode playbackPosition to 0 so if downloaded again it starts from beginning
+        episode.playbackPosition = 0
+
         CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode)
     }
     

@@ -29,4 +29,9 @@ class Episode: NSManagedObject {
     @NSManaged var uuid: String?
     @NSManaged var clips: NSSet
     @NSManaged var podcast: Podcast
+    @NSManaged var playlists: NSSet?
+    
+    func addClipObject(value: Clip) {
+        self.mutableSetValueForKey("clips").addObject(value)
+    }
 }
