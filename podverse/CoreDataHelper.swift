@@ -44,15 +44,13 @@ class CoreDataHelper: NSObject {
         super.init()
     }
     
-    func insertManagedObject(className: NSString, managedObjectContext: NSManagedObjectContext) -> AnyObject {
-        let managedObject = NSEntityDescription.insertNewObjectForEntityForName(className as String, inManagedObjectContext: managedObjectContext) 
-        
-        return managedObject
+    func insertManagedObject(className: String) -> AnyObject {        
+        return NSEntityDescription.insertNewObjectForEntityForName(className, inManagedObjectContext: self.moc)
     }
     
-    func fetchEntities (className: NSString, managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> NSArray {
+    func fetchEntities (className: NSString, predicate: NSPredicate?) -> [AnyObject] {
         let fetchRequest = NSFetchRequest()
-        let entityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: managedObjectContext)
+        let entityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: self.moc)
         
         fetchRequest.entity = entityDescription
         
@@ -62,23 +60,21 @@ class CoreDataHelper: NSObject {
         
         fetchRequest.returnsObjectsAsFaults = false
         
-        var items = NSArray()
         do {
-            items = try managedObjectContext.executeFetchRequest(fetchRequest)
+            return try self.moc.executeFetchRequest(fetchRequest)
         } catch {
             print(error)
         }
-
-        return items
         
+        return []
     }
     
-    func fetchOnlyEntityWithMostRecentPubDate (className: NSString, managedObjectContext: NSManagedObjectContext, predicate: NSPredicate?) -> NSArray {
+    func fetchOnlyEntityWithMostRecentPubDate (className: String, predicate: NSPredicate?) -> [AnyObject] {
         let fetchRequest = NSFetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: "pubDate", ascending: false)]
         fetchRequest.fetchLimit = 1
         
-        let entityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: managedObjectContext)
+        let entityDescription = NSEntityDescription.entityForName(className, inManagedObjectContext: self.moc)
         
         fetchRequest.entity = entityDescription
         
@@ -88,40 +84,33 @@ class CoreDataHelper: NSObject {
         
         fetchRequest.returnsObjectsAsFaults = false
         
-        var mostRecentItemByPubDate = NSArray()
         do {
-            mostRecentItemByPubDate = try managedObjectContext.executeFetchRequest(fetchRequest)
+            return try self.moc.executeFetchRequest(fetchRequest)
         } catch {
             print(error)
         }
 
-        return mostRecentItemByPubDate
+        return []
     }
     
-    func deleteItemFromCoreData(deleteObject:NSManagedObject, completionBlock:(()->Void)?) {
-        dispatch_async(Constants.saveQueue) { () -> Void in
-            Constants.moc.deleteObject(deleteObject)
-            if let completion = completionBlock {
-                completion()
+    func deleteItemFromCoreData(deleteObject:NSManagedObject) {
+        self.moc.deleteObject(deleteObject)
+        self.saveCoreData(nil)
+    }
+    
+    func saveCoreData(completionBlock:((saved:Bool)->Void)?) {
+        if self.moc.hasChanges {
+            do {
+                try self.moc.save()
+                if let completion = completionBlock {
+                    completion(saved:true)
+                }
             }
-        }
-    }
-    
-    static func saveCoreData(completionBlock:((saved:Bool)->Void)?) {
-        dispatch_async(Constants.saveQueue) { () -> Void in
-            if Constants.moc.hasChanges {
-                do {
-                    try Constants.moc.save()
-                    if let completion = completionBlock {
-                        completion(saved:true)
-                    }
+            catch {
+                if let completion = completionBlock {
+                    completion(saved:false)
                 }
-                catch {
-                    if let completion = completionBlock {
-                        completion(saved:false)
-                    }
-                    print(error)
-                }
+                print(error)
             }
         }
     }

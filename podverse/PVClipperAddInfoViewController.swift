@@ -67,7 +67,7 @@ class PVClipperAddInfoViewController: UIViewController {
     
     func saveClipWithTitle(clipTitle:String) {
         if clip == nil {
-            clip = (CoreDataHelper.sharedInstance.insertManagedObject("Clip", managedObjectContext: Constants.moc) as! Clip)
+            clip = (CoreDataHelper.sharedInstance.insertManagedObject("Clip") as! Clip)
             clip?.episode = episode
         }
         
@@ -99,13 +99,13 @@ class PVClipperAddInfoViewController: UIViewController {
             saveClip(unwrappedClip)
         }
         
-        CoreDataHelper.saveCoreData(nil)
+        CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
     
     final private func saveClip(clip:Clip) {
         let saveClipWS = SaveClipToServer(clip: clip, completionBlock: { (response) -> Void in
             self.clip?.clipUrl = response["clipUri"] as? String
-            CoreDataHelper.saveCoreData(nil)
+            CoreDataHelper.sharedInstance.saveCoreData(nil)
             
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
                 let alert = UIAlertController(title: "Clip saved with URL:", message: self.clip?.clipUrl, preferredStyle: .Alert)

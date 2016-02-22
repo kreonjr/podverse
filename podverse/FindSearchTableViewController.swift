@@ -66,7 +66,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                             	})
                             } else {
                                 // Get all podcasts in Core Data to use to determine if you're already subscribed to a search result podcast
-                                let allSubscribedPodcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
+                                let allSubscribedPodcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
                                 
                                 for (var i = 0; i < results.count; i++) {
                                     

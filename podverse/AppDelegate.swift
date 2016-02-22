@@ -41,7 +41,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func refreshPodcastFeeds () {
-        let podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
+        let podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
         for var i = 0; i < podcastArray.count; i++ {
             let feedURL = NSURL(string: podcastArray[i].feedURL)
             
@@ -80,7 +80,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         playCommand.addTarget(self, action: "playOrPauseEvent")
         
         // TODO: Currently we are setting taskIdentifier values = nil on app launch. This will probably need to change once we add crash handling for resuming downloads
-        let episodeArray = CoreDataHelper.sharedInstance.fetchEntities("Episode", managedObjectContext: Constants.moc, predicate: nil) as! [Episode]
+        let episodeArray = CoreDataHelper.sharedInstance.fetchEntities("Episode", predicate: nil) as! [Episode]
         for episode in episodeArray {
             episode.taskIdentifier = nil
         }
@@ -136,7 +136,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             PVMediaPlayer.sharedInstance.saveCurrentTimeAsPlaybackPosition()
         }
         
-        CoreDataHelper.saveCoreData(nil)
+        CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
 }
 

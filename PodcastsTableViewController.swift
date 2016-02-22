@@ -18,7 +18,7 @@ class PodcastsTableViewController: UITableViewController {
     var podcastArray = [Podcast]()
     
     func loadData() {
-        podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: nil) as! [Podcast]
+        podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
         podcastArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
         
         self.tableView.reloadData()

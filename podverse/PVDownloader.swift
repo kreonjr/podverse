@@ -43,7 +43,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 DLEpisodesList.shared.downloadingEpisodes.append(episode)
             }
             
-            CoreDataHelper.saveCoreData(nil)
+            CoreDataHelper.sharedInstance.saveCoreData(nil)
             let task = beginBackgroundTask()
             downloadTask.resume()
             endBackgroundTask(task)
@@ -62,7 +62,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
                 episode.taskResumeData = nil
                 
-                CoreDataHelper.saveCoreData(nil)
+                CoreDataHelper.sharedInstance.saveCoreData(nil)
                 
                 downloadTask.resume()
             }
@@ -76,7 +76,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                             if (resumeData != nil) {
                                 episode.taskResumeData = resumeData
                                 episode.taskIdentifier = nil
-                                CoreDataHelper.saveCoreData(nil)
+                                CoreDataHelper.sharedInstance.saveCoreData(nil)
                             }
                         }
                     }
@@ -95,7 +95,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             
             if let resumeData = error?.userInfo[NSURLSessionDownloadTaskResumeData] as? NSData {
                 episode.taskResumeData = resumeData
-                CoreDataHelper.saveCoreData(nil)
             }
         }
     }
@@ -184,7 +183,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     episode.taskIdentifier = nil
                     
                     // Save the downloadedMediaFileDestination with the object
-                    CoreDataHelper.saveCoreData(nil)
+                    CoreDataHelper.sharedInstance.saveCoreData(nil)
                     
                     let downloadHasFinishedUserInfo = ["episode":episode]
                     
