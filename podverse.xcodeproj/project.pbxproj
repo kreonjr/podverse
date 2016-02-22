@@ -66,6 +66,7 @@
 		EFB324A01BE5913A000936B6 /* PVClipperConfirmationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB3249F1BE5913A000936B6 /* PVClipperConfirmationViewController.swift */; };
 		EFD1D4E71C3106FB00666912 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD1D4E51C3106FA00666912 /* Fabric.framework */; };
 		EFD1D4E81C3106FB00666912 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFD1D4E61C3106FB00666912 /* Crashlytics.framework */; };
+		EFFD86A11C7AB01E0005014B /* SavePlaylistToServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFFD86A01C7AB01E0005014B /* SavePlaylistToServer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -211,6 +212,7 @@
 		EFB3249F1BE5913A000936B6 /* PVClipperConfirmationViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipperConfirmationViewController.swift; sourceTree = "<group>"; };
 		EFD1D4E51C3106FA00666912 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		EFD1D4E61C3106FB00666912 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
+		EFFD86A01C7AB01E0005014B /* SavePlaylistToServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SavePlaylistToServer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -377,6 +379,7 @@
 			isa = PBXGroup;
 			children = (
 				EF3980011C545B9900C91753 /* SaveClipToServer.swift */,
+				EFFD86A01C7AB01E0005014B /* SavePlaylistToServer.swift */,
 			);
 			name = WebServices;
 			sourceTree = "<group>";
@@ -613,6 +616,7 @@
 				3072BE2E1C48A2F000CA9C7F /* PVDeleter.swift in Sources */,
 				EF59CECA1BD07AB6002D9DDF /* FeedChannel.swift in Sources */,
 				818615CE1B1EB12C006C9731 /* PodcastsTableViewController.swift in Sources */,
+				EFFD86A11C7AB01E0005014B /* SavePlaylistToServer.swift in Sources */,
 				EF59CECB1BD07AB6002D9DDF /* FeedEnclosure.swift in Sources */,
 				3045E0971C658D4B006477B3 /* AddToPlaylistTableViewCell.swift in Sources */,
 				81DD2CC91B549C4D00432E0C /* Clip.swift in Sources */,

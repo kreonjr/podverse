@@ -28,33 +28,33 @@ class PVPlaylister: NSObject {
     
     func createPlaylist(title: String) {
         let predicate = NSPredicate(format: "title == %@", title)
-        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", managedObjectContext: Constants.moc, predicate: predicate) as! [Playlist]
+        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: predicate) as! [Playlist]
         if playlistSet.count > 0 {
             print("playlist with that name already saved")
         } else {
-            let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist", managedObjectContext: Constants.moc) as! Playlist
+            let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
             playlist.title = title
             playlist.isPublic = false
         }
-        CoreDataHelper.saveCoreData(nil)
+        CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
     
     func addPodcastToPlaylist(playlist: Playlist, podcast: Podcast) {
         playlist.lastUpdated = NSDate()
         playlist.addPodcastObject(podcast)
-        CoreDataHelper.saveCoreData(nil)
+        CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
     
     func addEpisodeToPlaylist(playlist: Playlist, episode: Episode) {
         playlist.lastUpdated = NSDate()
         playlist.addEpisodeObject(episode)
-        CoreDataHelper.saveCoreData(nil)
+        CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
     
     func addClipToPlaylist(playlist: Playlist, clip: Clip) {
         playlist.lastUpdated = NSDate()
         playlist.addClipObject(clip)
-        CoreDataHelper.saveCoreData(nil)
+        CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
     
     func countPlaylistItems(playlist: Playlist) -> Int {
@@ -75,48 +75,48 @@ class PVPlaylister: NSObject {
     
     func retrieveSavedPodcastsPlaylist() -> Playlist {
         let predicate = NSPredicate(format: "title == %@", "My Saved Podcasts")
-        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", managedObjectContext: Constants.moc, predicate: predicate) as! [Playlist]
+        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: predicate) as! [Playlist]
         
         if playlistSet.count > 0 {
             return playlistSet[0]
         } else {
-            let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist", managedObjectContext: Constants.moc) as! Playlist
+            let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
             playlist.title = "My Saved Podcasts"
-            CoreDataHelper.saveCoreData(nil)
+            CoreDataHelper.sharedInstance.saveCoreData(nil)
             return playlist
         }
     }
     
     func retrieveSavedEpisodesPlaylist() -> Playlist {
         let predicate = NSPredicate(format: "title == %@", "My Saved Episodes")
-        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", managedObjectContext: Constants.moc, predicate: predicate) as! [Playlist]
+        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: predicate) as! [Playlist]
         
         if playlistSet.count > 0 {
             return playlistSet[0]
         } else {
-            let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist", managedObjectContext: Constants.moc) as! Playlist
+            let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
             playlist.title = "My Saved Episodes"
-            CoreDataHelper.saveCoreData(nil)
+            CoreDataHelper.sharedInstance.saveCoreData(nil)
             return playlist
         }
     }
     
     func retrieveSavedClipsPlaylist() -> Playlist {
         let predicate = NSPredicate(format: "title == %@", "My Saved Clips")
-        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", managedObjectContext: Constants.moc, predicate: predicate) as! [Playlist]
+        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: predicate) as! [Playlist]
         
         if playlistSet.count > 0 {
             return playlistSet[0]
         } else {
-            let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist", managedObjectContext: Constants.moc) as! Playlist
+            let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
             playlist.title = "My Saved Clips"
-            CoreDataHelper.saveCoreData(nil)
+            CoreDataHelper.sharedInstance.saveCoreData(nil)
             return playlist
         }
     }
     
     func retrieveAllPlaylists() -> [Playlist] {
-        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", managedObjectContext: Constants.moc, predicate: nil) as! [Playlist]
+        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: nil) as! [Playlist]
         return playlistSet
     }
 }

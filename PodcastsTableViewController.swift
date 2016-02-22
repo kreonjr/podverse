@@ -21,8 +21,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     let playlists = PVPlaylister.sharedInstance.retrieveAllPlaylists()
     
     func loadData() {
-        podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
-        podcastArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+        podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
+        podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
         
         self.tableView.reloadData()
     }
@@ -129,7 +129,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             
             // Set pubdate in cell equal to most recent episode's pubdate
             let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-            let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: Constants.moc, predicate: podcastPredicate) as! [Episode]
+            let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate) as! [Episode]
             cell.lastPublishedDate?.text = ""
             if mostRecentEpisodeArray.count > 0 {
                 if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
