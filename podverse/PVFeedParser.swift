@@ -29,7 +29,6 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func parsePodcastFeed(feedURLString: String) {
-        // Parse podcast feeds on the saveQueue (serial queue) in order to prevent the "NSXMLParser does not support reentrant parsing" issue.
         dispatch_async(Constants.feedParsingQueue) {
             self.feedURL = feedURLString
             let feedParser = CustomFeedParser(feedURL: feedURLString)
@@ -43,12 +42,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     func feedParser(parser: FeedParser, didParseChannel channel: FeedChannel) {
         if let feedURLString = channel.channelURL {
             let predicate = NSPredicate(format: "feedURL == %@", feedURLString)
-            let podcastSet = CoreDataHelper.sharedInstance.fetchEntities("Podcast", managedObjectContext: Constants.moc, predicate: predicate) as! [Podcast]
+            let podcastSet = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: predicate) as! [Podcast]
             if podcastSet.count > 0 {
                 podcast = podcastSet[0]
             }
             else {
-                podcast = CoreDataHelper.sharedInstance.insertManagedObject("Podcast", managedObjectContext: Constants.moc) as! Podcast
+                podcast = CoreDataHelper.sharedInstance.insertManagedObject("Podcast") as! Podcast
             }
         }
         
@@ -86,7 +85,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         
         downloadedEpisodes = Array(podcast.episodes.allObjects)
         
-        CoreDataHelper.saveCoreData(nil)
+        CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
     
     func feedParser(parser: FeedParser, didParseItem item: FeedItem) {
@@ -96,7 +95,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         }
         
         var episodeAlreadySaved = false
-        let newEpisode = CoreDataHelper.sharedInstance.insertManagedObject("Episode", managedObjectContext: Constants.moc) as! Episode
+        let newEpisode = CoreDataHelper.sharedInstance.insertManagedObject("Episode") as! Episode
         
         // Retrieve parsed values from item and add values to their respective episode properties
         if let title = item.feedTitle { newEpisode.title = title }
@@ -124,10 +123,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
                 existingEpisode = newEpisode
                 episodeAlreadySaved = true
                 //Remove the created entity from core data if it already exists
-                CoreDataHelper.sharedInstance.deleteItemFromCoreData(newEpisode, completionBlock: { () -> Void in
-                    CoreDataHelper.saveCoreData(nil)
-                })
-
+                CoreDataHelper.sharedInstance.deleteItemFromCoreData(newEpisode)
                 break
             }
         }
@@ -137,7 +133,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             podcast.addEpisodeObject(newEpisode)
         }
         
-        CoreDataHelper.saveCoreData(nil)
+        CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
     
     func feedParserParsingAborted(parser: FeedParser) {
@@ -155,18 +151,17 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             if let newestFeedEpisode = latestEpisodeInFeed {
                 let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
                 
-                let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: Constants.moc, predicate: podcastPredicate)
+                let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate)
                 
                 if mostRecentEpisodeArray.count > 0 {
-                    if let latestEpisodeInRSSFeed = latestEpisodeInFeed {
+                    if let latestEpisodeInRSSFeed = self.latestEpisodeInFeed {
                         if latestEpisodeInRSSFeed.pubDate != mostRecentEpisodeArray[0].pubDate {
-                            shouldGetMostRecentEpisode = false
+                            self.shouldGetMostRecentEpisode = false
                             PVDownloader.sharedInstance.startDownloadingEpisode(newestFeedEpisode)
-                            parsePodcastFeed(podcast.feedURL)
+                            self.parsePodcastFeed(self.podcast.feedURL)
                         }
                     }
                 }
-                
             }
         } else {
             print("no newer episode available, don't download")
@@ -187,7 +182,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         // If subscribing to a podcast, then get the latest episode and begin downloading
         if shouldSubscribeToPodcast == true {
             let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-            let latestEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", managedObjectContext: Constants.moc, predicate: podcastPredicate)
+            let latestEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate)
             
             // If there is an episode in the array, then download the episode
             if latestEpisodeArray.count > 0 {
@@ -195,7 +190,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             }
         }
         
-        CoreDataHelper.saveCoreData(nil)
+        CoreDataHelper.sharedInstance.saveCoreData(nil)
         
         delegate?.feedParsingComplete()
         print("feed parser has finished!")
