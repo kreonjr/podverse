@@ -103,8 +103,14 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
             pvPlaylister.addEpisodeToPlaylist(playlist, episode: e)
         }
         
-        let viewControllers: [UIViewController] = navigationController!.viewControllers as [UIViewController];
-        navigationController!.popToViewController(viewControllers[viewControllers.count - 2], animated: true);
+        SavePlaylistToServer(playlist: playlist, completionBlock: {[unowned self] (response) -> Void in
+            if let mediaPlayerVC = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as? MediaPlayerViewController {
+                self.navigationController?.popToViewController(mediaPlayerVC, animated: true)
+            }
+            
+            }) { (error) -> Void in
+                print("Not saved to server. Error: ", error?.localizedDescription)
+        }.call()
     }
     
 //    // Override to support editing the table view.

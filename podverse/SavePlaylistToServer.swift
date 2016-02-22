@@ -23,12 +23,20 @@ class SavePlaylistToServer:WebService {
         
         if let episodes = episodesArray as? [Episode]{
             for episode in episodes {
-                playlistItems.append(["title":episode.title ?? "",
-                                      "duration":episode.duration ?? 0,
-                                      "pubDate": PVUtility.formatDateToString(episode.pubDate) ?? "",
-                                      "mediaURL":episode.mediaURL ?? "",
-                                      "podcast":["title":episode.podcast.title ?? "",
-                                                 "imageURL":episode.podcast.imageURL ?? ""]
+                let podcast = episode.podcast
+                let episodeTitle = episode.title ?? ""
+                let duration = episode.duration?.integerValue ?? 0
+                let pubDate = PVUtility.formatDateToString(episode.pubDate ?? NSDate())
+                let mediaUrl = episode.mediaURL ?? ""
+                let podcastTitle = podcast.title ?? ""
+                let podcastImageUrl = podcast.imageURL ?? ""
+                
+                playlistItems.append([ "title": episodeTitle,
+                                       "duration": duration,
+                                       "pubDate": pubDate,
+                                       "mediaURL": mediaUrl,
+                                       "podcast": [ "title": podcastTitle,
+                                                    "imageURL": podcastImageUrl]
                 ])
             }
         }
@@ -38,15 +46,24 @@ class SavePlaylistToServer:WebService {
                 let episode = clip.episode
                 let podcast = episode.podcast
                 
-                playlistItems.append(["title": clip.title ?? "",
-                                      "duration": clip.duration.integerValue,
-                                      "startTime": clip.startTime.integerValue,
-                                      "endTime": clip.endTime.integerValue,
-                                      "episode":["title": episode.title ?? "",
-                                                "mediaURL": episode.mediaURL],
-                                      "podcast": ["title": podcast.title ?? "",
-                                                  "imageURL": podcast.imageURL ?? ""]
-                                                 ])
+                let clipTitle = clip.title ?? ""
+                let duration = clip.duration.integerValue
+                let startTime = clip.startTime.integerValue
+                let endTime = clip.endTime.integerValue
+                let episodeTitle = episode.title ?? ""
+                let episodeURL = episode.mediaURL ?? ""
+                let podcastTitle = podcast.title ?? ""
+                let podcastImageUrl = podcast.imageURL ?? ""
+                
+                playlistItems.append(["title": clipTitle,
+                    "duration": duration,
+                    "startTime": startTime,
+                    "endTime": endTime,
+                    "episode":["title": episodeTitle,
+                        "mediaURL": episodeURL ],
+                    "podcast": ["title": podcastTitle,
+                        "imageURL": podcastImageUrl]
+                ])
             }
         }
         
