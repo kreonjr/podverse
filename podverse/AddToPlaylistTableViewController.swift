@@ -103,10 +103,23 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
             pvPlaylister.addEpisodeToPlaylist(playlist, episode: e)
         }
         
-        SavePlaylistToServer(playlist: playlist, completionBlock: {[unowned self] (response) -> Void in
-            if let mediaPlayerVC = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as? MediaPlayerViewController {
-                self.navigationController?.popToViewController(mediaPlayerVC, animated: true)
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.podcastId == nil), completionBlock: {[unowned self] (response) -> Void in
+            if let existingPlaylist = CoreDataHelper.sharedInstance.fetchEntityWithID(playlist.objectID) as? Playlist {
+                existingPlaylist.podcastId = response["_id"] as? String
+                
+                if let url = response["url"] as? String {
+                    existingPlaylist.url = url
+                }
+                
+                CoreDataHelper.sharedInstance.saveCoreData({ (saved) -> Void in
+                    if saved {
+                        if let mediaPlayerVC = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as? MediaPlayerViewController {
+                            self.navigationController?.popToViewController(mediaPlayerVC, animated: true)
+                        }
+                    }
+                })
             }
+            
             
             }) { (error) -> Void in
                 print("Not saved to server. Error: ", error?.localizedDescription)
