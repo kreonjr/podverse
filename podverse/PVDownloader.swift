@@ -35,6 +35,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     
     func startDownloadingEpisode (episode: Episode) {
         episode.downloadProgress = 0
+        episode.downloadComplete = false
         if let downloadSourceStringURL = episode.mediaURL, let downloadSourceURL = NSURL(string: downloadSourceStringURL) {
             let downloadTask = downloadSession.downloadTaskWithURL(downloadSourceURL)
             episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)

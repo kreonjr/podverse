@@ -9,11 +9,11 @@
 import UIKit
 import CoreData
 
-class CoreDataHelper: NSObject {
+class CoreDataHelper {
     static let sharedInstance = CoreDataHelper()
     var moc: NSManagedObjectContext
     
-    override init() {
+    init() {
         // This resource is the same name as your xcdatamodeld contained in your project.
         guard let modelURL = NSBundle.mainBundle().URLForResource("podverse", withExtension: "momd") else {
             fatalError("Error loading model from bundle")
@@ -40,8 +40,6 @@ class CoreDataHelper: NSObject {
                 fatalError("Error migrating store: \(error)")
             }
         }
-        
-        super.init()
     }
     
     func insertManagedObject(className: String) -> AnyObject {        
