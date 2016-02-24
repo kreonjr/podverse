@@ -9,10 +9,21 @@
 import Foundation
 
 class SavePlaylistToServer:WebService {
-    internal init(playlist:Playlist, completionBlock: (response: Dictionary<String, AnyObject>) -> Void, errorBlock: (error: NSError?) -> Void) {
-        super.init(name:"pl", completionBlock: completionBlock, errorBlock: errorBlock)
+    internal init(playlist:Playlist, newPlaylist:Bool = false, completionBlock: (response: Dictionary<String, AnyObject>) -> Void, errorBlock: (error: NSError?) -> Void) {
+        
+        var name = "pl"
+        if let id = playlist.podcastId where newPlaylist == false {
+            name += "/\(id)"
+        }
+        
+        super.init(name:name, completionBlock: completionBlock, errorBlock: errorBlock)
     
-        setHttpMethod(.METHOD_POST)
+        if newPlaylist {
+            setHttpMethod(.METHOD_POST)
+        } else {
+            setHttpMethod(.METHOD_PUT)
+        }
+        
         addHeaderWithKey("Content-Type", value: "application/json")
         
         addParamWithKey("playlistTitle", value: playlist.title)

@@ -15,6 +15,7 @@ class Playlist: NSManagedObject {
     @NSManaged var podcasts: NSSet?
     @NSManaged var episodes: NSSet?
     @NSManaged var clips: NSSet?
+    @NSManaged var podcastId: String?
     
     func addPodcastObject(value: Podcast) {
         self.mutableSetValueForKey("podcasts").addObject(value)
