@@ -111,7 +111,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         if section == 0 {
             return podcastsArray.count
         } else {
-            return playlists.count + 1
+            return playlists.count
         }
     }
 
@@ -139,50 +139,41 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
                 }
             }
             
-            cell.pvImage?.image = UIImage(named: "Blank52")
-            if let imageData = podcast.imageData {
-                if let image = UIImage(data: imageData) {
-                    cell.pvImage?.image = image
-                }
+            
+            if let imageData = podcast.imageData, image = UIImage(data: imageData) {
+                cell.pvImage?.image = image
             }
-            else if let itunesImageData = podcast.itunesImage {
-                if let itunesImage = UIImage(data: itunesImageData) {
-                    cell.pvImage?.image = itunesImage
-                }
+            else if let itunesImageData = podcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
+                cell.pvImage?.image = itunesImage
+            }
+            else {
+                cell.pvImage?.image = UIImage(named: "Blank52")
             }
         } else {
-            if indexPath.row < playlists.count {
-                let playlist = playlists[indexPath.row]
-                cell.title?.text = playlist.title
-                
-                cell.episodesDownloadedOrStarted?.text = "something here"
-                
-                cell.lastPublishedDate?.text = "last updated date"
-                //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
-                
-                let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
-                
-                cell.totalClips?.text = String(totalItems) + " items"
-                
-                cell.pvImage?.image = UIImage(named: "Blank52")
-                // TODO: Retrieve the image of the podcast/episode/clip that was most recently added to the playlist
-                //                if let imageData = podcast.imageData {
-                //                    if let image = UIImage(data: imageData) {
-                //                        cell.pvImage?.image = image
-                //                    }
-                //                }
-                //                else if let itunesImageData = podcast.itunesImage {
-                //                    if let itunesImage = UIImage(data: itunesImageData) {
-                //                        cell.pvImage?.image = itunesImage
-                //                    }
-                //                }                
-            } else {
-                let cell = tableView.dequeueReusableCellWithIdentifier("addPlaylistByURLCell", forIndexPath: indexPath)
-                
-                cell.textLabel?.text = "Add Playlist by URL"
-                
-                return cell
-            }
+            let playlist = playlists[indexPath.row]
+            cell.title?.text = playlist.title
+            
+            cell.episodesDownloadedOrStarted?.text = "something here"
+            
+            cell.lastPublishedDate?.text = "last updated date"
+            //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
+            
+            let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
+            
+            cell.totalClips?.text = String(totalItems) + " items"
+            
+            cell.pvImage?.image = UIImage(named: "Blank52")
+            // TODO: Retrieve the image of the podcast/episode/clip that was most recently added to the playlist
+            //                if let imageData = podcast.imageData {
+            //                    if let image = UIImage(data: imageData) {
+            //                        cell.pvImage?.image = image
+            //                    }
+            //                }
+            //                else if let itunesImageData = podcast.itunesImage {
+            //                    if let itunesImage = UIImage(data: itunesImageData) {
+            //                        cell.pvImage?.image = itunesImage
+            //                    }
+            //                }                
         }
 
         return cell
@@ -248,6 +239,9 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         refreshControl?.endRefreshing()
     }
 
+    @IBAction func addPlaylistByURL(sender: AnyObject) {
+        print("Do add playlist url stuff here")
+    }
 }
 
 extension String {

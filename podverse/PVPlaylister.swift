@@ -116,7 +116,6 @@ class PVPlaylister: NSObject {
     }
     
     func retrieveAllPlaylists() -> [Playlist] {
-        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: nil) as! [Playlist]
-        return playlistSet
+        return CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: nil) as! [Playlist]
     }
 }
