@@ -20,7 +20,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var playlists:[Playlist] {
         get {
-            return PVPlaylister.sharedInstance.retrieveAllPlaylists()
+            return PlaylistManager.sharedInstance.playlistsArray
         }
     }
     
@@ -152,7 +152,6 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         } else {
             let playlist = playlists[indexPath.row]
             cell.title?.text = playlist.title
-            
             cell.episodesDownloadedOrStarted?.text = "something here"
             
             cell.lastPublishedDate?.text = "last updated date"

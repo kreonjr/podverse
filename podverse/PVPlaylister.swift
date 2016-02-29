@@ -39,38 +39,8 @@ class PVPlaylister: NSObject {
         CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
     
-    func addPodcastToPlaylist(playlist: Playlist, podcast: Podcast) {
-        playlist.lastUpdated = NSDate()
-        playlist.addPodcastObject(podcast)
-        CoreDataHelper.sharedInstance.saveCoreData(nil)
-    }
-    
-    func addEpisodeToPlaylist(playlist: Playlist, episode: Episode) {
-        playlist.lastUpdated = NSDate()
-        playlist.addEpisodeObject(episode)
-        CoreDataHelper.sharedInstance.saveCoreData(nil)
-    }
-    
-    func addClipToPlaylist(playlist: Playlist, clip: Clip) {
-        playlist.lastUpdated = NSDate()
-        playlist.addClipObject(clip)
-        CoreDataHelper.sharedInstance.saveCoreData(nil)
-    }
-    
     func countPlaylistItems(playlist: Playlist) -> Int {
-        var totalItems = 0
-        if let podcastCount = playlist.podcasts?.allObjects.count {
-            totalItems += podcastCount
-        }
-        
-        if let episodeCount = playlist.episodes?.allObjects.count {
-            totalItems += episodeCount
-        }
-        
-        if let clipCount = playlist.clips?.allObjects.count {
-            totalItems += clipCount
-        }
-        return totalItems
+        return playlist.playlistItems?.count ?? 0
     }
     
     func retrieveSavedPodcastsPlaylist() -> Playlist {
