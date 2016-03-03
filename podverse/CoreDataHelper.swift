@@ -91,15 +91,15 @@ class CoreDataHelper {
         return []
     }
     
-    func fetchEntityWithID(objectId:NSManagedObjectID) -> AnyObject? {
-        do {
-            return try self.moc.existingObjectWithID(objectId)
-        } catch {
-            print(error)
-        }
-        
-        return nil
-    }
+//    func fetchEntityWithID(objectId:NSManagedObjectID) -> AnyObject? {
+//        do {
+//            return try self.moc.existingObjectWithID(objectId)
+//        } catch {
+//            print(error)
+//        }
+//        
+//        return nil
+//    }
     
     func deleteItemFromCoreData(deleteObject:NSManagedObject) {
         self.moc.deleteObject(deleteObject)

@@ -90,7 +90,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     
         self.refreshPodcastFeeds()
-        PlaylistManager.refreshPlaylists()
+        PlaylistManager.sharedInstance.refreshPlaylists()
         
         startCheckSubscriptionsForNewEpisodesTimer()
         

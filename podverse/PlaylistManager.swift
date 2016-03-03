@@ -8,11 +8,17 @@
 
 import Foundation
 
-final class PlaylistManager {
+final class PlaylistManager: NSObject {
     static let sharedInstance = PlaylistManager()
     
     let playlistQueue = dispatch_queue_create("com.podverese.playlistQueue", DISPATCH_QUEUE_SERIAL)
     private var playlists = [Playlist]()
+    var playlistIds:[String]!
+    
+    override init() {
+        super.init()
+            playlistIds = ["WAmf3QdoZvXIo7pY","ZbQC1HIs9L0tvyY4","ZGtLrfNC0V8rPoKz"]
+    }
     
     var playlistsArray:[Playlist] {
         get {
@@ -33,10 +39,10 @@ final class PlaylistManager {
         }
     }
     
-    static func refreshPlaylists() {
-        let ids = ["WAmf3QdoZvXIo7pY","ZbQC1HIs9L0tvyY4","ZGtLrfNC0V8rPoKz"]
-        
-        for id in ids {
+    
+    
+    func refreshPlaylists() {
+        for id in playlistIds {
             GetPlaylistFromServer(playlistId: id, completionBlock: { (response) -> Void in
                 PlaylistManager.sharedInstance.addPlaylist(PlaylistManager.JSONToPlaylist(response))
             }) { (error) -> Void in
@@ -54,4 +60,50 @@ final class PlaylistManager {
         
         return playlist
     }
+    
+    static func playlistToJSON(playlist:Playlist) -> Dictionary<String,AnyObject>? {
+        var JSONDict = Dictionary<String,AnyObject>()
+        JSONDict["playlistTitle"] = playlist.title
+        JSONDict["playlistItems"] = playlist.playlistItems
+
+        return JSONDict
+    }
+    
+    func clipToPlaylistItemJSON(clip:Clip) -> Dictionary<String,AnyObject>? {
+        var JSONDict = Dictionary<String,AnyObject>()
+        
+        JSONDict["title"] = clip.title
+        JSONDict["duration"] = clip.duration
+        JSONDict["startTime"] = clip.startTime
+        JSONDict["endTime"] = clip.endTime
+        
+        var episodeDict = Dictionary<String,AnyObject>()
+        episodeDict["title"] = clip.episode.title
+        episodeDict["mediaURL"] = clip.episode.mediaURL
+        JSONDict["episode"] = episodeDict
+        
+        var podcastDict = Dictionary<String,AnyObject>()
+        podcastDict["title"] = clip.episode.podcast.title
+        podcastDict["imageURL"] = clip.episode.podcast.imageURL
+        JSONDict["podcast"] = podcastDict
+        
+        return JSONDict
+    }
+    
+    func episodeToPlaylistItemJSON(episode:Episode) -> Dictionary<String,AnyObject>? {
+        var JSONDict = Dictionary<String,AnyObject>()
+        JSONDict["title"] = episode.title
+        JSONDict["duration"] = episode.duration
+        JSONDict["pubDate"] = episode.pubDate
+        JSONDict["mediaURL"] = episode.mediaURL
+        
+        var podcastDict = Dictionary<String,AnyObject>()
+        podcastDict["title"] = episode.podcast.title
+        podcastDict["imageURL"] = episode.podcast.imageURL
+        
+        JSONDict["podcast"] = podcastDict
+        
+        return JSONDict
+    }
+    
 }

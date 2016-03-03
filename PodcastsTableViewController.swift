@@ -157,7 +157,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             cell.lastPublishedDate?.text = "last updated date"
             //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
             
-            let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
+            let totalItems = 5
+//            let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
             
             cell.totalClips?.text = String(totalItems) + " items"
             

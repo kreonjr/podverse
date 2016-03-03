@@ -18,29 +18,29 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
     
     func loadData() {
-        playlistItems = [AnyObject]()
-        if let podcasts = playlist.podcasts {
-            if podcasts.count > 0 {
-                for podcast in podcasts {
-                    playlistItems.append(podcast as! Podcast)
-                }
-            }
-        }
-        if let episodes = playlist.episodes {
-            if episodes.count > 0 {
-                for episode in episodes {
-                    playlistItems.append(episode as! Episode)
-                }
-            }
-        }
-        if let clips = playlist.clips {
-            if clips.count > 0 {
-                for clip in clips {
-                    playlistItems.append(clip as! Clip)
-                }
-            }
-        }
-        
+//        playlistItems = [AnyObject]()
+//        if let podcasts = playlist.podcasts {
+//            if podcasts.count > 0 {
+//                for podcast in podcasts {
+//                    playlistItems.append(podcast as! Podcast)
+//                }
+//            }
+//        }
+//        if let episodes = playlist.episodes {
+//            if episodes.count > 0 {
+//                for episode in episodes {
+//                    playlistItems.append(episode as! Episode)
+//                }
+//            }
+//        }
+//        if let clips = playlist.clips {
+//            if clips.count > 0 {
+//                for clip in clips {
+//                    playlistItems.append(clip as! Clip)
+//                }
+//            }
+//        }
+//        
         tableView.reloadData()
     }
     
