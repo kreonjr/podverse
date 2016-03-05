@@ -39,7 +39,22 @@ final class PlaylistManager: NSObject {
         }
     }
     
-    
+    func addPlaylistByUrlString(urlString: String) {
+        let urlComponentArray = urlString.componentsSeparatedByString("/")
+        let playlistId = urlComponentArray[4]
+        
+        if (urlComponentArray[0] == "http:" || urlComponentArray[0] == "https") && (urlComponentArray[1] == "") && (urlComponentArray[2] == "podverse.tv") && (urlComponentArray[3] == "pl") && (playlistId.characters.count == 16) {
+                GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
+                    PlaylistManager.sharedInstance.addPlaylist(PlaylistManager.JSONToPlaylist(response))
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.refreshPodcastTableDataNotification, object: nil)
+                    }) { (error) -> Void in
+                        print("Error y'all \(error?.localizedDescription)")
+                    }.call()
+        } else {
+            print("Error: invalid URL")
+        }
+        
+    }
     
     func refreshPlaylists() {
         for id in playlistIds {

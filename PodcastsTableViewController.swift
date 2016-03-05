@@ -14,6 +14,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     @IBOutlet weak var tableView: UITableView!
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
 
+    var playlistManager = PlaylistManager.sharedInstance
+    
     var podcastsArray = [Podcast]()
     
     var refreshControl: UIRefreshControl!
@@ -182,13 +184,31 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.section == 0 {
             self.performSegueWithIdentifier("Show Episodes", sender: nil)
-        } else if indexPath.row >= playlists.count {
-            print("do add playlist by URL alert stuff here")
         } else {
             self.performSegueWithIdentifier("Show Playlist", sender: nil)
         }
     }
 
+    func showAddPlaylistByURLAlert() {
+        let addPlaylistByURLAlert = UIAlertController(title: "Add Playlist By URL", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
+        
+        addPlaylistByURLAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
+            textField.placeholder = "http://podverse.tv/pl/..."
+        })
+        
+        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
+        
+        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
+            let textField = addPlaylistByURLAlert.textFields![0] as UITextField
+            if let urlString = textField.text {
+                self.playlistManager.addPlaylistByUrlString(urlString)
+            }
+            self.loadData()
+        }))
+        
+        presentViewController(addPlaylistByURLAlert, animated: true, completion: nil)
+    }
+    
     // Override to support conditional editing of the table view.
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return NO if you do not want the specified item to be editable.
@@ -240,7 +260,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
 
     @IBAction func addPlaylistByURL(sender: AnyObject) {
-        print("Do add playlist url stuff here")
+        showAddPlaylistByURLAlert()
     }
 }
 
