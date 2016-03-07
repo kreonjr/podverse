@@ -29,6 +29,17 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     func loadData() {
         podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
         podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+
+        // Set pubdate in cell equal to most recent episode's pubdate
+        for podcast in podcastsArray {
+            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+            let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate) as! [Episode]
+            if mostRecentEpisodeArray.count > 0 {
+                if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
+                    podcast.lastPubDate = mostRecentEpisodePubDate
+                }
+            }
+        }
         
         self.tableView.reloadData()
     }
@@ -131,16 +142,10 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             
             cell.totalClips?.text = String(podcast.clips.count) + " clips"
             
-            // Set pubdate in cell equal to most recent episode's pubdate
-            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-            let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate) as! [Episode]
             cell.lastPublishedDate?.text = ""
-            if mostRecentEpisodeArray.count > 0 {
-                if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
-                    cell.lastPublishedDate?.text = PVUtility.formatDateToString(mostRecentEpisodePubDate)
-                }
+            if let lastPubDate = podcast.lastPubDate {
+                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
             }
-            
             
             if let imageData = podcast.imageData, image = UIImage(data: imageData) {
                 cell.pvImage?.image = image
