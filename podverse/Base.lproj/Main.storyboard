@@ -1444,7 +1444,7 @@
                     </view>
                     <connections>
                         <outlet property="tableView" destination="Lhk-s2-uMY" id="QTy-11-7lx"/>
-                        <segue destination="jDs-me-457" kind="show" identifier="Playlist to Now Playing" id="SeK-Nv-Ovw"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="PlaylistItem to Now Playing" id="SeK-Nv-Ovw"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sik-8l-1AU" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1655,6 +1655,6 @@
         <image name="Tab-Podcasts" width="25" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="fwx-gG-V2G"/>
+        <segue reference="SeK-Nv-Ovw"/>
     </inferredMetricsTieBreakers>
 </document>

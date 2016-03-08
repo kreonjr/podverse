@@ -16,36 +16,16 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     var playlistItems = [AnyObject]()
     
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
-    
+
     func loadData() {
-//        playlistItems = [AnyObject]()
-//        if let podcasts = playlist.podcasts {
-//            if podcasts.count > 0 {
-//                for podcast in podcasts {
-//                    playlistItems.append(podcast as! Podcast)
-//                }
-//            }
-//        }
-//        if let episodes = playlist.episodes {
-//            if episodes.count > 0 {
-//                for episode in episodes {
-//                    playlistItems.append(episode as! Episode)
-//                }
-//            }
-//        }
-//        if let clips = playlist.clips {
-//            if clips.count > 0 {
-//                for clip in clips {
-//                    playlistItems.append(clip as! Clip)
-//                }
-//            }
-//        }
-//        
+        if let pItems = playlist.playlistItems {
+            playlistItems = pItems
+        }
         tableView.reloadData()
     }
     
     func segueToNowPlaying(sender: UIBarButtonItem) {
-        performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
+        performSegueWithIdentifier("PlaylistItem to Now Playing", sender: nil)
     }
     
     func removePlayerNavButton(notification: NSNotification) {
@@ -55,7 +35,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         }
     }
     
-    func showPlaylistLink(sender: UIBarButtonItem) {
+    func showPlaylistShare(sender: UIBarButtonItem) {
         let alert = UIAlertController(title: "Playlist saved at URL:", message: "playlist url goes here", preferredStyle: .Alert)
         alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
         alert.addAction(UIAlertAction(title: "Copy", style: .Default, handler: { (action) -> Void in
@@ -82,12 +62,12 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
         if pvMediaPlayer.nowPlayingEpisode != nil || pvMediaPlayer.nowPlayingClip != nil {
-            let linkBarButton = UIBarButtonItem(title: "Link", style: .Plain, target: self, action: "showPlaylistLink:")
+            let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: "showPlaylistShare:")
             let playerBarButton = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
-            navigationItem.rightBarButtonItems = [playerBarButton, linkBarButton]
+            navigationItem.rightBarButtonItems = [playerBarButton, shareBarButton]
         } else {
-            let linkBarButton = UIBarButtonItem(title: "Link", style: .Plain, target: self, action: "showPlaylistLink:")
-            navigationItem.rightBarButtonItem = linkBarButton
+            let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: "showPlaylistShare:")
+            navigationItem.rightBarButtonItem = shareBarButton
         }
         
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
@@ -123,68 +103,80 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PlaylistTableViewCell
         
         let playlistItem = playlistItems[indexPath.row]
-                
-        if let episode = playlistItem as? Episode {
+        
+        // If episode property exists, handle as a clip
+        if playlistItem["episode"] != nil {
             
-            if let itemTitle = episode.title {
-                cell.itemTitle?.text = itemTitle
+            if let clipTitle = playlistItem["title"] as? String {
+                cell.itemTitle?.text = clipTitle
             }
             
-            let podcastTitle = episode.podcast.title
-            cell.podcastTitle?.text = podcastTitle
-            
-            if let duration = episode.duration {
-                cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(duration)
-            }
-            
-            let status = "played/unplayed"
-            cell.status?.text = status
-            
-            let pubDate = episode.pubDate
-            cell.itemPubDate?.text = PVUtility.formatDateToString(pubDate!)
-            
-            cell.pvImage?.image = UIImage(named: "Blank52")
-            if let imageData = episode.podcast.imageData {
-                if let image = UIImage(data: imageData) {
-                    cell.pvImage?.image = image
+            if let podcast = playlistItem["podcast"] as? Dictionary<String,AnyObject> {
+                if let podcastTitle = podcast["title"] as? String {
+                        cell.podcastTitle?.text = podcastTitle
                 }
-            }
-            else if let itunesImageData = episode.podcast.itunesImage {
-                if let itunesImage = UIImage(data: itunesImageData) {
-                    cell.pvImage?.image = itunesImage
+                cell.pvImage?.image = UIImage(named: "Blank52")
+
+                if let imageURLString = podcast["imageURL"] as? String {
+                    if let imageURL = NSURL(string: imageURLString) {
+                        if let imageData = NSData(contentsOfURL: imageURL) {
+                            if let image = UIImage(data: imageData) {
+                                cell.pvImage?.image = image
+                            }
+                        }
+                    }
                 }
             }
         
-        } else if let clip = playlistItem as? Clip {
+            if let episode = playlistItem["episode"] as? Dictionary<String,AnyObject> {
+                if let pubDate = episode["pubDate"] as? String {
+                    cell.itemPubDate?.text = pubDate
+                }
+            }
+        
+        
+            if let duration = playlistItem["duration"] as? NSNumber {
+                cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(duration)
+            }
+        
+            // TODO: add status property (whether or not a playlistItem has been listened to before,  ) to playlistItems
+            let status = "played/unplayed"
+            cell.status?.text = status
+        
+        }
+        // Else if episode property does not exist, handle as an episode
+        else {
             
-            if let itemTitle = clip.title {
-                cell.itemTitle?.text = itemTitle
+            if let podcast = playlistItem["podcast"] as? Dictionary<String,AnyObject> {
+                if let title = podcast["title"] as? String {
+                    cell.podcastTitle?.text = title
+                }
             }
             
-            let podcastTitle = clip.episode.podcast.title
-            cell.podcastTitle?.text = podcastTitle
+            if let title = playlistItem["title"] as? String {
+                cell.itemTitle?.text = title
+            }
             
-            let duration = clip.duration
-            cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(duration)
+            if let duration = playlistItem["duration"] as? String {
+                cell.duration?.text = duration
+            }
+            
+            if let pubDate = playlistItem["pubDate"] as? String {
+                cell.itemPubDate?.text = pubDate
+            }
+            
+            if let imageURLString = playlistItem["imageURL"] as? String {
+                if let imageURL = NSURL(string: imageURLString) {
+                    if let imageData = NSData(contentsOfURL: imageURL) {
+                        if let image = UIImage(data: imageData) {
+                            cell.pvImage?.image = image
+                        }
+                    }
+                }
+            }
             
             let status = "played/unplayed"
             cell.status?.text = status
-            
-            let pubDate = clip.episode.pubDate
-            cell.itemPubDate?.text = PVUtility.formatDateToString(pubDate!)
-            
-            cell.pvImage?.image = UIImage(named: "Blank52")
-            if let imageData = clip.episode.podcast.imageData {
-                if let image = UIImage(data: imageData) {
-                    cell.pvImage?.image = image
-                }
-            }
-            else if let itunesImageData = clip.episode.podcast.itunesImage {
-                if let itunesImage = UIImage(data: itunesImageData) {
-                    cell.pvImage?.image = itunesImage
-                }
-            }
-            
         }
         
         return cell
@@ -194,14 +186,15 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         
         let selectedItem = playlistItems[indexPath.row]
         
-        if let episode = selectedItem as? Episode {
-            pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode)
-        } else if let clip = selectedItem as? Clip {
-            pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip)
-        }
+        pvMediaPlayer.loadPlaylistItemAndPlay(selectedItem as! Dictionary<String, AnyObject>)
         
-        self.performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
-    
+        self.performSegueWithIdentifier("PlaylistItem to Now Playing", sender: nil)
+        
+//        if let episode = selectedItem as? Episode {
+//            pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode)
+//        } else if let clip = selectedItem as? Clip {
+//            pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip)
+//        }
         
 //        // If not the last item in the array, then perform selected episode actions
 //        if indexPath.row < episodesArray.count {
@@ -277,7 +270,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     
     // MARK: - Navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "Playlist to Now Playing" {
+        if segue.identifier == "PlaylistItem to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }

@@ -12,6 +12,7 @@ import CoreData
 class CoreDataHelper {
     static let sharedInstance = CoreDataHelper()
     var moc: NSManagedObjectContext
+    var mediaPlayerMoc: NSManagedObjectContext
     
     init() {
         // This resource is the same name as your xcdatamodeld contained in your project.
@@ -26,6 +27,9 @@ class CoreDataHelper {
         let psc = NSPersistentStoreCoordinator(managedObjectModel: mom)
         self.moc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
         self.moc.persistentStoreCoordinator = psc
+        
+        self.mediaPlayerMoc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+        self.mediaPlayerMoc.persistentStoreCoordinator = psc
         
         dispatch_async(Constants.saveQueue) {
             let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
@@ -44,6 +48,10 @@ class CoreDataHelper {
     
     func insertManagedObject(className: String) -> AnyObject {        
         return NSEntityDescription.insertNewObjectForEntityForName(className, inManagedObjectContext: self.moc)
+    }
+    
+    func insertMediaPlayerManagedObject(className: String) -> AnyObject {
+        return NSEntityDescription.insertNewObjectForEntityForName(className, inManagedObjectContext: self.mediaPlayerMoc)
     }
     
     func fetchEntities (className: NSString, predicate: NSPredicate?) -> [AnyObject] {
