@@ -12,12 +12,12 @@ final class PlaylistManager: NSObject {
     static let sharedInstance = PlaylistManager()
     
     let playlistQueue = dispatch_queue_create("com.podverese.playlistQueue", DISPATCH_QUEUE_SERIAL)
-    private var playlists = [Playlist]()
+    var playlists = [Playlist]()
     var playlistIds:[String]!
     
     override init() {
         super.init()
-            playlistIds = ["WAmf3QdoZvXIo7pY","ZbQC1HIs9L0tvyY4","ZGtLrfNC0V8rPoKz"]
+            playlistIds = ["ZGtLrfNC0V8rPoKz"]
     }
     
     var playlistsArray:[Playlist] {
@@ -32,8 +32,9 @@ final class PlaylistManager: NSObject {
     }
     
     func addPlaylist(playlist:Playlist?) {
-        if let playlist = playlist {
+        if let playlist = playlist, let playlistId = playlist.playlistId {
             dispatch_barrier_async(self.playlistQueue, { () -> Void in
+                self.playlistIds.append(playlistId)
                 self.playlists.append(playlist)
             })
         }

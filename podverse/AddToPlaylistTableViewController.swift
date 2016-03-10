@@ -17,9 +17,10 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     var episode:Episode?
     var clip:Clip?
     
-    var playlists:[Playlist] = []
+    var playlists:[Playlist] = PlaylistManager.sharedInstance.playlists
 
     func loadData() {
+        playlists = PlaylistManager.sharedInstance.playlists
         tableView.reloadData()
     }
     
@@ -38,21 +39,21 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
                 let playlist = Playlist(newTitle: playlistTitle)
                 
                 SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: {[unowned self] (response) -> Void in
-                    
+
                     playlist.playlistId = response["_id"] as? String
                     playlist.url = response["url"] as? String
                     
                     if let playlistId = playlist.playlistId {
                         self.playlistManager.playlistIds.append(playlistId)
+                        self.playlistManager.addPlaylist(playlist)
                     }
                     
-                    self.playlistManager.addPlaylist(playlist)
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
 
                     }) { (error) -> Void in
                         print("Not saved to server. Error: ", error?.localizedDescription)
                     }.call()
             }
-            self.loadData()
         }))
     
         presentViewController(createPlaylistAlert, animated: true, completion: nil)
@@ -66,6 +67,9 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         } else if pvMediaPlayer.nowPlayingEpisode != nil {
             episode = pvMediaPlayer.nowPlayingEpisode
         }
+        
+        // Make sure the Play/Pause button displays properly after returning from background
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
     }
 
     override func viewWillAppear(animated: Bool) {
