@@ -29,7 +29,6 @@
 		818615991B1E84CF006C9731 /* podverse.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 818615971B1E84CE006C9731 /* podverse.xcdatamodeld */; };
 		8186159E1B1E84CF006C9731 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 8186159C1B1E84CF006C9731 /* Main.storyboard */; };
 		818615A01B1E84CF006C9731 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8186159F1B1E84CF006C9731 /* Images.xcassets */; };
-		818615A31B1E84CF006C9731 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 818615A11B1E84CF006C9731 /* LaunchScreen.xib */; };
 		818615AF1B1E84CF006C9731 /* podverseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615AE1B1E84CF006C9731 /* podverseTests.swift */; };
 		818615B91B1E85F6006C9731 /* README in Resources */ = {isa = PBXBuildFile; fileRef = 818615B81B1E85F6006C9731 /* README */; };
 		818615C01B1E950D006C9731 /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615BF1B1E950D006C9731 /* CoreDataHelper.swift */; };
@@ -175,7 +174,6 @@
 		818615981B1E84CE006C9731 /* podverse.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = podverse.xcdatamodel; sourceTree = "<group>"; };
 		8186159D1B1E84CF006C9731 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		8186159F1B1E84CF006C9731 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		818615A21B1E84CF006C9731 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		818615A81B1E84CF006C9731 /* podverseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = podverseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		818615AD1B1E84CF006C9731 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		818615AE1B1E84CF006C9731 /* podverseTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = podverseTests.swift; sourceTree = "<group>"; };
@@ -300,7 +298,6 @@
 				EF3980001C545B7C00C91753 /* WebServices */,
 				81CCE4E11B52DB8B00DC8346 /* PodcastProfileViewController.swift */,
 				8186159F1B1E84CF006C9731 /* Images.xcassets */,
-				818615A11B1E84CF006C9731 /* LaunchScreen.xib */,
 				818615931B1E84CE006C9731 /* Supporting Files */,
 				818615CA1B1EA355006C9731 /* Datamodel */,
 				812A094E1B422AB300E8F070 /* Bridging-Header.h */,
@@ -561,7 +558,6 @@
 				818615B91B1E85F6006C9731 /* README in Resources */,
 				8186159E1B1E84CF006C9731 /* Main.storyboard in Resources */,
 				81E4FE671B2E11D600A10A77 /* fontawesome-webfont.ttf in Resources */,
-				818615A31B1E84CF006C9731 /* LaunchScreen.xib in Resources */,
 				818615A01B1E84CF006C9731 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -681,14 +677,6 @@
 			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
-		818615A11B1E84CF006C9731 /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				818615A21B1E84CF006C9731 /* Base */,
-			);
-			name = LaunchScreen.xib;
-			sourceTree = "<group>";
-		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -784,6 +772,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -793,7 +782,7 @@
 				);
 				INFOPLIST_FILE = podverse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "fm.podverse.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = fm.podverse.podverse;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -803,6 +792,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -812,7 +802,7 @@
 				);
 				INFOPLIST_FILE = podverse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "fm.podverse.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = fm.podverse.podverse;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};

@@ -36,9 +36,6 @@ class FindTableViewController: UITableViewController {
         
         // Set navigation bar styles
         self.navigationItem.title = "Find"
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
-        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
     }
     
     override func viewWillDisappear(animated: Bool) {
