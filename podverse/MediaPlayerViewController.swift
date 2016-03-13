@@ -44,14 +44,14 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        
         // If no nowPlaying episode or clip exists, then nav back out of MediaPlayerVC
         if pvMediaPlayer.nowPlayingEpisode == nil && pvMediaPlayer.nowPlayingClip == nil {
             self.navigationController?.popViewControllerAnimated(true)
         }
         
         pvMediaPlayer.delegate = self
-        
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "dismissKeyboard"))
         self.clipper = ((self.childViewControllers.first as! UINavigationController).topViewController as? PVClipperViewController)
@@ -195,12 +195,16 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         if let nowPlayingCurrentTime = notification.userInfo?["nowPlayingCurrentTime"] as? Float {
             currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(nowPlayingCurrentTime)
             
-            let totalTime: Float
+            var totalTime: Float = 0.0
             
             if let clip = pvMediaPlayer.nowPlayingClip {
                 totalTime = Float(clip.duration)
+            } else if let episode = pvMediaPlayer.nowPlayingEpisode {
+                totalTime = Float(episode.duration!)
             } else {
-                totalTime = Float(pvMediaPlayer.nowPlayingEpisode.duration!)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    self.navigationController?.popViewControllerAnimated(true)
+                })
             }
             
             nowPlayingSlider.value = nowPlayingCurrentTime / totalTime
@@ -214,6 +218,11 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        
+        self.navigationController?.navigationBar.barTintColor = UIColor(red: 0.0/255.0, green: 0.0/255.0, blue: 0.0/255.0, alpha: 1.0)
+        
+        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), forBarMetrics: UIBarMetrics.Default)
+        self.navigationController?.navigationBar.shadowImage = UIImage()
         
         // If loading the MediaPlayerVC when with no currentItem in the avPlayer, then nav back a page. Else load the MediaPlayerVC with the current item and related info.
         if pvMediaPlayer.avPlayer.currentItem == nil {
@@ -264,6 +273,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         
         // Stop timer that checks every second if the now playing current time has changed
         nowPlayingCurrentTimeTimer.invalidate()
+        
+        if (self.isMovingFromParentViewController()){
+            self.navigationController?.navigationBar.barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)
+        }
     }
     
     func toggleMakeClipView(sender: UIButton!) {
@@ -320,14 +333,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
             self.navigationController?.popViewControllerAnimated(true)
         })
-    }
-    
-    
-    // MARK: - Navigation
-//    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-////        if segue.identifier == "Add to Playlist" {
-////            let addToPlaylistViewController = segue.destinationViewController as! AddToPlaylistViewController
-////            addToPlaylistViewController.hidesBottomBarWhenPushed = true
-////        }
-//    }
+    }    
+
 }
