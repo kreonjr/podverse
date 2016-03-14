@@ -11,24 +11,16 @@ import UIKit
 class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
-    
-    let pvPlaylister = PVPlaylister.sharedInstance
-    let pvMediaPlayer = PVMediaPlayer.sharedInstance
+        let pvMediaPlayer = PVMediaPlayer.sharedInstance
+    let playlistManager = PlaylistManager.sharedInstance
     
     var episode:Episode?
     var clip:Clip?
     
-    var playlists:[Playlist] = []
+    var playlists:[Playlist] = PlaylistManager.sharedInstance.playlists
 
     func loadData() {
-        playlists = pvPlaylister.retrieveAllPlaylists()
-        if playlists.count > 0 {
-            if clip != nil {
-                playlists = playlists.filter() { $0.title != "My Saved Episodes" }
-            } else if episode != nil {
-                playlists = playlists.filter() { $0.title != "My Saved Clips" }
-            }
-        }
+        playlists = PlaylistManager.sharedInstance.playlists
         tableView.reloadData()
     }
     
@@ -44,9 +36,24 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         createPlaylistAlert.addAction(UIAlertAction(title: "Save", style: .Default, handler: { (action: UIAlertAction!) in
             let textField = createPlaylistAlert.textFields![0] as UITextField
             if let playlistTitle = textField.text {
-                self.pvPlaylister.createPlaylist(playlistTitle)
+                let playlist = Playlist(newTitle: playlistTitle)
+                
+                SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: {[unowned self] (response) -> Void in
+
+                    playlist.playlistId = response["_id"] as? String
+                    playlist.url = response["url"] as? String
+                    
+                    if let playlistId = playlist.playlistId {
+                        PlaylistManager.saveIDToPlist(playlistId)
+                        self.playlistManager.addPlaylist(playlist)
+                    }
+                    
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+
+                    }) { (error) -> Void in
+                        print("Not saved to server. Error: ", error?.localizedDescription)
+                    }.call()
             }
-            self.loadData()
         }))
     
         presentViewController(createPlaylistAlert, animated: true, completion: nil)
@@ -60,6 +67,9 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         } else if pvMediaPlayer.nowPlayingEpisode != nil {
             episode = pvMediaPlayer.nowPlayingEpisode
         }
+        
+        // Make sure the Play/Pause button displays properly after returning from background
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
     }
 
     override func viewWillAppear(animated: Bool) {
@@ -88,7 +98,8 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! AddToPlaylistTableViewCell
         let playlist = playlists[indexPath.row]
         cell.title?.text = playlist.title
-        cell.totalItems?.text = String(pvPlaylister.countPlaylistItems(playlist)) + " items"
+        cell.totalItems?.text = "123 items"
+        // cell.totalItems?.text = String(pvPlaylister.countPlaylistItems(playlist)) + " items"
         
         return cell
     }
@@ -97,30 +108,20 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         
         let playlist = playlists[indexPath.row]
 
-        if let c = clip {
-            pvPlaylister.addClipToPlaylist(playlist, clip: c)
-        } else if let e = episode {
-            pvPlaylister.addEpisodeToPlaylist(playlist, episode: e)
+        if let c = clip, let clipJSON = playlistManager.clipToPlaylistItemJSON(c) {
+            playlist.playlistItems.append(clipJSON)
         }
         
-        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.podcastId == nil), completionBlock: {[unowned self] (response) -> Void in
-            if let existingPlaylist = CoreDataHelper.sharedInstance.fetchEntityWithID(playlist.objectID) as? Playlist {
-                existingPlaylist.podcastId = response["_id"] as? String
-                
-                if let url = response["url"] as? String {
-                    existingPlaylist.url = url
+        if let e = episode, let episodeJSON = playlistManager.episodeToPlaylistItemJSON(e)  {
+                playlist.playlistItems.append(episodeJSON)
+        }
+        
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: {[unowned self] (response) -> Void in
+                playlist.url = response["url"] as? String
+            
+                if let mediaPlayerVC = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as? MediaPlayerViewController {
+                    self.navigationController?.popToViewController(mediaPlayerVC, animated: true)
                 }
-                
-                CoreDataHelper.sharedInstance.saveCoreData({ (saved) -> Void in
-                    if saved {
-                        if let mediaPlayerVC = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as? MediaPlayerViewController {
-                            self.navigationController?.popToViewController(mediaPlayerVC, animated: true)
-                        }
-                    }
-                })
-            }
-            
-            
             }) { (error) -> Void in
                 print("Not saved to server. Error: ", error?.localizedDescription)
         }.call()

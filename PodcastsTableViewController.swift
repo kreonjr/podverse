@@ -14,19 +14,32 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     @IBOutlet weak var tableView: UITableView!
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
 
+    var playlistManager = PlaylistManager.sharedInstance
+    
     var podcastsArray = [Podcast]()
     
     var refreshControl: UIRefreshControl!
     
     var playlists:[Playlist] {
         get {
-            return PVPlaylister.sharedInstance.retrieveAllPlaylists()
+            return PlaylistManager.sharedInstance.playlistsArray
         }
     }
     
     func loadData() {
         podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
         podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+
+        // Set pubdate in cell equal to most recent episode's pubdate
+        for podcast in podcastsArray {
+            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+            let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate) as! [Episode]
+            if mostRecentEpisodeArray.count > 0 {
+                if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
+                    podcast.lastPubDate = mostRecentEpisodePubDate
+                }
+            }
+        }
         
         self.tableView.reloadData()
     }
@@ -129,16 +142,10 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             
             cell.totalClips?.text = String(podcast.clips.count) + " clips"
             
-            // Set pubdate in cell equal to most recent episode's pubdate
-            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-            let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate) as! [Episode]
             cell.lastPublishedDate?.text = ""
-            if mostRecentEpisodeArray.count > 0 {
-                if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
-                    cell.lastPublishedDate?.text = PVUtility.formatDateToString(mostRecentEpisodePubDate)
-                }
+            if let lastPubDate = podcast.lastPubDate {
+                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
             }
-            
             
             if let imageData = podcast.imageData, image = UIImage(data: imageData) {
                 cell.pvImage?.image = image
@@ -152,13 +159,13 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         } else {
             let playlist = playlists[indexPath.row]
             cell.title?.text = playlist.title
-            
             cell.episodesDownloadedOrStarted?.text = "something here"
             
             cell.lastPublishedDate?.text = "last updated date"
             //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
             
-            let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
+            let totalItems = 5
+//            let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
             
             cell.totalClips?.text = String(totalItems) + " items"
             
@@ -182,13 +189,31 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.section == 0 {
             self.performSegueWithIdentifier("Show Episodes", sender: nil)
-        } else if indexPath.row >= playlists.count {
-            print("do add playlist by URL alert stuff here")
         } else {
             self.performSegueWithIdentifier("Show Playlist", sender: nil)
         }
     }
 
+    func showAddPlaylistByURLAlert() {
+        let addPlaylistByURLAlert = UIAlertController(title: "Add Playlist By URL", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
+        
+        addPlaylistByURLAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
+            textField.placeholder = "http://podverse.tv/pl/..."
+        })
+        
+        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
+        
+        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
+            let textField = addPlaylistByURLAlert.textFields![0] as UITextField
+            if let urlString = textField.text {
+                self.playlistManager.addPlaylistByUrlString(urlString)
+            }
+            self.loadData()
+        }))
+        
+        presentViewController(addPlaylistByURLAlert, animated: true, completion: nil)
+    }
+    
     // Override to support conditional editing of the table view.
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return NO if you do not want the specified item to be editable.
@@ -208,7 +233,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
                 }
             }
             
-            PVDeleter.sharedInstance.deletePodcast(podcastToRemove)
+            PVDeleter.deletePodcast(podcastToRemove)
             podcastsArray.removeAtIndex(indexPath.row)
             
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
@@ -240,7 +265,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
 
     @IBAction func addPlaylistByURL(sender: AnyObject) {
-        print("Do add playlist url stuff here")
+        showAddPlaylistByURLAlert()
     }
 }
 

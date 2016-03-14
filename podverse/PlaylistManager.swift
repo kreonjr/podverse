@@ -1,0 +1,164 @@
+//
+//  PlaylistManager.swift
+//  podverse
+//
+//  Created by Kreon on 2/28/16.
+//  Copyright © 2016 Mitchell Downey. All rights reserved.
+//
+
+import Foundation
+
+final class PlaylistManager: NSObject {
+    static let sharedInstance = PlaylistManager()
+    
+    let playlistQueue = dispatch_queue_create("com.podverese.playlistQueue", DISPATCH_QUEUE_SERIAL)
+    var playlists = [Playlist]()
+    var playlistIds:[String] {
+        let data:NSData =  NSFileManager.defaultManager().contentsAtPath(Constants.kPlaylistIDPath)!
+        do{
+            return try NSPropertyListSerialization.propertyListWithData(data, options: NSPropertyListMutabilityOptions.MutableContainersAndLeaves, format: nil) as! [String]
+        }catch{
+            print("Error occured while reading from the plist file")
+        }
+        
+        return []
+    }
+    
+    var playlistsArray:[Playlist] {
+        get {
+            var playlistsTemp = [Playlist]()
+           dispatch_sync(playlistQueue) { () -> Void in
+                playlistsTemp = self.playlists
+           }
+            
+            return playlistsTemp
+        }
+    }
+    
+    func addPlaylist(playlist:Playlist?) {
+        if let playlist = playlist, let playlistId = playlist.playlistId {
+            dispatch_barrier_async(self.playlistQueue, { () -> Void in
+                PlaylistManager.saveIDToPlist(playlistId)
+                self.playlists.append(playlist)
+            })
+        }
+    }
+    
+    func addPlaylistByUrlString(urlString: String) {
+        let urlComponentArray = urlString.componentsSeparatedByString("/")
+        let playlistId = urlComponentArray[4]
+        
+        if (urlComponentArray[0] == "http:" || urlComponentArray[0] == "https") && (urlComponentArray[1] == "") && (urlComponentArray[2] == "podverse.tv") && (urlComponentArray[3] == "pl") && (playlistId.characters.count == 16) {
+                GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
+                    PlaylistManager.sharedInstance.addPlaylist(PlaylistManager.JSONToPlaylist(response))
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.refreshPodcastTableDataNotification, object: nil)
+                    }) { (error) -> Void in
+                        print("Error y'all \(error?.localizedDescription)")
+                    }.call()
+        } else {
+            print("Error: invalid URL")
+        }
+        
+    }
+    
+    func refreshPlaylists() {
+        let dispatchGroup = dispatch_group_create()
+        for id in playlistIds {
+            dispatch_group_enter(dispatchGroup)
+            GetPlaylistFromServer(playlistId: id, completionBlock: { (response) -> Void in
+                PlaylistManager.sharedInstance.addPlaylist(PlaylistManager.JSONToPlaylist(response))
+                dispatch_group_leave(dispatchGroup)
+            }) { (error) -> Void in
+                    print("Error y'all \(error?.localizedDescription)")
+            }.call()
+        }
+        
+        dispatch_group_notify(dispatchGroup, dispatch_get_main_queue()) { () -> Void in
+            NSNotificationCenter.defaultCenter().postNotificationName(Constants.refreshPodcastTableDataNotification, object: nil)
+        }
+    }
+    
+    static func JSONToPlaylist(JSONDict:Dictionary<String,AnyObject>) -> Playlist? {
+        let playlist = Playlist(newTitle: JSONDict["playlistTitle"] as! String, newURL: JSONDict["url"] as! String)
+        
+        playlist.playlistId = JSONDict["id"] as? String
+        playlist.isPublic = JSONDict["isPublic"]?.boolValue
+        if let playlistItems = JSONDict["playlistItems"] as? [Dictionary<String,AnyObject>] {
+            playlist.playlistItems = playlistItems
+        }
+        
+        return playlist
+    }
+    
+    static func playlistToJSON(playlist:Playlist) -> Dictionary<String,AnyObject>? {
+        var JSONDict = Dictionary<String,AnyObject>()
+        JSONDict["playlistTitle"] = playlist.title
+        JSONDict["playlistItems"] = playlist.playlistItems
+
+        return JSONDict
+    }
+    
+    func clipToPlaylistItemJSON(clip:Clip) -> Dictionary<String,AnyObject>? {
+        var JSONDict = Dictionary<String,AnyObject>()
+        
+        JSONDict["title"] = clip.title
+        JSONDict["duration"] = clip.duration
+        JSONDict["startTime"] = clip.startTime
+        JSONDict["endTime"] = clip.endTime
+        
+        var episodeDict = Dictionary<String,AnyObject>()
+        episodeDict["title"] = clip.episode.title
+        episodeDict["mediaURL"] = clip.episode.mediaURL
+        
+        if let pubDate = clip.episode.pubDate {
+            episodeDict["pubDate"] = PVUtility.formatDateToString(pubDate)
+        }
+        JSONDict["episode"] = episodeDict
+        
+        var podcastDict = Dictionary<String,AnyObject>()
+        podcastDict["title"] = clip.episode.podcast.title
+        podcastDict["imageURL"] = clip.episode.podcast.imageURL
+        JSONDict["podcast"] = podcastDict
+        
+        return JSONDict
+    }
+    
+    func episodeToPlaylistItemJSON(episode:Episode) -> Dictionary<String,AnyObject>? {
+        var JSONDict = Dictionary<String,AnyObject>()
+        JSONDict["title"] = episode.title
+        JSONDict["duration"] = episode.duration
+        if let pubDate = episode.pubDate {
+            JSONDict["pubDate"] = PVUtility.formatDateToString(pubDate)
+        }
+        JSONDict["mediaURL"] = episode.mediaURL
+        
+        var podcastDict = Dictionary<String,AnyObject>()
+        podcastDict["title"] = episode.podcast.title
+        podcastDict["imageURL"] = episode.podcast.imageURL
+        
+        JSONDict["podcast"] = podcastDict
+        
+        return JSONDict
+    }
+    
+    static func saveIDToPlist(playlistId:String) {
+        var saveArray = PlaylistManager.sharedInstance.playlistIds
+        if !saveArray.contains(playlistId) {
+            saveArray.append(playlistId)
+            (saveArray as NSArray).writeToFile(Constants.kPlaylistIDPath, atomically: true)
+        }
+    }
+
+    static func removeIDFromList(playlistId:String) {
+        var idArray = PlaylistManager.sharedInstance.playlistIds
+        for (index , id) in idArray.enumerate() {
+            if id == playlistId {
+                idArray.removeAtIndex(index)
+                break
+            }
+        }
+        
+        (idArray as NSArray).writeToFile(Constants.kPlaylistIDPath, atomically: true)
+    }
+    
+}

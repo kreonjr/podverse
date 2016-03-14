@@ -90,6 +90,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     
         self.refreshPodcastFeeds()
+        setupPlaylistPlist()
+
+        PlaylistManager.sharedInstance.refreshPlaylists()
         
         startCheckSubscriptionsForNewEpisodesTimer()
         
@@ -137,6 +140,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         CoreDataHelper.sharedInstance.saveCoreData(nil)
+    }
+    
+    func setupPlaylistPlist() {
+        let fileManager = NSFileManager.defaultManager()
+        if (!(fileManager.fileExistsAtPath(Constants.kPlaylistIDPath)))
+        {
+            let bundle = NSBundle.mainBundle().pathForResource("playlistIds", ofType: "plist")!
+            do {
+                try fileManager.copyItemAtPath(bundle, toPath: Constants.kPlaylistIDPath)
+            }
+            catch {
+                print(error)
+            }
+        }
     }
 }
 

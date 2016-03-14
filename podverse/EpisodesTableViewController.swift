@@ -316,7 +316,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     // Override to support editing the table view.
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            PVDeleter.sharedInstance.deleteEpisode(episodesArray[indexPath.row], completion:nil)
+            PVDeleter.deleteEpisode(episodesArray[indexPath.row], completion:nil)
             episodesArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
         }
