@@ -32,13 +32,7 @@ class DownloadsTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Style the navigation bar
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
-        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
-        
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
-        
     }
     
     override func viewWillAppear(animated: Bool) {

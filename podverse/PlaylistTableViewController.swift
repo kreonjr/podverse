@@ -53,9 +53,6 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         
         // Set navigation bar styles
         navigationItem.title = "Playlist"
-        navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        navigationController?.navigationBar.tintColor = UIColor.whiteColor()
-        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
         
         if pvMediaPlayer.nowPlayingEpisode != nil || pvMediaPlayer.nowPlayingClip != nil {
             let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: "showPlaylistShare:")

@@ -54,6 +54,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
+        UIApplication.sharedApplication().statusBarStyle = .LightContent
+        
+        UINavigationBar.appearance().translucent = false
+        UINavigationBar.appearance().barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)
+        //        UINavigationBar.appearance().barTintColor = UIColor(red: 28.0/255.0, green: 28.0/255.0, blue: 28.0/255.0, alpha: 1.0)
+        UINavigationBar.appearance().tintColor = UIColor.whiteColor()
+        UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(17.0)]
+        
         // Alert the user to enable background notifications
         // TODO: Shouldn't this be moved to somewhere like the AppDelegate?
         let registerUserNotificationSettings = UIApplication.instancesRespondToSelector("registerUserNotificationSettings:")

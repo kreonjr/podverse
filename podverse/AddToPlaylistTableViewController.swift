@@ -62,6 +62,8 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.navigationController?.navigationBar.barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)
+        
         if pvMediaPlayer.nowPlayingClip != nil {
             clip = pvMediaPlayer.nowPlayingClip
         } else if pvMediaPlayer.nowPlayingEpisode != nil {
@@ -77,11 +79,6 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         
         // Set navigation bar styles
         navigationItem.title = "Add to Playlist"
-        navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        navigationController?.navigationBar.tintColor = UIColor.whiteColor()
-        navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(16.0)]
-        
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .Plain, target: self, action: "showcreatePlaylistAlert")
         
