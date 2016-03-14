@@ -11,36 +11,22 @@ import Foundation
 final class PlaylistManager: NSObject {
     static let sharedInstance = PlaylistManager()
     
-    let playlistQueue = dispatch_queue_create("com.podverese.playlistQueue", DISPATCH_QUEUE_SERIAL)
     var playlists = [Playlist]()
     var playlistIds:[String] {
         let data:NSData =  NSFileManager.defaultManager().contentsAtPath(Constants.kPlaylistIDPath)!
         do{
             return try NSPropertyListSerialization.propertyListWithData(data, options: NSPropertyListMutabilityOptions.MutableContainersAndLeaves, format: nil) as! [String]
         }catch{
-            print("Error occured while reading from the plist file")
+            print(error)
         }
         
         return []
     }
     
-    var playlistsArray:[Playlist] {
-        get {
-            var playlistsTemp = [Playlist]()
-           dispatch_sync(playlistQueue) { () -> Void in
-                playlistsTemp = self.playlists
-           }
-            
-            return playlistsTemp
-        }
-    }
-    
     func addPlaylist(playlist:Playlist?) {
         if let playlist = playlist, let playlistId = playlist.playlistId {
-            dispatch_barrier_async(self.playlistQueue, { () -> Void in
-                PlaylistManager.saveIDToPlist(playlistId)
-                self.playlists.append(playlist)
-            })
+            PlaylistManager.saveIDToPlist(playlistId)
+            self.playlists.append(playlist)
         }
     }
     
@@ -50,11 +36,10 @@ final class PlaylistManager: NSObject {
         
         if (urlComponentArray[0] == "http:" || urlComponentArray[0] == "https") && (urlComponentArray[1] == "") && (urlComponentArray[2] == "podverse.tv") && (urlComponentArray[3] == "pl") && (playlistId.characters.count == 16) {
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
-                    PlaylistManager.sharedInstance.addPlaylist(PlaylistManager.JSONToPlaylist(response))
-                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.refreshPodcastTableDataNotification, object: nil)
-                    }) { (error) -> Void in
+                    self.addPlaylist(PlaylistManager.JSONToPlaylist(response))
+                }) { (error) -> Void in
                         print("Error y'all \(error?.localizedDescription)")
-                    }.call()
+                }.call()
         } else {
             print("Error: invalid URL")
         }
@@ -66,7 +51,7 @@ final class PlaylistManager: NSObject {
         for id in playlistIds {
             dispatch_group_enter(dispatchGroup)
             GetPlaylistFromServer(playlistId: id, completionBlock: { (response) -> Void in
-                PlaylistManager.sharedInstance.addPlaylist(PlaylistManager.JSONToPlaylist(response))
+                self.addPlaylist(PlaylistManager.JSONToPlaylist(response))
                 dispatch_group_leave(dispatchGroup)
             }) { (error) -> Void in
                     print("Error y'all \(error?.localizedDescription)")
@@ -79,9 +64,9 @@ final class PlaylistManager: NSObject {
     }
     
     static func JSONToPlaylist(JSONDict:Dictionary<String,AnyObject>) -> Playlist? {
-        let playlist = Playlist(newTitle: JSONDict["playlistTitle"] as! String, newURL: JSONDict["url"] as! String)
+        let playlist = Playlist(newTitle: JSONDict["playlistTitle"] as! String, newURL: JSONDict["url"] as? String)
         
-        playlist.playlistId = JSONDict["id"] as? String
+        playlist.playlistId = JSONDict["_id"] as? String
         playlist.isPublic = JSONDict["isPublic"]?.boolValue
         if let playlistItems = JSONDict["playlistItems"] as? [Dictionary<String,AnyObject>] {
             playlist.playlistItems = playlistItems

@@ -122,8 +122,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("remote play or pause happened")
     }
     
-    
-    
     func applicationDidEnterBackground(application: UIApplication) {
         // If the app has entered the background, then it may be the case that the device has locked, and we should update the MPNowPlayingInfoCenter with the latest information.
         if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
@@ -152,15 +150,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func setupPlaylistPlist() {
         let fileManager = NSFileManager.defaultManager()
-        if (!(fileManager.fileExistsAtPath(Constants.kPlaylistIDPath)))
-        {
-            let bundle = NSBundle.mainBundle().pathForResource("playlistIds", ofType: "plist")!
-            do {
-                try fileManager.copyItemAtPath(bundle, toPath: Constants.kPlaylistIDPath)
-            }
-            catch {
-                print(error)
-            }
+        if !fileManager.fileExistsAtPath(Constants.kPlaylistIDPath) {
+            fileManager.createFileAtPath(Constants.kPlaylistIDPath, contents: nil, attributes: nil)
+            ([String]() as NSArray).writeToFile(Constants.kPlaylistIDPath, atomically: true)
         }
     }
 }
