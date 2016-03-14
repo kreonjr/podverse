@@ -28,8 +28,6 @@ class SavePlaylistToServer:WebService {
         
         addParamWithKey("playlistTitle", value: playlist.title)
         
-        if let playlistItems = playlist.playlistItems?.description {
-            addParamWithKey("playlistItems", value:playlistItems)
-        }
+        addParamWithKey("playlistItems", value:playlist.playlistItems)
     }
 }

@@ -233,7 +233,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
                 }
             }
             
-            PVDeleter.sharedInstance.deletePodcast(podcastToRemove)
+            PVDeleter.deletePodcast(podcastToRemove)
             podcastsArray.removeAtIndex(indexPath.row)
             
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)

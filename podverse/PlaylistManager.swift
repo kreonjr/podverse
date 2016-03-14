@@ -13,11 +13,15 @@ final class PlaylistManager: NSObject {
     
     let playlistQueue = dispatch_queue_create("com.podverese.playlistQueue", DISPATCH_QUEUE_SERIAL)
     var playlists = [Playlist]()
-    var playlistIds:[String]!
-    
-    override init() {
-        super.init()
-            playlistIds = ["ZGtLrfNC0V8rPoKz"]
+    var playlistIds:[String] {
+        let data:NSData =  NSFileManager.defaultManager().contentsAtPath(Constants.kPlaylistIDPath)!
+        do{
+            return try NSPropertyListSerialization.propertyListWithData(data, options: NSPropertyListMutabilityOptions.MutableContainersAndLeaves, format: nil) as! [String]
+        }catch{
+            print("Error occured while reading from the plist file")
+        }
+        
+        return []
     }
     
     var playlistsArray:[Playlist] {
@@ -34,7 +38,7 @@ final class PlaylistManager: NSObject {
     func addPlaylist(playlist:Playlist?) {
         if let playlist = playlist, let playlistId = playlist.playlistId {
             dispatch_barrier_async(self.playlistQueue, { () -> Void in
-                self.playlistIds.append(playlistId)
+                PlaylistManager.saveIDToPlist(playlistId)
                 self.playlists.append(playlist)
             })
         }
@@ -58,12 +62,19 @@ final class PlaylistManager: NSObject {
     }
     
     func refreshPlaylists() {
+        let dispatchGroup = dispatch_group_create()
         for id in playlistIds {
+            dispatch_group_enter(dispatchGroup)
             GetPlaylistFromServer(playlistId: id, completionBlock: { (response) -> Void in
                 PlaylistManager.sharedInstance.addPlaylist(PlaylistManager.JSONToPlaylist(response))
+                dispatch_group_leave(dispatchGroup)
             }) { (error) -> Void in
                     print("Error y'all \(error?.localizedDescription)")
             }.call()
+        }
+        
+        dispatch_group_notify(dispatchGroup, dispatch_get_main_queue()) { () -> Void in
+            NSNotificationCenter.defaultCenter().postNotificationName(Constants.refreshPodcastTableDataNotification, object: nil)
         }
     }
     
@@ -72,7 +83,9 @@ final class PlaylistManager: NSObject {
         
         playlist.playlistId = JSONDict["id"] as? String
         playlist.isPublic = JSONDict["isPublic"]?.boolValue
-        playlist.playlistItems = JSONDict["playlistItems"] as? [Dictionary<String,AnyObject>]
+        if let playlistItems = JSONDict["playlistItems"] as? [Dictionary<String,AnyObject>] {
+            playlist.playlistItems = playlistItems
+        }
         
         return playlist
     }
@@ -96,6 +109,10 @@ final class PlaylistManager: NSObject {
         var episodeDict = Dictionary<String,AnyObject>()
         episodeDict["title"] = clip.episode.title
         episodeDict["mediaURL"] = clip.episode.mediaURL
+        
+        if let pubDate = clip.episode.pubDate {
+            episodeDict["pubDate"] = PVUtility.formatDateToString(pubDate)
+        }
         JSONDict["episode"] = episodeDict
         
         var podcastDict = Dictionary<String,AnyObject>()
@@ -110,7 +127,9 @@ final class PlaylistManager: NSObject {
         var JSONDict = Dictionary<String,AnyObject>()
         JSONDict["title"] = episode.title
         JSONDict["duration"] = episode.duration
-        JSONDict["pubDate"] = episode.pubDate
+        if let pubDate = episode.pubDate {
+            JSONDict["pubDate"] = PVUtility.formatDateToString(pubDate)
+        }
         JSONDict["mediaURL"] = episode.mediaURL
         
         var podcastDict = Dictionary<String,AnyObject>()
@@ -120,6 +139,26 @@ final class PlaylistManager: NSObject {
         JSONDict["podcast"] = podcastDict
         
         return JSONDict
+    }
+    
+    static func saveIDToPlist(playlistId:String) {
+        var saveArray = PlaylistManager.sharedInstance.playlistIds
+        if !saveArray.contains(playlistId) {
+            saveArray.append(playlistId)
+            (saveArray as NSArray).writeToFile(Constants.kPlaylistIDPath, atomically: true)
+        }
+    }
+
+    static func removeIDFromList(playlistId:String) {
+        var idArray = PlaylistManager.sharedInstance.playlistIds
+        for (index , id) in idArray.enumerate() {
+            if id == playlistId {
+                idArray.removeAtIndex(index)
+                break
+            }
+        }
+        
+        (idArray as NSArray).writeToFile(Constants.kPlaylistIDPath, atomically: true)
     }
     
 }

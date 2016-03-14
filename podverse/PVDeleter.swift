@@ -10,9 +10,8 @@ import UIKit
 import CoreData
 
 class PVDeleter: NSObject {    
-    static let sharedInstance = PVDeleter()
     
-    func deletePodcast(podcast: Podcast) {
+    static func deletePodcast(podcast: Podcast) {
         
         podcast.isSubscribed = false
         
@@ -26,7 +25,7 @@ class PVDeleter: NSObject {
         CoreDataHelper.sharedInstance.deleteItemFromCoreData(podcast)
     }
     
-    func deleteEpisode(episode: Episode, completion:(()->())? ) {
+    static func deleteEpisode(episode: Episode, completion:(()->())? ) {
         
         // Get the downloadSession, and if there is a downloadSession with a matching taskIdentifier as episode's taskIdentifier, then cancel the downloadSession
         let downloadSession = PVDownloader.sharedInstance.downloadSession

@@ -13,14 +13,10 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     @IBOutlet weak var tableView: UITableView!
     
     var playlist:Playlist!
-    var playlistItems = [AnyObject]()
     
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
 
     func loadData() {
-        if let pItems = playlist.playlistItems {
-            playlistItems = pItems
-        }
         tableView.reloadData()
     }
     
@@ -96,13 +92,13 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return playlistItems.count
+        return playlist.playlistItems.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PlaylistTableViewCell
         
-        let playlistItem = playlistItems[indexPath.row]
+        let playlistItem = playlist.playlistItems[indexPath.row]
         
         // If episode property exists, handle as a clip
         if playlistItem["episode"] != nil {
@@ -184,11 +180,10 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         
-        let selectedItem = playlistItems[indexPath.row]
-        
-        pvMediaPlayer.loadPlaylistItemAndPlay(selectedItem as! Dictionary<String, AnyObject>)
-        
-        self.performSegueWithIdentifier("PlaylistItem to Now Playing", sender: nil)
+         let selectedItem = playlist.playlistItems[indexPath.row]
+         pvMediaPlayer.loadPlaylistItemAndPlay(selectedItem)
+            
+         self.performSegueWithIdentifier("PlaylistItem to Now Playing", sender: nil)
         
 //        if let episode = selectedItem as? Episode {
 //            pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode)

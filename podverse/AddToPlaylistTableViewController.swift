@@ -44,7 +44,7 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
                     playlist.url = response["url"] as? String
                     
                     if let playlistId = playlist.playlistId {
-                        self.playlistManager.playlistIds.append(playlistId)
+                        PlaylistManager.saveIDToPlist(playlistId)
                         self.playlistManager.addPlaylist(playlist)
                     }
                     
@@ -109,14 +109,15 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         let playlist = playlists[indexPath.row]
 
         if let c = clip, let clipJSON = playlistManager.clipToPlaylistItemJSON(c) {
-            playlist.playlistItems?.append(clipJSON)
+            playlist.playlistItems.append(clipJSON)
         }
         
         if let e = episode, let episodeJSON = playlistManager.episodeToPlaylistItemJSON(e)  {
-                playlist.playlistItems?.append(episodeJSON)
+                playlist.playlistItems.append(episodeJSON)
         }
         
         SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: {[unowned self] (response) -> Void in
+                playlist.url = response["url"] as? String
             
                 if let mediaPlayerVC = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as? MediaPlayerViewController {
                     self.navigationController?.popToViewController(mediaPlayerVC, animated: true)

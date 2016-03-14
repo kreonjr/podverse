@@ -25,4 +25,7 @@ struct Constants {
     static let refreshPodcastTableDataNotification = "refreshPodcastTableDataNotification"
     
     static let kRefreshAddToPlaylistTableDataNotification = "refreshPodcastTableDataNotification"
+    
+    static let rootPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, .UserDomainMask, true)[0]
+    static let kPlaylistIDPath = Constants.rootPath.stringByAppendingString("/playlistIds.plist")
 }
