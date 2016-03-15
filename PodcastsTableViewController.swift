@@ -22,7 +22,9 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var playlists:[Playlist] {
         get {
-            return PlaylistManager.sharedInstance.playlists
+            let unsortedPlaylists = PlaylistManager.sharedInstance.playlists
+            let sortedPlaylists = unsortedPlaylists.sort({ $0.title.lowercaseString < $1.title.lowercaseString })
+            return sortedPlaylists
         }
     }
     

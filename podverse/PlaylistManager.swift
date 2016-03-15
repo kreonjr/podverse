@@ -23,7 +23,7 @@ final class PlaylistManager: NSObject {
         return []
     }
     
-    func addPlaylist(playlist:Playlist?) {
+    func addPlaylistLocally(playlist:Playlist?) {
         if let playlist = playlist, let playlistId = playlist.playlistId {
             PlaylistManager.saveIDToPlist(playlistId)
             self.playlists.append(playlist)
@@ -36,7 +36,7 @@ final class PlaylistManager: NSObject {
         
         if (urlComponentArray[0] == "http:" || urlComponentArray[0] == "https") && (urlComponentArray[1] == "") && (urlComponentArray[2] == "podverse.tv") && (urlComponentArray[3] == "pl") && (playlistId.characters.count == 16) {
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
-                    self.addPlaylist(PlaylistManager.JSONToPlaylist(response))
+                    self.addPlaylistLocally(PlaylistManager.JSONToPlaylist(response))
                 }) { (error) -> Void in
                         print("Error y'all \(error?.localizedDescription)")
                 }.call()
@@ -51,7 +51,7 @@ final class PlaylistManager: NSObject {
         for id in playlistIds {
             dispatch_group_enter(dispatchGroup)
             GetPlaylistFromServer(playlistId: id, completionBlock: { (response) -> Void in
-                self.addPlaylist(PlaylistManager.JSONToPlaylist(response))
+                self.addPlaylistLocally(PlaylistManager.JSONToPlaylist(response))
                 dispatch_group_leave(dispatchGroup)
             }) { (error) -> Void in
                     print("Error y'all \(error?.localizedDescription)")
@@ -145,5 +145,52 @@ final class PlaylistManager: NSObject {
         
         (idArray as NSArray).writeToFile(Constants.kPlaylistIDPath, atomically: true)
     }
+    
+    func createMyClipsPlaylist() {
+        // If no playlistIds are saved in the plist, then create the "My Clips" and "My Episodes" playlist
+        if PlaylistManager.sharedInstance.playlistIds.count < 1 {
+            let myClipsPlaylist = Playlist(newTitle: "My Clips")
+            savePlaylist(myClipsPlaylist)
+            let myEpisodesPlaylist = Playlist(newTitle: "My Episodes")
+            savePlaylist(myEpisodesPlaylist)
+        }
+    }
+    
+    func addItemToPlaylist(playlist: Playlist, clip: Clip?, episode: Episode?) {
+        if let c = clip, let clipJSON = self.clipToPlaylistItemJSON(c) {
+            playlist.playlistItems.append(clipJSON)
+        }
+        
+        if let e = episode, let episodeJSON = self.episodeToPlaylistItemJSON(e)  {
+            playlist.playlistItems.append(episodeJSON)
+        }
+        
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: {[unowned self] (response) -> Void in
+            playlist.url = response["url"] as? String
+            
+            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kItemAddedToPlaylistNotification, object: nil)
+            }) { (error) -> Void in
+                print("Not saved to server. Error: ", error?.localizedDescription)
+            }.call()
+    }
+    
+    func savePlaylist(playlist: Playlist) {
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: {[unowned self] (response) -> Void in
+            
+            playlist.playlistId = response["_id"] as? String
+            playlist.url = response["url"] as? String
+            
+            if let playlistId = playlist.playlistId {
+                PlaylistManager.saveIDToPlist(playlistId)
+                self.addPlaylistLocally(playlist)
+            }
+            
+            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+            
+            }) { (error) -> Void in
+                print("Not saved to server. Error: ", error?.localizedDescription)
+            }.call()
+    }
+    
     
 }
