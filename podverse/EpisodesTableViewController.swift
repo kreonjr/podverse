@@ -109,6 +109,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
         
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: Constants.kDownloadHasFinished, object: nil)
+        
         loadData()
     }
     
@@ -120,8 +122,6 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: Constants.kDownloadHasFinished, object: nil)
         
         self.refreshControl = UIRefreshControl()
         self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh episodes")
@@ -143,6 +143,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kDownloadHasFinished, object: nil)
     }
     
     override func didReceiveMemoryWarning() {
