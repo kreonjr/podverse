@@ -23,7 +23,16 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     var playlists:[Playlist] {
         get {
             let unsortedPlaylists = PlaylistManager.sharedInstance.playlists
-            let sortedPlaylists = unsortedPlaylists.sort({ $0.title.lowercaseString < $1.title.lowercaseString })
+            var sortedPlaylists = unsortedPlaylists.sort({ $0.title.lowercaseString < $1.title.lowercaseString })
+            for (index , playlist) in sortedPlaylists.enumerate() {
+                if playlist.title == "My Clips" {
+                    sortedPlaylists.removeAtIndex(index)
+                    sortedPlaylists.insert(playlist, atIndex: 0)
+                } else if playlist.title == "My Episodes" {
+                    sortedPlaylists.removeAtIndex(index)
+                    sortedPlaylists.insert(playlist, atIndex: 1)
+                }
+            }
             return sortedPlaylists
         }
     }
