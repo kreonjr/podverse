@@ -22,7 +22,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var playlists:[Playlist] {
         get {
-            return PlaylistManager.sharedInstance.playlistsArray
+            return PlaylistManager.sharedInstance.playlists
         }
     }
     
