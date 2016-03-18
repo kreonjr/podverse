@@ -28,6 +28,10 @@ class CoreDataHelper {
         self.moc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
         self.moc.persistentStoreCoordinator = psc
         
+        // TODO to review: I added the line below to address the "merge conflict" issues that would happen when subscribing to many podcasts rapidly. I think it tells Core Data to always save the newest object when a merge conflict exists...anyway after adding this line, I could not reproduce the merge conflict issue again.
+        // Reference: http://stackoverflow.com/questions/4405912/iphone-coredata-error-nsmergeconflict-for-nsmanagedobject
+        self.moc.mergePolicy = NSMergePolicy(mergeType: NSMergePolicyType.MergeByPropertyObjectTrumpMergePolicyType)
+        
         self.mediaPlayerMoc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
         self.mediaPlayerMoc.persistentStoreCoordinator = psc
         
