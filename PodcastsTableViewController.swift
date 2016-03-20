@@ -22,7 +22,18 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var playlists:[Playlist] {
         get {
-            return PlaylistManager.sharedInstance.playlists
+            let unsortedPlaylists = PlaylistManager.sharedInstance.playlists
+            var sortedPlaylists = unsortedPlaylists.sort({ $0.title.lowercaseString < $1.title.lowercaseString })
+            for (index , playlist) in sortedPlaylists.enumerate() {
+                if playlist.title == "My Clips" {
+                    sortedPlaylists.removeAtIndex(index)
+                    sortedPlaylists.insert(playlist, atIndex: 0)
+                } else if playlist.title == "My Episodes" {
+                    sortedPlaylists.removeAtIndex(index)
+                    sortedPlaylists.insert(playlist, atIndex: 1)
+                }
+            }
+            return sortedPlaylists
         }
     }
     
@@ -60,8 +71,6 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh all podcasts")
         refreshControl.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector:"reloadTable" , name: Constants.refreshPodcastTableDataNotification, object: nil)
     }
     
     func refreshPodcastFeeds() {
@@ -83,6 +92,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
         
+        NSNotificationCenter.defaultCenter().addObserver(self, selector:"reloadTable" , name: Constants.refreshPodcastTableDataNotification, object: nil)
+        
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
         
         loadData()
@@ -90,6 +101,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
 
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.refreshPodcastTableDataNotification, object: nil)
         NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
     }
     
