@@ -146,7 +146,7 @@ final class PlaylistManager: NSObject {
         (idArray as NSArray).writeToFile(Constants.kPlaylistIDPath, atomically: true)
     }
     
-    func createMyClipsPlaylist() {
+    func createDefaultPlaylists() {
         // If no playlistIds are saved in the plist, then create the "My Clips" and "My Episodes" playlist
         if PlaylistManager.sharedInstance.playlistIds.count < 1 {
             let myClipsPlaylist = Playlist(newTitle: "My Clips")

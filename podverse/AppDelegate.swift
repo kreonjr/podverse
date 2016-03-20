@@ -99,7 +99,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
         self.refreshPodcastFeeds()
         setupPlaylistPlist()
-        PlaylistManager.sharedInstance.createMyClipsPlaylist()
+        PlaylistManager.sharedInstance.createDefaultPlaylists()
 
         PlaylistManager.sharedInstance.refreshPlaylists()
         
