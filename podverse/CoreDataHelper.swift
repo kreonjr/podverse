@@ -12,7 +12,6 @@ import CoreData
 class CoreDataHelper {
     static let sharedInstance = CoreDataHelper()
     var moc: NSManagedObjectContext
-    var mediaPlayerMoc: NSManagedObjectContext
     
     init() {
         // This resource is the same name as your xcdatamodeld contained in your project.
@@ -32,9 +31,6 @@ class CoreDataHelper {
         // Reference: http://stackoverflow.com/questions/4405912/iphone-coredata-error-nsmergeconflict-for-nsmanagedobject
         self.moc.mergePolicy = NSMergePolicy(mergeType: NSMergePolicyType.MergeByPropertyObjectTrumpMergePolicyType)
         
-        self.mediaPlayerMoc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
-        self.mediaPlayerMoc.persistentStoreCoordinator = psc
-        
         dispatch_async(Constants.saveQueue) {
             let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
             let docURL = urls[urls.endIndex-1]
@@ -52,10 +48,6 @@ class CoreDataHelper {
     
     func insertManagedObject(className: String) -> AnyObject {        
         return NSEntityDescription.insertNewObjectForEntityForName(className, inManagedObjectContext: self.moc)
-    }
-    
-    func insertMediaPlayerManagedObject(className: String) -> AnyObject {
-        return NSEntityDescription.insertNewObjectForEntityForName(className, inManagedObjectContext: self.mediaPlayerMoc)
     }
     
     func fetchEntities (className: NSString, predicate: NSPredicate?) -> [AnyObject] {
@@ -101,6 +93,42 @@ class CoreDataHelper {
         }
 
         return []
+    }
+    
+    func retrieveExistingOrCreateNewPodcast(feedUrlString: String) -> Podcast {
+        let predicate = NSPredicate(format: "feedURL == %@", feedUrlString)
+        let podcastSet = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: predicate) as! [Podcast]
+        if podcastSet.count > 0 {
+            let podcast = podcastSet[0]
+            return podcast
+        } else {
+            let podcast = CoreDataHelper.sharedInstance.insertManagedObject("Podcast") as! Podcast
+            return podcast
+        }
+    }
+    
+    func retrieveExistingOrCreateNewEpisode(mediaUrlString: String) -> Episode {
+        let predicate = NSPredicate(format: "mediaURL == %@", mediaUrlString)
+        let episodeSet = CoreDataHelper.sharedInstance.fetchEntities("Episode", predicate: predicate) as! [Episode]
+        if episodeSet.count > 0 {
+            let episode = episodeSet[0]
+            return episode
+        } else {
+            let episode = CoreDataHelper.sharedInstance.insertManagedObject("Episode") as! Episode
+            return episode
+        }
+    }
+    
+    func retrieveExistingOrCreateNewPlaylist(playlistId: String) -> Playlist {
+        let predicate = NSPredicate(format: "playlistId == %@", playlistId)
+        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: predicate) as! [Playlist]
+        if playlistSet.count > 0 {
+            let playlist = playlistSet[0]
+            return playlist
+        } else {
+            let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
+            return playlist
+        }
     }
     
 //    func fetchEntityWithID(objectId:NSManagedObjectID) -> AnyObject? {

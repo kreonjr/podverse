@@ -40,9 +40,10 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func loadData() {
-        podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
+        let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
+        podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: podcastsPredicate) as! [Podcast]
         podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
-        
+
         // TODO: The answer in the SO link below claims that using a string in a predicate can cause performance issues. Well below we are passing a podcast object as the NSPredicate. If strings can cause performance issues, wouldn't this cause egregiously horrible performance issues? I know this "fetchOnlyEntityWithMostRecentPubDate" has had mutating array crashes in the past (although I haven't seen it happen since mid-February). Could it be that we are using a bad predicate? If yes, how can we make this more performant?
         // http://stackoverflow.com/questions/30368945/saving-coredata-on-background-thread-causes-fetching-into-a-deadlock-and-crash
 
@@ -73,6 +74,21 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh all podcasts")
         refreshControl.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
+        
+        // TODO: I moved all of the code below from AppDelegate didFinishLaunchingWithOptions to this VC's viewDidLoad because I realized that all fetchEntities requests will return 0 elements when done within didFinishLaunchingWithOptions. It doesn't feel right putting this here, but I don't where else to put it.
+        // TODO: Currently we are setting taskIdentifier values = nil on app launch. This will probably need to change once we add crash handling for resuming downloads
+        let episodeArray = CoreDataHelper.sharedInstance.fetchEntities("Episode", predicate: nil) as! [Episode]
+        for episode in episodeArray {
+            episode.taskIdentifier = nil
+        }
+        
+        for episode:Episode in DLEpisodesList.shared.downloadingEpisodes {
+            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
+        }
+        
+        self.refreshPodcastFeeds()
+        
+        PlaylistManager.sharedInstance.refreshPlaylists()
     }
     
     func refreshPodcastFeeds() {
@@ -94,7 +110,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector:"reloadTable" , name: Constants.refreshPodcastTableDataNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector:"loadData" , name: Constants.refreshPodcastTableDataNotification, object: nil)
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
         
@@ -173,12 +189,12 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         } else {
             let playlist = playlists[indexPath.row]
             cell.title?.text = playlist.title
-            cell.episodesDownloadedOrStarted?.text = "something here"
+            cell.episodesDownloadedOrStarted?.text = "playlist creator's name here"
             
             cell.lastPublishedDate?.text = "last updated date"
             //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
             
-            let totalItems = 5
+            let totalItems = playlistManager.getPlaylistItemsCount(playlist)
 //            let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
             
             cell.totalClips?.text = String(totalItems) + " items"

@@ -21,8 +21,6 @@ class PVDeleter: NSObject {
         for var i = 0; i < episodesToRemove.count; i++ {
             deleteEpisode(episodesToRemove[i],completion: nil)
         }
-        
-        CoreDataHelper.sharedInstance.deleteItemFromCoreData(podcast)
     }
     
     static func deleteEpisode(episode: Episode, completion:(()->())? ) {
@@ -63,8 +61,6 @@ class PVDeleter: NSObject {
         
         // Set episode playbackPosition to 0 so if downloaded again it starts from beginning
         episode.playbackPosition = 0
-
-        CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode)
     }
     
 }

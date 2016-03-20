@@ -3,20 +3,25 @@
 //
 
 import Foundation
+import CoreData
+@objc(Playlist)
 
-class Playlist {
-    var playlistItems = [Dictionary<String,AnyObject>]()
-    var title: String
-    var url: String?
-    var isPublic: Bool? = true
-    var lastUpdated: NSDate?
-    var playlistId:String?
+class Playlist: NSManagedObject {
+    @NSManaged var playlistItems: [Dictionary<String,AnyObject>]
+    @NSManaged var title: String
+    @NSManaged var url: String?
+    @NSManaged var isPublic: Bool
+    @NSManaged var lastUpdated: NSDate?
+    @NSManaged var playlistId:String?
+
+    @NSManaged var episodes: NSSet?
+    @NSManaged var clips: NSSet?
     
-    init(newTitle:String, newURL:String? = nil, newIsPublic:Bool? = true, newLastUpdated:NSDate? = nil, newPlaylistId:String? = nil) {
-        title = newTitle
-        url = newURL
-        lastUpdated = newLastUpdated
-        playlistId = newPlaylistId
-        isPublic = newIsPublic
+    func addEpisodeObject(value: Episode) {
+        self.mutableSetValueForKey("episodes").addObject(value)
+    }
+    
+    func addClipObject(value: Clip) {
+        self.mutableSetValueForKey("clips").addObject(value)
     }
 }

@@ -32,6 +32,15 @@
         <relationship name="clips" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Clip" inverseName="episode" inverseEntity="Clip" syncable="YES"/>
         <relationship name="podcast" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Podcast" inverseName="episodes" inverseEntity="Podcast" syncable="YES"/>
     </entity>
+    <entity name="Playlist" representedClassName="Playlist" syncable="YES">
+        <attribute name="isPublic" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="lastUpdated" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="playlistId" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="clips" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Clip" syncable="YES"/>
+        <relationship name="episodes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Episode" syncable="YES"/>
+    </entity>
     <entity name="Podcast" representedClassName="Podcast" syncable="YES">
         <attribute name="feedURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="imageData" optional="YES" attributeType="Binary" syncable="YES"/>
@@ -51,5 +60,6 @@
         <element name="Clip" positionX="-20" positionY="-387" width="128" height="165"/>
         <element name="Episode" positionX="-207" positionY="-526" width="128" height="345"/>
         <element name="Podcast" positionX="-398" positionY="-541" width="128" height="240"/>
+        <element name="Playlist" positionX="-207" positionY="-387" width="128" height="150"/>
     </elements>
 </model>

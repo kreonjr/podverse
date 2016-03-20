@@ -40,6 +40,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: "refreshPodcastFeeds", userInfo: nil, repeats: true)
     }
     
+    func isAppAlreadyLaunchedOnce()->Bool{
+        let defaults = NSUserDefaults.standardUserDefaults()
+        if let isAppAlreadyLaunchedOnce = defaults.stringForKey("isAppAlreadyLaunchedOnce") {
+            print("App already launched")
+            return true
+        } else {
+            defaults.setBool(true, forKey: "isAppAlreadyLaunchedOnce")
+            print("App launched first time")
+            return false
+        }
+    }
+    
     func refreshPodcastFeeds () {
         let podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
         for var i = 0; i < podcastArray.count; i++ {
@@ -87,22 +99,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let playCommand = rcc.playCommand
         playCommand.addTarget(self, action: "playOrPauseEvent")
         
-        // TODO: Currently we are setting taskIdentifier values = nil on app launch. This will probably need to change once we add crash handling for resuming downloads
-        let episodeArray = CoreDataHelper.sharedInstance.fetchEntities("Episode", predicate: nil) as! [Episode]
-        for episode in episodeArray {
-            episode.taskIdentifier = nil
+        if isAppAlreadyLaunchedOnce() == false {
+            PlaylistManager.sharedInstance.createDefaultPlaylists()
         }
-        
-        for episode:Episode in DLEpisodesList.shared.downloadingEpisodes {
-            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
-        }
-    
-        self.refreshPodcastFeeds()
-        setupPlaylistPlist()
-        PlaylistManager.sharedInstance.createDefaultPlaylists()
-
-        PlaylistManager.sharedInstance.refreshPlaylists()
-        
+                
         startCheckSubscriptionsForNewEpisodesTimer()
         
         Fabric.with([Crashlytics.self])
@@ -147,14 +147,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         CoreDataHelper.sharedInstance.saveCoreData(nil)
-    }
-    
-    func setupPlaylistPlist() {
-        let fileManager = NSFileManager.defaultManager()
-        if !fileManager.fileExistsAtPath(Constants.kPlaylistIDPath) {
-            fileManager.createFileAtPath(Constants.kPlaylistIDPath, contents: nil, attributes: nil)
-            ([String]() as NSArray).writeToFile(Constants.kPlaylistIDPath, atomically: true)
-        }
     }
 }
 
