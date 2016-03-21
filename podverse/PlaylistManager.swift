@@ -8,8 +8,14 @@
 
 import Foundation
 
+protocol PlaylistManagerDelegate {
+    func playlistAddedByUrl()
+}
+
 final class PlaylistManager: NSObject {
     static let sharedInstance = PlaylistManager()
+    
+    var delegate:PlaylistManagerDelegate?
     
     var playlists:[Playlist] {
         get {
@@ -28,9 +34,9 @@ final class PlaylistManager: NSObject {
         // TODO: This doesn't work properly. If I add a playlist by URL, the playlist items are not successfully grabbed and added to CoreData.
         if (urlComponentArray[0] == "http:" || urlComponentArray[0] == "https") && (urlComponentArray[1] == "") && (urlComponentArray[2] == "podverse.tv") && (urlComponentArray[3] == "pl") && (playlistId.characters.count == 16) {
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
-                    var playlist = CoreDataHelper.sharedInstance.retrieveExistingOrCreateNewPlaylist(playlistId)
-                    playlist = PlaylistManager.JSONToPlaylist(response)
-                    CoreDataHelper.sharedInstance.saveCoreData(nil)
+                    let playlist = CoreDataHelper.sharedInstance.retrieveExistingOrCreateNewPlaylist(playlistId)
+                    PlaylistManager.JSONToPlaylist(playlist, JSONDict: response)
+                    PlaylistManager.sharedInstance.delegate?.playlistAddedByUrl()
                 }) { (error) -> Void in
                         print("Error y'all \(error?.localizedDescription)")
                 }.call()
@@ -61,9 +67,7 @@ final class PlaylistManager: NSObject {
 //        }
     }
     
-    static func JSONToPlaylist(JSONDict:Dictionary<String,AnyObject>) -> Playlist {
-        let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
-        
+    static func JSONToPlaylist(playlist:Playlist, JSONDict:Dictionary<String,AnyObject>) {
         if let title = JSONDict["playlistTitle"] as? String {
             playlist.title = title
         }
@@ -186,7 +190,7 @@ final class PlaylistManager: NSObject {
             }
         }
         
-        return playlist
+        CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
     
     static func playlistToJSON(playlist:Playlist) -> Dictionary<String,AnyObject>? {
@@ -217,6 +221,7 @@ final class PlaylistManager: NSObject {
         var podcastDict = Dictionary<String,AnyObject>()
         podcastDict["title"] = clip.episode.podcast.title
         podcastDict["imageURL"] = clip.episode.podcast.imageURL
+        podcastDict["feedURL"] = clip.episode.podcast.feedURL
         JSONDict["podcast"] = podcastDict
         
         return JSONDict
@@ -234,6 +239,7 @@ final class PlaylistManager: NSObject {
         var podcastDict = Dictionary<String,AnyObject>()
         podcastDict["title"] = episode.podcast.title
         podcastDict["imageURL"] = episode.podcast.imageURL
+        podcastDict["feedURL"] = episode.podcast.feedURL
         
         JSONDict["podcast"] = podcastDict
         
