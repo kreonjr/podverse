@@ -44,6 +44,12 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Make sure the Play/Pause button displays properly after returning from background
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setPlayPauseIcon", name: UIApplicationWillEnterForegroundNotification, object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateNowPlayingCurrentTime:", name:
+            Constants.kNowPlayingTimeHasChanged, object: nil)
+        
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
         // If no nowPlaying episode or clip exists, then nav back out of MediaPlayerVC
@@ -102,9 +108,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         else {
             summary.text = ""
         }
-        
-        // Make sure the Play/Pause button displays properly after returning from background
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setPlayPauseIcon", name: UIApplicationWillEnterForegroundNotification, object: nil)
         
         setPlayPauseIcon()
     }
@@ -232,8 +235,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
             if pvMediaPlayer.avPlayer.currentItem != nil {
                 
             }
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateNowPlayingCurrentTime:", name:
-                Constants.kNowPlayingTimeHasChanged, object: nil)
             
             // Start timer to check every half second if the now playing current time has changed
             nowPlayingCurrentTimeTimer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "updateNowPlayingCurrentTimeNotification", userInfo: nil, repeats: true)
@@ -267,9 +268,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        
-        // Stop calling updateNowPlayingCurrentTime whenever the now playing current time changes
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kNowPlayingTimeHasChanged, object: nil)
         
         // Stop timer that checks every second if the now playing current time has changed
         nowPlayingCurrentTimeTimer.invalidate()

@@ -54,6 +54,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
+        CoreDataHelper.sharedInstance
+        
         UIApplication.sharedApplication().statusBarStyle = .LightContent
         
         UINavigationBar.appearance().translucent = false
@@ -87,21 +89,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let playCommand = rcc.playCommand
         playCommand.addTarget(self, action: "playOrPauseEvent")
         
-        // TODO: Currently we are setting taskIdentifier values = nil on app launch. This will probably need to change once we add crash handling for resuming downloads
-        let episodeArray = CoreDataHelper.sharedInstance.fetchEntities("Episode", predicate: nil) as! [Episode]
-        for episode in episodeArray {
-            episode.taskIdentifier = nil
+        if NSUserDefaults.standardUserDefaults().boolForKey("AppHasLaunchedOnce") == false {
+            NSUserDefaults.standardUserDefaults().setBool(true, forKey: "AppHasLaunchedOnce")
+            PlaylistManager.sharedInstance.createDefaultPlaylists()
         }
-        
-        for episode:Episode in DLEpisodesList.shared.downloadingEpisodes {
-            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
-        }
-    
-        self.refreshPodcastFeeds()
-        setupPlaylistPlist()
-
-        PlaylistManager.sharedInstance.refreshPlaylists()
-        
+                
         startCheckSubscriptionsForNewEpisodesTimer()
         
         Fabric.with([Crashlytics.self])
@@ -146,14 +138,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         CoreDataHelper.sharedInstance.saveCoreData(nil)
-    }
-    
-    func setupPlaylistPlist() {
-        let fileManager = NSFileManager.defaultManager()
-        if !fileManager.fileExistsAtPath(Constants.kPlaylistIDPath) {
-            fileManager.createFileAtPath(Constants.kPlaylistIDPath, contents: nil, attributes: nil)
-            ([String]() as NSArray).writeToFile(Constants.kPlaylistIDPath, atomically: true)
-        }
     }
 }
 

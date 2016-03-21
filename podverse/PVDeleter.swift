@@ -22,11 +22,10 @@ class PVDeleter: NSObject {
             deleteEpisode(episodesToRemove[i],completion: nil)
         }
         
-        CoreDataHelper.sharedInstance.deleteItemFromCoreData(podcast)
+        // TODO: handle removing podcast when a podcast has isSubscribed = false, and the podcast is not a part of a playlist
     }
     
     static func deleteEpisode(episode: Episode, completion:(()->())? ) {
-        
         // Get the downloadSession, and if there is a downloadSession with a matching taskIdentifier as episode's taskIdentifier, then cancel the downloadSession
         let downloadSession = PVDownloader.sharedInstance.downloadSession
         downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
@@ -63,8 +62,10 @@ class PVDeleter: NSObject {
         
         // Set episode playbackPosition to 0 so if downloaded again it starts from beginning
         episode.playbackPosition = 0
-
-        CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode)
+        
+        // TODO: handle removing episode when a podcast has isSubscribed = false, and the podcast is not a part of a playlist
     }
+    
+    // TODO: handle removing clips
     
 }

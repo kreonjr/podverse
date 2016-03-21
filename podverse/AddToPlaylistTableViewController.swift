@@ -17,10 +17,41 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     var episode:Episode?
     var clip:Clip?
     
-    var playlists:[Playlist] = PlaylistManager.sharedInstance.playlists
+    var validPlaylists:[Playlist]!
 
     func loadData() {
-        playlists = PlaylistManager.sharedInstance.playlists
+        validPlaylists = playlistManager.playlists
+        // TODO: there has to be a better way to do this...
+        for (index , playlist) in validPlaylists.enumerate() {
+            if clip == nil {
+                if playlist.title == Constants.kMyClipsPlaylist {
+                    validPlaylists.removeAtIndex(index)
+                    break
+                }
+            } else if episode == nil {
+                if playlist.title == Constants.kMyEpisodesPlaylist {
+                    validPlaylists.removeAtIndex(index)
+                    break
+                }
+            }
+        }
+        
+        validPlaylists.sortInPlace({ $0.title.lowercaseString < $1.title.lowercaseString })
+        for (index , playlist) in validPlaylists.enumerate() {
+            if clip == nil {
+                if playlist.title == Constants.kMyEpisodesPlaylist {
+                    validPlaylists.removeAtIndex(index)
+                    validPlaylists.insert(playlist, atIndex: 0)
+                    break
+                }
+            } else if episode == nil {
+                if playlist.title == Constants.kMyClipsPlaylist {
+                    validPlaylists.removeAtIndex(index)
+                    validPlaylists.insert(playlist, atIndex: 0)
+                    break
+                }
+            }
+        }
         tableView.reloadData()
     }
     
@@ -36,31 +67,29 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         createPlaylistAlert.addAction(UIAlertAction(title: "Save", style: .Default, handler: { (action: UIAlertAction!) in
             let textField = createPlaylistAlert.textFields![0] as UITextField
             if let playlistTitle = textField.text {
-                let playlist = Playlist(newTitle: playlistTitle)
-                
-                SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: {[unowned self] (response) -> Void in
-
-                    playlist.playlistId = response["_id"] as? String
-                    playlist.url = response["url"] as? String
-                    
-                    if let playlistId = playlist.playlistId {
-                        PlaylistManager.saveIDToPlist(playlistId)
-                        self.playlistManager.addPlaylist(playlist)
-                    }
-                    
-                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
-
-                    }) { (error) -> Void in
-                        print("Not saved to server. Error: ", error?.localizedDescription)
-                    }.call()
+                let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
+                playlist.title = playlistTitle
+                self.playlistManager.savePlaylist(playlist)
             }
         }))
     
         presentViewController(createPlaylistAlert, animated: true, completion: nil)
     }
     
+    func navBackToMediaPlayer() {
+        if let mediaPlayerVC = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as? MediaPlayerViewController {
+            self.navigationController?.popToViewController(mediaPlayerVC, animated: true)
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "navBackToMediaPlayer", name: Constants.kPlayerHasNoItem, object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "navBackToMediaPlayer", name: Constants.kItemAddedToPlaylistNotification, object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
         
         self.navigationController?.navigationBar.barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)
         
@@ -70,8 +99,7 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
             episode = pvMediaPlayer.nowPlayingEpisode
         }
         
-        // Make sure the Play/Pause button displays properly after returning from background
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+        loadData()
     }
 
     override func viewWillAppear(animated: Bool) {
@@ -88,12 +116,12 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     // MARK: - Table view data source
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return playlists.count
+        return validPlaylists.count
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! AddToPlaylistTableViewCell
-        let playlist = playlists[indexPath.row]
+        let playlist = validPlaylists[indexPath.row]
         cell.title?.text = playlist.title
         cell.totalItems?.text = "123 items"
         // cell.totalItems?.text = String(pvPlaylister.countPlaylistItems(playlist)) + " items"
@@ -102,26 +130,12 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
-        let playlist = playlists[indexPath.row]
-
-        if let c = clip, let clipJSON = playlistManager.clipToPlaylistItemJSON(c) {
-            playlist.playlistItems.append(clipJSON)
+        let playlist = validPlaylists[indexPath.row]
+        if let c = clip {
+            playlistManager.addItemToPlaylist(playlist, clip: c, episode: nil)
+        } else if let e = episode {
+            playlistManager.addItemToPlaylist(playlist, clip: nil, episode: e)
         }
-        
-        if let e = episode, let episodeJSON = playlistManager.episodeToPlaylistItemJSON(e)  {
-                playlist.playlistItems.append(episodeJSON)
-        }
-        
-        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: {[unowned self] (response) -> Void in
-                playlist.url = response["url"] as? String
-            
-                if let mediaPlayerVC = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as? MediaPlayerViewController {
-                    self.navigationController?.popToViewController(mediaPlayerVC, animated: true)
-                }
-            }) { (error) -> Void in
-                print("Not saved to server. Error: ", error?.localizedDescription)
-        }.call()
     }
     
 //    // Override to support editing the table view.

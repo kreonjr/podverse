@@ -13,19 +13,23 @@ class DownloadsTableViewController: UITableViewController {
 
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var reloadDataTimer: NSTimer!
+    var episodes:[Episode] {
+        get {
+            return DLEpisodesList.shared.downloadingEpisodes
+        }
+    }
     
     func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Downloads to Now Playing", sender: nil)
     }
     
-    func reloadDownloadTableData() {
+    func reloadDownloadTable() {
         self.tableView.reloadData()
     }
     
     func removePlayerNavButton(notification: NSNotification) {
         dispatch_async(dispatch_get_main_queue()) {
-            self.reloadDownloadTableData()
+            self.reloadDownloadTable()
             PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
         }
     }
@@ -33,28 +37,34 @@ class DownloadsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadData:", name: Constants.kDownloadHasProgressed, object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadTable", name: Constants.kUpdateDownloadsTable, object: nil)
+    }
+    
+    func reloadDownloadData(notification:NSNotification) {
+        if let downloadDataInfo = notification.userInfo {
+            for(index, episode) in self.episodes.enumerate() {
+                let indexPath = NSIndexPath(forRow: index, inSection: 0)
+                if episode.mediaURL == downloadDataInfo["mediaUrl"] as? String, let totalBytes = downloadDataInfo["totalBytes"] as? Float, let currentBytes = downloadDataInfo["currentBytes"]as? Float, let cell = self.tableView.cellForRowAtIndexPath(indexPath) as? DownloadsTableViewCell  {
+                
+                        // Format the total bytes into a human readable KB or MB number
+                        let dataFormatter = NSByteCountFormatter()
+                        
+                        cell.progress.progress = Float(currentBytes / totalBytes)
+                        let formattedCurrentBytesDownloaded = dataFormatter.stringFromByteCount(Int64(currentBytes))
+                        let formattedTotalFileBytes = dataFormatter.stringFromByteCount(Int64(totalBytes))
+                        cell.progressBytes.text = "\(formattedCurrentBytesDownloaded) / \(formattedTotalFileBytes)"
+                    
+                        return
+                }
+            }
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
-        
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
-        
-        reloadDownloadTableData()
-        
-        // Create reloadDataTimer when this view appears to reload table data every second
-        self.reloadDataTimer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("reloadDownloadTableData"), userInfo: nil, repeats: true)
-    }
-    
-    override func viewDidDisappear(animated: Bool) {
-        // Remove reloadDataTimer when leaving this view
-        if self.reloadDataTimer != nil {
-            self.reloadDataTimer.invalidate()
-            self.reloadDataTimer = nil
-        }
-        
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
     }
 
     override func didReceiveMemoryWarning() {
@@ -93,17 +103,6 @@ class DownloadsTableViewController: UITableViewController {
                     cell.pvImage?.image = itunesImage
                 }
             }
-        }
-        
-        if let downloadProgress = episode.downloadProgress, let totalMediaBytes = episode.mediaBytes {
-            // Format the total bytes into a human readable KB or MB number
-            let dataFormatter = NSByteCountFormatter()
-            
-            cell.progress.progress = Float(downloadProgress)
-            let currentBytesDownloaded = Int64(Float(downloadProgress) * Float(totalMediaBytes))
-            let formattedCurrentBytesDownloaded = dataFormatter.stringFromByteCount(currentBytesDownloaded)
-            let formattedTotalFileBytes = dataFormatter.stringFromByteCount(Int64(Float(totalMediaBytes)))
-            cell.progressBytes.text = "\(formattedCurrentBytesDownloaded) / \(formattedTotalFileBytes)"
         }
         
         if episode.downloadComplete == true {

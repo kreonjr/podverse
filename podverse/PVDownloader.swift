@@ -110,16 +110,14 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             if let episodeDownloadIndex = getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier) {
                 if episodeDownloadIndex.integerValue < DLEpisodesList.shared.downloadingEpisodes.count {
                     let episode = DLEpisodesList.shared.downloadingEpisodes[episodeDownloadIndex.integerValue]
+                
+                    let downloadHasProgressedUserInfo:[NSObject:AnyObject] = ["mediaUrl":episode.mediaURL ?? "",
+                                                                              "totalBytes": Double(totalBytesExpectedToWrite),
+                                                                              "currentBytes": Double(totalBytesWritten)]
                     
-                    let totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
-                    
-                    episode.downloadProgress = Float(totalProgress)
-                    episode.mediaBytes = Float(totalBytesExpectedToWrite)
-                    
-                    // TODO: Is this Notification actually doing anything? I don't see the downloadHasProgressed notification getting used anywhere...
-                    let downloadHasProgressedUserInfo = ["episode":episode]
-                    
-                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
+                    })
                 }
             }
         }

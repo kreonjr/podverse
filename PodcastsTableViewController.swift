@@ -22,13 +22,30 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var playlists:[Playlist] {
         get {
-            return PlaylistManager.sharedInstance.playlists
+            let unsortedPlaylists = PlaylistManager.sharedInstance.playlists
+            var sortedPlaylists = unsortedPlaylists.sort({ $0.title.lowercaseString < $1.title.lowercaseString })
+            
+            for (index , playlist) in sortedPlaylists.enumerate() {
+                // TODO: there's got to be a better way to do this. The goal is to make My Episodes and My Clips always be the first 2 playlists in the table.
+                if playlist.title == Constants.kMyClipsPlaylist {
+                    sortedPlaylists.removeAtIndex(index)
+                    sortedPlaylists.insert(playlist, atIndex: 0)
+                } else if playlist.title == Constants.kMyEpisodesPlaylist {
+                    sortedPlaylists.removeAtIndex(index)
+                    sortedPlaylists.insert(playlist, atIndex: 0)
+                }
+            }
+            return sortedPlaylists
         }
     }
     
     func loadData() {
-        podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
+        let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
+        podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: podcastsPredicate) as! [Podcast]
         podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+
+        // TODO: The answer in the SO link below claims that using a string in a predicate can cause performance issues. Well below we are passing a podcast object as the NSPredicate. If strings can cause performance issues, wouldn't this cause egregiously horrible performance issues? I know this "fetchOnlyEntityWithMostRecentPubDate" has had mutating array crashes in the past (although I haven't seen it happen since mid-February). Could it be that we are using a bad predicate? If yes, how can we make this more performant?
+        // http://stackoverflow.com/questions/30368945/saving-coredata-on-background-thread-causes-fetching-into-a-deadlock-and-crash
 
         // Set pubdate in cell equal to most recent episode's pubdate
         for podcast in podcastsArray {
@@ -58,7 +75,22 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         refreshControl.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector:"reloadTable" , name: Constants.refreshPodcastTableDataNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector:"loadData" , name: Constants.refreshPodcastTableDataNotification, object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+
+        let episodeArray = CoreDataHelper.sharedInstance.fetchEntities("Episode", predicate: nil) as! [Episode]
+        for episode in episodeArray {
+            episode.taskIdentifier = nil
+        }
+        
+        for episode:Episode in DLEpisodesList.shared.downloadingEpisodes {
+            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
+        }
+        
+        self.refreshPodcastFeeds()
+        
+        PlaylistManager.sharedInstance.refreshPlaylists()
     }
     
     func refreshPodcastFeeds() {
@@ -80,14 +112,11 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
-        
         loadData()
     }
 
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func didReceiveMemoryWarning() {
@@ -156,15 +185,12 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         } else {
             let playlist = playlists[indexPath.row]
             cell.title?.text = playlist.title
-            cell.episodesDownloadedOrStarted?.text = "something here"
+            cell.episodesDownloadedOrStarted?.text = "playlist creator's name here"
             
             cell.lastPublishedDate?.text = "last updated date"
             //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
             
-            let totalItems = 5
-//            let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
-            
-            cell.totalClips?.text = String(totalItems) + " items"
+            cell.totalClips?.text = "\(playlist.totalItems) items"
             
             cell.pvImage?.image = UIImage(named: "Blank52")
             // TODO: Retrieve the image of the podcast/episode/clip that was most recently added to the playlist

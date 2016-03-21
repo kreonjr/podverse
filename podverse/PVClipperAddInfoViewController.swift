@@ -116,6 +116,13 @@ class PVClipperAddInfoViewController: UIViewController {
                     UIPasteboard.generalPasteboard().string = self.clip?.clipUrl ?? ""
                 }))
                 self.presentViewController(alert, animated: true, completion: nil)
+                
+                for playlist in PlaylistManager.sharedInstance.playlists {
+                    if playlist.title == Constants.kMyClipsPlaylist {
+                        PlaylistManager.sharedInstance.addItemToPlaylist(playlist, clip: self.clip, episode: nil)
+                    }
+                }                
+                
             })
         }) { (error) -> Void in
             dispatch_async(dispatch_get_main_queue(), { () -> Void in

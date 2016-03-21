@@ -22,10 +22,9 @@ class Podcast: NSManagedObject {
     @NSManaged var lastPubDate: NSDate?
     @NSManaged var summary: String?
     @NSManaged var title: String
-    @NSManaged var isSubscribed: NSNumber?
+    @NSManaged var isSubscribed: Bool
     @NSManaged var clips: NSSet
     @NSManaged var episodes: NSSet
-    @NSManaged var playlists: NSSet?
     
     func addEpisodeObject(value: Episode) {
         self.mutableSetValueForKey("episodes").addObject(value)

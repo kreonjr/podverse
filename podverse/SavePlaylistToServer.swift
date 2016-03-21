@@ -28,6 +28,27 @@ class SavePlaylistToServer:WebService {
         
         addParamWithKey("playlistTitle", value: playlist.title)
         
-        addParamWithKey("playlistItems", value:playlist.playlistItems)
+        var playlistItems = [Dictionary<String,AnyObject>]()
+        
+        if let episodes = playlist.episodes {
+            for episode in episodes {
+                let episodeJSON = PlaylistManager.sharedInstance.episodeToPlaylistItemJSON(episode as! Episode)
+                playlistItems.append(episodeJSON)
+                
+            }
+        }
+        
+        if let clips = playlist.clips {
+            for clip in clips {
+                let clipJSON = PlaylistManager.sharedInstance.clipToPlaylistItemJSON(clip as! Clip)
+                playlistItems.append(clipJSON)
+                
+            }
+        }
+        
+        if playlistItems.count > 0 {
+            addParamWithKey("playlistItems", value: playlistItems)
+        }
+        
     }
 }
