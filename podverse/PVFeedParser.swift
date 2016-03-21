@@ -82,7 +82,9 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             self.podcast.lastPubDate = lastPubDate
         }
         
-        podcast.isSubscribed = self.shouldSubscribeToPodcast
+        if self.shouldSubscribeToPodcast {
+            podcast.isSubscribed = true
+        }
         
         savedFeedEpisodes = Array(podcast.episodes.allObjects)
         

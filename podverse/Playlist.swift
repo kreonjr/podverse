@@ -17,6 +17,22 @@ class Playlist: NSManagedObject {
     @NSManaged var episodes: NSSet?
     @NSManaged var clips: NSSet?
     
+    var totalItems:Int {
+        get {
+            var episodeCount = 0
+            var clipCount = 0
+            if let episodes = self.episodes {
+                episodeCount = episodes.count
+            }
+            
+            if let clips = self.clips {
+                clipCount = clips.count
+            }
+            
+            return episodeCount + clipCount
+        }
+    }
+    
     func addEpisodeObject(value: Episode) {
         self.mutableSetValueForKey("episodes").addObject(value)
     }

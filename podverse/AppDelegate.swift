@@ -40,18 +40,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: "refreshPodcastFeeds", userInfo: nil, repeats: true)
     }
     
-    func isAppAlreadyLaunchedOnce()->Bool{
-        let defaults = NSUserDefaults.standardUserDefaults()
-        if let isAppAlreadyLaunchedOnce = defaults.stringForKey("isAppAlreadyLaunchedOnce") {
-            print("App already launched")
-            return true
-        } else {
-            defaults.setBool(true, forKey: "isAppAlreadyLaunchedOnce")
-            print("App launched first time")
-            return false
-        }
-    }
-    
     func refreshPodcastFeeds () {
         let podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
         for var i = 0; i < podcastArray.count; i++ {
@@ -65,6 +53,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        
+        CoreDataHelper.sharedInstance
         
         UIApplication.sharedApplication().statusBarStyle = .LightContent
         
@@ -99,7 +89,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let playCommand = rcc.playCommand
         playCommand.addTarget(self, action: "playOrPauseEvent")
         
-        if isAppAlreadyLaunchedOnce() == false {
+        if NSUserDefaults.standardUserDefaults().boolForKey("AppHasLaunchedOnce") == false {
+            NSUserDefaults.standardUserDefaults().setBool(true, forKey: "AppHasLaunchedOnce")
             PlaylistManager.sharedInstance.createDefaultPlaylists()
         }
                 

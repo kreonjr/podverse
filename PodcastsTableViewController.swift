@@ -27,10 +27,10 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             
             for (index , playlist) in sortedPlaylists.enumerate() {
                 // TODO: there's got to be a better way to do this. The goal is to make My Episodes and My Clips always be the first 2 playlists in the table.
-                if playlist.title == "My Clips" {
+                if playlist.title == Constants.kMyClipsPlaylist {
                     sortedPlaylists.removeAtIndex(index)
                     sortedPlaylists.insert(playlist, atIndex: 0)
-                } else if playlist.title == "My Episodes" {
+                } else if playlist.title == Constants.kMyEpisodesPlaylist {
                     sortedPlaylists.removeAtIndex(index)
                     sortedPlaylists.insert(playlist, atIndex: 0)
                 }
@@ -75,8 +75,10 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         refreshControl.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
         
-        // TODO: I moved all of the code below from AppDelegate didFinishLaunchingWithOptions to this VC's viewDidLoad because I realized that all fetchEntities requests will return 0 elements when done within didFinishLaunchingWithOptions. It doesn't feel right putting this here, but I don't where else to put it.
-        // TODO: Currently we are setting taskIdentifier values = nil on app launch. This will probably need to change once we add crash handling for resuming downloads
+        NSNotificationCenter.defaultCenter().addObserver(self, selector:"loadData" , name: Constants.refreshPodcastTableDataNotification, object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+
         let episodeArray = CoreDataHelper.sharedInstance.fetchEntities("Episode", predicate: nil) as! [Episode]
         for episode in episodeArray {
             episode.taskIdentifier = nil
@@ -110,17 +112,11 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector:"loadData" , name: Constants.refreshPodcastTableDataNotification, object: nil)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
-        
         loadData()
     }
 
     override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.refreshPodcastTableDataNotification, object: nil)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func didReceiveMemoryWarning() {
@@ -194,10 +190,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             cell.lastPublishedDate?.text = "last updated date"
             //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
             
-            let totalItems = playlistManager.getPlaylistItemsCount(playlist)
-//            let totalItems = PVPlaylister.sharedInstance.countPlaylistItems(playlist)
-            
-            cell.totalClips?.text = String(totalItems) + " items"
+            cell.totalClips?.text = "\(playlist.totalItems) items"
             
             cell.pvImage?.image = UIImage(named: "Blank52")
             // TODO: Retrieve the image of the podcast/episode/clip that was most recently added to the playlist

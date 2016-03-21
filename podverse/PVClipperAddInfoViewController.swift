@@ -118,9 +118,8 @@ class PVClipperAddInfoViewController: UIViewController {
                 self.presentViewController(alert, animated: true, completion: nil)
                 
                 for playlist in PlaylistManager.sharedInstance.playlists {
-                    if playlist.title == "My Clips" {
+                    if playlist.title == Constants.kMyClipsPlaylist {
                         PlaylistManager.sharedInstance.addItemToPlaylist(playlist, clip: self.clip, episode: nil)
-                        
                     }
                 }                
                 

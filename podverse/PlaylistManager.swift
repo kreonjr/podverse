@@ -61,20 +61,6 @@ final class PlaylistManager: NSObject {
 //        }
     }
     
-    func getPlaylistItemsCount(playlist: Playlist) -> NSNumber {
-        var count = 0
-        
-        if let clips = playlist.clips {
-            count += clips.count
-        }
-        
-        if let episodes = playlist.episodes {
-            count += episodes.count
-        }
-        
-        return count
-    }
-    
     static func JSONToPlaylist(JSONDict:Dictionary<String,AnyObject>) -> Playlist {
         let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
         
@@ -259,11 +245,11 @@ final class PlaylistManager: NSObject {
     
         if playlists.count < 1 {
             let myEpisodesPlaylist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
-            myEpisodesPlaylist.title = "My Episodes"
+            myEpisodesPlaylist.title = Constants.kMyEpisodesPlaylist
             savePlaylist(myEpisodesPlaylist)
             
             let myClipsPlaylist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
-            myClipsPlaylist.title = "My Clips"
+            myClipsPlaylist.title = Constants.kMyClipsPlaylist
             savePlaylist(myClipsPlaylist)
         }
     }
@@ -278,26 +264,31 @@ final class PlaylistManager: NSObject {
             playlist.addEpisodeObject(e)
         }
         
-        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: {[unowned self] (response) -> Void in
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
             playlist.url = response["url"] as? String
             
             CoreDataHelper.sharedInstance.saveCoreData(nil)
             
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kItemAddedToPlaylistNotification, object: nil)
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kItemAddedToPlaylistNotification, object: nil)
+            })
+
             }) { (error) -> Void in
                 print("Not saved to server. Error: ", error?.localizedDescription)
             }.call()
     }
     
     func savePlaylist(playlist: Playlist) {
-        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: {[unowned self] (response) -> Void in
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
             
             playlist.playlistId = response["_id"] as? String
             playlist.url = response["url"] as? String
             
             CoreDataHelper.sharedInstance.saveCoreData(nil)
             
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+            })
             
             }) { (error) -> Void in
                 print("Not saved to server. Error: ", error?.localizedDescription)

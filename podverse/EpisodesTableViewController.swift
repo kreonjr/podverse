@@ -106,16 +106,15 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: Constants.kDownloadHasFinished, object: nil)
-        
         loadData()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: Constants.kDownloadHasFinished, object: nil)
         
         self.title = selectedPodcast.title
         
@@ -138,12 +137,6 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         headerSummaryLabel.text = selectedPodcast.summary
         
         loadData()
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kDownloadHasFinished, object: nil)
     }
     
     override func didReceiveMemoryWarning() {

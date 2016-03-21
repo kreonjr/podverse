@@ -11,5 +11,9 @@ import Foundation
 struct DLEpisodesList {
     static var shared = DLEpisodesList()
     
-    var downloadingEpisodes = [Episode]()
+    var downloadingEpisodes = [Episode]() {
+        didSet {
+            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kUpdateDownloadsTable, object: nil)
+        }
+    }
 }

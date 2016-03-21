@@ -24,12 +24,12 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         // TODO: there has to be a better way to do this...
         for (index , playlist) in validPlaylists.enumerate() {
             if clip == nil {
-                if playlist.title == "My Clips" {
+                if playlist.title == Constants.kMyClipsPlaylist {
                     validPlaylists.removeAtIndex(index)
                     break
                 }
             } else if episode == nil {
-                if playlist.title == "My Episodes" {
+                if playlist.title == Constants.kMyEpisodesPlaylist {
                     validPlaylists.removeAtIndex(index)
                     break
                 }
@@ -39,13 +39,13 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         validPlaylists.sortInPlace({ $0.title.lowercaseString < $1.title.lowercaseString })
         for (index , playlist) in validPlaylists.enumerate() {
             if clip == nil {
-                if playlist.title == "My Episodes" {
+                if playlist.title == Constants.kMyEpisodesPlaylist {
                     validPlaylists.removeAtIndex(index)
                     validPlaylists.insert(playlist, atIndex: 0)
                     break
                 }
             } else if episode == nil {
-                if playlist.title == "My Clips" {
+                if playlist.title == Constants.kMyClipsPlaylist {
                     validPlaylists.removeAtIndex(index)
                     validPlaylists.insert(playlist, atIndex: 0)
                     break
@@ -85,6 +85,12 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "navBackToMediaPlayer", name: Constants.kPlayerHasNoItem, object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "navBackToMediaPlayer", name: Constants.kItemAddedToPlaylistNotification, object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+        
         self.navigationController?.navigationBar.barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)
         
         if pvMediaPlayer.nowPlayingClip != nil {
@@ -99,26 +105,12 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "navBackToMediaPlayer", name: Constants.kPlayerHasNoItem, object: nil)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "navBackToMediaPlayer", name: Constants.kItemAddedToPlaylistNotification, object: nil)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
-        
         // Set navigation bar styles
         navigationItem.title = "Add to Playlist"
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .Plain, target: self, action: "showcreatePlaylistAlert")
         
         loadData()
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
-        
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kItemAddedToPlaylistNotification, object: nil)
-        
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
     }
     
     // MARK: - Table view data source

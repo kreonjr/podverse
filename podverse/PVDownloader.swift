@@ -110,17 +110,14 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             if let episodeDownloadIndex = getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier) {
                 if episodeDownloadIndex.integerValue < DLEpisodesList.shared.downloadingEpisodes.count {
                     let episode = DLEpisodesList.shared.downloadingEpisodes[episodeDownloadIndex.integerValue]
+                
+                    let downloadHasProgressedUserInfo:[NSObject:AnyObject] = ["mediaUrl":episode.mediaURL ?? "",
+                                                                              "totalBytes": Double(totalBytesExpectedToWrite),
+                                                                              "currentBytes": Double(totalBytesWritten)]
                     
-                    let totalProgress = Double(totalBytesWritten) / Double(totalBytesExpectedToWrite)
-                    
-                    // TODO: This line crashed when subscribing to many podcasts quickly ("Thread 11: EXC_BAD_ACCESS"). Could this be a source of mutating array issues? In this case the NSManaged Episode object is getting updated very rapidly, and if the MOC is getting rapidly saved in other functions, could this cause a problem? I don't think the downloadProgress needs to be saved in Core Data at all. We just need the DownloadsTableVC to update and display the downloadProgress for that episode. Maybe we should just use the notificationcenter to post updates to the DownloadsTableVC, and stop updating the .downloadProgress and .mediaBytes properties in this function?
-                    episode.downloadProgress = Float(totalProgress)
-                    episode.mediaBytes = Float(totalBytesExpectedToWrite)
-                    
-                    // TODO: This notification is doing nothing.I don't see the downloadHasProgressed notification getting used anywhere...maybe we should use this or something similar to update the DownloadTableVC progress?
-                    let downloadHasProgressedUserInfo = ["episode":episode]
-                    
-                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasProgressed, object: self, userInfo: downloadHasProgressedUserInfo)
+                    })
                 }
             }
         }

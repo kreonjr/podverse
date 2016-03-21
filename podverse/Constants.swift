@@ -13,6 +13,8 @@ struct Constants {
     static let kDownloadHasFinished  = "downloadHasFinished"
 
     static let kDownloadHasProgressed = "downloadHasProgressed"
+    
+    static let kUpdateDownloadsTable = "updateDownloadTable"
 
     static let kNowPlayingTimeHasChanged = "nowPlayingTimeHasChanged"
     
@@ -27,6 +29,10 @@ struct Constants {
     static let kRefreshAddToPlaylistTableDataNotification = "refreshPodcastTableDataNotification"
     
     static let kItemAddedToPlaylistNotification = "itemAddedToPlaylistNotificiation"
+    
+    static let kMyClipsPlaylist = "My Clips"
+    
+    static let kMyEpisodesPlaylist = "My Episodes"
     
     static let rootPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, .UserDomainMask, true)[0]
     static let kPlaylistIDPath = Constants.rootPath.stringByAppendingString("/playlistIds.plist")
