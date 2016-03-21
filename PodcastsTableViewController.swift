@@ -68,6 +68,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        playlistManager.delegate = self
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
         refreshControl = UIRefreshControl()
@@ -289,6 +290,12 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
 
     @IBAction func addPlaylistByURL(sender: AnyObject) {
         showAddPlaylistByURLAlert()
+    }
+}
+
+extension PodcastsTableViewController:PlaylistManagerDelegate {
+    func playlistAddedByUrl() {
+        self.reloadTable()
     }
 }
 
