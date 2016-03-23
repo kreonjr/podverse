@@ -188,23 +188,42 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             cell.title?.text = playlist.title
             cell.episodesDownloadedOrStarted?.text = "playlist creator's name here"
             
-            cell.lastPublishedDate?.text = "last updated date"
+            cell.lastPublishedDate?.text = "playlist last updated date"
             //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
             
             cell.totalClips?.text = "\(playlist.totalItems) items"
             
             cell.pvImage?.image = UIImage(named: "Blank52")
-            // TODO: Retrieve the image of the podcast/episode/clip that was most recently added to the playlist
-            //                if let imageData = podcast.imageData {
-            //                    if let image = UIImage(data: imageData) {
-            //                        cell.pvImage?.image = image
-            //                    }
-            //                }
-            //                else if let itunesImageData = podcast.itunesImage {
-            //                    if let itunesImage = UIImage(data: itunesImageData) {
-            //                        cell.pvImage?.image = itunesImage
-            //                    }
-            //                }                
+
+            for item in playlist.allItems {
+                if item is Episode {
+                    let episode = item as! Episode
+                    if let imageData = episode.podcast.imageData {
+                        if let image = UIImage(data: imageData) {
+                            cell.pvImage?.image = image
+                        }
+                    }
+                    else if let itunesImageData = episode.podcast.itunesImage {
+                        if let itunesImage = UIImage(data: itunesImageData) {
+                            cell.pvImage?.image = itunesImage
+                        }
+                    }
+                }
+                else if item is Clip {
+                    let clip = item as! Clip
+                    if let imageData = clip.episode.podcast.imageData {
+                        if let image = UIImage(data: imageData) {
+                            cell.pvImage?.image = image
+                        }
+                    }
+                    else if let itunesImageData = clip.episode.podcast.itunesImage {
+                        if let itunesImage = UIImage(data: itunesImageData) {
+                            cell.pvImage?.image = itunesImage
+                        }
+                    }
+                }
+            }
+            
         }
 
         return cell

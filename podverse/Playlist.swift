@@ -17,19 +17,28 @@ class Playlist: NSManagedObject {
     @NSManaged var episodes: NSSet?
     @NSManaged var clips: NSSet?
     
+    var allItems: [AnyObject] {
+        get {
+            var allItemsArray: [AnyObject] = []
+            if let episodes = episodes {
+                for episode in episodes {
+                    allItemsArray.append(episode)
+                }
+            }
+            if let clips = clips {
+                for clip in clips {
+                    allItemsArray.append(clip)
+                }
+            }
+            
+            return allItemsArray
+        }
+    }
+    
     var totalItems:Int {
         get {
-            var episodeCount = 0
-            var clipCount = 0
-            if let episodes = self.episodes {
-                episodeCount = episodes.count
-            }
-            
-            if let clips = self.clips {
-                clipCount = clips.count
-            }
-            
-            return episodeCount + clipCount
+            return self.allItems.count
+
         }
     }
     

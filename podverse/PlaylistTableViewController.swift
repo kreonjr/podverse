@@ -118,7 +118,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
             }
             
             if let episodeDuration = episode.duration {
-                cell.duration?.text = episodeDuration.stringValue
+                cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(episodeDuration)
             }
             
             if let pubDate = episode.pubDate {
