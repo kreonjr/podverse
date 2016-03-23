@@ -237,7 +237,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             
             let selectedEpisode = episodesArray[indexPath.row]
             
-            let episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
+            let episodeActions = UIAlertController(title: "", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
             
             if selectedEpisode.fileName != nil {
                 episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
