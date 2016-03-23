@@ -42,6 +42,7 @@ class CoreDataHelper {
     lazy var moc: NSManagedObjectContext = {
         let coordinator = self.persistentStoreCoordinator
         var managedObjectContext = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+        managedObjectContext.mergePolicy = NSMergePolicy(mergeType: .MergeByPropertyObjectTrumpMergePolicyType)
         managedObjectContext.persistentStoreCoordinator = coordinator
         return managedObjectContext
     }()
