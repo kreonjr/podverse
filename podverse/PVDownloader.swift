@@ -44,7 +44,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 DLEpisodesList.shared.downloadingEpisodes.append(episode)
             }
             
-            CoreDataHelper.sharedInstance.saveCoreData(nil)
             let task = beginBackgroundTask()
             downloadTask.resume()
             endBackgroundTask(task)
@@ -62,8 +61,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 let downloadTask = downloadSession.downloadTaskWithResumeData(downloadTaskResumeData)
                 episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
                 episode.taskResumeData = nil
-                
-                CoreDataHelper.sharedInstance.saveCoreData(nil)
                 
                 downloadTask.resume()
             }
@@ -186,7 +183,10 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     
                     let downloadHasFinishedUserInfo = ["episode":episode]
                     
-                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
+                    })
+
                     let notification = UILocalNotification()
                     notification.applicationIconBadgeNumber = UIApplication.sharedApplication().applicationIconBadgeNumber + 1
                     notification.alertBody = episode.podcast.title + " - " + episodeTitle // text that will be displayed in the notification

@@ -13,7 +13,9 @@ struct DLEpisodesList {
     
     var downloadingEpisodes = [Episode]() {
         didSet {
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kUpdateDownloadsTable, object: nil)
+            dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kUpdateDownloadsTable, object: nil)
+            }
         }
     }
 }

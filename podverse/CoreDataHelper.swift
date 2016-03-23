@@ -11,40 +11,40 @@ import CoreData
 
 class CoreDataHelper {
     static let sharedInstance = CoreDataHelper()
-    var moc: NSManagedObjectContext
     
-    init() {
-        // This resource is the same name as your xcdatamodeld contained in your project.
+    lazy var applicationDocumentsDirectory: NSURL = {
+        let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
+        return urls[urls.count-1] 
+    }()
+    
+    lazy var managedObjectModel: NSManagedObjectModel = {
         guard let modelURL = NSBundle.mainBundle().URLForResource("podverse", withExtension: "momd") else {
             fatalError("Error loading model from bundle")
         }
-        // The managed object model for the application. It is a fatal error for the application not to be able to find and load its model.
-        guard let mom = NSManagedObjectModel(contentsOfURL: modelURL) else {
-            fatalError("Error initializing mom from: \(modelURL)")
+
+        return NSManagedObjectModel(contentsOfURL: modelURL)!
+    }()
+    
+    lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator? = {
+        let storeURL = self.applicationDocumentsDirectory.URLByAppendingPathComponent("podverse.sqlite")
+        var coordinator: NSPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
+        var error: NSError? = nil
+        
+        do {
+            try coordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: [NSMigratePersistentStoresAutomaticallyOption: true, NSInferMappingModelAutomaticallyOption: true])
+        } catch {
+            fatalError("Error migrating store: \(error)")
         }
         
-        let psc = NSPersistentStoreCoordinator(managedObjectModel: mom)
-        self.moc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
-        self.moc.persistentStoreCoordinator = psc
-        
-        // TODO to review: I added the line below to address the "merge conflict" issues that would happen when subscribing to many podcasts rapidly. I think it tells Core Data to always save the newest object when a merge conflict exists...anyway after adding this line, I could not reproduce the merge conflict issue again.
-        // Reference: http://stackoverflow.com/questions/4405912/iphone-coredata-error-nsmergeconflict-for-nsmanagedobject
-        self.moc.mergePolicy = NSMergePolicy(mergeType: NSMergePolicyType.MergeByPropertyObjectTrumpMergePolicyType)
-        
-        dispatch_async(Constants.saveQueue) {
-            let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
-            let docURL = urls[urls.endIndex-1]
-            /* The directory the application uses to store the Core Data store file.
-            This code uses a file named "DataModel.sqlite" in the application's documents directory.
-            */
-            let storeURL = docURL.URLByAppendingPathComponent("podverse.sqlite")
-            do {
-                try psc.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: [NSMigratePersistentStoresAutomaticallyOption: true, NSInferMappingModelAutomaticallyOption: true])
-            } catch {
-                fatalError("Error migrating store: \(error)")
-            }
-        }
-    }
+        return coordinator
+    }()
+    
+    lazy var moc: NSManagedObjectContext = {
+        let coordinator = self.persistentStoreCoordinator
+        var managedObjectContext = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+        managedObjectContext.persistentStoreCoordinator = coordinator
+        return managedObjectContext
+    }()
     
     func insertManagedObject(className: String) -> AnyObject {        
         return NSEntityDescription.insertNewObjectForEntityForName(className, inManagedObjectContext: self.moc)
