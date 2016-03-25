@@ -123,6 +123,10 @@ final class PlaylistManager: NSObject {
                             episode.title = title
                         }
                         
+                        if let duration = episodeDict["duration"] as? Int {
+                            episode.duration = duration
+                        }
+                        
                         podcast.addEpisodeObject(episode)
                     }
                     
