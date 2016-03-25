@@ -196,8 +196,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             cell.pvImage?.image = UIImage(named: "Blank52")
 
             for item in playlist.allItems {
-                if item is Episode {
-                    let episode = item as! Episode
+                if let episode = item as? Episode {
                     if let imageData = episode.podcast.imageData {
                         if let image = UIImage(data: imageData) {
                             cell.pvImage?.image = image
@@ -209,8 +208,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
                         }
                     }
                 }
-                else if item is Clip {
-                    let clip = item as! Clip
+                else if let clip = item as? Clip {
                     if let imageData = clip.episode.podcast.imageData {
                         if let image = UIImage(data: imageData) {
                             cell.pvImage?.image = image

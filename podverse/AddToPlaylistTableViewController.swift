@@ -123,7 +123,7 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! AddToPlaylistTableViewCell
         let playlist = validPlaylists[indexPath.row]
         cell.title?.text = playlist.title
-        cell.totalItems?.text = String(playlist.allItems.count) + " items"
+        cell.totalItems?.text = "\(playlist.allItems.count) items"
         
         return cell
     }
