@@ -131,11 +131,11 @@ class PVClipStreamer: NSObject, AVAssetResourceLoaderDelegate, NSURLConnectionDa
             metadataBytesOffset = totalMetaDataBytes
             
             // TODO: can we refine the startBytesRange and endBytesRange?
-            startBytesRange = metadataBytesOffset + Int((Double(clip.startTime) / episodeDuration) * Double(remoteFileSize))
+            startBytesRange = metadataBytesOffset + Int((Double(clip.startTime) / episodeDuration) * Double(remoteFileSize - metadataBytesOffset))
             
             // If clip has a valid end time, then use it to determine the End Byte Range Request value. Else use the full episode file size as the End Byte Range Request value.
             if clip.endTime != 0 {
-                endBytesRange = metadataBytesOffset + Int((Double(clip.endTime) / episodeDuration) * Double(remoteFileSize))
+                endBytesRange = metadataBytesOffset + Int((Double(clip.endTime) / episodeDuration) * Double(remoteFileSize - metadataBytesOffset))
             } else {
                 endBytesRange = Int(remoteFileSize)
             }
