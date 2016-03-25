@@ -231,11 +231,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         if pvMediaPlayer.avPlayer.currentItem == nil {
             self.navigationController?.popViewControllerAnimated(true)
         } else {
-            // Call updateNowPlayingCurrentTime whenever the now playing current time changes
-            if pvMediaPlayer.avPlayer.currentItem != nil {
-                
-            }
-            
+
             // Start timer to check every half second if the now playing current time has changed
             nowPlayingCurrentTimeTimer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "updateNowPlayingCurrentTimeNotification", userInfo: nil, repeats: true)
             
@@ -270,7 +266,9 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         super.viewWillDisappear(animated)
         
         // Stop timer that checks every second if the now playing current time has changed
-        nowPlayingCurrentTimeTimer.invalidate()
+        if nowPlayingCurrentTimeTimer != nil {
+            nowPlayingCurrentTimeTimer.invalidate()   
+        }
         
         if (self.isMovingFromParentViewController()){
             self.navigationController?.navigationBar.barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)

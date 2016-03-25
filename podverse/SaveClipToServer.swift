@@ -18,7 +18,8 @@ class SaveClipToServer:WebService {
                                            "imageURL":clip.episode.podcast.imageURL ?? ""])
         addParamWithKey("episode", value: ["title":clip.episode.title ?? "",
                                            "pubDate":PVUtility.formatDateToString(clip.episode.pubDate!),
-                                           "mediaURL":clip.episode.mediaURL ?? ""])
+                                           "mediaURL":clip.episode.mediaURL ?? "",
+                                           "duration": clip.episode.duration ?? 0])
         addParamWithKey("clip", value: ["title":clip.title ?? "",
                                         "startTime":clip.startTime,
                                         "endTime":clip.endTime,
