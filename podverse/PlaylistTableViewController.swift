@@ -118,7 +118,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
             }
             
             if let episodeDuration = episode.duration {
-                cell.duration?.text = episodeDuration.stringValue
+                cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(episodeDuration)
             }
             
             if let pubDate = episode.pubDate {
@@ -175,62 +175,56 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        let playlistItemActions = UIAlertController(title: "Item Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
         
-//         let selectedItem = playlist.playlistItems[indexPath.row]
-//         pvMediaPlayer.loadPlaylistItemAndPlay(selectedItem)
+        if let episode = playlistItems[indexPath.row] as? Episode {
+
+            if episode.fileName != nil {
+                playlistItemActions.addAction(UIAlertAction(title: "Play", style: .Default, handler: { action in
+                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode)
+                    self.performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
+                }))
+            } else {
+                playlistItemActions.addAction(UIAlertAction(title: "Stream", style: .Default, handler: { action in
+                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode)
+                    self.performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
+                }))
+            }
+            
+            playlistItemActions.addAction(UIAlertAction (title: "Episode", style: .Default, handler: { action in
+                // TODO: add episode page
+            }))
+            
+            playlistItemActions.addAction(UIAlertAction (title: "Podcast", style: .Default, handler: { action in
+                // TODO: add podcast page
+            }))
+
+        } else if let clip = playlistItems[indexPath.row] as? Clip {
+            
+            if clip.episode.fileName != nil {
+                playlistItemActions.addAction(UIAlertAction(title: "Play", style: .Default, handler: { action in
+                    self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip)
+                    self.performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
+                }))
+            } else {
+                playlistItemActions.addAction(UIAlertAction(title: "Stream", style: .Default, handler: { action in
+                    self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip)
+                    self.performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
+                }))
+            }
+            
+            playlistItemActions.addAction(UIAlertAction (title: "Episode", style: .Default, handler: { action in
+                // TODO: add episode page
+            }))
+            
+            playlistItemActions.addAction(UIAlertAction (title: "Podcast", style: .Default, handler: { action in
+                // TODO: add podcast page
+            }))
+        }
         
-//         self.performSegueWithIdentifier("PlaylistItem to Now Playing", sender: nil)
+        playlistItemActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
         
-//        if let episode = selectedItem as? Episode {
-//            pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode)
-//        } else if let clip = selectedItem as? Clip {
-//            pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip)
-//        }
-        
-//        // If not the last item in the array, then perform selected episode actions
-//        if indexPath.row < episodesArray.count {
-//            
-//            let selectedEpisode = episodesArray[indexPath.row]
-//            
-//            let episodeActions = UIAlertController(title: "Episode Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
-//            
-//            if selectedEpisode.fileName != nil {
-//                episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
-//                    self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(selectedEpisode)
-//                    self.performSegueWithIdentifier("Episodes to Now Playing", sender: nil)
-//                }))
-//            } else {
-//                if selectedEpisode.taskIdentifier != nil {
-//                    episodeActions.addAction(UIAlertAction(title: "Downloading Episode", style: .Default, handler: nil))
-//                } else {
-//                    episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
-//                        PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
-//                        let cell = tableView.cellForRowAtIndexPath(indexPath) as! EpisodesTableCell
-//                        cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
-//                    }))
-//                }
-//            }
-//            
-//            let totalClips = String(selectedEpisode.clips.count)
-//            episodeActions.addAction(UIAlertAction(title: "Show Clips (\(totalClips))", style: .Default, handler: { action in
-//                self.performSegueWithIdentifier("Show Clips", sender: self)
-//            }))
-//            
-//            episodeActions.addAction(UIAlertAction (title: "Episode Info", style: .Default, handler: nil))
-//            
-//            episodeActions.addAction(UIAlertAction (title: "Stream Episode", style: .Default, handler: { action in
-//                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(selectedEpisode)
-//                self.performSegueWithIdentifier("Episodes to Now Playing", sender: nil)
-//            }))
-//            
-//            episodeActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-//            
-//            self.presentViewController(episodeActions, animated: true, completion: nil)
-//        }
-//            // Else Show All Episodes or Show Downloaded Episodes
-//        else {
-//            toggleShowAllEpisodes()
-//        }
+        self.presentViewController(playlistItemActions, animated: true, completion: nil)
     }
     
     // Override to support conditional editing of the table view.
@@ -261,7 +255,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     
     // MARK: - Navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "PlaylistItem to Now Playing" {
+        if segue.identifier == "Playlist to Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }

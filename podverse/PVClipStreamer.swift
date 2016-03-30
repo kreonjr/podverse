@@ -90,31 +90,52 @@ class PVClipStreamer: NSObject, AVAssetResourceLoaderDelegate, NSURLConnectionDa
             let metadataList = calculateDurationAsset.metadata
             var totalMetaDataBytes = 0
             for item in metadataList {
+//                print("start over")
+//                print(item.key)
+//                print(item.keySpace)
+//                print(item.commonKey)
+//                print(item.value)
+//                print(item.dataValue)
+//                print(item.extraAttributes)
+                if let dataValue = item.dataValue {
+                    totalMetaDataBytes += dataValue.length
+                }
                 if item.commonKey != nil && item.value != nil {
-                    if item.commonKey  == "title" {
-                        // totalMetaDataBytes += (item.dataValue?.length)!
-                    }
-                    if item.commonKey   == "type" {
-                        // totalMetaDataBytes += (item.dataValue?.length)!
-                    }
-                    if item.commonKey  == "albumName" {
-                        // totalMetaDataBytes += (item.dataValue?.length)!
-                    }
-                    if item.commonKey   == "artist" {
-                        // totalMetaDataBytes += (item.dataValue?.length)!
-                    }
-                    if item.commonKey  == "artwork" {
-                        totalMetaDataBytes += (item.dataValue?.length)!
-                    }
+//                    if item.commonKey  == "title" {
+//                        if let dataValue = item.dataValue {
+//                            totalMetaDataBytes += dataValue.length
+//                        }
+//                    }
+//                    if item.commonKey   == "type" {
+//                        if let dataValue = item.dataValue {
+//                            totalMetaDataBytes += dataValue.length
+//                        }
+//                    }
+//                    if item.commonKey  == "albumName" {
+//                        if let dataValue = item.dataValue {
+//                            totalMetaDataBytes += dataValue.length
+//                        }
+//                    }
+//                    if item.commonKey   == "artist" {
+//                        if let dataValue = item.dataValue {
+//                            totalMetaDataBytes += dataValue.length
+//                        }
+//                    }
+//                    if item.commonKey  == "artwork" {
+//                        if let dataValue = item.dataValue {
+//                            totalMetaDataBytes += dataValue.length
+//                        }
+//                    }
                 }
             }
             metadataBytesOffset = totalMetaDataBytes
             
-            startBytesRange = metadataBytesOffset + Int((Double(clip.startTime) / episodeDuration) * Double(remoteFileSize))
+            // TODO: can we refine the startBytesRange and endBytesRange?
+            startBytesRange = metadataBytesOffset + Int((Double(clip.startTime) / episodeDuration) * Double(remoteFileSize - metadataBytesOffset))
             
             // If clip has a valid end time, then use it to determine the End Byte Range Request value. Else use the full episode file size as the End Byte Range Request value.
             if clip.endTime != 0 {
-                endBytesRange = metadataBytesOffset + Int((Double(clip.endTime) / episodeDuration) * Double(remoteFileSize))
+                endBytesRange = metadataBytesOffset + Int((Double(clip.endTime) / episodeDuration) * Double(remoteFileSize - metadataBytesOffset))
             } else {
                 endBytesRange = Int(remoteFileSize)
             }

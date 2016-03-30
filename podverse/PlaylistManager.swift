@@ -89,7 +89,7 @@ final class PlaylistManager: NSObject {
             for playlistItem in playlistItems {
                 var podcast: Podcast!
                 var episode: Episode!
-                var clip: Clip!
+                
                 // If the episode property has a value, then treat as a clip
                 if playlistItem["episode"] != nil {
                     if let podcastDict = playlistItem["podcast"] {
@@ -114,12 +114,17 @@ final class PlaylistManager: NSObject {
                     if let episodeDict = playlistItem["episode"] {
                         if let mediaUrlString = episodeDict["mediaURL"] as? String {
                             episode = CoreDataHelper.sharedInstance.retrieveExistingOrCreateNewEpisode(mediaUrlString)
+                            episode.mediaURL = mediaUrlString
                         } else {
                             break
                         }
                         
                         if let title = episodeDict["title"] as? String {
                             episode.title = title
+                        }
+                        
+                        if let duration = episodeDict["duration"] as? Int {
+                            episode.duration = duration
                         }
                         
                         podcast.addEpisodeObject(episode)
@@ -212,6 +217,7 @@ final class PlaylistManager: NSObject {
         var episodeDict = Dictionary<String,AnyObject>()
         episodeDict["title"] = clip.episode.title
         episodeDict["mediaURL"] = clip.episode.mediaURL
+        episodeDict["duration"] = clip.episode.duration
         
         if let pubDate = clip.episode.pubDate {
             episodeDict["pubDate"] = PVUtility.formatDateToString(pubDate)
@@ -222,6 +228,7 @@ final class PlaylistManager: NSObject {
         podcastDict["title"] = clip.episode.podcast.title
         podcastDict["imageURL"] = clip.episode.podcast.imageURL
         podcastDict["feedURL"] = clip.episode.podcast.feedURL
+
         JSONDict["podcast"] = podcastDict
         
         return JSONDict
