@@ -198,14 +198,6 @@ final class PlaylistManager: NSObject {
         CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
     
-    static func playlistToJSON(playlist:Playlist) -> Dictionary<String,AnyObject>? {
-        var JSONDict = Dictionary<String,AnyObject>()
-        JSONDict["playlistTitle"] = playlist.title
-        JSONDict["playlistItems"] = playlist.playlistItems
-
-        return JSONDict
-    }
-    
     func clipToPlaylistItemJSON(clip:Clip) -> Dictionary<String,AnyObject> {
         var JSONDict = Dictionary<String,AnyObject>()
         

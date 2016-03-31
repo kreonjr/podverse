@@ -192,14 +192,18 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         if iTunesSearchPodcast.isSubscribed == false {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
                 if let feedURL = iTunesSearchPodcast.feedURL {
-                    PVSubscriber.sharedInstance.subscribeToPodcast(feedURL.absoluteString)
+                    PVSubscriber.subscribeToPodcast(feedURL.absoluteString)
                     iTunesSearchPodcast.isSubscribed = true
                 }
             }))
         }
         else {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Unsubscribe", style: .Default, handler: { action in
-                print("unsubscribe to podcast")
+                if let podcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as? [Podcast] {
+                    if let index = podcasts.indexOf({ $0.feedURL == iTunesSearchPodcast.feedURL?.absoluteString }) {
+                        PVSubscriber.unsubscribeFromPodcast(podcasts[index])
+                    }
+                }
             }))
         }
         

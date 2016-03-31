@@ -158,7 +158,6 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
 
-        
         if indexPath.section == 0 {
             let podcast = podcastsArray[indexPath.row]
             cell.title?.text = podcast.title
@@ -167,7 +166,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             let episodesDownloaded = episodes.filter{ $0.fileName != nil }
             cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
             
-            cell.totalClips?.text = String(podcast.clips.count) + " clips"
+            //TODO: Calculate all clips in podcast
+            cell.totalClips?.text = "\(0) clips"
             
             cell.lastPublishedDate?.text = ""
             if let lastPubDate = podcast.lastPubDate {

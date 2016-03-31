@@ -68,4 +68,10 @@ class PVDeleter: NSObject {
     
     // TODO: handle removing clips
     
+    static func deletePlaylistItem(playlist:Playlist, item:AnyObject) {
+        playlist.removePlaylistItem(item)
+        
+        //TODO: Server playlist item deletion
+    }
+    
 }
