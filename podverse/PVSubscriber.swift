@@ -20,7 +20,6 @@ class PVSubscriber {
     
     static func unsubscribeFromPodcast(podcast:Podcast) {
         if let playlists = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: nil) as? [Playlist] {
-            podcast.isSubscribed = false
             
             var alsoDelete = true
             

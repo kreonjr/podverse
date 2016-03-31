@@ -17,8 +17,6 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var jsonTableData = []
-    
     var iTunesSearchPodcastArray = [SearchResultPodcast]()
     var iTunesSearchPodcastFeedURLArray: [NSURL] = []
     
@@ -86,19 +84,9 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                                     
                                     let searchResultPodcast = SearchResultPodcast()
                                     
-                                    searchResultPodcast.artistName = podcastJSON["artistName"] as? String
+                                    searchResultPodcast.feedURL = podcastJSON["feedUrl"] as? String
                                     
-                                    if let feedURLString = podcastJSON["feedUrl"] as? String {
-                                        searchResultPodcast.feedURL = NSURL(string: feedURLString)
-                                        
-                                        let podcastAlreadySubscribedTo = allSubscribedPodcasts.filter{ $0.feedURL == feedURLString }
-                                        
-                                        if podcastAlreadySubscribedTo.count != 0 {
-                                            searchResultPodcast.isSubscribed = true
-                                        } else {
-                                            searchResultPodcast.isSubscribed = false
-                                        }
-                                    }
+                                    searchResultPodcast.artistName = podcastJSON["artistName"] as? String
                                     
                                     searchResultPodcast.itunesImageURL = podcastJSON["artworkUrl100"] as? String
                                     
@@ -188,19 +176,29 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         let searchResultPodcastActions = UIAlertController(title: "Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
         
         let iTunesSearchPodcast = iTunesSearchPodcastArray[indexPath.row]
+        var isSubscribed = false
         
-        if iTunesSearchPodcast.isSubscribed == false {
+        
+        if let savedPodcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as? [Podcast] {
+            for savedPodcast in savedPodcasts {
+                if iTunesSearchPodcast.feedURL == savedPodcast.feedURL {
+                    isSubscribed = true
+                }
+            }
+        }
+        
+        if isSubscribed == false {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
                 if let feedURL = iTunesSearchPodcast.feedURL {
-                    PVSubscriber.subscribeToPodcast(feedURL.absoluteString)
-                    iTunesSearchPodcast.isSubscribed = true
+                    PVSubscriber.subscribeToPodcast(feedURL)
+                    
                 }
             }))
         }
         else {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Unsubscribe", style: .Default, handler: { action in
                 if let podcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as? [Podcast] {
-                    if let index = podcasts.indexOf({ $0.feedURL == iTunesSearchPodcast.feedURL?.absoluteString }) {
+                    if let index = podcasts.indexOf({ $0.feedURL == iTunesSearchPodcast.feedURL }) {
                         PVSubscriber.unsubscribeFromPodcast(podcasts[index])
                     }
                 }

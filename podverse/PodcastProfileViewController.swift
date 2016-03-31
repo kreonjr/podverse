@@ -59,7 +59,7 @@ class PodcastProfileViewController: UIViewController {
 //
 ////        searchResultEpisodesTotal.text = "Episodes Available: " + String(searchResultPodcast.episodesTotal!)
         
-        searchResultFeedURL.text = "RSS Feed: " + searchResultPodcast.feedURL!.absoluteString
+//        searchResultFeedURL.text = "RSS Feed: " + searchResultPodcast.feedURL
 
         searchResultSummary.text = searchResultPodcast.artistName!
         

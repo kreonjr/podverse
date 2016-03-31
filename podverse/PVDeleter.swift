@@ -12,17 +12,14 @@ import CoreData
 class PVDeleter: NSObject {    
     
     static func deletePodcast(podcast: Podcast) {
-        
-        podcast.isSubscribed = false
-        
         let episodesToRemove = podcast.episodes.allObjects as! [Episode]
         
         // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
         for var i = 0; i < episodesToRemove.count; i++ {
             deleteEpisode(episodesToRemove[i],completion: nil)
         }
-        
-        // TODO: handle removing podcast when a podcast has isSubscribed = false, and the podcast is not a part of a playlist
+
+        CoreDataHelper.sharedInstance.deleteItemFromCoreData(podcast)
     }
     
     static func deleteEpisode(episode: Episode, completion:(()->())? ) {
@@ -51,19 +48,13 @@ class PVDeleter: NSObject {
             }
         }
         
+        //TODO: is the deleteEpisodeFromDiskWithName redundant because of the deleteItemFromCoreData?
         // Delete the episode from CoreData and the disk, and update the UI
         if let fileName = episode.fileName {
             PVUtility.deleteEpisodeFromDiskWithName(fileName)
-            episode.fileName = nil
         }
 
-        // Set episode taskIdentifier to nil since it can't be currently downloading
-        episode.taskIdentifier = nil
-        
-        // Set episode playbackPosition to 0 so if downloaded again it starts from beginning
-        episode.playbackPosition = 0
-        
-        // TODO: handle removing episode when a podcast has isSubscribed = false, and the podcast is not a part of a playlist
+        CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode)
     }
     
     // TODO: handle removing clips

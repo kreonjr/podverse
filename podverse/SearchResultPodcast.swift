@@ -12,7 +12,7 @@ class SearchResultPodcast: NSObject {
 
     var artistName: String?
     var episodesTotal: Int?
-    var feedURL: NSURL?
+    var feedURL: String?
     var imageURL: String?
     var itunesImageURL: String?
     var isSubscribed: Bool?
