@@ -263,22 +263,40 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     // Override to support editing the table view.
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            let podcastToRemove = podcastsArray[indexPath.row]
-
-            // Remove Player button if the now playing episode was one of the podcast's episodes
-            let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
-            if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-                if allPodcastEpisodes.contains(nowPlayingEpisode) {
-                    self.navigationItem.rightBarButtonItem = nil
+        if indexPath.section == 0 {
+            if editingStyle == .Delete {
+                let podcastToRemove = podcastsArray[indexPath.row]
+                
+                // Remove Player button if the now playing episode was one of the podcast's episodes
+                let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
+                if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+                    if allPodcastEpisodes.contains(nowPlayingEpisode) {
+                        self.navigationItem.rightBarButtonItem = nil
+                    }
                 }
+                
+                PVSubscriber.unsubscribeFromPodcast(podcastToRemove)
+                podcastsArray.removeAtIndex(indexPath.row)
+                
+                self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             }
-            
-            PVSubscriber.unsubscribeFromPodcast(podcastToRemove)
-            podcastsArray.removeAtIndex(indexPath.row)
-            
-            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+        } else {
+            if indexPath.row > 1 {
+                if editingStyle == .Delete {
+                    let playlistToRemove = playlists[indexPath.row]
+                    
+                    //TODO: alert the user to ask if they want to delete the playlist locally only, locally and from the server, or cancel
+                    PVDeleter.deletePlaylist(playlistToRemove, deleteFromServer: false)
+                    
+                    self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                }
+            } else {
+                let alert = UIAlertController(title: "Cannot Delete", message: "The \"My Episodes\" and \"My Clips\" playlists are required by default and cannot be deleted.", preferredStyle: UIAlertControllerStyle.Alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
+            }
         }
+
     }
 
     // MARK: - Navigation

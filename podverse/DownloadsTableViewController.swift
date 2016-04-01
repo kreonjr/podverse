@@ -48,7 +48,7 @@ class DownloadsTableViewController: UITableViewController {
             for(index, episode) in self.episodes.enumerate() {
                 let indexPath = NSIndexPath(forRow: index, inSection: 0)
                 if episode.mediaURL == downloadDataInfo["mediaUrl"] as? String, let totalBytes = downloadDataInfo["totalBytes"] as? Float, let currentBytes = downloadDataInfo["currentBytes"]as? Float, let cell = self.tableView.cellForRowAtIndexPath(indexPath) as? DownloadsTableViewCell  {
-                
+                    
                         // Format the total bytes into a human readable KB or MB number
                         let dataFormatter = NSByteCountFormatter()
                         
@@ -57,6 +57,11 @@ class DownloadsTableViewController: UITableViewController {
                         let formattedTotalFileBytes = dataFormatter.stringFromByteCount(Int64(totalBytes))
                         cell.progressBytes.text = "\(formattedCurrentBytesDownloaded) / \(formattedTotalFileBytes)"
                     
+                        if cell.progress.progress == 1.0 {
+                            cell.downloadStatus.text = "Finished"
+                            cell.progressBytes.text = "\(formattedTotalFileBytes)"
+                        }
+                                        
                         return
                 }
             }
@@ -114,6 +119,9 @@ class DownloadsTableViewController: UITableViewController {
         else {
             cell.downloadStatus.text = "Paused"
         }
+        
+        cell.progress.progress = Float(0)
+        cell.progressBytes.text = ""
 
         return cell
     }

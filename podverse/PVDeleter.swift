@@ -59,10 +59,87 @@ class PVDeleter: NSObject {
     
     // TODO: handle removing clips
     
-    static func deletePlaylistItem(playlist:Playlist, item:AnyObject) {
+    static func deletePlaylist(playlist:Playlist, deleteFromServer:Bool) {
+        
+        // Remove Player button if the now playing episode was one of the playlists episodes or clips
+        if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+            if let episodes = playlist.episodes {
+                if (episodes.contains{$0 as? Episode == nowPlayingEpisode}) {
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: self, userInfo: nil)
+                }
+            }
+        }
+        if let nowPlayingClip = PVMediaPlayer.sharedInstance.nowPlayingClip {
+            if let clips = playlist.clips {
+                if (clips.contains{$0 as? Clip == nowPlayingClip}) {
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: self, userInfo: nil)
+                }
+            }
+        }
+        
+        for playlistItem in playlist.allItems {
+            playlist.removePlaylistItem(playlistItem)
+        }
+        
+        //TODO: Delete playlist from server here
+        
+        CoreDataHelper.sharedInstance.deleteItemFromCoreData(playlist)
+    }
+    
+    static func deletePlaylistItem(playlist:Playlist, item:AnyObject, deleteFromServer:Bool) {
+        // Remove Player button if the now playing episode was one of the playlists episodes or clips
+        if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+            if nowPlayingEpisode == item as? Episode {
+                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: self, userInfo: nil)
+            }
+        }
+        if let nowPlayingClip = PVMediaPlayer.sharedInstance.nowPlayingClip {
+            if nowPlayingClip == item as? Clip {
+                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: self, userInfo: nil)
+            }
+        }
+        
         playlist.removePlaylistItem(item)
         
-        //TODO: Server playlist item deletion
+        //TODO: Delete playlistItem from server here
+    }
+    
+    static func checkIfPodcastShouldBeRemoved(podcast: Podcast, isUnsubscribing: Bool) -> Bool {
+        var alsoDelete = true
+        
+        if isUnsubscribing != true {
+            if podcast.isSubscribed == true {
+                alsoDelete = false
+                return alsoDelete
+            }
+        }
+        
+        if let allPlaylists = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: nil) as? [Playlist] {
+            outerLoop: for playlist in allPlaylists {
+                for item in playlist.allItems {
+                    if let episode = item as? Episode {
+                        for podcastEpisode in podcast.episodes {
+                            if (podcastEpisode as! Episode) == episode {
+                                alsoDelete = false
+                                break outerLoop
+                            }
+                        }
+                    }
+                    else if let clip = item as? Clip {
+                        for podcastEpisode in podcast.episodes.allObjects {
+                            for podcastClip in (podcastEpisode as! Episode).clips {
+                                if clip == (podcastClip as! Clip) {
+                                    alsoDelete = false
+                                    break outerLoop
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return alsoDelete
     }
     
 }

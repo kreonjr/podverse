@@ -19,35 +19,14 @@ class PVSubscriber {
     }
     
     static func unsubscribeFromPodcast(podcast:Podcast) {
-        if let playlists = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: nil) as? [Playlist] {
-            
-            var alsoDelete = true
-            
-   outerLoop: for playlist in playlists {
-                for item in playlist.allItems {
-                    if let episode = item as? Episode {
-                        for podcastEpisode in podcast.episodes {
-                            if (podcastEpisode as! Episode) == episode {
-                                alsoDelete = false
-                                break outerLoop
-                            }
-                        }
-                    }
-                    else if let clip = item as? Clip {
-                        for podcastEpisode in podcast.episodes.allObjects {
-                            for podcastClip in (podcastEpisode as! Episode).clips {
-                                if clip == (podcastClip as! Clip) {
-                                    alsoDelete = false
-                                    break outerLoop
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            if alsoDelete {
-                PVDeleter.deletePodcast(podcast)
+        let alsoDelete = PVDeleter.checkIfPodcastShouldBeRemoved(podcast, isUnsubscribing: true)
+        
+        if alsoDelete {
+            PVDeleter.deletePodcast(podcast)
+        } else {
+            dispatch_async(Constants.feedParsingQueue) { () -> Void in
+                podcast.isSubscribed = false
+                CoreDataHelper.sharedInstance.saveCoreData(nil)
             }
         }
     }
