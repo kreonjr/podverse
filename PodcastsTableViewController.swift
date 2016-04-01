@@ -239,7 +239,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         let addPlaylistByURLAlert = UIAlertController(title: "Add Playlist By URL", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
         
         addPlaylistByURLAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
-            textField.placeholder = "http://podverse.tv/pl/..."
+            textField.placeholder = "http://podverse.tv/playlist/..."
         })
         
         addPlaylistByURLAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
@@ -286,13 +286,31 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
                     let playlistToRemove = playlists[indexPath.row]
                     
                     //TODO: alert the user to ask if they want to delete the playlist locally only, locally and from the server, or cancel
-                    PVDeleter.deletePlaylist(playlistToRemove, deleteFromServer: false)
+                    let deletePlaylistAlert = UIAlertController(title: "Delete Playlist", message: "Do you want to delete this playlist locally, or both locally and on podverse.fm?", preferredStyle: UIAlertControllerStyle.Alert)
                     
-                    self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                    deletePlaylistAlert.addAction(UIAlertAction(title: "Locally", style: .Default, handler: { (action: UIAlertAction!) in
+                        PVDeleter.deletePlaylist(playlistToRemove, deleteFromServer: false)
+                        self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                    }))
+                    
+                    deletePlaylistAlert.addAction(UIAlertAction(title: "Locally and Online", style: .Default, handler: { (action: UIAlertAction!) in
+                        PVDeleter.deletePlaylist(playlistToRemove, deleteFromServer: true)
+                        self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                    }))
+                    
+                    deletePlaylistAlert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: { (action: UIAlertAction!) in
+                        self.tableView.editing = false
+                        
+                    }))
+                    
+                    presentViewController(deletePlaylistAlert, animated: true, completion: nil)
                 }
             } else {
                 let alert = UIAlertController(title: "Cannot Delete", message: "The \"My Episodes\" and \"My Clips\" playlists are required by default and cannot be deleted.", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
+                alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
+                    self.tableView.editing = false
+                    
+                }))
                 self.presentViewController(alert, animated: true, completion: nil)
             }
         }

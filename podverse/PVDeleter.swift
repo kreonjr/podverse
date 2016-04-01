@@ -81,12 +81,20 @@ class PVDeleter: NSObject {
             playlist.removePlaylistItem(playlistItem)
         }
         
-        //TODO: Delete playlist from server here
+        if deleteFromServer == true {
+            SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
+                playlist.title = "This playlist has been deleted"
+                playlist.url = response["url"] as? String
+                CoreDataHelper.sharedInstance.saveCoreData(nil)
+                }) { (error) -> Void in
+                    print("Not saved to server. Error: ", error?.localizedDescription)
+                }.call()
+        }
         
         CoreDataHelper.sharedInstance.deleteItemFromCoreData(playlist)
     }
     
-    static func deletePlaylistItem(playlist:Playlist, item:AnyObject, deleteFromServer:Bool) {
+    static func deletePlaylistItem(playlist:Playlist, item:AnyObject) {
         // Remove Player button if the now playing episode was one of the playlists episodes or clips
         if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
             if nowPlayingEpisode == item as? Episode {
@@ -101,7 +109,12 @@ class PVDeleter: NSObject {
         
         playlist.removePlaylistItem(item)
         
-        //TODO: Delete playlistItem from server here
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
+            playlist.url = response["url"] as? String
+            CoreDataHelper.sharedInstance.saveCoreData(nil)
+            }) { (error) -> Void in
+                print("Not saved to server. Error: ", error?.localizedDescription)
+            }.call()
     }
     
     static func checkIfPodcastShouldBeRemoved(podcast: Podcast, isUnsubscribing: Bool) -> Bool {

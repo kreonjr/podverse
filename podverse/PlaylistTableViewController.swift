@@ -253,7 +253,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
                 }
             }
             
-            PVDeleter.deletePlaylistItem(playlist, item: playlistItemToRemove, deleteFromServer: true)
+            PVDeleter.deletePlaylistItem(playlist, item: playlistItemToRemove)
             self.playlistItems.removeAtIndex(indexPath.row)
             
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
