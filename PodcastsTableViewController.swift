@@ -158,7 +158,6 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
 
-        
         if indexPath.section == 0 {
             let podcast = podcastsArray[indexPath.row]
             cell.title?.text = podcast.title
@@ -167,7 +166,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             let episodesDownloaded = episodes.filter{ $0.fileName != nil }
             cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
             
-            cell.totalClips?.text = String(podcast.clips.count) + " clips"
+            //TODO: Calculate all clips in podcast
+            cell.totalClips?.text = "\(0) clips"
             
             cell.lastPublishedDate?.text = ""
             if let lastPubDate = podcast.lastPubDate {
@@ -239,7 +239,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         let addPlaylistByURLAlert = UIAlertController(title: "Add Playlist By URL", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
         
         addPlaylistByURLAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
-            textField.placeholder = "http://podverse.tv/pl/..."
+            textField.placeholder = "http://podverse.tv/playlist/..."
         })
         
         addPlaylistByURLAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
@@ -263,22 +263,58 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     // Override to support editing the table view.
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            let podcastToRemove = podcastsArray[indexPath.row]
-
-            // Remove Player button if the now playing episode was one of the podcast's episodes
-            let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
-            if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-                if allPodcastEpisodes.contains(nowPlayingEpisode) {
-                    self.navigationItem.rightBarButtonItem = nil
+        if indexPath.section == 0 {
+            if editingStyle == .Delete {
+                let podcastToRemove = podcastsArray[indexPath.row]
+                
+                // Remove Player button if the now playing episode was one of the podcast's episodes
+                let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
+                if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+                    if allPodcastEpisodes.contains(nowPlayingEpisode) {
+                        self.navigationItem.rightBarButtonItem = nil
+                    }
                 }
+                
+                PVSubscriber.unsubscribeFromPodcast(podcastToRemove)
+                podcastsArray.removeAtIndex(indexPath.row)
+                
+                self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             }
-            
-            PVDeleter.deletePodcast(podcastToRemove)
-            podcastsArray.removeAtIndex(indexPath.row)
-            
-            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+        } else {
+            if indexPath.row > 1 {
+                if editingStyle == .Delete {
+                    let playlistToRemove = playlists[indexPath.row]
+                    
+                    //TODO: alert the user to ask if they want to delete the playlist locally only, locally and from the server, or cancel
+                    let deletePlaylistAlert = UIAlertController(title: "Delete Playlist", message: "Do you want to delete this playlist locally, or both locally and on podverse.fm?", preferredStyle: UIAlertControllerStyle.Alert)
+                    
+                    deletePlaylistAlert.addAction(UIAlertAction(title: "Locally", style: .Default, handler: { (action: UIAlertAction!) in
+                        PVDeleter.deletePlaylist(playlistToRemove, deleteFromServer: false)
+                        self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                    }))
+                    
+                    deletePlaylistAlert.addAction(UIAlertAction(title: "Locally and Online", style: .Default, handler: { (action: UIAlertAction!) in
+                        PVDeleter.deletePlaylist(playlistToRemove, deleteFromServer: true)
+                        self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                    }))
+                    
+                    deletePlaylistAlert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: { (action: UIAlertAction!) in
+                        self.tableView.editing = false
+                        
+                    }))
+                    
+                    presentViewController(deletePlaylistAlert, animated: true, completion: nil)
+                }
+            } else {
+                let alert = UIAlertController(title: "Cannot Delete", message: "The \"My Episodes\" and \"My Clips\" playlists are required by default and cannot be deleted.", preferredStyle: UIAlertControllerStyle.Alert)
+                alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
+                    self.tableView.editing = false
+                    
+                }))
+                self.presentViewController(alert, animated: true, completion: nil)
+            }
         }
+
     }
 
     // MARK: - Navigation

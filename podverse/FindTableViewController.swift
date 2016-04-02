@@ -89,7 +89,7 @@ class FindTableViewController: UITableViewController {
                 
                 addByRSSAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
                     let textField = addByRSSAlert.textFields![0] as UITextField
-                    PVSubscriber.sharedInstance.subscribeToPodcast(textField.text!)
+                    PVSubscriber.subscribeToPodcast(textField.text!)
                 }))
                 
                 presentViewController(addByRSSAlert, animated: true, completion: nil)

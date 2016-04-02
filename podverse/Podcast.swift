@@ -23,11 +23,13 @@ class Podcast: NSManagedObject {
     @NSManaged var summary: String?
     @NSManaged var title: String
     @NSManaged var isSubscribed: Bool
-    @NSManaged var clips: NSSet
     @NSManaged var episodes: NSSet
     
     func addEpisodeObject(value: Episode) {
         self.mutableSetValueForKey("episodes").addObject(value)
     }
-
+    
+    func removeEpisodeObject(value: Episode) {
+        self.mutableSetValueForKey("episode").removeObject(value)
+    }
 }

@@ -236,20 +236,27 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     // Override to support editing the table view.
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-//            let podcastToRemove = podcastArray[indexPath.row]
-//            
-//            // Remove Player button if the now playing episode was one of the podcast's episodes
-//            let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
-//            if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-//                if allPodcastEpisodes.contains(nowPlayingEpisode) {
-//                    self.navigationItem.rightBarButtonItem = nil
-//                }
-//            }
-//            
-//            PVDeleter.sharedInstance.deletePodcast(podcastToRemove)
-//            podcastArray.removeAtIndex(indexPath.row)
-//            
-//            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            let playlistItemToRemove = playlistItems[indexPath.row]
+            
+            // Remove Player button if the now playing item matches the playlistItem
+            if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+                if let episode = playlistItems[indexPath.row] as? Episode {
+                    if episode.mediaURL == nowPlayingEpisode.mediaURL  {
+                        self.navigationItem.rightBarButtonItem = nil
+                    }
+                }
+            } else if let nowPlayingClip = PVMediaPlayer.sharedInstance.nowPlayingClip {
+                if let clip = playlistItems[indexPath.row] as? Clip {
+                    if clip.episode.mediaURL == nowPlayingClip.episode.mediaURL  {
+                        self.navigationItem.rightBarButtonItem = nil
+                    }
+                }
+            }
+            
+            PVDeleter.deletePlaylistItem(playlist, item: playlistItemToRemove)
+            self.playlistItems.removeAtIndex(indexPath.row)
+            
+            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
         }
     }
     

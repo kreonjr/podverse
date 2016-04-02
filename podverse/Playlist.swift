@@ -7,7 +7,6 @@ import CoreData
 @objc(Playlist)
 
 class Playlist: NSManagedObject {
-    @NSManaged var playlistItems: [Dictionary<String,AnyObject>]
     @NSManaged var title: String
     @NSManaged var url: String?
     @NSManaged var isPublic: Bool
@@ -38,7 +37,6 @@ class Playlist: NSManagedObject {
     var totalItems:Int {
         get {
             return self.allItems.count
-
         }
     }
     
@@ -49,4 +47,41 @@ class Playlist: NSManagedObject {
     func addClipObject(value: Clip) {
         self.mutableSetValueForKey("clips").addObject(value)
     }
+    
+    private func removeEpisodeObject(value: Episode) {
+        self.mutableSetValueForKey("episodes").removeObject(value)
+        
+        let alsoDeletePodcast = PVDeleter.checkIfPodcastShouldBeRemoved(value.podcast, isUnsubscribing: false)
+        
+        if alsoDeletePodcast {
+            PVDeleter.deletePodcast(value.podcast)
+        }
+        
+    }
+    
+    private func removeClipObject(value: Clip) {
+        self.mutableSetValueForKey("clips").removeObject(value)
+        
+        let alsoDeletePodcast = PVDeleter.checkIfPodcastShouldBeRemoved(value.episode.podcast, isUnsubscribing: false)
+        
+        if alsoDeletePodcast {
+            PVDeleter.deletePodcast(value.episode.podcast)
+        }
+    }
+    
+    func removePlaylistItem(value: AnyObject) {
+        
+        
+        if let episode = value as? Episode {
+            removeEpisodeObject(episode)
+        }
+        else if let clip = value as? Clip {
+            removeClipObject(clip)
+        }
+        else {
+            print("Object not a playlist item")
+        }
+    }
+    
+
 }
