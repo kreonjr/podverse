@@ -144,9 +144,6 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func feedParserParsingAborted(parser: FeedParser) {
-        dispatch_async(dispatch_get_main_queue()) { () -> Void in
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.refreshPodcastTableDataNotification, object: nil)
-        }
         // If podcast is nil, then the RSS feed was invalid for the parser, and we should return out of successfullyParsedURL
         if podcast == nil {
             delegate?.feedParsingComplete()
@@ -176,10 +173,6 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func feedParser(parser: FeedParser, successfullyParsedURL url: String) {
-        dispatch_async(dispatch_get_main_queue()) { () -> Void in
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.refreshPodcastTableDataNotification, object: nil)
-        }
-        
         // If podcast is nil, then the RSS feed was invalid for the parser, and we should return out of successfullyParsedURL
         if podcast == nil {
             delegate?.feedParsingComplete()

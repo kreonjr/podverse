@@ -43,10 +43,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
         podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: podcastsPredicate) as! [Podcast]
         podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
-
-        // TODO: The answer in the SO link below claims that using a string in a predicate can cause performance issues. Well below we are passing a podcast object as the NSPredicate. If strings can cause performance issues, wouldn't this cause egregiously horrible performance issues? I know this "fetchOnlyEntityWithMostRecentPubDate" has had mutating array crashes in the past (although I haven't seen it happen since mid-February). Could it be that we are using a bad predicate? If yes, how can we make this more performant?
-        // http://stackoverflow.com/questions/30368945/saving-coredata-on-background-thread-causes-fetching-into-a-deadlock-and-crash
-
+        
         // Set pubdate in cell equal to most recent episode's pubdate
         for podcast in podcastsArray {
             let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
@@ -191,7 +188,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             cell.lastPublishedDate?.text = "playlist last updated date"
             //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
             
-            cell.totalClips?.text = "\(playlist.totalItems) items"
+            cell.totalClips?.text = "\(playlist.allItems.count) items"
             
             cell.pvImage?.image = UIImage(named: "Blank52")
 
