@@ -44,7 +44,9 @@ class PVDeleter: NSObject {
             if episode == nowPlayingEpisode {
                 PVMediaPlayer.sharedInstance.avPlayer.pause()
                 PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
-                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                })
             }
         }
         
@@ -65,14 +67,18 @@ class PVDeleter: NSObject {
         if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
             if let episodes = playlist.episodes {
                 if (episodes.contains{$0 as? Episode == nowPlayingEpisode}) {
-                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: self, userInfo: nil)
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                    })
                 }
             }
         }
         if let nowPlayingClip = PVMediaPlayer.sharedInstance.nowPlayingClip {
             if let clips = playlist.clips {
                 if (clips.contains{$0 as? Clip == nowPlayingClip}) {
-                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: self, userInfo: nil)
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                    })
                 }
             }
         }
@@ -98,12 +104,16 @@ class PVDeleter: NSObject {
         // Remove Player button if the now playing episode was one of the playlists episodes or clips
         if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
             if nowPlayingEpisode == item as? Episode {
-                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: self, userInfo: nil)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                })
             }
         }
         if let nowPlayingClip = PVMediaPlayer.sharedInstance.nowPlayingClip {
             if nowPlayingClip == item as? Clip {
-                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: self, userInfo: nil)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                })
             }
         }
         
@@ -112,9 +122,9 @@ class PVDeleter: NSObject {
         SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
             playlist.url = response["url"] as? String
             CoreDataHelper.sharedInstance.saveCoreData(nil)
-            }) { (error) -> Void in
+        }) { (error) -> Void in
                 print("Not saved to server. Error: ", error?.localizedDescription)
-            }.call()
+        }.call()
     }
     
     static func checkIfPodcastShouldBeRemoved(podcast: Podcast, isUnsubscribing: Bool) -> Bool {

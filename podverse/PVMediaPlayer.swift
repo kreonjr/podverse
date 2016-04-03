@@ -316,6 +316,9 @@ class PVMediaPlayer: NSObject {
         if nowPlayingEpisode != nil || nowPlayingClip != nil {
             vc.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: vc, action: "segueToNowPlaying:")
         }
+        else {
+            vc.navigationItem.rightBarButtonItem = nil
+        }
     }
     
     // If there is not a now playing episode or clip, remove Now Playing button from nav bar if present

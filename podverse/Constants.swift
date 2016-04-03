@@ -23,8 +23,6 @@ struct Constants {
     static let saveQueue = dispatch_queue_create("MOC_SERIAL_SAVE_QUEUE", DISPATCH_QUEUE_SERIAL)
     
     static let feedParsingQueue = dispatch_queue_create("FEED_PARSER_QUEUE", DISPATCH_QUEUE_SERIAL);
-
-    static let refreshPodcastTableDataNotification = "refreshPodcastTableDataNotification"
     
     static let kRefreshAddToPlaylistTableDataNotification = "refreshPodcastTableDataNotification"
     

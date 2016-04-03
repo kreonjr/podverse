@@ -310,11 +310,11 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         pvMediaPlayer.clearPlayingInfo()
         pvMediaPlayer.nowPlayingEpisode = nil
         
-        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
         
         PVDeleter.deleteEpisode(currentEpisode,completion: nil)
         
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
             self.navigationController?.popViewControllerAnimated(true)
         })
     }
@@ -324,9 +324,9 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         pvMediaPlayer.clearPlayingInfo()
         pvMediaPlayer.nowPlayingClip = nil
         
-        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
         
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
             self.navigationController?.popViewControllerAnimated(true)
         })
     }    

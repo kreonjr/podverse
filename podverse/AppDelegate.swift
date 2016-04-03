@@ -19,7 +19,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
     
-    let REFRESH_PODCAST_TIME:Double = 3600
     
     var backgroundTransferCompletionHandler: (() -> Void)?
     
@@ -33,24 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
     
-    // This function runs once on app load, then runs in the background every 30 minutes.
-    // Check if a new episode is available for a subscribed podcast; if true, download that episode.
-    // TODO: shouldn't we check via push notifications? Rather than a timer that continuously runs in the background?
-    func startCheckSubscriptionsForNewEpisodesTimer() {
-        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: "refreshPodcastFeeds", userInfo: nil, repeats: true)
-    }
-    
-    func refreshPodcastFeeds () {
-        let podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
-        for var i = 0; i < podcastArray.count; i++ {
-            let feedURL = NSURL(string: podcastArray[i].feedURL)
-            
-            let feedParser = PVFeedParser(shouldGetMostRecent: true, shouldSubscribe:false )
-            if let feedURLString = feedURL?.absoluteString {
-                feedParser.parsePodcastFeed(feedURLString)
-            }
-        }
-    }
+
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
@@ -93,9 +75,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             NSUserDefaults.standardUserDefaults().setBool(true, forKey: "AppHasLaunchedOnce")
             PlaylistManager.sharedInstance.createDefaultPlaylists()
         }
-                
-        startCheckSubscriptionsForNewEpisodesTimer()
-        
+                        
         Fabric.with([Crashlytics.self])
         return true
     }
@@ -123,7 +103,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillEnterForeground(application: UIApplication) {
         // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-        self.refreshPodcastFeeds()
     }
 
     func applicationDidBecomeActive(application: UIApplication) {

@@ -9,8 +9,9 @@
 import UIKit
 import CoreData
 
-protocol PVFeedParserDelegate {
+@objc protocol PVFeedParserDelegate {
    func feedParsingComplete()
+   optional func feedItemParsed()
 }
 
 class PVFeedParser: NSObject, FeedParserDelegate {
@@ -92,6 +93,11 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func feedParser(parser: FeedParser, didParseItem item: FeedItem) {
+        defer {
+            dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                self.delegate?.feedItemParsed?()
+            }
+        }
         //Do not parse episode if it does not contain feedEnclosures.
         if item.feedEnclosures.count <= 0 {
             return
@@ -144,12 +150,11 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func feedParserParsingAborted(parser: FeedParser) {
-        dispatch_async(dispatch_get_main_queue()) { () -> Void in
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.refreshPodcastTableDataNotification, object: nil)
-        }
         // If podcast is nil, then the RSS feed was invalid for the parser, and we should return out of successfullyParsedURL
         if podcast == nil {
-            delegate?.feedParsingComplete()
+            dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                self.delegate?.feedParsingComplete()
+            }
             return
         }
         
@@ -176,13 +181,14 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func feedParser(parser: FeedParser, successfullyParsedURL url: String) {
-        dispatch_async(dispatch_get_main_queue()) { () -> Void in
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.refreshPodcastTableDataNotification, object: nil)
+        defer {
+            dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                self.delegate?.feedParsingComplete()
+            }
         }
         
         // If podcast is nil, then the RSS feed was invalid for the parser, and we should return out of successfullyParsedURL
         if podcast == nil {
-            delegate?.feedParsingComplete()
             return
         }
         
@@ -199,7 +205,6 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         
         CoreDataHelper.sharedInstance.saveCoreData(nil)
         
-        delegate?.feedParsingComplete()
         print("feed parser has finished!")
     }
     
