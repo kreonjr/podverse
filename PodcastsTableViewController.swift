@@ -170,7 +170,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             cell.lastPublishedDate?.text = "playlist last updated date"
             //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
             
-            cell.totalClips?.text = "\(playlist.totalItems) items"
+            cell.totalClips?.text = "\(playlist.allItems.count) items"
             
             cell.pvImage?.image = UIImage(named: "Blank52")
 
