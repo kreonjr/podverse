@@ -191,9 +191,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
             let latestEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate)
             
-            // If there is an episode in the array, then download the episode
             if latestEpisodeArray.count > 0 {
-                PVDownloader.sharedInstance.startDownloadingEpisode(latestEpisodeArray[0] as! Episode)
+                if let latestEpisode = latestEpisodeArray[0] as? Episode {
+                    if latestEpisode.downloadComplete != true {
+                        PVDownloader.sharedInstance.startDownloadingEpisode(latestEpisode)
+                    }
+                }
             }
         }
         
