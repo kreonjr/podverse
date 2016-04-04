@@ -68,7 +68,16 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         refreshPodcastFeeds()
         startCheckSubscriptionsForNewEpisodesTimer()
         
-        PlaylistManager.sharedInstance.refreshPlaylists()
+        PlaylistManager.sharedInstance.refreshPlaylists { () -> Void in
+            self.reloadTable()
+        }
+    }
+    
+    func refreshAllData() {
+        refreshPodcastFeeds()
+        PlaylistManager.sharedInstance.refreshPlaylists { () -> Void in
+            self.tableView.reloadSections(NSIndexSet(index: 1), withRowAnimation: .None)
+        }
     }
     
     func refreshPodcastFeeds() {
@@ -328,7 +337,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     // Check if a new episode is available for a subscribed podcast; if true, download that episode.
     // TODO: shouldn't we check via push notifications? Rather than a timer that continuously runs in the background?
     func startCheckSubscriptionsForNewEpisodesTimer() {
-        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: "refreshPodcastFeeds", userInfo: nil, repeats: true)
+        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: "refreshAllData", userInfo: nil, repeats: true)
     }
     
     func loadData() {
@@ -359,8 +368,10 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
 }
 
 extension PodcastsTableViewController: PVFeedParserDelegate {
-    func feedParsingComplete() {
-        loadData()
+    func feedParsingComplete(feedURL:String?) {
+        if let url = feedURL, let index = podcastsArray.indexOf({ url == $0.feedURL }) {
+            self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
+        }
     }
     
     func feedItemParsed() {

@@ -331,7 +331,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         }
     }
     
-    func feedParsingComplete() {
+    func feedParsingComplete(feedURL:String?) {
         self.refreshControl.endRefreshing()
         tableView.reloadData()
     }

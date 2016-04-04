@@ -106,6 +106,10 @@ public class WebService {
             alamoMethod = .CONNECT
         }
         
+        if httpMethod == .METHOD_PUT || httpMethod == .METHOD_POST {
+            addHeaderWithKey("Authorization", value: Constants.SERVER_AUTHORIZATION_KEY)
+        }
+        
         if .METHOD_GET == httpMethod && .PARAM_ENCODING_JSON == paramEncoding {
             paramEncoding = .PARAM_ENCODING_URL
         }

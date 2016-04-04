@@ -44,7 +44,7 @@ final class PlaylistManager: NSObject {
         
     }
     
-    func refreshPlaylists() {
+    func refreshPlaylists(completion:()->Void) {
         let dispatchGroup = dispatch_group_create()
         for playlist in playlists {
             if let playlistId = playlist.playlistId {
@@ -61,7 +61,7 @@ final class PlaylistManager: NSObject {
         }
         
         dispatch_group_notify(dispatchGroup, dispatch_get_main_queue()) { () -> Void in
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.refreshPodcastTableDataNotification, object: nil)
+            completion()
         }
     }
     
