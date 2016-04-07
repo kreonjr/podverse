@@ -372,6 +372,9 @@ extension PodcastsTableViewController: PVFeedParserDelegate {
         if let url = feedURL, let index = podcastsArray.indexOf({ url == $0.feedURL }) {
             self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
         }
+        else {
+            loadData()
+        }
     }
     
     func feedItemParsed() {

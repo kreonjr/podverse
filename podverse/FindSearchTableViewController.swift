@@ -15,14 +15,22 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     
     @IBOutlet weak var tableView: UITableView!
     
-    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    
     var iTunesSearchPodcastArray = [SearchResultPodcast]()
     var iTunesSearchPodcastFeedURLArray: [NSURL] = []
     
     func removePlayerNavButton(notification: NSNotification) {
         dispatch_async(dispatch_get_main_queue()) {
             PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
+        }
+    }
+    
+    var podcastVC:PodcastsTableViewController? {
+        get {
+            if let navController = self.tabBarController?.viewControllers?.first as? UINavigationController, podcastTable = navController.topViewController as? PodcastsTableViewController {
+                return podcastTable
+            }
+            
+            return nil
         }
     }
     
@@ -75,13 +83,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                                 	self.presentViewController(addByRSSAlert, animated: true, completion: nil)
                             	})
                             } else {
-                                // Get all podcasts in Core Data to use to determine if you're already subscribed to a search result podcast
-                                let allSubscribedPodcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
-                                
-                                for (var i = 0; i < results.count; i++) {
-                                    
-                                    let podcastJSON: AnyObject = results[i]
-                                    
+                                for podcastJSON in results {
                                     let searchResultPodcast = SearchResultPodcast()
                                     
                                     searchResultPodcast.feedURL = podcastJSON["feedUrl"] as? String
@@ -136,6 +138,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         searchItunesFor(searchBar.text!)
+        searchBar.resignFirstResponder()
     }
     
     override func didReceiveMemoryWarning() {
@@ -190,8 +193,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         if isSubscribed == false {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
                 if let feedURL = iTunesSearchPodcast.feedURL {
-                    PVSubscriber.subscribeToPodcast(feedURL)
-                    
+                    PVSubscriber.subscribeToPodcast(feedURL, podcastTableDelegate: self.podcastVC)
                 }
             }))
         }

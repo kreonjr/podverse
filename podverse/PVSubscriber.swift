@@ -11,9 +11,10 @@ import CoreData
 
 class PVSubscriber {
 
-    static func subscribeToPodcast(feedURLString: String) {
+    static func subscribeToPodcast(feedURLString: String, podcastTableDelegate:PodcastsTableViewController?) {
         dispatch_async(Constants.feedParsingQueue) { () -> Void in
             let feedParser = PVFeedParser(shouldGetMostRecent: false, shouldSubscribe: true)
+            feedParser.delegate = podcastTableDelegate
             feedParser.parsePodcastFeed(feedURLString)
         }
     }
