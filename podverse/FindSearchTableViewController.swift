@@ -74,10 +74,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
                                 	self.presentViewController(addByRSSAlert, animated: true, completion: nil)
                             	})
-                            } else {
-                                // Get all podcasts in Core Data to use to determine if you're already subscribed to a search result podcast
-                                let allSubscribedPodcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
-                                
+                            } else {                                
                                 for (var i = 0; i < results.count; i++) {
                                     
                                     let podcastJSON: AnyObject = results[i]
@@ -182,7 +179,9 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         if let savedPodcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as? [Podcast] {
             for savedPodcast in savedPodcasts {
                 if iTunesSearchPodcast.feedURL == savedPodcast.feedURL {
-                    isSubscribed = true
+                    if savedPodcast.isSubscribed == true {
+                        isSubscribed = true
+                    }
                 }
             }
         }
