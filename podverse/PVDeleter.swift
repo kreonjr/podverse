@@ -54,9 +54,15 @@ class PVDeleter: NSObject {
         // Delete the episode from CoreData and the disk, and update the UI
         if let fileName = episode.fileName {
             PVUtility.deleteEpisodeFromDiskWithName(fileName)
+            episode.fileName = nil
         }
-
-        CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode)
+        
+        // If the episode or a clip from the episode is currently a playlistItem in a local playlist, then do not delete the episode item from Core Data
+        var alsoDelete = checkIfEpisodeShouldBeRemoved(episode)
+        
+        if alsoDelete == true {
+            CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode)
+        }
     }
     
     // TODO: handle removing clips
@@ -152,6 +158,42 @@ class PVDeleter: NSObject {
                         for podcastEpisode in podcast.episodes.allObjects {
                             for podcastClip in (podcastEpisode as! Episode).clips {
                                 if clip == (podcastClip as! Clip) {
+                                    alsoDelete = false
+                                    break outerLoop
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return alsoDelete
+    }
+    
+    static func checkIfEpisodeShouldBeRemoved(episode: Episode) -> Bool {
+        var alsoDelete = true
+        
+        if episode.podcast.isSubscribed == true {
+            alsoDelete = false
+            return alsoDelete
+        }
+        
+        if let allPlaylists = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: nil) as? [Playlist] {
+            outerLoop: for playlist in allPlaylists {
+                for item in playlist.allItems {
+                    if let episode = item as? Episode {
+                        for ep in episode.podcast.episodes {
+                            if (ep as! Episode) == episode {
+                                alsoDelete = false
+                                break outerLoop
+                            }
+                        }
+                    }
+                    else if let clip = item as? Clip {
+                        for ep in episode.podcast.episodes {
+                            for cl in (ep as! Episode).clips {
+                                if clip == (cl as! Clip) {
                                     alsoDelete = false
                                     break outerLoop
                                 }
