@@ -35,9 +35,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        
-        CoreDataHelper.sharedInstance
-        
         UIApplication.sharedApplication().statusBarStyle = .LightContent
         
         UINavigationBar.appearance().translucent = false
@@ -115,8 +112,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if PVMediaPlayer.sharedInstance.avPlayer.rate == 1 {
             PVMediaPlayer.sharedInstance.saveCurrentTimeAsPlaybackPosition()
         }
-        
-        CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
 }
 

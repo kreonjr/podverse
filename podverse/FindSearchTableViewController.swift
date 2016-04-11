@@ -24,6 +24,8 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         }
     }
     
+    let moc = CoreDataHelper().managedObjectContext
+    
     var podcastVC:PodcastsTableViewController? {
         get {
             if let navController = self.tabBarController?.viewControllers?.first as? UINavigationController, podcastTable = navController.topViewController as? PodcastsTableViewController {
@@ -182,7 +184,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         var isSubscribed = false
         
         
-        if let savedPodcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as? [Podcast] {
+        if let savedPodcasts = CoreDataHelper.fetchEntities("Podcast", predicate: nil, moc:moc) as? [Podcast] {
             for savedPodcast in savedPodcasts {
                 if iTunesSearchPodcast.feedURL == savedPodcast.feedURL {
                     isSubscribed = true
@@ -199,9 +201,9 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         }
         else {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Unsubscribe", style: .Default, handler: { action in
-                if let podcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as? [Podcast] {
+                if let podcasts = CoreDataHelper.fetchEntities("Podcast", predicate: nil, moc:self.moc) as? [Podcast] {
                     if let index = podcasts.indexOf({ $0.feedURL == iTunesSearchPodcast.feedURL }) {
-                        PVSubscriber.unsubscribeFromPodcast(podcasts[index])
+                        PVSubscriber.unsubscribeFromPodcast(podcasts[index], moc: self.moc)
                     }
                 }
             }))

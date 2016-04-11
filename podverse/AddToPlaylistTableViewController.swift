@@ -67,9 +67,12 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         createPlaylistAlert.addAction(UIAlertAction(title: "Save", style: .Default, handler: { (action: UIAlertAction!) in
             let textField = createPlaylistAlert.textFields![0] as UITextField
             if let playlistTitle = textField.text {
-                let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
+                let moc = CoreDataHelper().managedObjectContext
+                
+                let playlist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
                 playlist.title = playlistTitle
-                self.playlistManager.savePlaylist(playlist)
+                CoreDataHelper.saveCoreData(moc, completionBlock:nil)
+                self.playlistManager.savePlaylist(playlist, moc:moc)
             }
         }))
     
@@ -131,9 +134,9 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let playlist = validPlaylists[indexPath.row]
         if let c = clip {
-            playlistManager.addItemToPlaylist(playlist, clip: c, episode: nil)
+            playlistManager.addItemToPlaylist(playlist, clip: c, episode: nil, moc: playlist.managedObjectContext)
         } else if let e = episode {
-            playlistManager.addItemToPlaylist(playlist, clip: nil, episode: e)
+            playlistManager.addItemToPlaylist(playlist, clip: nil, episode: e, moc: playlist.managedObjectContext)
         }
     }
     

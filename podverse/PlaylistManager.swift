@@ -6,20 +6,24 @@
 //  Copyright © 2016 Mitchell Downey. All rights reserved.
 //
 
-import Foundation
+import UIKit
+import CoreData
 
 protocol PlaylistManagerDelegate {
     func playlistAddedByUrl()
 }
 
-final class PlaylistManager: NSObject {
+final class PlaylistManager {
+
     static let sharedInstance = PlaylistManager()
     
     var delegate:PlaylistManagerDelegate?
     
     var playlists:[Playlist] {
         get {
-            return CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: nil) as! [Playlist]
+            
+            let moc = CoreDataHelper().managedObjectContext
+            return CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc:moc) as! [Playlist]
         }
     }
     
@@ -32,9 +36,16 @@ final class PlaylistManager: NSObject {
         
         if (urlComponentArray[0] == "http:" || urlComponentArray[0] == "https") && (urlComponentArray[1] == "") && (urlComponentArray[2] == "podverse.tv") && (urlComponentArray[3] == "pl") && (playlistId.characters.count == 16) {
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
-                    let playlist = CoreDataHelper.sharedInstance.retrieveExistingOrCreateNewPlaylist(playlistId)
-                    PlaylistManager.JSONToPlaylist(playlist, JSONDict: response)
-                    PlaylistManager.sharedInstance.delegate?.playlistAddedByUrl()
+                    
+                        let moc = CoreDataHelper().backgroundContext
+                        let playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:moc)
+                        PlaylistManager.JSONToPlaylist(playlist, JSONDict: response)
+                        
+                        CoreDataHelper.saveCoreData(moc, completionBlock:{ (finished) in
+                            dispatch_async(dispatch_get_main_queue()) {
+                                PlaylistManager.sharedInstance.delegate?.playlistAddedByUrl()
+                            }
+                        })
                 }) { (error) -> Void in
                         print("Error y'all \(error?.localizedDescription)")
                 }.call()
@@ -50,10 +61,17 @@ final class PlaylistManager: NSObject {
             if let playlistId = playlist.playlistId {
                 dispatch_group_enter(dispatchGroup)
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
-                    let playlist = CoreDataHelper.sharedInstance.retrieveExistingOrCreateNewPlaylist(playlistId)
+
+                    let moc = CoreDataHelper().backgroundContext
+                    let playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:moc)
                     PlaylistManager.JSONToPlaylist(playlist, JSONDict: response)
-                    print("Playlist refreshed")
-                    dispatch_group_leave(dispatchGroup)
+                    
+                    CoreDataHelper.saveCoreData(moc, completionBlock:{ (finished) in
+                        PlaylistManager.sharedInstance.delegate?.playlistAddedByUrl()
+                        print("Playlist refreshed")
+                        dispatch_group_leave(dispatchGroup)
+                    })
+                    
                 }) { (error) -> Void in
                     print("Error y'all \(error?.localizedDescription)")
                 }.call()
@@ -66,6 +84,7 @@ final class PlaylistManager: NSObject {
     }
     
     static func JSONToPlaylist(playlist:Playlist, JSONDict:Dictionary<String,AnyObject>) {
+        let moc = CoreDataHelper().managedObjectContext
         if let title = JSONDict["playlistTitle"] as? String {
             playlist.title = title
         }
@@ -94,7 +113,7 @@ final class PlaylistManager: NSObject {
                     if playlistItem["episode"] != nil {
                         if let podcastDict = playlistItem["podcast"] {
                             if let feedURLString = podcastDict["feedURL"] as? String {
-                                podcast = CoreDataHelper.sharedInstance.retrieveExistingOrCreateNewPodcast(feedURLString)
+                                podcast = CoreDataHelper.retrieveExistingOrCreateNewPodcast(feedURLString, moc:moc)
                                 podcast.feedURL = feedURLString
                             } else {
                                 break
@@ -113,7 +132,7 @@ final class PlaylistManager: NSObject {
                         
                         if let episodeDict = playlistItem["episode"] {
                             if let mediaUrlString = episodeDict["mediaURL"] as? String {
-                                episode = CoreDataHelper.sharedInstance.retrieveExistingOrCreateNewEpisode(mediaUrlString)
+                                episode = CoreDataHelper.retrieveExistingOrCreateNewEpisode(mediaUrlString, moc:moc)
                                 episode.mediaURL = mediaUrlString
                             } else {
                                 break
@@ -131,7 +150,7 @@ final class PlaylistManager: NSObject {
                         }
                         
                         // TODO: add a retrieveExistingOrCreateNewClip function and use it below. We'll need to have a unique identifier for clips...
-                        let clip = CoreDataHelper.sharedInstance.insertManagedObject("Clip") as! Clip
+                        let clip = CoreDataHelper.insertManagedObject("Clip", moc:moc) as! Clip
                         
                         if let title = playlistItem["title"] as? String {
                             clip.title = title
@@ -157,7 +176,7 @@ final class PlaylistManager: NSObject {
                     else {
                         if let podcastDict = playlistItem["podcast"] {
                             if let feedURLString = podcastDict["feedURL"] as? String {
-                                podcast = CoreDataHelper.sharedInstance.retrieveExistingOrCreateNewPodcast(feedURLString)
+                                podcast = CoreDataHelper.retrieveExistingOrCreateNewPodcast(feedURLString, moc:moc)
                                 podcast.feedURL = feedURLString
                             } else {
                                 break
@@ -175,7 +194,7 @@ final class PlaylistManager: NSObject {
                         }
                         
                         if let mediaUrlString = playlistItem["mediaURL"] as? String {
-                            episode = CoreDataHelper.sharedInstance.retrieveExistingOrCreateNewEpisode(mediaUrlString)
+                            episode = CoreDataHelper.retrieveExistingOrCreateNewEpisode(mediaUrlString, moc:moc)
                         } else {
                             break
                         }
@@ -196,7 +215,7 @@ final class PlaylistManager: NSObject {
             }
         }
         
-        CoreDataHelper.sharedInstance.saveCoreData(nil)
+        CoreDataHelper.saveCoreData(moc, completionBlock:nil)
     }
     
     func clipToPlaylistItemJSON(clip:Clip) -> Dictionary<String,AnyObject> {
@@ -248,19 +267,19 @@ final class PlaylistManager: NSObject {
     
     func createDefaultPlaylists() {
         // If no playlists are saved, then create the "My Clips" and "My Episodes" playlists
-    
-        if playlists.count < 1 {
-            let myEpisodesPlaylist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
+        let moc = CoreDataHelper().backgroundContext
+        if self.playlists.count < 1 {
+            let myEpisodesPlaylist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
             myEpisodesPlaylist.title = Constants.kMyEpisodesPlaylist
-            savePlaylist(myEpisodesPlaylist)
+            self.savePlaylist(myEpisodesPlaylist, moc:moc)
             
-            let myClipsPlaylist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
+            let myClipsPlaylist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
             myClipsPlaylist.title = Constants.kMyClipsPlaylist
-            savePlaylist(myClipsPlaylist)
+            self.savePlaylist(myClipsPlaylist, moc:moc)
         }
     }
     
-    func addItemToPlaylist(playlist: Playlist, clip: Clip?, episode: Episode?) {
+    func addItemToPlaylist(playlist: Playlist, clip: Clip?, episode: Episode?,  moc:NSManagedObjectContext?) {
         if let c = clip {
             playlist.addClipObject(c)
             
@@ -273,32 +292,32 @@ final class PlaylistManager: NSObject {
         SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
             playlist.url = response["url"] as? String
             
-            CoreDataHelper.sharedInstance.saveCoreData(nil)
-            
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                CoreDataHelper.saveCoreData(moc, completionBlock: nil)
                 NSNotificationCenter.defaultCenter().postNotificationName(Constants.kItemAddedToPlaylistNotification, object: nil)
             })
-
-            }) { (error) -> Void in
-                print("Not saved to server. Error: ", error?.localizedDescription)
-            }.call()
+        }) { (error) -> Void in
+            print("Not saved to server. Error: ", error?.localizedDescription)
+        }.call()
     }
     
-    func savePlaylist(playlist: Playlist) {
-        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
-            
-            playlist.playlistId = response["_id"] as? String
-            playlist.url = response["url"] as? String
-            
-            CoreDataHelper.sharedInstance.saveCoreData(nil)
-            
-            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
-            })
-            
+    func savePlaylist(playlist: Playlist, moc:NSManagedObjectContext) {
+        CoreDataHelper.saveCoreData(moc) { (saved) -> Void in
+            let playlist = playlist
+            SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
+                playlist.playlistId = response["_id"] as? String
+                playlist.url = response["url"] as? String
+                
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    CoreDataHelper.saveCoreData(moc, completionBlock: { (saved) -> Void in
+                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+                    })
+                })
+                
             }) { (error) -> Void in
                 print("Not saved to server. Error: ", error?.localizedDescription)
             }.call()
+        }
     }
     
     

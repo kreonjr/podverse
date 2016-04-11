@@ -12,11 +12,14 @@ import CoreData
 class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet weak var tableView: UITableView!
-    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-
+    
     var playlistManager = PlaylistManager.sharedInstance
     
-    var podcastsArray = [Podcast]()
+    var podcastsArray = [Podcast]() {
+        didSet {
+            print("Changed")
+        }
+    }
     
     var refreshControl: UIRefreshControl!
     
@@ -55,15 +58,14 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
                 
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kDownloadHasFinished, object: nil)
-
-        let episodeArray = CoreDataHelper.sharedInstance.fetchEntities("Episode", predicate: nil) as! [Episode]
-        for episode in episodeArray {
-            episode.taskIdentifier = nil
-        }
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
         
-        for episode:Episode in DLEpisodesList.shared.downloadingEpisodes {
-            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
-        }
+        //TODO: Investigate
+//        let moc = CoreDataHelper().managedObjectContext
+//        let episodeArray = CoreDataHelper.fetchEntities("Episode", predicate: nil, moc:moc) as! [Episode]
+//        for episode in episodeArray {
+//            episode.taskIdentifier = nil
+//        }
         
         refreshPodcastFeeds()
         startCheckSubscriptionsForNewEpisodesTimer()
@@ -81,11 +83,14 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func refreshPodcastFeeds() {
-        let podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
-        for var i = 0; i < podcastArray.count; i++ {
-            let feedURL = NSURL(string: podcastArray[i].feedURL)
+        let moc = CoreDataHelper().managedObjectContext
+        let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
+        let podcastArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:moc) as! [Podcast]
+
+        for podcast in podcastArray {
+            let feedURL = NSURL(string:podcast.feedURL)
             
-            let feedParser = PVFeedParser(shouldGetMostRecent: true, shouldSubscribe:false )
+            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: true, shouldSubscribe:false)
             feedParser.delegate = self
             if let feedURLString = feedURL?.absoluteString {
                 feedParser.parsePodcastFeed(feedURLString)
@@ -263,7 +268,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
                     }
                 }
                 
-                PVSubscriber.unsubscribeFromPodcast(podcastToRemove)
+                PVSubscriber.unsubscribeFromPodcast(podcastToRemove, moc:podcastToRemove.managedObjectContext)
                 podcastsArray.removeAtIndex(indexPath.row)
                 
                 self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
@@ -341,24 +346,22 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func loadData() {
+        let moc = CoreDataHelper().managedObjectContext
         let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
-        podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: podcastsPredicate) as! [Podcast]
-        podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
-        
-        // TODO: The answer in the SO link below claims that using a string in a predicate can cause performance issues. Well below we are passing a podcast object as the NSPredicate. If strings can cause performance issues, wouldn't this cause egregiously horrible performance issues? I know this "fetchOnlyEntityWithMostRecentPubDate" has had mutating array crashes in the past (although I haven't seen it happen since mid-February). Could it be that we are using a bad predicate? If yes, how can we make this more performant?
-        // http://stackoverflow.com/questions/30368945/saving-coredata-on-background-thread-causes-fetching-into-a-deadlock-and-crash
-        
-        // Set pubdate in cell equal to most recent episode's pubdate
-        for podcast in podcastsArray {
-            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-            let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate) as! [Episode]
-            if mostRecentEpisodeArray.count > 0 {
-                if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
-                    podcast.lastPubDate = mostRecentEpisodePubDate
-                }
-            }
-        }
-        
+        self.podcastsArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:moc) as! [Podcast]
+        self.podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+
+        //TODO (Somewhere else, not in the view controller) Set pubdate in cell equal to most recent episode's pubdate
+//            for podcast in self.podcastsArray {
+//                let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+//                let mostRecentEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate, moc:moc) as! [Episode]
+//                if mostRecentEpisodeArray.count > 0 {
+//                    if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
+//                        podcast.lastPubDate = mostRecentEpisodePubDate
+//                    }
+//                }
+//            }
+
         self.reloadTable()
     }
     
@@ -370,7 +373,9 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
 extension PodcastsTableViewController: PVFeedParserDelegate {
     func feedParsingComplete(feedURL:String?) {
         if let url = feedURL, let index = podcastsArray.indexOf({ url == $0.feedURL }) {
-            self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
+            })
         }
         else {
             loadData()
@@ -378,7 +383,7 @@ extension PodcastsTableViewController: PVFeedParserDelegate {
     }
     
     func feedItemParsed() {
-        loadData()
+        //loadData()
     }
 }
 

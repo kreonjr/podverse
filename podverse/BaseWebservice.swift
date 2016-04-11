@@ -8,8 +8,8 @@
 import Foundation
 import Alamofire
 
-let BASE_URL = "http://podverse.fm/"
-let TEST_URL = "http://podverse.tv/"
+let BASE_URL = "https://podverse.fm/"
+let TEST_URL = "https://podverse.tv/"
 
 
 public enum HTTP_METHOD {

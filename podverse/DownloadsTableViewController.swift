@@ -13,7 +13,7 @@ class DownloadsTableViewController: UITableViewController {
 
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var episodes:[Episode] {
+    var episodes:[DownloadingEpisode] {
         get {
             return DLEpisodesList.shared.downloadingEpisodes
         }
@@ -24,7 +24,9 @@ class DownloadsTableViewController: UITableViewController {
     }
     
     func reloadDownloadTable() {
-        self.tableView.reloadData()
+        dispatch_async(dispatch_get_main_queue()) {
+            self.tableView.reloadData()
+        }
     }
     
     func removePlayerNavButton(notification: NSNotification) {
@@ -92,28 +94,20 @@ class DownloadsTableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell: DownloadsTableViewCell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! DownloadsTableViewCell
-        let episode = DLEpisodesList.shared.downloadingEpisodes[indexPath.row]
+        let downloadingEpisode = DLEpisodesList.shared.downloadingEpisodes[indexPath.row]
         
-        cell.title!.text = episode.title
+        cell.title?.text = downloadingEpisode.title
         
-        if let imageData = episode.podcast.imageData {
+        if let imageData = downloadingEpisode.imageData {
             if let image = UIImage(data: imageData) {
                 cell.pvImage?.image = image
             }
         }
-
-        if cell.pvImage?.image == nil {
-            if let itunesImageData = episode.podcast.itunesImage {
-                if let itunesImage = UIImage(data: itunesImageData) {
-                    cell.pvImage?.image = itunesImage
-                }
-            }
-        }
         
-        if episode.downloadComplete == true {
+        if downloadingEpisode.downloadComplete == true {
             cell.downloadStatus.text = "Finished"
         }
-        else if episode.taskIdentifier != nil {
+        else if downloadingEpisode.taskIdentifier != nil {
             cell.downloadStatus.text = "Downloading"
         }
         else {
@@ -131,7 +125,19 @@ class DownloadsTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let episode = DLEpisodesList.shared.downloadingEpisodes[indexPath.row]
+        let moc = CoreDataHelper().managedObjectContext
+        
+        let downloadingEpisode = DLEpisodesList.shared.downloadingEpisodes[indexPath.row]
+        
+        guard let mediaUrl =  downloadingEpisode.mediaURL else {
+            return
+        }
+        
+        let predicate = NSPredicate(format: "mediaURL == %@", mediaUrl)
+        guard let episode = CoreDataHelper.fetchEntities("Episode", predicate: predicate, moc: moc).first as? Episode else {
+            return
+        }
+        
         PVDownloader.sharedInstance.pauseOrResumeDownloadingEpisode(episode)
     }
     

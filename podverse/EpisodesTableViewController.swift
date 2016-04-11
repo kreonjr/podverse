@@ -66,7 +66,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         
         //  TOASK: Could this be more efficient? Should we only reload the proper cell, and not all with reloadData?
         dispatch_async(dispatch_get_main_queue()) {
-            self.tableView.reloadData()
+            self.loadData()
         }
         
     }
@@ -98,7 +98,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func refresh() {
-        let feedParser = PVFeedParser(shouldGetMostRecent: false, shouldSubscribe: false)
+        let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe: false)
         feedParser.delegate = self
         feedParser.parsePodcastFeed(selectedPodcast.feedURL)
     }

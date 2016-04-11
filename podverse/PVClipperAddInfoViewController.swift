@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class PVClipperAddInfoViewController: UIViewController {
 
@@ -66,8 +67,9 @@ class PVClipperAddInfoViewController: UIViewController {
     }
     
     func saveClipWithTitle(clipTitle:String) {
+        let moc = CoreDataHelper().managedObjectContext
         if clip == nil {
-            clip = (CoreDataHelper.sharedInstance.insertManagedObject("Clip") as! Clip)
+            clip = (CoreDataHelper.insertManagedObject("Clip", moc:moc) as! Clip)
             episode.addClipObject(clip!)
         }
         
@@ -101,15 +103,15 @@ class PVClipperAddInfoViewController: UIViewController {
             saveClip(unwrappedClip)
         }
         
-        CoreDataHelper.sharedInstance.saveCoreData(nil)
+        CoreDataHelper.saveCoreData(moc, completionBlock:nil)
     }
     
     final private func saveClip(clip:Clip) {
         let saveClipWS = SaveClipToServer(clip: clip, completionBlock: { (response) -> Void in
             self.clip?.clipUrl = response["clipUri"] as? String
-            CoreDataHelper.sharedInstance.saveCoreData(nil)
-            
+
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                
                 let alert = UIAlertController(title: "Clip saved with URL:", message: self.clip?.clipUrl, preferredStyle: .Alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
                 alert.addAction(UIAlertAction(title: "Copy", style: .Default, handler: { (action) -> Void in
@@ -119,10 +121,11 @@ class PVClipperAddInfoViewController: UIViewController {
                 
                 for playlist in PlaylistManager.sharedInstance.playlists {
                     if playlist.title == Constants.kMyClipsPlaylist {
-                        PlaylistManager.sharedInstance.addItemToPlaylist(playlist, clip: self.clip, episode: nil)
+                        PlaylistManager.sharedInstance.addItemToPlaylist(playlist, clip: self.clip, episode: nil, moc:clip.managedObjectContext)
                     }
-                }                
+                }
                 
+                CoreDataHelper.saveCoreData(clip.managedObjectContext, completionBlock:nil)
             })
         }) { (error) -> Void in
             dispatch_async(dispatch_get_main_queue(), { () -> Void in

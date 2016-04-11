@@ -9,147 +9,177 @@
 import UIKit
 import CoreData
 
-class CoreDataHelper {
-    static let sharedInstance = CoreDataHelper()
-    var moc: NSManagedObjectContext
+class CoreDataHelper:NSObject {
+    let storeName = "podverse"
+    let storeFilename = "podverse.sqlite"
     
-    init() {
-        // This resource is the same name as your xcdatamodeld contained in your project.
-        guard let modelURL = NSBundle.mainBundle().URLForResource("podverse", withExtension: "momd") else {
-            fatalError("Error loading model from bundle")
-        }
-        // The managed object model for the application. It is a fatal error for the application not to be able to find and load its model.
-        guard let mom = NSManagedObjectModel(contentsOfURL: modelURL) else {
-            fatalError("Error initializing mom from: \(modelURL)")
-        }
-        
-        let psc = NSPersistentStoreCoordinator(managedObjectModel: mom)
-        self.moc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
-        self.moc.persistentStoreCoordinator = psc
-        
-        // TODO to review: I added the line below to address the "merge conflict" issues that would happen when subscribing to many podcasts rapidly. I think it tells Core Data to always save the newest object when a merge conflict exists...anyway after adding this line, I could not reproduce the merge conflict issue again.
-        // Reference: http://stackoverflow.com/questions/4405912/iphone-coredata-error-nsmergeconflict-for-nsmanagedobject
-        self.moc.mergePolicy = NSMergePolicy(mergeType: NSMergePolicyType.MergeByPropertyObjectTrumpMergePolicyType)
-        
-        dispatch_async(Constants.saveQueue) {
-            let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
-            let docURL = urls[urls.endIndex-1]
-            /* The directory the application uses to store the Core Data store file.
-            This code uses a file named "DataModel.sqlite" in the application's documents directory.
-            */
-            let storeURL = docURL.URLByAppendingPathComponent("podverse.sqlite")
-            do {
-                try psc.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: [NSMigratePersistentStoresAutomaticallyOption: true, NSInferMappingModelAutomaticallyOption: true])
-            } catch {
-                fatalError("Error migrating store: \(error)")
-            }
-        }
-    }
+    lazy var applicationDocumentsDirectory: NSURL = {
+        // The directory the application uses to store the Core Data store file. This code uses a directory named "me.iascchen.MyTTT" in the application's documents Application Support directory.
+        let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
+        return urls[urls.count-1]
+    }()
     
-    func insertManagedObject(className: String) -> AnyObject {        
-        return NSEntityDescription.insertNewObjectForEntityForName(className, inManagedObjectContext: self.moc)
-    }
+    lazy var managedObjectModel: NSManagedObjectModel = {
+        // The managed object model for the application. This property is not optional. It is a fatal error for the application not to be able to find and load its model.
+        let modelURL = NSBundle.mainBundle().URLForResource(self.storeName, withExtension: "momd")!
+        return NSManagedObjectModel(contentsOfURL: modelURL)!
+    }()
     
-    func fetchEntities (className: NSString, predicate: NSPredicate?) -> [AnyObject] {
-        let fetchRequest = NSFetchRequest()
-        let entityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: self.moc)
-        
-        fetchRequest.entity = entityDescription
-        
-        if predicate != nil {
-            fetchRequest.predicate = predicate!
-        }
-        
-        fetchRequest.returnsObjectsAsFaults = false
-        
+    lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = {
+        // The persistent store coordinator for the application. This implementation creates and returns a coordinator, having added the store for the application to it. This property is optional since there are legitimate error conditions that could cause the creation of the store to fail.
+        // Create the coordinator and store
+        let coordinator = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
+        let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent(self.storeFilename)
+        var failureReason = "There was an error creating or loading the application's saved data."
         do {
-            return try self.moc.executeFetchRequest(fetchRequest)
+            try coordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil)
         } catch {
-            print(error)
+            // Report any error we got.
+            var dict = [String: AnyObject]()
+            dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's saved data"
+            dict[NSLocalizedFailureReasonErrorKey] = failureReason
+            
+            dict[NSUnderlyingErrorKey] = error as NSError
+            let wrappedError = NSError(domain: "YOUR_ERROR_DOMAIN", code: 9999, userInfo: dict)
+            // Replace this with code to handle the error appropriately.
+            // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+            NSLog("Unresolved error \(wrappedError), \(wrappedError.userInfo)")
+            abort()
+        }
+        
+        return coordinator
+    }()
+    
+    lazy var managedObjectContext: NSManagedObjectContext = {
+        // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.) This property is optional since there are legitimate error conditions that could cause the creation of the context to fail.
+        let coordinator = self.persistentStoreCoordinator
+        var managedObjectContext = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+        managedObjectContext.persistentStoreCoordinator = coordinator
+        managedObjectContext.mergePolicy = NSMergePolicy(mergeType: NSMergePolicyType.MergeByPropertyObjectTrumpMergePolicyType)
+        return managedObjectContext
+    }()
+    
+    // Returns the background object context for the application.
+    // You can use it to process bulk data update in background.
+    // If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
+    
+    lazy var backgroundContext: NSManagedObjectContext = {
+        // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.) This property is optional since there are legitimate error conditions that could cause the creation of the context to fail.
+        let coordinator = self.persistentStoreCoordinator
+        var backgroundContext = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+        backgroundContext.persistentStoreCoordinator = coordinator
+        backgroundContext.mergePolicy = NSMergePolicy(mergeType: NSMergePolicyType.MergeByPropertyObjectTrumpMergePolicyType)
+        return backgroundContext
+    }()
+
+    static func insertManagedObject(className: String, moc:NSManagedObjectContext?) -> NSManagedObject? {
+        guard let moc = moc else {
+            return nil
+        }
+        
+        return NSEntityDescription.insertNewObjectForEntityForName(className, inManagedObjectContext: moc)
+    }
+    
+    static func fetchEntities(className: String, predicate: NSPredicate?, moc:NSManagedObjectContext?) -> [AnyObject] {
+        if let moc = moc {
+            let fetchRequest = NSFetchRequest()
+            let entityDescription = NSEntityDescription.entityForName(className as String, inManagedObjectContext: moc)
+            
+            fetchRequest.entity = entityDescription
+            fetchRequest.predicate = predicate
+            fetchRequest.returnsObjectsAsFaults = false
+            
+            do {
+                return try moc.executeFetchRequest(fetchRequest)
+            } catch {
+                print(error)
+            }
         }
         
         return []
     }
     
-    func fetchOnlyEntityWithMostRecentPubDate (className: String, predicate: NSPredicate?) -> [AnyObject] {
-        let fetchRequest = NSFetchRequest()
-        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "pubDate", ascending: false)]
-        fetchRequest.fetchLimit = 1
-        
-        let entityDescription = NSEntityDescription.entityForName(className, inManagedObjectContext: self.moc)
-        
-        fetchRequest.entity = entityDescription
-        
-        if predicate != nil {
-            fetchRequest.predicate = predicate!
-        }
-        
-        fetchRequest.returnsObjectsAsFaults = false
-        
-        do {
-            return try self.moc.executeFetchRequest(fetchRequest)
-        } catch {
-            print(error)
+    static func fetchOnlyEntityWithMostRecentPubDate(className: String, predicate: NSPredicate?, moc:NSManagedObjectContext?) -> [AnyObject] {
+        if let moc = moc {
+            let fetchRequest = NSFetchRequest()
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "pubDate", ascending: false)]
+            fetchRequest.fetchLimit = 1
+            
+            let entityDescription = NSEntityDescription.entityForName(className, inManagedObjectContext: moc)
+            
+            fetchRequest.entity = entityDescription
+            fetchRequest.predicate = predicate
+            fetchRequest.returnsObjectsAsFaults = false
+            
+            do {
+                return try moc.executeFetchRequest(fetchRequest)
+            } catch {
+                print(error)
+            }
         }
 
         return []
     }
     
-    func retrieveExistingOrCreateNewPodcast(feedUrlString: String) -> Podcast {
+    static func retrieveExistingOrCreateNewPodcast(feedUrlString: String, moc:NSManagedObjectContext) -> Podcast {
         let predicate = NSPredicate(format: "feedURL == %@", feedUrlString)
-        let podcastSet = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: predicate) as! [Podcast]
+        let podcastSet = CoreDataHelper.fetchEntities("Podcast", predicate: predicate, moc:moc) as! [Podcast]
         if podcastSet.count > 0 {
             let podcast = podcastSet[0]
             return podcast
         } else {
-            let podcast = CoreDataHelper.sharedInstance.insertManagedObject("Podcast") as! Podcast
+            let podcast = CoreDataHelper.insertManagedObject("Podcast", moc:moc) as! Podcast
             return podcast
         }
     }
     
-    func retrieveExistingOrCreateNewEpisode(mediaUrlString: String) -> Episode {
+    static func retrieveExistingOrCreateNewEpisode(mediaUrlString: String, moc:NSManagedObjectContext) -> Episode {
         let predicate = NSPredicate(format: "mediaURL == %@", mediaUrlString)
-        let episodeSet = CoreDataHelper.sharedInstance.fetchEntities("Episode", predicate: predicate) as! [Episode]
+        let episodeSet = CoreDataHelper.fetchEntities("Episode", predicate: predicate,moc: moc) as! [Episode]
         if episodeSet.count > 0 {
             let episode = episodeSet[0]
             return episode
         } else {
-            let episode = CoreDataHelper.sharedInstance.insertManagedObject("Episode") as! Episode
+            let episode = CoreDataHelper.insertManagedObject("Episode", moc:moc) as! Episode
             return episode
         }
     }
     
-    func retrieveExistingOrCreateNewPlaylist(playlistId: String) -> Playlist {
+    static func retrieveExistingOrCreateNewPlaylist(playlistId: String, moc:NSManagedObjectContext?) -> Playlist {
         let predicate = NSPredicate(format: "playlistId == %@", playlistId)
-        let playlistSet = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: predicate) as! [Playlist]
+        let playlistSet = CoreDataHelper.fetchEntities("Playlist", predicate: predicate, moc:moc) as! [Playlist]
         if playlistSet.count > 0 {
             let playlist = playlistSet[0]
             return playlist
         } else {
-            let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
+            let playlist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
             return playlist
         }
     }
     
-//    func fetchEntityWithID(objectId:NSManagedObjectID) -> AnyObject? {
-//        do {
-//            return try self.moc.existingObjectWithID(objectId)
-//        } catch {
-//            print(error)
-//        }
-//        
-//        return nil
-//    }
-    
-    func deleteItemFromCoreData(deleteObject:NSManagedObject) {
-        self.moc.deleteObject(deleteObject)
-        self.saveCoreData(nil)
+    static func fetchEntityWithID(objectId:NSManagedObjectID, moc:NSManagedObjectContext) -> AnyObject? {
+        do {
+            return try moc.existingObjectWithID(objectId)
+        } catch {
+            print(error)
+        }
+        
+        return nil
     }
     
-    func saveCoreData(completionBlock:((saved:Bool)->Void)?) {
-        if self.moc.hasChanges {
+    static func deleteItemFromCoreData(deleteObject:NSManagedObject, moc:NSManagedObjectContext?) {
+        guard let moc = moc else {
+            print("Missing managed Object Context")
+            return
+        }
+        
+        moc.deleteObject(deleteObject)
+    }
+    
+    static func saveCoreData(moc:NSManagedObjectContext?, completionBlock:((saved:Bool)->Void)?) {
+        if let moc = moc {
             do {
-                try self.moc.save()
+                try moc.save()
                 if let completion = completionBlock {
                     completion(saved:true)
                 }
