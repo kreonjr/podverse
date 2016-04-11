@@ -30,7 +30,12 @@ final class PlaylistManager: NSObject {
             urlComponentArray[3] = "pl"
         }
         
-        if (urlComponentArray[0] == "http:" || urlComponentArray[0] == "https") && (urlComponentArray[1] == "") && (urlComponentArray[2] == "podverse.tv") && (urlComponentArray[3] == "pl") && (playlistId.characters.count == 16) {
+        if urlComponentArray[4].characters.contains("#") {
+            var idComponentArray = urlComponentArray[4].componentsSeparatedByString("#")
+            urlComponentArray[4] = idComponentArray[0]
+        }
+        
+        if (urlComponentArray[0] == "http:" || urlComponentArray[0] == "https:") && (urlComponentArray[1] == "") && (urlComponentArray[2] == "podverse.tv") && (urlComponentArray[3] == "pl") {
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
                     let playlist = CoreDataHelper.sharedInstance.retrieveExistingOrCreateNewPlaylist(playlistId)
                     PlaylistManager.JSONToPlaylist(playlist, JSONDict: response)

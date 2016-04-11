@@ -52,7 +52,7 @@ class PVClipperAddInfoViewController: UIViewController {
             }
             
             if let startT = startTime {
-                startTimeString = " - " + PVUtility.convertNSNumberToHHMMSSString(startT) + " start time"
+                startTimeString = " - " + PVUtility.convertNSNumberToHHMMSSString(startT)
             }
             
             if endTime != 0 && endTime != nil {
