@@ -309,6 +309,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kNowPlayingTimeHasChanged, object: nil)
         pvMediaPlayer.clearPlayingInfo()
         pvMediaPlayer.nowPlayingEpisode = nil
+        pvMediaPlayer.nowPlayingClip = nil
         
         
         PVDeleter.deleteEpisode(currentEpisode,completion: nil)
@@ -322,6 +323,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     func clipFinishedPlaying(currentClip: Clip) {
         NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kNowPlayingTimeHasChanged, object: nil)
         pvMediaPlayer.clearPlayingInfo()
+        pvMediaPlayer.nowPlayingEpisode = nil
         pvMediaPlayer.nowPlayingClip = nil
         
         

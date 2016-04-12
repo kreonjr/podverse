@@ -106,7 +106,7 @@ public class WebService {
             alamoMethod = .CONNECT
         }
         
-        if httpMethod == .METHOD_PUT || httpMethod == .METHOD_POST {
+        if httpMethod == .METHOD_PUT || httpMethod == .METHOD_POST || httpMethod == .METHOD_GET {
             addHeaderWithKey("Authorization", value: Constants.SERVER_AUTHORIZATION_KEY)
         }
         

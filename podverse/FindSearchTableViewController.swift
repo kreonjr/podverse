@@ -187,7 +187,9 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         if let savedPodcasts = CoreDataHelper.fetchEntities("Podcast", predicate: nil, moc:moc) as? [Podcast] {
             for savedPodcast in savedPodcasts {
                 if iTunesSearchPodcast.feedURL == savedPodcast.feedURL {
-                    isSubscribed = true
+                    if savedPodcast.isSubscribed == true {
+                        isSubscribed = true
+                    }
                 }
             }
         }

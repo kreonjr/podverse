@@ -72,6 +72,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     if episodeDownloadTask.taskIdentifier == taskIdentifier.integerValue {
                         episodeDownloadTask.cancelByProducingResumeData() {resumeData in
                             if (resumeData != nil) {
+                                self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Paused")
+                                
                                 episode.taskResumeData = resumeData
                                 episode.taskIdentifier = nil
                                 CoreDataHelper.saveCoreData(episode.managedObjectContext, completionBlock:nil)
@@ -84,6 +86,21 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         // Else start or restart the download
         else {
           startDownloadingEpisode(episode)
+        }
+    }
+    
+    func postPauseOrResumeNotification(taskIdentifier: NSNumber, pauseOrResume: String) {
+        // Get the corresponding episode object by its taskIdentifier value
+        if let episodeDownloadIndex = DLEpisodesList.shared.downloadingEpisodes.indexOf({$0.taskIdentifier == taskIdentifier.integerValue}) {
+            if episodeDownloadIndex < DLEpisodesList.shared.downloadingEpisodes.count {
+                let episode = DLEpisodesList.shared.downloadingEpisodes[episodeDownloadIndex]
+                
+                let downloadHasPausedOrResumedUserInfo:[NSObject:AnyObject] = ["mediaUrl":episode.mediaURL ?? "", "pauseOrResume": pauseOrResume ?? ""]
+                
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasPausedOrResumed, object: self, userInfo: downloadHasPausedOrResumedUserInfo)
+                })
+            }
         }
     }
     

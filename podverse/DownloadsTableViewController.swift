@@ -40,6 +40,8 @@ class DownloadsTableViewController: UITableViewController {
         super.viewDidLoad()
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadData:", name: Constants.kDownloadHasProgressed, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadData:", name: Constants.kDownloadHasFinished, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "pauseOrResumeDownloadData:", name: Constants.kDownloadHasPausedOrResumed, object: nil)
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadTable", name: Constants.kUpdateDownloadsTable, object: nil)
@@ -65,6 +67,18 @@ class DownloadsTableViewController: UITableViewController {
                         }
                                         
                         return
+                }
+            }
+        }
+    }
+    
+    func pauseOrResumeDownloadData(notification:NSNotification) {
+        if let downloadDataInfo = notification.userInfo {
+            for(index, episode) in self.episodes.enumerate() {
+                let indexPath = NSIndexPath(forRow: index, inSection: 0)
+                if episode.mediaURL == downloadDataInfo["mediaUrl"] as? String, let pauseOrResume = downloadDataInfo["pauseOrResume"] as? String, let cell = self.tableView.cellForRowAtIndexPath(indexPath) as? DownloadsTableViewCell  {
+                    cell.downloadStatus.text = pauseOrResume
+                    return
                 }
             }
         }

@@ -31,7 +31,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             var sortedPlaylists = unsortedPlaylists.sort({ $0.title.lowercaseString < $1.title.lowercaseString })
             
             for (index , playlist) in sortedPlaylists.enumerate() {
-                // TODO: there's got to be a better way to do this. The goal is to make My Episodes and My Clips always be the first 2 playlists in the table.
+                // TODO: This method is problematic. We need a way to distinguish the user's "My Clips" and "My Episodes" playlists WITHOUT depending on the title. 
+                // Currently it depends on the title, and so if you share your "My Clips" or "My Episodes" playlist with me, then the UI will move your playlist to the beginning of the array as if it were my own.
                 if playlist.title == Constants.kMyClipsPlaylist {
                     sortedPlaylists.removeAtIndex(index)
                     sortedPlaylists.insert(playlist, atIndex: 0)

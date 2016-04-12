@@ -19,13 +19,13 @@ class PVSubscriber {
     
     static func unsubscribeFromPodcast(podcast:Podcast, moc:NSManagedObjectContext?) {
         let alsoDelete = PVDeleter.checkIfPodcastShouldBeRemoved(podcast, isUnsubscribing: true)
-        
+        podcast.isSubscribed = false
+
         if alsoDelete {
             PVDeleter.deletePodcast(podcast)
-        } else {
-            podcast.isSubscribed = false
-            CoreDataHelper.saveCoreData(moc, completionBlock:nil)
-        }
+        } 
+
+        CoreDataHelper.saveCoreData(moc, completionBlock:nil)
     }
     
 }
