@@ -9,8 +9,9 @@
 import UIKit
 import CoreData
 
-protocol PVFeedParserDelegate {
-   func feedParsingComplete()
+@objc protocol PVFeedParserDelegate {
+   func feedParsingComplete(feedURL:String?)
+   optional func feedItemParsed()
 }
 
 class PVFeedParser: NSObject, FeedParserDelegate {
@@ -92,6 +93,11 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func feedParser(parser: FeedParser, didParseItem item: FeedItem) {
+        defer {
+            dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                self.delegate?.feedItemParsed?()
+            }
+        }
         //Do not parse episode if it does not contain feedEnclosures.
         if item.feedEnclosures.count <= 0 {
             return
@@ -144,12 +150,11 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func feedParserParsingAborted(parser: FeedParser) {
-        dispatch_async(dispatch_get_main_queue()) { () -> Void in
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.refreshPodcastTableDataNotification, object: nil)
-        }
         // If podcast is nil, then the RSS feed was invalid for the parser, and we should return out of successfullyParsedURL
         if podcast == nil {
-            delegate?.feedParsingComplete()
+            dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                self.delegate?.feedParsingComplete(nil)
+            }
             return
         }
         
@@ -173,16 +178,18 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         } else {
             print("no newer episode available, don't download")
         }
+        
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            self.delegate?.feedParsingComplete(nil)
+        }
     }
     
     func feedParser(parser: FeedParser, successfullyParsedURL url: String) {
-        dispatch_async(dispatch_get_main_queue()) { () -> Void in
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.refreshPodcastTableDataNotification, object: nil)
-        }
-        
         // If podcast is nil, then the RSS feed was invalid for the parser, and we should return out of successfullyParsedURL
         if podcast == nil {
-            delegate?.feedParsingComplete()
+            dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                self.delegate?.feedParsingComplete(nil)
+            }
             return
         }
         
@@ -191,15 +198,24 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
             let latestEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate)
             
-            // If there is an episode in the array, then download the episode
             if latestEpisodeArray.count > 0 {
-                PVDownloader.sharedInstance.startDownloadingEpisode(latestEpisodeArray[0] as! Episode)
+                if let latestEpisode = latestEpisodeArray[0] as? Episode {
+                    if latestEpisode.downloadComplete != true {
+                        PVDownloader.sharedInstance.startDownloadingEpisode(latestEpisode)
+                    }
+                }
             }
         }
+
         
-        CoreDataHelper.sharedInstance.saveCoreData(nil)
+        CoreDataHelper.sharedInstance.saveCoreData ({[weak self] (saved) -> Void in
+            dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                if let strongSelf = self {
+                    strongSelf.delegate?.feedParsingComplete(strongSelf.podcast.feedURL)
+                }
+            }
+        })
         
-        delegate?.feedParsingComplete()
         print("feed parser has finished!")
     }
     

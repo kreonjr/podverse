@@ -38,6 +38,8 @@ class DownloadsTableViewController: UITableViewController {
         super.viewDidLoad()
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadData:", name: Constants.kDownloadHasProgressed, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadData:", name: Constants.kDownloadHasFinished, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "pauseOrResumeDownloadData:", name: Constants.kDownloadHasPausedOrResumed, object: nil)
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadTable", name: Constants.kUpdateDownloadsTable, object: nil)
@@ -63,6 +65,18 @@ class DownloadsTableViewController: UITableViewController {
                         }
                                         
                         return
+                }
+            }
+        }
+    }
+    
+    func pauseOrResumeDownloadData(notification:NSNotification) {
+        if let downloadDataInfo = notification.userInfo {
+            for(index, episode) in self.episodes.enumerate() {
+                let indexPath = NSIndexPath(forRow: index, inSection: 0)
+                if episode.mediaURL == downloadDataInfo["mediaUrl"] as? String, let pauseOrResume = downloadDataInfo["pauseOrResume"] as? String, let cell = self.tableView.cellForRowAtIndexPath(indexPath) as? DownloadsTableViewCell  {
+                    cell.downloadStatus.text = pauseOrResume
+                    return
                 }
             }
         }
@@ -112,16 +126,33 @@ class DownloadsTableViewController: UITableViewController {
         
         if episode.downloadComplete == true {
             cell.downloadStatus.text = "Finished"
+            cell.progress.progress = 1.0
+            
+            if let mediaBytes = episode.mediaBytes {
+                if Int(mediaBytes) > 0 {
+                    // Format the total bytes into a human readable KB or MB number
+                    let dataFormatter = NSByteCountFormatter()
+                    let formattedTotalBytes = dataFormatter.stringFromByteCount(Int64(Int(mediaBytes)))
+                    cell.progressBytes.text = "\(formattedTotalBytes)"
+                } else {
+                    cell.progressBytes.text = ""
+                }
+            } else {
+                cell.progressBytes.text = ""
+            }
         }
         else if episode.taskIdentifier != nil {
             cell.downloadStatus.text = "Downloading"
+            // TODO: show the actual progress and progressBytes. Since the progress and progressBytes is not saved to the NSManagedObject (they are currently provided only via notification userinfo), I was not sure how to display those values here.
+            cell.progress.progress = 0.0
+            cell.progressBytes.text = ""
         }
         else {
             cell.downloadStatus.text = "Paused"
+            // TODO: show the actual progress and progressBytes. Since the progress and progressBytes is not saved to the NSManagedObject (they are currently provided only via notification userinfo), I was not sure how to display those values here.
+            cell.progress.progress = 0.0
+            cell.progressBytes.text = ""
         }
-        
-        cell.progress.progress = Float(0)
-        cell.progressBytes.text = ""
 
         return cell
     }

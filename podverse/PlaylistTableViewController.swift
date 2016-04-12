@@ -22,7 +22,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func segueToNowPlaying(sender: UIBarButtonItem) {
-        performSegueWithIdentifier("PlaylistItem to Now Playing", sender: nil)
+        performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
     }
     
     func removePlayerNavButton(notification: NSNotification) {

@@ -161,5 +161,10 @@ class CoreDataHelper {
                 print(error)
             }
         }
+        else {
+            if let completion = completionBlock {
+                completion(saved:true)
+            }
+        }
     }
 }

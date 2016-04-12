@@ -26,6 +26,12 @@ class PVSubscriber {
         } else {
             dispatch_async(Constants.feedParsingQueue) { () -> Void in
                 podcast.isSubscribed = false
+                
+                let episodesToRemove = podcast.episodes.allObjects as! [Episode]
+                for var i = 0; i < episodesToRemove.count; i++ {
+                    PVDeleter.deleteEpisode(episodesToRemove[i],completion: nil)
+                }
+                
                 CoreDataHelper.sharedInstance.saveCoreData(nil)
             }
         }

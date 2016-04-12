@@ -14,6 +14,8 @@ struct Constants {
 
     static let kDownloadHasProgressed = "downloadHasProgressed"
     
+    static let kDownloadHasPausedOrResumed = "downloadHasPausedOrResumed"
+    
     static let kUpdateDownloadsTable = "updateDownloadTable"
 
     static let kNowPlayingTimeHasChanged = "nowPlayingTimeHasChanged"
@@ -23,8 +25,6 @@ struct Constants {
     static let saveQueue = dispatch_queue_create("MOC_SERIAL_SAVE_QUEUE", DISPATCH_QUEUE_SERIAL)
     
     static let feedParsingQueue = dispatch_queue_create("FEED_PARSER_QUEUE", DISPATCH_QUEUE_SERIAL);
-
-    static let refreshPodcastTableDataNotification = "refreshPodcastTableDataNotification"
     
     static let kRefreshAddToPlaylistTableDataNotification = "refreshPodcastTableDataNotification"
     
@@ -35,5 +35,15 @@ struct Constants {
     static let kMyEpisodesPlaylist = "My Episodes"
     
     static let rootPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, .UserDomainMask, true)[0]
-    static let kPlaylistIDPath = Constants.rootPath.stringByAppendingString("/playlistIds.plist")
+    
+    static var SERVER_AUTHORIZATION_KEY:String {
+        get {
+            if let plistPath = NSBundle.mainBundle().pathForResource("ServerKey", ofType: "plist"), let dict = NSDictionary(contentsOfFile: plistPath), key = dict["ServerKey"] as? String {
+                return key
+            }
+            else {
+                return ""
+            }
+        }
+    }
 }

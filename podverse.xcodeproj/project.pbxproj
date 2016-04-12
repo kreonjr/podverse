@@ -48,6 +48,7 @@
 		81E3578E1B21619F00D67634 /* PVFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578D1B21619F00D67634 /* PVFeedParser.swift */; };
 		81E357901B21624500D67634 /* PVUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578F1B21624500D67634 /* PVUtility.swift */; };
 		81E4FE671B2E11D600A10A77 /* fontawesome-webfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */; };
+		EF170CD41CB2075E00610F1B /* ServerKey.plist in Resources */ = {isa = PBXBuildFile; fileRef = EF170CD31CB2075E00610F1B /* ServerKey.plist */; };
 		EF3799D21BD4981E00211419 /* CustomFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF3799D11BD4981E00211419 /* CustomFeedParser.swift */; };
 		EF397FF41C54561C00C91753 /* Alamofire.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF397FE71C54558A00C91753 /* Alamofire.framework */; };
 		EF397FF51C54561C00C91753 /* Alamofire.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EF397FE71C54558A00C91753 /* Alamofire.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -195,6 +196,7 @@
 		81E3578D1B21619F00D67634 /* PVFeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PVFeedParser.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		81E3578F1B21624500D67634 /* PVUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVUtility.swift; sourceTree = "<group>"; };
 		81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fontawesome-webfont.ttf"; sourceTree = "<group>"; };
+		EF170CD31CB2075E00610F1B /* ServerKey.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ServerKey.plist; sourceTree = "<group>"; };
 		EF3799D11BD4981E00211419 /* CustomFeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomFeedParser.swift; sourceTree = "<group>"; };
 		EF397FDC1C54558A00C91753 /* Alamofire.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Alamofire.xcodeproj; path = lib/Alamofire/Alamofire.xcodeproj; sourceTree = SOURCE_ROOT; };
 		EF397FFE1C5458A000C91753 /* BaseWebservice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseWebservice.swift; sourceTree = "<group>"; };
@@ -318,6 +320,7 @@
 				818615941B1E84CE006C9731 /* Info.plist */,
 				EF397FDC1C54558A00C91753 /* Alamofire.xcodeproj */,
 				EF397FFE1C5458A000C91753 /* BaseWebservice.swift */,
+				EF170CD31CB2075E00610F1B /* ServerKey.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -557,6 +560,7 @@
 				812A094F1B42375F00E8F070 /* podverse.xcdatamodeld in Resources */,
 				818615B91B1E85F6006C9731 /* README in Resources */,
 				8186159E1B1E84CF006C9731 /* Main.storyboard in Resources */,
+				EF170CD41CB2075E00610F1B /* ServerKey.plist in Resources */,
 				81E4FE671B2E11D600A10A77 /* fontawesome-webfont.ttf in Resources */,
 				818615A01B1E84CF006C9731 /* Images.xcassets in Resources */,
 			);

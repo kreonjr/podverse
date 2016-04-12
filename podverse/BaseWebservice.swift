@@ -8,8 +8,8 @@
 import Foundation
 import Alamofire
 
-let BASE_URL = "http://podverse.fm/"
-let TEST_URL = "http://podverse.tv/"
+let BASE_URL = "https://podverse.fm/"
+let TEST_URL = "https://podverse.tv/"
 
 
 public enum HTTP_METHOD {
@@ -104,6 +104,10 @@ public class WebService {
             alamoMethod = .TRACE
         case .METHOD_CONNECT:
             alamoMethod = .CONNECT
+        }
+        
+        if httpMethod == .METHOD_PUT || httpMethod == .METHOD_POST || httpMethod == .METHOD_GET {
+            addHeaderWithKey("Authorization", value: Constants.SERVER_AUTHORIZATION_KEY)
         }
         
         if .METHOD_GET == httpMethod && .PARAM_ENCODING_JSON == paramEncoding {

@@ -34,12 +34,6 @@ class Playlist: NSManagedObject {
         }
     }
     
-    var totalItems:Int {
-        get {
-            return self.allItems.count
-        }
-    }
-    
     func addEpisodeObject(value: Episode) {
         self.mutableSetValueForKey("episodes").addObject(value)
     }

@@ -20,13 +20,16 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var refreshControl: UIRefreshControl!
     
+    private let REFRESH_PODCAST_TIME:Double = 3600
+    
     var playlists:[Playlist] {
         get {
             let unsortedPlaylists = PlaylistManager.sharedInstance.playlists
             var sortedPlaylists = unsortedPlaylists.sort({ $0.title.lowercaseString < $1.title.lowercaseString })
             
             for (index , playlist) in sortedPlaylists.enumerate() {
-                // TODO: there's got to be a better way to do this. The goal is to make My Episodes and My Clips always be the first 2 playlists in the table.
+                // TODO: This method is problematic. We need a way to distinguish the user's "My Clips" and "My Episodes" playlists WITHOUT depending on the title. 
+                // Currently it depends on the title, and so if you share your "My Clips" or "My Episodes" playlist with me, then the UI will move your playlist to the beginning of the array as if it were my own.
                 if playlist.title == Constants.kMyClipsPlaylist {
                     sortedPlaylists.removeAtIndex(index)
                     sortedPlaylists.insert(playlist, atIndex: 0)
@@ -39,35 +42,10 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         }
     }
     
-    func loadData() {
-        let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
-        podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: podcastsPredicate) as! [Podcast]
-        podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
-
-        // TODO: The answer in the SO link below claims that using a string in a predicate can cause performance issues. Well below we are passing a podcast object as the NSPredicate. If strings can cause performance issues, wouldn't this cause egregiously horrible performance issues? I know this "fetchOnlyEntityWithMostRecentPubDate" has had mutating array crashes in the past (although I haven't seen it happen since mid-February). Could it be that we are using a bad predicate? If yes, how can we make this more performant?
-        // http://stackoverflow.com/questions/30368945/saving-coredata-on-background-thread-causes-fetching-into-a-deadlock-and-crash
-
-        // Set pubdate in cell equal to most recent episode's pubdate
-        for podcast in podcastsArray {
-            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-            let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate) as! [Episode]
-            if mostRecentEpisodeArray.count > 0 {
-                if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
-                    podcast.lastPubDate = mostRecentEpisodePubDate
-                }
-            }
-        }
-        
-        self.tableView.reloadData()
-    }
-    
-    func segueToNowPlaying(sender: UIBarButtonItem) {
-        self.performSegueWithIdentifier("Podcasts to Now Playing", sender: nil)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.navigationItem.title = "Podverse"
+
         playlistManager.delegate = self
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
@@ -75,10 +53,9 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh all podcasts")
         refreshControl.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector:"loadData" , name: Constants.refreshPodcastTableDataNotification, object: nil)
-        
+                
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kDownloadHasFinished, object: nil)
 
         let episodeArray = CoreDataHelper.sharedInstance.fetchEntities("Episode", predicate: nil) as! [Episode]
         for episode in episodeArray {
@@ -89,31 +66,43 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             PVDownloader.sharedInstance.startDownloadingEpisode(episode)
         }
         
-        self.refreshPodcastFeeds()
+        refreshPodcastFeeds()
+        startCheckSubscriptionsForNewEpisodesTimer()
         
-        PlaylistManager.sharedInstance.refreshPlaylists()
+        PlaylistManager.sharedInstance.refreshPlaylists { () -> Void in
+            self.reloadTable()
+        }
+    }
+    
+    func refreshAllData() {
+        refreshPodcastFeeds()
+        PlaylistManager.sharedInstance.refreshPlaylists { () -> Void in
+            self.tableView.reloadSections(NSIndexSet(index: 1), withRowAnimation: .None)
+        }
     }
     
     func refreshPodcastFeeds() {
-        appDelegate.refreshPodcastFeeds()
+        let podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
+        for var i = 0; i < podcastArray.count; i++ {
+            let feedURL = NSURL(string: podcastArray[i].feedURL)
+            
+            let feedParser = PVFeedParser(shouldGetMostRecent: true, shouldSubscribe:false )
+            feedParser.delegate = self
+            if let feedURLString = feedURL?.absoluteString {
+                feedParser.parsePodcastFeed(feedURLString)
+            }
+        }
     }
     
     func removePlayerNavButton(notification: NSNotification) {
-        dispatch_async(dispatch_get_main_queue()) {
-            self.loadData()
-            PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
-        }
+        self.loadData()
+        PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        // Set navigation bar styles
-        self.navigationItem.title = "Podverse"
-        
-        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
-        
-        loadData()
+                
+        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)        
     }
 
     override func viewWillDisappear(animated: Bool) {
@@ -191,7 +180,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             cell.lastPublishedDate?.text = "playlist last updated date"
             //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
             
-            cell.totalClips?.text = "\(playlist.totalItems) items"
+            cell.totalClips?.text = "\(playlist.allItems.count) items"
             
             cell.pvImage?.image = UIImage(named: "Blank52")
 
@@ -343,6 +332,51 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
 
     @IBAction func addPlaylistByURL(sender: AnyObject) {
         showAddPlaylistByURLAlert()
+    }
+    
+    // This function runs once on app load, then runs in the background every 30 minutes.
+    // Check if a new episode is available for a subscribed podcast; if true, download that episode.
+    // TODO: shouldn't we check via push notifications? Rather than a timer that continuously runs in the background?
+    func startCheckSubscriptionsForNewEpisodesTimer() {
+        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: "refreshAllData", userInfo: nil, repeats: true)
+    }
+    
+    func loadData() {
+        let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
+        podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: podcastsPredicate) as! [Podcast]
+        podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+        
+        // TODO: The answer in the SO link below claims that using a string in a predicate can cause performance issues. Well below we are passing a podcast object as the NSPredicate. If strings can cause performance issues, wouldn't this cause egregiously horrible performance issues? I know this "fetchOnlyEntityWithMostRecentPubDate" has had mutating array crashes in the past (although I haven't seen it happen since mid-February). Could it be that we are using a bad predicate? If yes, how can we make this more performant?
+        // http://stackoverflow.com/questions/30368945/saving-coredata-on-background-thread-causes-fetching-into-a-deadlock-and-crash
+        
+        // Set pubdate in cell equal to most recent episode's pubdate
+        for podcast in podcastsArray {
+            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+            let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate) as! [Episode]
+            if mostRecentEpisodeArray.count > 0 {
+                if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
+                    podcast.lastPubDate = mostRecentEpisodePubDate
+                }
+            }
+        }
+        
+        self.reloadTable()
+    }
+    
+    func segueToNowPlaying(sender: UIBarButtonItem) {
+        self.performSegueWithIdentifier("Podcasts to Now Playing", sender: nil)
+    }
+}
+
+extension PodcastsTableViewController: PVFeedParserDelegate {
+    func feedParsingComplete(feedURL:String?) {
+        if let url = feedURL, let index = podcastsArray.indexOf({ url == $0.feedURL }) {
+            self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
+        }
+    }
+    
+    func feedItemParsed() {
+        loadData()
     }
 }
 

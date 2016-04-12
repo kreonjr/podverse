@@ -44,7 +44,9 @@ class PVDeleter: NSObject {
             if episode == nowPlayingEpisode {
                 PVMediaPlayer.sharedInstance.avPlayer.pause()
                 PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
-                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                })
             }
         }
         
@@ -52,9 +54,15 @@ class PVDeleter: NSObject {
         // Delete the episode from CoreData and the disk, and update the UI
         if let fileName = episode.fileName {
             PVUtility.deleteEpisodeFromDiskWithName(fileName)
+            episode.fileName = nil
         }
-
-        CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode)
+        
+        // If the episode or a clip from the episode is currently a playlistItem in a local playlist, then do not delete the episode item from Core Data
+        var alsoDelete = checkIfEpisodeShouldBeRemoved(episode)
+        
+        if alsoDelete == true {
+            CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode)
+        }
     }
     
     // TODO: handle removing clips
@@ -65,14 +73,18 @@ class PVDeleter: NSObject {
         if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
             if let episodes = playlist.episodes {
                 if (episodes.contains{$0 as? Episode == nowPlayingEpisode}) {
-                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: self, userInfo: nil)
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                    })
                 }
             }
         }
         if let nowPlayingClip = PVMediaPlayer.sharedInstance.nowPlayingClip {
             if let clips = playlist.clips {
                 if (clips.contains{$0 as? Clip == nowPlayingClip}) {
-                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: self, userInfo: nil)
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                    })
                 }
             }
         }
@@ -98,12 +110,16 @@ class PVDeleter: NSObject {
         // Remove Player button if the now playing episode was one of the playlists episodes or clips
         if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
             if nowPlayingEpisode == item as? Episode {
-                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: self, userInfo: nil)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                })
             }
         }
         if let nowPlayingClip = PVMediaPlayer.sharedInstance.nowPlayingClip {
             if nowPlayingClip == item as? Clip {
-                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: self, userInfo: nil)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                })
             }
         }
         
@@ -112,9 +128,9 @@ class PVDeleter: NSObject {
         SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
             playlist.url = response["url"] as? String
             CoreDataHelper.sharedInstance.saveCoreData(nil)
-            }) { (error) -> Void in
+        }) { (error) -> Void in
                 print("Not saved to server. Error: ", error?.localizedDescription)
-            }.call()
+        }.call()
     }
     
     static func checkIfPodcastShouldBeRemoved(podcast: Podcast, isUnsubscribing: Bool) -> Bool {
@@ -142,6 +158,42 @@ class PVDeleter: NSObject {
                         for podcastEpisode in podcast.episodes.allObjects {
                             for podcastClip in (podcastEpisode as! Episode).clips {
                                 if clip == (podcastClip as! Clip) {
+                                    alsoDelete = false
+                                    break outerLoop
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return alsoDelete
+    }
+    
+    static func checkIfEpisodeShouldBeRemoved(episode: Episode) -> Bool {
+        var alsoDelete = true
+        
+        if episode.podcast.isSubscribed == true {
+            alsoDelete = false
+            return alsoDelete
+        }
+        
+        if let allPlaylists = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: nil) as? [Playlist] {
+            outerLoop: for playlist in allPlaylists {
+                for item in playlist.allItems {
+                    if let episode = item as? Episode {
+                        for ep in episode.podcast.episodes {
+                            if (ep as! Episode) == episode {
+                                alsoDelete = false
+                                break outerLoop
+                            }
+                        }
+                    }
+                    else if let clip = item as? Clip {
+                        for ep in episode.podcast.episodes {
+                            for cl in (ep as! Episode).clips {
+                                if clip == (cl as! Clip) {
                                     alsoDelete = false
                                     break outerLoop
                                 }

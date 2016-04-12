@@ -54,7 +54,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     func pauseOrResumeDownloadingEpisode(episode: Episode) {
         // If the episode has already downloaded, then do nothing
         if (episode.downloadComplete == true) {
-            // do nothing
+            return
         }
         // Else if the episode download is paused, then resume the download
         else if episode.taskResumeData != nil {
@@ -64,6 +64,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 episode.taskResumeData = nil
                 
                 CoreDataHelper.sharedInstance.saveCoreData(nil)
+                
+                self.postPauseOrResumeNotification(downloadTask.taskIdentifier, pauseOrResume: "Downloading")
                 
                 downloadTask.resume()
             }
@@ -75,6 +77,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     if episodeDownloadTask.taskIdentifier == taskIdentifier.integerValue {
                         episodeDownloadTask.cancelByProducingResumeData() {resumeData in
                             if (resumeData != nil) {
+                                self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Paused")
+                                
                                 episode.taskResumeData = resumeData
                                 episode.taskIdentifier = nil
                                 CoreDataHelper.sharedInstance.saveCoreData(nil)
@@ -87,6 +91,21 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         // Else start or restart the download
         else {
           startDownloadingEpisode(episode)
+        }
+    }
+    
+    func postPauseOrResumeNotification(taskIdentifier: NSNumber, pauseOrResume: String) {
+        // Get the corresponding episode object by its taskIdentifier value
+        if let episodeDownloadIndex = self.getDownloadingEpisodeIndexWithTaskIdentifier(Int(taskIdentifier)) {
+            if episodeDownloadIndex.integerValue < DLEpisodesList.shared.downloadingEpisodes.count {
+                let episode = DLEpisodesList.shared.downloadingEpisodes[episodeDownloadIndex.integerValue]
+                
+                let downloadHasPausedOrResumedUserInfo:[NSObject:AnyObject] = ["mediaUrl":episode.mediaURL ?? "", "pauseOrResume": pauseOrResume ?? ""]
+                
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasPausedOrResumed, object: self, userInfo: downloadHasPausedOrResumedUserInfo)
+                })
+            }
         }
     }
     
@@ -110,6 +129,12 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             if let episodeDownloadIndex = getDownloadingEpisodeIndexWithTaskIdentifier(downloadTask.taskIdentifier) {
                 if episodeDownloadIndex.integerValue < DLEpisodesList.shared.downloadingEpisodes.count {
                     let episode = DLEpisodesList.shared.downloadingEpisodes[episodeDownloadIndex.integerValue]
+                    
+                    // TODO: if an episode.mediaBytes value of 0 was provided in the episode's media enclosure length field (this is the case with NPR podcasts), then update the episode.mediaBytes value to equal the totalBytesExpectedToWrite. I did not finish adding this feature because I want to make sure this does not cause mutating array crashes
+//                    if episode.mediaBytes == 0 {
+//                        episode.mediaBytes = NSNumber(longLong: totalBytesExpectedToWrite)
+//                        CoreDataHelper.sharedInstance.saveCoreData(nil)
+//                    }
                 
                     let downloadHasProgressedUserInfo:[NSObject:AnyObject] = ["mediaUrl":episode.mediaURL ?? "",
                                                                               "totalBytes": Double(totalBytesExpectedToWrite),
@@ -186,13 +211,16 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     
                     let downloadHasFinishedUserInfo = ["episode":episode]
                     
-                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
-                    let notification = UILocalNotification()
-                    notification.applicationIconBadgeNumber = UIApplication.sharedApplication().applicationIconBadgeNumber + 1
-                    notification.alertBody = episode.podcast.title + " - " + episodeTitle // text that will be displayed in the notification
-                    notification.alertAction = "open"
-                    notification.soundName = UILocalNotificationDefaultSoundName // play default sound
-                    UIApplication.sharedApplication().scheduleLocalNotification(notification)
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
+                        let notification = UILocalNotification()
+                        notification.applicationIconBadgeNumber = UIApplication.sharedApplication().applicationIconBadgeNumber + 1
+                        notification.alertBody = episode.podcast.title + " - " + episodeTitle // text that will be displayed in the notification
+                        notification.alertAction = "open"
+                        notification.soundName = UILocalNotificationDefaultSoundName // play default sound
+                        UIApplication.sharedApplication().scheduleLocalNotification(notification)
+
+                    })
                 }
             } catch {
                 print(error)
