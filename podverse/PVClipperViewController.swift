@@ -33,8 +33,25 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var endMinuteTextField: UITextField!
     @IBOutlet weak var endSecTextField: UITextField!
     
+    var currentTextField: UITextField?
     
     override func viewDidLoad() {
+        startHourTextField.tag = 1
+        startMinuteTextField.tag = 2
+        startSecTextField.tag = 3
+        endHourTextField.tag = 4
+        endMinuteTextField.tag = 5
+        endSecTextField.tag = 6
+        
+        startHourTextField.delegate = self
+        startMinuteTextField.delegate = self
+        startSecTextField.delegate = self
+        endHourTextField.delegate = self
+        endMinuteTextField.delegate = self
+        endSecTextField.delegate = self
+        
+        addKeyboardToolbar()
+        
         let startLabelTapGesture = UITapGestureRecognizer(target: self, action: "playFromStartTime")
         startLabel.userInteractionEnabled = true
         startLabel.addGestureRecognizer(startLabelTapGesture)
@@ -42,6 +59,7 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
         let endLabelTapGesture = UITapGestureRecognizer(target: self, action: "playFromEndTime")
         endLabel.userInteractionEnabled = true
         endLabel.addGestureRecognizer(endLabelTapGesture)
+        
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -112,9 +130,9 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
         if hms2.0 > 0 && hms2.1 == 0 {
             endMinuteTextField.text = "00"
         } else if hms2.1 <= 9 && hms2.1 > 0 {
-            endMinuteTextField.text = "\(hms.1)"
+            endMinuteTextField.text = "\(hms2.1)"
         } else if hms2.1 >= 10 {
-            endMinuteTextField.text = "\(hms.1)"
+            endMinuteTextField.text = "\(hms2.1)"
         }
         
         if (hms2.0 > 0 || hms2.1 > 0) && hms2.2 == 0 {
@@ -126,6 +144,172 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
+    func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
+        currentTextField = textField
+        return true
+    }
+    
+    func navToTextField(sender:UIButton) {
+        var navIncrement: Int?
+        if sender.tag == 12 {
+            navIncrement = -1
+        } else if sender.tag == 13 {
+            navIncrement = 1
+        }
+        
+        if let inc = navIncrement, let currentField = currentTextField {
+            let navToTag = currentField.tag + inc
+            if let nextResponder = currentField.superview!.viewWithTag(navToTag) {
+                nextResponder.becomeFirstResponder()
+            } else if let nextResponder = currentField.superview!.superview!.viewWithTag(navToTag) {
+                nextResponder.becomeFirstResponder()
+            } else {
+                self.performSegueWithIdentifier("show_add_clipTitle", sender: self)
+            }
+        }
+    }
+    
+    // TODO: this monstrosity needs refactoring
+    func incrementTextField(sender:UIButton) {
+        var increment: Int?
+        if sender.tag == 14 {
+            increment = -1
+        } else if sender.tag == 15 {
+            increment = 1
+        }
+        
+        if let inc = increment, let currentField = currentTextField {
+            let currentValue = returnCurrentValueFromTextField(currentField)
+            var newValueString: String!
+            let adjacentValue: Int!
+            
+            if (currentValue == 1 && inc == -1) && (currentField.tag == 1 || currentField.tag == 4) {
+                newValueString = String()
+            } else if currentValue == 0 && inc == -1 {
+                if currentField.tag == 1 || currentField.tag == 4 {
+                    newValueString = String()
+                } else if currentField.tag == 2 {
+                    if let adjacentTextField = self.view.viewWithTag(1) as? UITextField {
+                        adjacentValue = returnCurrentValueFromTextField(adjacentTextField)
+                        if adjacentValue > 0 {
+                            newValueString = String(59)
+                            adjacentTextField.text = String(adjacentValue - 1)
+                        } else {
+                            newValueString = String()
+                        }
+                    }
+                } else if currentField.tag == 3 {
+                    if let adjacentTextField = self.view.viewWithTag(2) as? UITextField {
+                        adjacentValue = returnCurrentValueFromTextField(adjacentTextField)
+                        if adjacentValue > 0 {
+                            newValueString = String(59)
+                            adjacentTextField.text = String(adjacentValue - 1)
+                        } else {
+                            newValueString = String()
+                        }
+                    }
+                } else if currentField.tag == 5 {
+                    if let adjacentTextField = self.view.viewWithTag(4) as? UITextField {
+                        adjacentValue = returnCurrentValueFromTextField(adjacentTextField)
+                        if adjacentValue > 0 {
+                            newValueString = String(59)
+                            adjacentTextField.text = String(adjacentValue - 1)
+                        } else {
+                            newValueString = String()
+                        }
+                    }
+                } else if currentField.tag == 6 {
+                    if let adjacentTextField = self.view.viewWithTag(5) as? UITextField {
+                        adjacentValue = returnCurrentValueFromTextField(adjacentTextField)
+                        if adjacentValue > 0 {
+                            newValueString = String(59)
+                            adjacentTextField.text = String(adjacentValue - 1)
+                        } else {
+                            newValueString = String()
+                        }
+                    }
+                }
+            } else if currentValue == 59 && inc == 1 {
+                if currentField.tag == 1 || currentField.tag == 4 {
+                    newValueString = String(currentValue + 1)
+                } else if currentField.tag == 2 {
+                    if let adjacentTextField = self.view.viewWithTag(1) as? UITextField {
+                        adjacentValue = returnCurrentValueFromTextField(adjacentTextField)
+                        adjacentTextField.text = String(adjacentValue + 1)
+                    }
+                    newValueString = String(00)
+                } else if currentField.tag == 3 {
+                    if let adjacentTextField = self.view.viewWithTag(2) as? UITextField {
+                        adjacentValue = returnCurrentValueFromTextField(adjacentTextField)
+                        adjacentTextField.text = String(adjacentValue + 1)
+                    }
+                    newValueString = String(00)
+                } else if currentField.tag == 5 {
+                    if let adjacentTextField = self.view.viewWithTag(4) as? UITextField {
+                        adjacentValue = returnCurrentValueFromTextField(adjacentTextField)
+                        adjacentTextField.text = String(adjacentValue + 1)
+                    }
+                    newValueString = String(00)
+                } else if currentField.tag == 6 {
+                    if let adjacentTextField = self.view.viewWithTag(5) as? UITextField {
+                        adjacentValue = returnCurrentValueFromTextField(adjacentTextField)
+                        adjacentTextField.text = String(adjacentValue + 1)
+                    }
+                    newValueString = String(00)
+                }
+            } else if currentValue >= 0 && currentValue <= 59 {
+                    newValueString = String(currentValue + inc)
+            }
+            currentField.text = newValueString
+        }
+    }
+    
+    func returnCurrentValueFromTextField(textField: UITextField) -> Int {
+        var currentValue: Int!
+        if let text = textField.text {
+            currentValue = Int(text)
+            if currentValue == nil {
+                currentValue = 0
+            }
+            return currentValue
+        }
+        return 0
+    }
+    
+    func addKeyboardToolbar() {
+        let keyboardToolbar = UIToolbar()
+        keyboardToolbar.sizeToFit()
+        
+        let flexBarButton = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: nil)
+        
+        let startBarButton = UIBarButtonItem(title: "Start", style: .Plain, target: self, action: "playFromStartTime")
+        startBarButton.tag = 10
+        
+        let endBarButton = UIBarButtonItem(title: "  End  ", style: .Plain, target: self, action: "playFromEndTime")
+        endBarButton.tag = 11
+        
+        let prevBarButton = UIBarButtonItem(title: " <––  ", style: .Plain, target: self, action: "navToTextField:")
+        prevBarButton.tag = 12
+        
+        let nextBarButton = UIBarButtonItem(title: "  ––>  ", style: .Plain, target: self, action: "navToTextField:")
+        nextBarButton.tag = 13
+        
+        let minusOneBarButton = UIBarButtonItem(title: "  –1  ", style: .Plain, target: self, action: "incrementTextField:")
+        minusOneBarButton.tag = 14
+        
+        let plusOneBarButton = UIBarButtonItem(title: "  +1  ", style: .Plain, target: self, action: "incrementTextField:")
+        plusOneBarButton.tag = 15
+        
+        keyboardToolbar.items = [startBarButton, endBarButton, flexBarButton, prevBarButton, nextBarButton, minusOneBarButton, plusOneBarButton]
+        
+        startHourTextField.inputAccessoryView = keyboardToolbar
+        startMinuteTextField.inputAccessoryView = keyboardToolbar
+        startSecTextField.inputAccessoryView = keyboardToolbar
+        endHourTextField.inputAccessoryView = keyboardToolbar
+        endMinuteTextField.inputAccessoryView = keyboardToolbar
+        endSecTextField.inputAccessoryView = keyboardToolbar
+    }
+    
     func playFromStartTime() {
         let playFromStartTime = Double(getStartTimeFromTextFields())
         PVMediaPlayer.sharedInstance.goToTime(playFromStartTime)
@@ -133,6 +317,10 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     
     func playFromEndTime() {
         let playFromEndDouble = Double(getEndTimeFromTextFields())
+        if playFromEndDouble == 0 {
+            return
+        }
+        
         let playFromEndCMTime = CMTimeMakeWithSeconds(playFromEndDouble, 1)
         let playFromEndValue = NSValue(CMTime: playFromEndCMTime)
         
