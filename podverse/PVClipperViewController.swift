@@ -66,7 +66,7 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
             
             self.presentViewController(timingAlert, animated: true, completion: nil)
         } else if endTime == 0 {
-            let timingAlert = UIAlertController(title: "Clip End Time", message: "No End Time is set. Press OK to continue without an End Time, or Cancel to update it.", preferredStyle:.Alert)
+            let timingAlert = UIAlertController(title: "Clip End Time", message: "No End Time is set. Press OK to use the end of the episode as the End Time.", preferredStyle:.Alert)
             timingAlert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { (alertAction) -> Void in
                     self.endTime = 0
                     self.performSegueWithIdentifier("show_add_clipTitle", sender: self)
@@ -81,15 +81,49 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     }
 
     func updateUI() {
+        // TODO: this should probably be refactored...
+        
         let hms = PVUtility.secondsToHoursMinutesSeconds(Int(startTime))
-        startHourTextField.text = "\(hms.0)"
-        startMinuteTextField.text = "\(hms.1)"
-        startSecTextField.text = "\(hms.2)"
+        if hms.0 > 0 {
+            startHourTextField.text = "\(hms.0)"
+        }
+
+        if hms.0 > 0 && hms.1 == 0 {
+            startMinuteTextField.text = "00"
+        } else if hms.1 <= 9 && hms.1 > 0 {
+            startMinuteTextField.text = "\(hms.1)"
+        } else if hms.1 >= 10 {
+            startMinuteTextField.text = "\(hms.1)"
+        }
+        
+        if (hms.0 > 0 || hms.1 > 0) && hms.2 == 0 {
+            startSecTextField.text = "00"
+        } else if hms.2 <= 9 && hms.2 > 0 {
+            startSecTextField.text = "0\(hms.2)"
+        } else if hms.2 >= 10 {
+            startSecTextField.text = "\(hms.2)"
+        }
         
         let hms2 = PVUtility.secondsToHoursMinutesSeconds(Int(endTime))
-        endHourTextField.text = "\(hms2.0)"
-        endMinuteTextField.text = "\(hms2.1)"
-        endSecTextField.text = "\(hms2.2)"
+        if hms2.0 > 0 {
+            endHourTextField.text = "\(hms2.0)"
+        }
+        
+        if hms2.0 > 0 && hms2.1 == 0 {
+            endMinuteTextField.text = "00"
+        } else if hms2.1 <= 9 && hms2.1 > 0 {
+            endMinuteTextField.text = "\(hms.1)"
+        } else if hms2.1 >= 10 {
+            endMinuteTextField.text = "\(hms.1)"
+        }
+        
+        if (hms2.0 > 0 || hms2.1 > 0) && hms2.2 == 0 {
+            endSecTextField.text = "00"
+        } else if hms2.2 <= 9 && hms2.2 > 0 {
+            endSecTextField.text = "0\(hms2.2)"
+        } else if hms2.2 >= 10 {
+            endSecTextField.text = "\(hms2.2)"
+        }
     }
     
     func playFromStartTime() {
