@@ -60,6 +60,7 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
         endLabel.userInteractionEnabled = true
         endLabel.addGestureRecognizer(endLabelTapGesture)
         
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "navToInitialTextField", name: Constants.kClipperWillDisplay, object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -147,6 +148,30 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
         currentTextField = textField
         return true
+    }
+    
+    func navToInitialTextField() {
+        if let startHours = self.view.viewWithTag(1) as? UITextField, let startHoursText = startHours.text, let startHoursInt = Int(startHoursText) {
+            if startHoursInt > 0 {
+                let firstResponder = self.view.viewWithTag(1)
+                firstResponder?.becomeFirstResponder()
+                return
+            }
+        }
+        if let startMinutes = self.view.viewWithTag(2) as? UITextField, let startMinutesText = startMinutes.text, let startMinutesInt = Int(startMinutesText) {
+            if startMinutesInt > 0 {
+                let firstResponder = self.view.viewWithTag(2)
+                firstResponder?.becomeFirstResponder()
+                return
+            }
+        }
+        if let startSeconds = self.view.viewWithTag(3) as? UITextField, let startSecondsText = startSeconds.text, let startSecondsInt = Int(startSecondsText) {
+            if startSecondsInt > 0 {
+                let firstResponder = self.view.viewWithTag(3)
+                firstResponder?.becomeFirstResponder()
+                return
+            }
+        }
     }
     
     func navToTextField(sender:UIButton) {

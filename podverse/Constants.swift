@@ -21,6 +21,8 @@ struct Constants {
     static let kNowPlayingTimeHasChanged = "nowPlayingTimeHasChanged"
     
     static let kPlayerHasNoItem = "playerHasNoItem"
+    
+    static let kClipperWillDisplay = "clipperWillDisplay"
 
     static let saveQueue = dispatch_queue_create("MOC_SERIAL_SAVE_QUEUE", DISPATCH_QUEUE_SERIAL)
     
