@@ -341,6 +341,13 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     }
     
     func playFromEndTime() {
+        
+        // TODO: BUG: When pressing the "End" key twice quickly in the Make Clip view, I run into the error "An instance of AVPlayer cannot remove a time observer that was added by a different instance of AVPlayer..."
+        // I implemented a work around for this issue by not allowing the app to set a new boundaryObserver until the previous one has been removed (currently the end time observer is removed every 3 seconds). This is not optimal...
+        if self.boundaryObserver != nil {
+            return
+        }
+        
         let playFromEndDouble = Double(getEndTimeFromTextFields())
         if playFromEndDouble == 0 {
             return
@@ -353,6 +360,7 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
             PVMediaPlayer.sharedInstance.playOrPause()
             if let observer = self.boundaryObserver{
                 self.avPlayer.removeTimeObserver(observer)
+                self.boundaryObserver = nil
             }
         })
         
