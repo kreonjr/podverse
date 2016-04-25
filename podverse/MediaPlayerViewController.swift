@@ -290,6 +290,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         else {
             if let PVClipper = self.clipper {
                 PVClipper.startTime = Int(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()))
+                PVClipper.endTime = Int(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime())) + 60
                 PVClipper.updateUI()
                 PVClipper.currentEpisode = pvMediaPlayer.nowPlayingEpisode
             }
