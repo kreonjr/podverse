@@ -35,6 +35,8 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     
     var currentTextField: UITextField?
     
+    var textFieldLimitLength = 2
+    
     override func viewDidLoad() {
         startHourTextField.tag = 1
         startMinuteTextField.tag = 2
@@ -148,6 +150,12 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     func textFieldShouldBeginEditing(textField: UITextField) -> Bool {
         currentTextField = textField
         return true
+    }
+    
+    func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
+        guard let text = textField.text else { return true }
+        let newLength = text.characters.count + string.characters.count - range.length
+        return newLength <= textFieldLimitLength
     }
     
     func navToInitialTextField() {
