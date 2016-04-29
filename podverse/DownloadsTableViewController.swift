@@ -139,7 +139,7 @@ class DownloadsTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let moc = CoreDataHelper().managedObjectContext
+        let moc = CoreDataHelper.sharedInstance.managedObjectContext
         
         let downloadingEpisode = DLEpisodesList.shared.downloadingEpisodes[indexPath.row]
         
@@ -152,7 +152,13 @@ class DownloadsTableViewController: UITableViewController {
             return
         }
         
-        PVDownloader.sharedInstance.pauseOrResumeDownloadingEpisode(episode)
+        startDownloadingEpisode(episode)
+    }
+    
+    private func startDownloadingEpisode(episode:Episode) {
+        let downloader = PVDownloader()
+        downloader.moc = episode.managedObjectContext
+        downloader.pauseOrResumeDownloadingEpisode(episode)
     }
     
     /*

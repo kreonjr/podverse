@@ -22,7 +22,7 @@ final class PlaylistManager {
     var playlists:[Playlist] {
         get {
             
-            let moc = CoreDataHelper().managedObjectContext
+            let moc = CoreDataHelper.sharedInstance.managedObjectContext
             return CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc:moc) as! [Playlist]
         }
     }
@@ -42,7 +42,7 @@ final class PlaylistManager {
         if (urlComponentArray[0] == "http:" || urlComponentArray[0] == "https:") && (urlComponentArray[1] == "") && (urlComponentArray[2] == "podverse.tv") && (urlComponentArray[3] == "pl") {
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
                     
-                        let moc = CoreDataHelper().backgroundContext
+                        let moc = CoreDataHelper.sharedInstance.backgroundContext
                         let playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:moc)
                         PlaylistManager.JSONToPlaylist(playlist, JSONDict: response)
                         
@@ -67,7 +67,7 @@ final class PlaylistManager {
                 dispatch_group_enter(dispatchGroup)
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
 
-                    let moc = CoreDataHelper().backgroundContext
+                    let moc = CoreDataHelper.sharedInstance.backgroundContext
                     let playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:moc)
                     PlaylistManager.JSONToPlaylist(playlist, JSONDict: response)
                     
@@ -89,7 +89,7 @@ final class PlaylistManager {
     }
     
     static func JSONToPlaylist(playlist:Playlist, JSONDict:Dictionary<String,AnyObject>) {
-        let moc = CoreDataHelper().managedObjectContext
+        let moc = CoreDataHelper.sharedInstance.managedObjectContext
         if let title = JSONDict["playlistTitle"] as? String {
             playlist.title = title
         }
@@ -272,7 +272,7 @@ final class PlaylistManager {
     
     func createDefaultPlaylists() {
         // If no playlists are saved, then create the "My Clips" and "My Episodes" playlists
-        let moc = CoreDataHelper().backgroundContext
+        let moc = CoreDataHelper.sharedInstance.backgroundContext
         if self.playlists.count < 1 {
             let myEpisodesPlaylist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
             myEpisodesPlaylist.title = Constants.kMyEpisodesPlaylist

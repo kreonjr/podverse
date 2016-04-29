@@ -13,6 +13,8 @@ class CoreDataHelper:NSObject {
     let storeName = "podverse"
     let storeFilename = "podverse.sqlite"
     
+    static let sharedInstance = CoreDataHelper()
+    
     lazy var applicationDocumentsDirectory: NSURL = {
         // The directory the application uses to store the Core Data store file. This code uses a directory named "me.iascchen.MyTTT" in the application's documents Application Support directory.
         let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)

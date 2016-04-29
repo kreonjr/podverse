@@ -67,7 +67,7 @@ class PVClipperAddInfoViewController: UIViewController {
     }
     
     func saveClipWithTitle(clipTitle:String) {
-        let moc = CoreDataHelper().managedObjectContext
+        let moc = CoreDataHelper.sharedInstance.managedObjectContext
         if clip == nil {
             clip = (CoreDataHelper.insertManagedObject("Clip", moc:moc) as! Clip)
             episode.addClipObject(clip!)

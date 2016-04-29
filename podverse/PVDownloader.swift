@@ -12,12 +12,11 @@ import CoreData
 class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
 
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    var moc:NSManagedObjectContext?
     
     var docDirectoryURL: NSURL?
     var downloadSession: NSURLSession!
-    
-    static let sharedInstance = PVDownloader()
-    
+        
     override init() {
         super.init()
         
@@ -144,14 +143,13 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         // Get the corresponding episode object by its taskIdentifier value
         if let episodeDownloadIndex = DLEpisodesList.shared.downloadingEpisodes.indexOf({$0.taskIdentifier == downloadTask.taskIdentifier}) {
             let downloadingEpisode = DLEpisodesList.shared.downloadingEpisodes[episodeDownloadIndex]
-            let moc = CoreDataHelper().backgroundContext
             
             guard let mediaUrl =  downloadingEpisode.mediaURL else {
                 return
             }
             
             let predicate = NSPredicate(format: "mediaURL == %@", mediaUrl)
-            guard let episode = CoreDataHelper.fetchEntities("Episode", predicate: predicate, moc: moc).first as? Episode else {
+            guard let episode = CoreDataHelper.fetchEntities("Episode", predicate: predicate, moc: self.moc).first as? Episode else {
                 return
             }
             
@@ -207,7 +205,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     
                     let podcastTitle = episode.podcast.title
                     // Save the downloadedMediaFileDestination with the object
-                    CoreDataHelper.saveCoreData(moc, completionBlock: { (saved) -> Void in
+                    CoreDataHelper.saveCoreData(self.moc, completionBlock: { (saved) -> Void in
                         let downloadHasFinishedUserInfo = ["episode":episode]
                         
                         dispatch_async(dispatch_get_main_queue(), { () -> Void in
@@ -229,20 +227,25 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     }
     
     func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
-        downloadSession.getTasksWithCompletionHandler { (dataTasks, uploadTasks, downloadTasks) -> Void in
+        downloadSession.getTasksWithCompletionHandler {[weak self] (dataTasks, uploadTasks, downloadTasks) -> Void in
+            guard let strongSelf = self else {
+                return
+            }
             if (downloadTasks.count == 0) {
-                if (self.appDelegate.backgroundTransferCompletionHandler != nil) {
-                    let completionHandler: (() -> Void)? = self.appDelegate.backgroundTransferCompletionHandler
+                if (strongSelf.appDelegate.backgroundTransferCompletionHandler != nil) {
+                    let completionHandler: (() -> Void)? = strongSelf.appDelegate.backgroundTransferCompletionHandler
                     
-                    self.appDelegate.backgroundTransferCompletionHandler = nil
+                    strongSelf.appDelegate.backgroundTransferCompletionHandler = nil
                     
                     NSOperationQueue.mainQueue().addOperationWithBlock() {
                         completionHandler?()
                         
-                        let localNotification = UILocalNotification()
-                        localNotification.alertBody = "All files have been downloaded!"
-                        
-                        UIApplication.sharedApplication().presentLocalNotificationNow(localNotification)
+                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                            let localNotification = UILocalNotification()
+                            localNotification.alertBody = "All files have been downloaded!"
+                            
+                            UIApplication.sharedApplication().presentLocalNotificationNow(localNotification)
+                        })
                     }
                 }
             }

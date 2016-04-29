@@ -24,7 +24,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         }
     }
     
-    let moc = CoreDataHelper().managedObjectContext
+    let moc = CoreDataHelper.sharedInstance.managedObjectContext
     
     var podcastVC:PodcastsTableViewController? {
         get {

@@ -22,9 +22,8 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     var shouldSubscribeToPodcast: Bool
     var shouldDownloadMostRecentEpisode = false
     var latestEpisodeInFeed: Episode?
-//    var savedFeedEpisodes = []
     var delegate:PVFeedParserDelegate?
-    let moc = CoreDataHelper().backgroundContext
+    let moc = CoreDataHelper.sharedInstance.backgroundContext
     
     init(onlyGetMostRecentEpisode:Bool, shouldSubscribe:Bool) {
         onlyGetMostRecent = onlyGetMostRecentEpisode
@@ -32,14 +31,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func parsePodcastFeed(feedURLString: String) {
-        dispatch_async(Constants.feedParsingQueue) {
-            self.feedURL = feedURLString
-            let feedParser = CustomFeedParser(feedURL: feedURLString)
-            feedParser.delegate = self
-            feedParser.parsingType = .Full
-            feedParser.parse()
-            print("feedParser did start")
-        }
+        self.feedURL = feedURLString
+        let feedParser = CustomFeedParser(feedURL: feedURLString)
+        feedParser.delegate = self
+        feedParser.parsingType = .Full
+        feedParser.parse()
+        print("feedParser did start")
     }
     
     func feedParser(parser: FeedParser, didParseChannel channel: FeedChannel) {
@@ -103,7 +100,6 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             // If podcast is nil, then the RSS feed was invalid for the parser, and we should return out of successfullyParsedURL
             return
         }
-       
         
         //Do not parse episode if it does not contain feedEnclosures.
         if item.feedEnclosures.count <= 0 {
@@ -152,13 +148,21 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         
         if !episodeAlreadySaved {
             podcast.addEpisodeObject(newEpisode)
-            CoreDataHelper.saveCoreData(moc) { (saved) -> Void in
-                if self.shouldDownloadMostRecentEpisode == true {
-                    PVDownloader.sharedInstance.startDownloadingEpisode(newEpisode)
-                    self.shouldDownloadMostRecentEpisode = false
+            CoreDataHelper.saveCoreData(moc) {[weak self] (saved) -> Void in
+                guard let strongSelf = self else {
+                    return
+
+                }
+                if strongSelf.shouldDownloadMostRecentEpisode == true {
+                    let downloader = PVDownloader()
+                    downloader.moc = strongSelf.moc
+                    downloader.startDownloadingEpisode(newEpisode)
+                    strongSelf.shouldDownloadMostRecentEpisode = false
                 }
                 
-                self.delegate?.feedItemParsed?()
+                dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                    strongSelf.delegate?.feedItemParsed?()
+                }
             }
         }
         else {
@@ -215,24 +219,29 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             dispatch_async(dispatch_get_main_queue()) { () -> Void in
                 self.delegate?.feedItemParsed?()
             }
+            
             return
         }
         
         // If subscribing to a podcast, then get the latest episode and begin downloading
         if shouldSubscribeToPodcast == true {
             let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-            let latestEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate, moc:moc)
+            let latestEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate, moc:self.moc)
             
             if latestEpisodeArray.count > 0 {
                 if let latestEpisode = latestEpisodeArray[0] as? Episode {
                     if latestEpisode.downloadComplete != true {
-                        PVDownloader.sharedInstance.startDownloadingEpisode(latestEpisode)
+                        let downloader = PVDownloader()
+                        downloader.moc = self.moc
+                        downloader.startDownloadingEpisode(latestEpisode)
                     }
                 }
             }
         }
 
-        self.delegate?.feedParsingComplete(podcast.feedURL)
+        dispatch_async(dispatch_get_main_queue()) { () -> Void in
+            self.delegate?.feedParsingComplete(podcast.feedURL)
+        }
         print("feed parser has finished!")
     }
     

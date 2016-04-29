@@ -22,6 +22,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var selectedPodcast: Podcast!
     
+    var selectedPodcastId: NSManagedObjectID!
+    
     var episodesArray = [Episode]()
     
     var refreshControl: UIRefreshControl!
@@ -30,6 +32,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var pvMediaPlayer = PVMediaPlayer.sharedInstance
     
+    let moc = CoreDataHelper.sharedInstance.managedObjectContext
+    
     func loadData() {
         
         // Clear the episodes array, then retrieve and sort the full episode or downloaded episode array
@@ -37,6 +41,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         let unsortedEpisodes = NSMutableArray()
         
         var episodesArray: NSSet!
+        
+        self.selectedPodcast = CoreDataHelper.fetchEntityWithID(self.selectedPodcastId, moc: moc) as! Podcast
         
         // If showAllEpisodes is false, then only retrieve the downloaded episodes
         if showAllEpisodes == false {
@@ -54,6 +60,17 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         
         self.episodesArray = unsortedEpisodes.sortedArrayUsingDescriptors([sortDescriptor]) as! [Episode]
         
+        if let imageData = selectedPodcast.imageData, image = UIImage(data: imageData)  {
+            headerImageView.image = image
+        }
+        else if let itunesImageData = selectedPodcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
+            headerImageView.image = itunesImage
+        }
+        
+        headerSummaryLabel.text = selectedPodcast.summary
+        
+        self.title = selectedPodcast.title
+
         self.tableView.reloadData()
     }
     
@@ -91,16 +108,24 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(selectedEpisode)
                 self.performSegueWithIdentifier("Episodes to Now Playing", sender: nil)
             } else {
-                PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
+                let downloader = PVDownloader()
+                downloader.moc = selectedEpisode.managedObjectContext
+                downloader.startDownloadingEpisode(selectedEpisode)
                 cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
             }
         }
     }
     
     func refresh() {
-        let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe: false)
-        feedParser.delegate = self
-        feedParser.parsePodcastFeed(selectedPodcast.feedURL)
+        dispatch_async(Constants.feedParsingQueue) { [weak self] in
+            guard let strongSelf = self else {
+                return
+            }
+            
+            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe: false)
+            feedParser.delegate = strongSelf
+            feedParser.parsePodcastFeed(strongSelf.selectedPodcast.feedURL)
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -115,9 +140,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: Constants.kDownloadHasFinished, object: nil)
-        
-        self.title = selectedPodcast.title
-        
+
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
         self.automaticallyAdjustsScrollViewInsets = false
@@ -127,16 +150,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         self.refreshControl.addTarget(self, action: "refresh", forControlEvents: UIControlEvents.ValueChanged)
         self.tableView.addSubview(refreshControl)
         
-        if let imageData = selectedPodcast.imageData, image = UIImage(data: imageData)  {
-            headerImageView.image = image
-        }
-        else if let itunesImageData = selectedPodcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
-            headerImageView.image = itunesImage
-        }
-        
-        headerSummaryLabel.text = selectedPodcast.summary
-        
-        loadData()
+        self.loadData()
     }
     
     override func didReceiveMemoryWarning() {
@@ -249,7 +263,9 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                     episodeActions.addAction(UIAlertAction(title: "Downloading Episode", style: .Default, handler: nil))
                 } else {
                     episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
-                        PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
+                        let downloader = PVDownloader()
+                        downloader.moc = selectedEpisode.managedObjectContext
+                        downloader.startDownloadingEpisode(selectedEpisode)
                         let cell = tableView.cellForRowAtIndexPath(indexPath) as! EpisodesTableCell
                         cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
                     }))
@@ -280,7 +296,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     func toggleShowAllEpisodes() {
         let vc = self.storyboard?.instantiateViewControllerWithIdentifier("episodesTableViewController") as! EpisodesTableViewController
-        vc.selectedPodcast = selectedPodcast
+        vc.selectedPodcastId = selectedPodcast.objectID
         vc.showAllEpisodes = !showAllEpisodes
         if showAllEpisodes == false {
             self.navigationController?.pushViewController(vc, animated: true)

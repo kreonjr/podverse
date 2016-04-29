@@ -24,7 +24,9 @@ class PVDeleter {
     
     static func deleteEpisode(episode: Episode, completion:(()->())? ) {
         // Get the downloadSession, and if there is a downloadSession with a matching taskIdentifier as episode's taskIdentifier, then cancel the downloadSession
-        let downloadSession = PVDownloader.sharedInstance.downloadSession
+        let downloader = PVDownloader()
+        downloader.moc = episode.managedObjectContext
+        let downloadSession = downloader.downloadSession
         downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
             for episodeDownloadTask in downloadTasks {
                 if episodeDownloadTask.taskIdentifier == episode.taskIdentifier {
@@ -172,7 +174,7 @@ class PVDeleter {
     }
     
     static func checkIfEpisodeShouldBeRemoved(episode: Episode) -> Bool {
-        let moc = CoreDataHelper().managedObjectContext
+        let moc = CoreDataHelper.sharedInstance.managedObjectContext
         var alsoDelete = true
         
         if episode.podcast.isSubscribed == true {

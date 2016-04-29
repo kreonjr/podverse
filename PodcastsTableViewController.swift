@@ -21,6 +21,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         }
     }
     
+    let coreDataHelper = CoreDataHelper.sharedInstance
+    
     var refreshControl: UIRefreshControl!
     
     private let REFRESH_PODCAST_TIME:Double = 3600
@@ -61,7 +63,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kDownloadHasFinished, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
         
-        //TODO: Investigate
+        //TODO: Investigate why this is needed
 //        let moc = CoreDataHelper().managedObjectContext
 //        let episodeArray = CoreDataHelper.fetchEntities("Episode", predicate: nil, moc:moc) as! [Episode]
 //        for episode in episodeArray {
@@ -84,17 +86,19 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func refreshPodcastFeeds() {
-        let moc = CoreDataHelper().managedObjectContext
+        let moc = self.coreDataHelper.managedObjectContext
         let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
         let podcastArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:moc) as! [Podcast]
 
         for podcast in podcastArray {
             let feedURL = NSURL(string:podcast.feedURL)
             
-            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: true, shouldSubscribe:false)
-            feedParser.delegate = self
-            if let feedURLString = feedURL?.absoluteString {
-                feedParser.parsePodcastFeed(feedURLString)
+            dispatch_async(Constants.feedParsingQueue) {
+                let feedParser = PVFeedParser(onlyGetMostRecentEpisode: true, shouldSubscribe:false)
+                feedParser.delegate = self
+                if let feedURLString = feedURL?.absoluteString {
+                    feedParser.parsePodcastFeed(feedURLString)
+                }
             }
         }
     }
@@ -316,7 +320,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         if segue.identifier == "Show Episodes" {
             let episodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
             if let index = tableView.indexPathForSelectedRow {
-                episodesTableViewController.selectedPodcast = podcastsArray[index.row]
+                episodesTableViewController.selectedPodcastId = podcastsArray[index.row].objectID
             }
             episodesTableViewController.showAllEpisodes = false
         } else if segue.identifier == "Show Playlist" {
@@ -347,9 +351,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func loadData() {
-        let moc = CoreDataHelper().managedObjectContext
         let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
-        self.podcastsArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:moc) as! [Podcast]
+        self.podcastsArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:coreDataHelper.managedObjectContext) as! [Podcast]
         self.podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
 
         //TODO (Somewhere else, not in the view controller) Set pubdate in cell equal to most recent episode's pubdate
@@ -379,7 +382,9 @@ extension PodcastsTableViewController: PVFeedParserDelegate {
             })
         }
         else {
-            loadData()
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                self.loadData()
+            })
         }
     }
     

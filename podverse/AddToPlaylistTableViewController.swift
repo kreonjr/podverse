@@ -67,7 +67,7 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         createPlaylistAlert.addAction(UIAlertAction(title: "Save", style: .Default, handler: { (action: UIAlertAction!) in
             let textField = createPlaylistAlert.textFields![0] as UITextField
             if let playlistTitle = textField.text {
-                let moc = CoreDataHelper().managedObjectContext
+                let moc = CoreDataHelper.sharedInstance.managedObjectContext
                 
                 let playlist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
                 playlist.title = playlistTitle
