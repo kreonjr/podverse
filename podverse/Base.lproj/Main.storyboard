@@ -117,14 +117,32 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="bVH-xt-Ob5" firstAttribute="leading" secondItem="Vpz-NT-QBa" secondAttribute="leadingMargin" constant="-20" id="5U2-tt-zA4"/>
                             <constraint firstAttribute="trailingMargin" secondItem="bVH-xt-Ob5" secondAttribute="trailing" constant="-20" id="7Xb-hE-Ghj"/>
                             <constraint firstItem="bVH-xt-Ob5" firstAttribute="leading" secondItem="Vpz-NT-QBa" secondAttribute="leadingMargin" constant="-20" id="NxV-Hg-sG5"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="bVH-xt-Ob5" secondAttribute="trailing" constant="-20" id="SpG-9Z-iwk"/>
                             <constraint firstItem="bVH-xt-Ob5" firstAttribute="top" secondItem="hUG-GD-nKu" secondAttribute="bottom" id="cQY-Eh-yUM"/>
                             <constraint firstItem="VhN-37-UaU" firstAttribute="top" secondItem="bVH-xt-Ob5" secondAttribute="bottom" id="qD1-Wo-ta9"/>
+                            <constraint firstItem="bVH-xt-Ob5" firstAttribute="top" secondItem="hUG-GD-nKu" secondAttribute="bottom" id="yeA-c5-vDE"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="xHq-75-KZF"/>
+                    <navigationItem key="navigationItem" id="xHq-75-KZF">
+                        <nil key="title"/>
+                        <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="jD2-3s-mrQ">
+                            <rect key="frame" x="209" y="7" width="182" height="30"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <segments>
+                                <segment title="Podcasts"/>
+                                <segment title="Playlists"/>
+                            </segments>
+                            <connections>
+                                <action selector="indexChanged:" destination="lWq-Ak-k5s" eventType="valueChanged" id="PTW-Mr-7Yc"/>
+                            </connections>
+                        </segmentedControl>
+                    </navigationItem>
                     <connections>
+                        <outlet property="addPlaylistByURL" destination="sfb-S0-Xvc" id="fwI-QB-4GP"/>
+                        <outlet property="segmentedControl" destination="jD2-3s-mrQ" id="xfL-QF-vju"/>
                         <outlet property="tableView" destination="bVH-xt-Ob5" id="tby-vu-7B7"/>
                         <segue destination="jfK-O4-nvL" kind="show" identifier="Show Episodes" id="Wxg-po-9OF"/>
                         <segue destination="QaS-ox-B9v" kind="show" identifier="Show Playlist" id="Eqj-Vy-Alg"/>
@@ -976,40 +994,40 @@
                                 </subviews>
                             </stackView>
                             <stackView opaque="NO" contentMode="scaleToFill" misplaced="YES" distribution="fillEqually" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="kyG-vS-Uez">
-                                <rect key="frame" x="20" y="49" width="560" height="360000000000"/>
+                                <rect key="frame" x="20" y="49" width="560" height="36000000000"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Start Time" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZiT-Ad-sPE">
-                                        <rect key="frame" x="0.0" y="0.0" width="89" height="360000000000"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="89" height="36000000000"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Hour" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="I2O-58-tB4">
-                                        <rect key="frame" x="94" y="0.0" width="90" height="360000000000"/>
+                                        <rect key="frame" x="94" y="0.0" width="90" height="36000000000"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text=" " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jHA-Td-9V0">
-                                        <rect key="frame" x="189" y="0.0" width="89" height="360000000000"/>
+                                        <rect key="frame" x="189" y="0.0" width="89" height="36000000000"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Min" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JaU-g9-5A6">
-                                        <rect key="frame" x="283" y="0.0" width="89" height="360000000000"/>
+                                        <rect key="frame" x="283" y="0.0" width="89" height="36000000000"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hWt-Ob-2nq">
-                                        <rect key="frame" x="377" y="0.0" width="90" height="360000000000"/>
+                                        <rect key="frame" x="377" y="0.0" width="90" height="36000000000"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Sec" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="u7u-Tb-s7n">
-                                        <rect key="frame" x="471" y="0.0" width="89" height="360000000000"/>
+                                        <rect key="frame" x="471" y="0.0" width="89" height="36000000000"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
@@ -1683,6 +1701,6 @@
         <image name="Tab-Podcasts" width="25" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="Xc1-wE-NTg"/>
+        <segue reference="fwx-gG-V2G"/>
     </inferredMetricsTieBreakers>
 </document>

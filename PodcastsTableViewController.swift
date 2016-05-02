@@ -12,8 +12,27 @@ import CoreData
 class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet weak var tableView: UITableView!
+    
+    @IBOutlet weak var segmentedControl: UISegmentedControl!
+    
+    @IBAction func indexChanged(sender: UISegmentedControl) {
+        switch segmentedControl.selectedSegmentIndex
+        {
+        case 0:
+            addPlaylistByURL.hidden = true
+            reloadTable()
+        case 1:
+            addPlaylistByURL.hidden = false
+            reloadTable()
+        default:
+            break;
+        }
+    }
+    
+    @IBOutlet weak var addPlaylistByURL: UIButton!
+    
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-
+    
     var playlistManager = PlaylistManager.sharedInstance
     
     var podcastsArray = [Podcast]()
@@ -45,6 +64,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationItem.title = "Podverse"
+        
+        addPlaylistByURL.hidden = true
 
         playlistManager.delegate = self
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
@@ -117,11 +138,11 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     // MARK: - Table view data source
 
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 2
+        return 1
     }
     
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if section == 0 {
+        if segmentedControl.selectedSegmentIndex == 0 {
             return "My Subscribed Podcasts"
         } else {
             return "My Playlists"
@@ -129,7 +150,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        if indexPath.section == 1 && indexPath.row >= playlists.count {
+        if segmentedControl.selectedSegmentIndex == 1 && indexPath.row >= playlists.count {
             return 60
         } else {
             return 100
@@ -137,7 +158,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
 
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 {
+        if segmentedControl.selectedSegmentIndex == 0 {
             return podcastsArray.count
         } else {
             return playlists.count
@@ -147,7 +168,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
 
-        if indexPath.section == 0 {
+        if segmentedControl.selectedSegmentIndex == 0 {
             let podcast = podcastsArray[indexPath.row]
             cell.title?.text = podcast.title
             
@@ -217,7 +238,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.section == 0 {
+        if segmentedControl.selectedSegmentIndex == 0 {
             self.performSegueWithIdentifier("Show Episodes", sender: nil)
         } else {
             self.performSegueWithIdentifier("Show Playlist", sender: nil)
@@ -252,7 +273,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     // Override to support editing the table view.
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.section == 0 {
+        if segmentedControl.selectedSegmentIndex == 0 {
             if editingStyle == .Delete {
                 let podcastToRemove = podcastsArray[indexPath.row]
                 
