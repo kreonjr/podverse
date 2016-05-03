@@ -290,10 +290,14 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         else {
             if let PVClipper = self.clipper {
                 PVClipper.startTime = Int(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()))
+                PVClipper.endTime = Int(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime())) + 60
                 PVClipper.updateUI()
                 PVClipper.currentEpisode = pvMediaPlayer.nowPlayingEpisode
             }
             buttonMakeClip.setTitle(hideClipper, forState: .Normal)
+            
+            // TODO: I tried implementing this kClipperWillDisplay -> navToInitialTextField() feature using a protocol and extension (attempting to reproduce the way the PlaylistManagerDelegate works), but I couldn't get it to work. Maybe I am missing something because the PlaylistManager is an NSObject, but this class is a UIViewController? Anyway this postNotification approach seems to be working fine, but I would like to understand sometime why I could not get the protocol + extension approach to work here.
+            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kClipperWillDisplay, object: nil)
         }
     }
     
@@ -311,7 +315,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         pvMediaPlayer.nowPlayingEpisode = nil
         pvMediaPlayer.nowPlayingClip = nil
         
-        
         PVDeleter.deleteEpisode(currentEpisode,completion: nil)
         
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
@@ -325,7 +328,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         pvMediaPlayer.clearPlayingInfo()
         pvMediaPlayer.nowPlayingEpisode = nil
         pvMediaPlayer.nowPlayingClip = nil
-        
         
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
             NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)

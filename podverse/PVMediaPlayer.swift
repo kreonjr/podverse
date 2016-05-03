@@ -93,17 +93,18 @@ class PVMediaPlayer: NSObject {
             if avPlayer.rate == 0 {
                 avPlayer.play()
                 mediaPlayerIsPlaying = true
-
+                self.delegate?.setMediaPlayerVCPlayPauseIcon()
                 return true
                 
             } else {
                 saveCurrentTimeAsPlaybackPosition()
                 avPlayer.pause()
                 mediaPlayerIsPlaying = false
+                self.delegate?.setMediaPlayerVCPlayPauseIcon()
                 return false
             }
         }
-        
+        self.delegate?.setMediaPlayerVCPlayPauseIcon()
         mediaPlayerIsPlaying = false
         return false
     }
@@ -197,6 +198,7 @@ class PVMediaPlayer: NSObject {
         avPlayer.rate = currentRate
         avPlayer.play()
         mediaPlayerIsPlaying = true
+        self.delegate?.setMediaPlayerVCPlayPauseIcon()
     }
     
     func skipTime(seconds: Double) {
