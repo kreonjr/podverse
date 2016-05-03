@@ -45,9 +45,9 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         super.viewDidLoad()
         
         // Make sure the Play/Pause button displays properly after returning from background
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "setPlayPauseIcon", name: UIApplicationWillEnterForegroundNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MediaPlayerViewController.setPlayPauseIcon), name: UIApplicationWillEnterForegroundNotification, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateNowPlayingCurrentTime:", name:
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MediaPlayerViewController.updateNowPlayingCurrentTime(_:)), name:
             Constants.kNowPlayingTimeHasChanged, object: nil)
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
@@ -59,7 +59,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         
         pvMediaPlayer.delegate = self
         
-        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: "dismissKeyboard"))
+        self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(MediaPlayerViewController.dismissKeyboard)))
         self.clipper = ((self.childViewControllers.first as! UINavigationController).topViewController as? PVClipperViewController)
         
         if let duration = pvMediaPlayer.nowPlayingEpisode.duration {
@@ -69,7 +69,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         buttonMakeClip.frame = CGRectMake(0, 0, 100, 90)
         buttonMakeClip.setTitle(makeClipString, forState: .Normal)
         buttonMakeClip.titleLabel!.font = UIFont(name: "System", size: 18)
-        buttonMakeClip.addTarget(self, action: "toggleMakeClipView:", forControlEvents: .TouchUpInside)
+        buttonMakeClip.addTarget(self, action: #selector(MediaPlayerViewController.toggleMakeClipView(_:)), forControlEvents: .TouchUpInside)
         let rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
         
         makeClipContainerView.hidden = true
@@ -77,7 +77,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         buttonAddToList.frame = CGRectMake(0, 0, 100, 90)
         buttonAddToList.setTitle(addToList, forState: .Normal)
         buttonAddToList.titleLabel!.font = UIFont(name: "System", size: 18)
-        buttonAddToList.addTarget(self, action: "addNowPlayingToList", forControlEvents: .TouchUpInside)
+        buttonAddToList.addTarget(self, action: #selector(MediaPlayerViewController.addNowPlayingToList), forControlEvents: .TouchUpInside)
         let rightBarButtonAddToList: UIBarButtonItem = UIBarButtonItem(customView: buttonAddToList)
         
         self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip, rightBarButtonAddToList], animated: false)
@@ -233,7 +233,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         } else {
 
             // Start timer to check every half second if the now playing current time has changed
-            nowPlayingCurrentTimeTimer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "updateNowPlayingCurrentTimeNotification", userInfo: nil, repeats: true)
+            nowPlayingCurrentTimeTimer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: #selector(MediaPlayerViewController.updateNowPlayingCurrentTimeNotification), userInfo: nil, repeats: true)
             
             // If currentTime != 0.0, then immediately insert the currentTime in its label; else manually set the currentTime label to 00:00.
             if CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()) != 0.0 {

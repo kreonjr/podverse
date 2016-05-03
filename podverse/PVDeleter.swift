@@ -15,8 +15,8 @@ class PVDeleter {
         let episodesToRemove = podcast.episodes.allObjects as! [Episode]
         
         // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
-        for var i = 0; i < episodesToRemove.count; i++ {
-            PVDeleter.deleteEpisode(episodesToRemove[i], completion: nil)
+        for episode in episodesToRemove {
+            PVDeleter.deleteEpisode(episode, completion: nil)
         }
 
         CoreDataHelper.deleteItemFromCoreData(podcast, moc:podcast.managedObjectContext)

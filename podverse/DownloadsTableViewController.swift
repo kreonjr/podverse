@@ -39,12 +39,12 @@ class DownloadsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadData:", name: Constants.kDownloadHasProgressed, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadData:", name: Constants.kDownloadHasFinished, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "pauseOrResumeDownloadData:", name: Constants.kDownloadHasPausedOrResumed, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.reloadDownloadData(_:)), name: Constants.kDownloadHasProgressed, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.reloadDownloadData(_:)), name: Constants.kDownloadHasFinished, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.pauseOrResumeDownloadData(_:)), name: Constants.kDownloadHasPausedOrResumed, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadTable", name: Constants.kUpdateDownloadsTable, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.reloadDownloadTable), name: Constants.kUpdateDownloadsTable, object: nil)
     }
     
     func reloadDownloadData(notification:NSNotification) {

@@ -19,10 +19,10 @@ class PVClipperConfirmationViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        let shareButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: "shareClip")
+        let shareButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: #selector(PVClipperConfirmationViewController.shareClip))
         self.navigationItem.rightBarButtonItem = shareButton
         
-        let editButton = UIBarButtonItem(title: "Edit", style: .Plain, target: self, action: "popToRoot")
+        let editButton = UIBarButtonItem(title: "Edit", style: .Plain, target: self, action: #selector(PVClipperConfirmationViewController.popToRoot))
         self.navigationItem.leftBarButtonItem = editButton
 
     }

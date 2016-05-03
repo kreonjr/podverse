@@ -54,7 +54,7 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
         
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ClipsTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func viewDidLoad() {

@@ -37,7 +37,7 @@ class FindTableViewController: UITableViewController {
     override func viewDidAppear(animated: Bool) {
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(FindTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func viewDidLoad() {

@@ -88,11 +88,11 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "navBackToMediaPlayer", name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToPlaylistTableViewController.navBackToMediaPlayer), name: Constants.kPlayerHasNoItem, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "navBackToMediaPlayer", name: Constants.kItemAddedToPlaylistNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToPlaylistTableViewController.navBackToMediaPlayer), name: Constants.kItemAddedToPlaylistNotification, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToPlaylistTableViewController.loadData), name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
         
         self.navigationController?.navigationBar.barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)
         
@@ -111,7 +111,7 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         // Set navigation bar styles
         navigationItem.title = "Add to Playlist"
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .Plain, target: self, action: "showcreatePlaylistAlert")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .Plain, target: self, action: #selector(AddToPlaylistTableViewController.showcreatePlaylistAlert))
         
         loadData()
     }

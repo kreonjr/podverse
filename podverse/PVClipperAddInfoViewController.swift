@@ -24,10 +24,10 @@ class PVClipperAddInfoViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        let saveButton = UIBarButtonItem(title: "Save", style: .Plain, target: self, action: "saveAndGoToReview")
+        let saveButton = UIBarButtonItem(title: "Save", style: .Plain, target: self, action: #selector(PVClipperAddInfoViewController.saveAndGoToReview))
         self.navigationItem.rightBarButtonItem = saveButton
         
-        let backButton = UIBarButtonItem(title: "Back", style: .Plain, target: self, action: "popViewController")
+        let backButton = UIBarButtonItem(title: "Back", style: .Plain, target: self, action: #selector(PVClipperAddInfoViewController.popViewController))
         self.navigationItem.leftBarButtonItem = backButton
         
         clipTitleTextField.text = clip?.title

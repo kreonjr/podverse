@@ -137,9 +137,9 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(EpisodesTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "updateDownloadFinishedButton:", name: Constants.kDownloadHasFinished, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(EpisodesTableViewController.updateDownloadFinishedButton(_:)), name: Constants.kDownloadHasFinished, object: nil)
 
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
@@ -147,7 +147,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         
         self.refreshControl = UIRefreshControl()
         self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh episodes")
-        self.refreshControl.addTarget(self, action: "refresh", forControlEvents: UIControlEvents.ValueChanged)
+        self.refreshControl.addTarget(self, action: #selector(EpisodesTableViewController.refresh), forControlEvents: UIControlEvents.ValueChanged)
         self.tableView.addSubview(refreshControl)
         
         self.loadData()
@@ -216,7 +216,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 cell.downloadPlayButton.setTitle("DL", forState: .Normal)
             }
             
-            cell.downloadPlayButton.addTarget(self, action: "downloadPlay:", forControlEvents: .TouchUpInside)
+            cell.downloadPlayButton.addTarget(self, action: #selector(EpisodesTableViewController.downloadPlay(_:)), forControlEvents: .TouchUpInside)
             
             return cell
         }

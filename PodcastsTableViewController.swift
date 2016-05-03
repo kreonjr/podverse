@@ -78,12 +78,12 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         
         refreshControl = UIRefreshControl()
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh all podcasts")
-        refreshControl.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
+        refreshControl.addTarget(self, action: #selector(PodcastsTableViewController.refreshPodcastFeeds), forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
                 
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kDownloadHasFinished, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PodcastsTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PodcastsTableViewController.loadData), name: Constants.kDownloadHasFinished, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PodcastsTableViewController.loadData), name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
         
         //TODO: Investigate why this is needed
 //        let moc = CoreDataHelper().managedObjectContext
@@ -369,7 +369,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     // Check if a new episode is available for a subscribed podcast; if true, download that episode.
     // TODO: shouldn't we check via push notifications? Rather than a timer that continuously runs in the background?
     func startCheckSubscriptionsForNewEpisodesTimer() {
-        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: "refreshAllData", userInfo: nil, repeats: true)
+        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: #selector(PodcastsTableViewController.refreshAllData), userInfo: nil, repeats: true)
     }
     
     func loadData() {
