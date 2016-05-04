@@ -19,7 +19,9 @@ class PVDeleter {
             PVDeleter.deleteEpisode(episode, completion: nil)
         }
 
-        CoreDataHelper.deleteItemFromCoreData(podcast, moc:podcast.managedObjectContext)
+        CoreDataHelper.deleteItemFromCoreData(podcast, moc: CoreDataHelper.sharedInstance.managedObjectContext)
+        
+        CoreDataHelper.saveCoreData(podcast.managedObjectContext, completionBlock: nil)
     }
     
     static func deleteEpisode(episode: Episode, completion:(()->())? ) {
@@ -58,8 +60,10 @@ class PVDeleter {
         
         // If the episode or a clip from the episode is currently a playlistItem in a local playlist, then do not delete the episode item from Core Data
         if checkIfEpisodeShouldBeRemoved(episode) == true {
-            CoreDataHelper.deleteItemFromCoreData(episode, moc: episode.managedObjectContext)
+            CoreDataHelper.deleteItemFromCoreData(episode, moc: CoreDataHelper.sharedInstance.managedObjectContext)
         }
+        
+        CoreDataHelper.saveCoreData(episode.managedObjectContext, completionBlock: nil)
     }
     
     // TODO: handle removing clips
@@ -104,6 +108,8 @@ class PVDeleter {
         }
         
         CoreDataHelper.deleteItemFromCoreData(playlist, moc:playlist.managedObjectContext)
+        
+        CoreDataHelper.saveCoreData(playlist.managedObjectContext, completionBlock: nil)
     }
     
     static func deletePlaylistItem(playlist:Playlist, item:AnyObject) {

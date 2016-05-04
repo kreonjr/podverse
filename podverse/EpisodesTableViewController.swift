@@ -32,7 +32,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var pvMediaPlayer = PVMediaPlayer.sharedInstance
     
-    let moc = CoreDataHelper.sharedInstance.managedObjectContext
+    var moc:NSManagedObjectContext!
     
     func loadData() {
         
@@ -42,6 +42,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         
         var episodesArray: NSSet!
         
+        self.moc = CoreDataHelper.sharedInstance.managedObjectContext
         self.selectedPodcast = CoreDataHelper.fetchEntityWithID(self.selectedPodcastId, moc: moc) as! Podcast
         
         // If showAllEpisodes is false, then only retrieve the downloaded episodes
@@ -76,16 +77,6 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Episodes to Now Playing", sender: nil)
-    }
-    
-    func updateDownloadFinishedButton(notification: NSNotification) {
-        //        let userInfo : Dictionary<String,Episode> = notification.userInfo as! Dictionary<String,Episode>
-        
-        //  TOASK: Could this be more efficient? Should we only reload the proper cell, and not all with reloadData?
-        dispatch_async(dispatch_get_main_queue()) {
-            self.loadData()
-        }
-        
     }
     
     func removePlayerNavButton(notification: NSNotification) {
@@ -131,15 +122,13 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
-        loadData()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(EpisodesTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(EpisodesTableViewController.updateDownloadFinishedButton(_:)), name: Constants.kDownloadHasFinished, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(EpisodesTableViewController.loadData), name: Constants.kDownloadHasFinished, object: nil)
 
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
@@ -151,11 +140,6 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         self.tableView.addSubview(refreshControl)
         
         self.loadData()
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     // MARK: - Table view data source
@@ -329,6 +313,9 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             PVDeleter.deleteEpisode(episodesArray[indexPath.row], completion:nil)
             episodesArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            if let podcastTableVC = self.navigationController?.viewControllers.first as? PodcastsTableViewController {
+                podcastTableVC.loadData()
+            }
         }
     }
     

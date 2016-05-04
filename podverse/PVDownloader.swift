@@ -185,10 +185,9 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             do {
                 if let destination = destinationURL {
                     try fileManager.copyItemAtURL(location, toURL: destination)
-
-
                     
                     episode.downloadComplete = true
+
                     episode.taskResumeData = nil
                     
                     // Add the file destination to the episode object for playback and retrieval
@@ -197,6 +196,10 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     // Reset the episode.downloadTask to nil before saving, or the app will crash
                     episode.taskIdentifier = nil
                     
+                    for downloadingEpisode in DLEpisodesList.shared.downloadingEpisodes where episode.mediaURL == downloadingEpisode.mediaURL {
+                        downloadingEpisode.downloadComplete = true
+                        downloadingEpisode.taskIdentifier = nil
+                    }
                     
                     var episodeTitle = ""
                     if let title = episode.title {

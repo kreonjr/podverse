@@ -31,8 +31,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             PVMediaPlayer.sharedInstance.remoteControlReceivedWithEvent(evt)
         }
     }
-    
-
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         UIApplication.sharedApplication().statusBarStyle = .LightContent

@@ -16,7 +16,7 @@ import CoreData
 
 class PVFeedParser: NSObject, FeedParserDelegate {
     var feedURL: String!
-    var currentPodcast: Podcast?
+    var currentPodcast: Podcast? = nil
     
     var onlyGetMostRecent: Bool
     var shouldSubscribeToPodcast: Bool
@@ -47,7 +47,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             let podcastSet = CoreDataHelper.fetchEntities("Podcast", predicate: predicate, moc:moc) as! [Podcast]
             
             if podcastSet.count > 0 {
-                podcast = podcastSet[0]
+                podcast = podcastSet.first
             }
             else {
                 podcast = CoreDataHelper.insertManagedObject("Podcast", moc:moc) as! Podcast
@@ -137,13 +137,10 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         }
         
         // If episode already exists in the database, do not insert new episode
-        for existingEpisode in podcast.episodes.allObjects {
-            if newEpisode.mediaURL == existingEpisode.mediaURL {
-                episodeAlreadySaved = true
-                //Remove the created entity from core data if it already exists
-                CoreDataHelper.deleteItemFromCoreData(newEpisode, moc:moc)
-                break
-            }
+        if podcast.episodes.allObjects.contains({ $0.mediaURL == newEpisode.mediaURL }) {
+            episodeAlreadySaved = true
+            //Remove the created entity from core data if it already exists
+            CoreDataHelper.deleteItemFromCoreData(newEpisode, moc:moc)
         }
         
         if !episodeAlreadySaved {
@@ -151,8 +148,8 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             CoreDataHelper.saveCoreData(moc) {[weak self] (saved) -> Void in
                 guard let strongSelf = self else {
                     return
-
                 }
+                
                 if strongSelf.shouldDownloadMostRecentEpisode == true {
                     let downloader = PVDownloader()
                     downloader.moc = strongSelf.moc

@@ -35,11 +35,9 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var playlistManager = PlaylistManager.sharedInstance
     
-    var podcastsArray = [Podcast]() {
-        didSet {
-            print("Changed")
-        }
-    }
+    var managedObjectContext:NSManagedObjectContext!
+    
+    var podcastsArray = [Podcast]()
     
     let coreDataHelper = CoreDataHelper.sharedInstance
     
@@ -132,17 +130,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-                
-        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)        
-    }
 
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
     }
 
     // MARK: - Table view data source
@@ -170,9 +159,9 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if segmentedControl.selectedSegmentIndex == 0 {
             return podcastsArray.count
-        } else {
-            return playlists.count
         }
+        
+        return playlists.count
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -374,7 +363,10 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     func loadData() {
         let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
-        self.podcastsArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:coreDataHelper.managedObjectContext) as! [Podcast]
+        self.managedObjectContext = coreDataHelper.managedObjectContext
+        self.podcastsArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:managedObjectContext) as! [Podcast]
+
+        
         self.podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
 
         //TODO (Somewhere else, not in the view controller) Set pubdate in cell equal to most recent episode's pubdate
@@ -387,7 +379,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
 //                    }
 //                }
 //            }
-
+        
+        
         self.reloadTable()
     }
     
@@ -398,20 +391,12 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
 
 extension PodcastsTableViewController: PVFeedParserDelegate {
     func feedParsingComplete(feedURL:String?) {
-        if let url = feedURL, let index = podcastsArray.indexOf({ url == $0.feedURL }) {
-            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
-            })
+        if let url = feedURL, let index = self.podcastsArray.indexOf({ url == $0.feedURL }) {
+            self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
         }
         else {
-            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                self.loadData()
-            })
+            self.loadData()
         }
-    }
-    
-    func feedItemParsed() {
-        //loadData()
     }
 }
 
