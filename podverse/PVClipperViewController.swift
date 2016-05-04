@@ -54,15 +54,15 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
         
         addKeyboardToolbar()
         
-        let startLabelTapGesture = UITapGestureRecognizer(target: self, action: "playFromStartTime")
+        let startLabelTapGesture = UITapGestureRecognizer(target: self, action: #selector(PVClipperViewController.playFromStartTime))
         startLabel.userInteractionEnabled = true
         startLabel.addGestureRecognizer(startLabelTapGesture)
         
-        let endLabelTapGesture = UITapGestureRecognizer(target: self, action: "playFromEndTime")
+        let endLabelTapGesture = UITapGestureRecognizer(target: self, action: #selector(PVClipperViewController.playFromEndTime))
         endLabel.userInteractionEnabled = true
         endLabel.addGestureRecognizer(endLabelTapGesture)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "navToInitialTextField", name: Constants.kClipperWillDisplay, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVClipperViewController.navToInitialTextField), name: Constants.kClipperWillDisplay, object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -315,22 +315,22 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
         
         let flexBarButton = UIBarButtonItem(barButtonSystemItem: .FlexibleSpace, target: nil, action: nil)
         
-        let startBarButton = UIBarButtonItem(title: "Start", style: .Plain, target: self, action: "playFromStartTime")
+        let startBarButton = UIBarButtonItem(title: "Start", style: .Plain, target: self, action: #selector(PVClipperViewController.playFromStartTime))
         startBarButton.tag = 10
         
-        let endBarButton = UIBarButtonItem(title: "  End  ", style: .Plain, target: self, action: "playFromEndTime")
+        let endBarButton = UIBarButtonItem(title: "  End  ", style: .Plain, target: self, action: #selector(PVClipperViewController.playFromEndTime))
         endBarButton.tag = 11
         
-        let prevBarButton = UIBarButtonItem(title: " <––  ", style: .Plain, target: self, action: "navToTextField:")
+        let prevBarButton = UIBarButtonItem(title: " <––  ", style: .Plain, target: self, action: #selector(PVClipperViewController.navToTextField(_:)))
         prevBarButton.tag = 12
         
-        let nextBarButton = UIBarButtonItem(title: "  ––>  ", style: .Plain, target: self, action: "navToTextField:")
+        let nextBarButton = UIBarButtonItem(title: "  ––>  ", style: .Plain, target: self, action: #selector(PVClipperViewController.navToTextField(_:)))
         nextBarButton.tag = 13
         
-        let minusOneBarButton = UIBarButtonItem(title: "  –1  ", style: .Plain, target: self, action: "incrementTextField:")
+        let minusOneBarButton = UIBarButtonItem(title: "  –1  ", style: .Plain, target: self, action: #selector(PVClipperViewController.incrementTextField(_:)))
         minusOneBarButton.tag = 14
         
-        let plusOneBarButton = UIBarButtonItem(title: "  +1  ", style: .Plain, target: self, action: "incrementTextField:")
+        let plusOneBarButton = UIBarButtonItem(title: "  +1  ", style: .Plain, target: self, action: #selector(PVClipperViewController.incrementTextField(_:)))
         plusOneBarButton.tag = 15
         
         keyboardToolbar.items = [startBarButton, endBarButton, flexBarButton, prevBarButton, nextBarButton, minusOneBarButton, plusOneBarButton]

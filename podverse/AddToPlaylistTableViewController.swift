@@ -67,9 +67,12 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         createPlaylistAlert.addAction(UIAlertAction(title: "Save", style: .Default, handler: { (action: UIAlertAction!) in
             let textField = createPlaylistAlert.textFields![0] as UITextField
             if let playlistTitle = textField.text {
-                let playlist = CoreDataHelper.sharedInstance.insertManagedObject("Playlist") as! Playlist
+                let moc = CoreDataHelper.sharedInstance.managedObjectContext
+                
+                let playlist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
                 playlist.title = playlistTitle
-                self.playlistManager.savePlaylist(playlist)
+                CoreDataHelper.saveCoreData(moc, completionBlock:nil)
+                self.playlistManager.savePlaylist(playlist, moc:moc)
             }
         }))
     
@@ -85,11 +88,11 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "navBackToMediaPlayer", name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToPlaylistTableViewController.navBackToMediaPlayer), name: Constants.kPlayerHasNoItem, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "navBackToMediaPlayer", name: Constants.kItemAddedToPlaylistNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToPlaylistTableViewController.navBackToMediaPlayer), name: Constants.kItemAddedToPlaylistNotification, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToPlaylistTableViewController.loadData), name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
         
         self.navigationController?.navigationBar.barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)
         
@@ -108,7 +111,7 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
         // Set navigation bar styles
         navigationItem.title = "Add to Playlist"
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .Plain, target: self, action: "showcreatePlaylistAlert")
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .Plain, target: self, action: #selector(AddToPlaylistTableViewController.showcreatePlaylistAlert))
         
         loadData()
     }
@@ -131,9 +134,9 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let playlist = validPlaylists[indexPath.row]
         if let c = clip {
-            playlistManager.addItemToPlaylist(playlist, clip: c, episode: nil)
+            playlistManager.addItemToPlaylist(playlist, clip: c, episode: nil, moc: playlist.managedObjectContext)
         } else if let e = episode {
-            playlistManager.addItemToPlaylist(playlist, clip: nil, episode: e)
+            playlistManager.addItemToPlaylist(playlist, clip: nil, episode: e, moc: playlist.managedObjectContext)
         }
     }
     

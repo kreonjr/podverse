@@ -31,13 +31,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             PVMediaPlayer.sharedInstance.remoteControlReceivedWithEvent(evt)
         }
     }
-    
-
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        
-        CoreDataHelper.sharedInstance
-        
         UIApplication.sharedApplication().statusBarStyle = .LightContent
         
         UINavigationBar.appearance().translucent = false
@@ -48,7 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Alert the user to enable background notifications
         // TODO: Shouldn't this be moved to somewhere like the AppDelegate?
-        let registerUserNotificationSettings = UIApplication.instancesRespondToSelector("registerUserNotificationSettings:")
+        let registerUserNotificationSettings = UIApplication.instancesRespondToSelector(#selector(UIApplication.registerUserNotificationSettings(_:)))
         if registerUserNotificationSettings {
             let types: UIUserNotificationType = [.Alert , .Sound]
             UIApplication.sharedApplication().registerUserNotificationSettings(UIUserNotificationSettings(forTypes: types, categories: nil))
@@ -61,15 +56,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let rcc = MPRemoteCommandCenter.sharedCommandCenter()
         
         let skipBackwardIntervalCommand = rcc.skipBackwardCommand
-        skipBackwardIntervalCommand.addTarget(self, action: "skipBackwardEvent")
+        skipBackwardIntervalCommand.addTarget(self, action: #selector(AppDelegate.skipBackwardEvent))
         
         let skipForwardIntervalCommand = rcc.skipForwardCommand
-        skipForwardIntervalCommand.addTarget(self, action: "skipForwardEvent")
+        skipForwardIntervalCommand.addTarget(self, action: #selector(AppDelegate.skipForwardEvent))
         
         let pauseCommand = rcc.pauseCommand
-        pauseCommand.addTarget(self, action: "playOrPauseEvent")
+        pauseCommand.addTarget(self, action: #selector(AppDelegate.playOrPauseEvent))
         let playCommand = rcc.playCommand
-        playCommand.addTarget(self, action: "playOrPauseEvent")
+        playCommand.addTarget(self, action: #selector(AppDelegate.playOrPauseEvent))
         
         if NSUserDefaults.standardUserDefaults().boolForKey("AppHasLaunchedOnce") == false {
             NSUserDefaults.standardUserDefaults().setBool(true, forKey: "AppHasLaunchedOnce")
@@ -115,8 +110,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if PVMediaPlayer.sharedInstance.avPlayer.rate == 1 {
             PVMediaPlayer.sharedInstance.saveCurrentTimeAsPlaybackPosition()
         }
-        
-        CoreDataHelper.sharedInstance.saveCoreData(nil)
     }
 }
 

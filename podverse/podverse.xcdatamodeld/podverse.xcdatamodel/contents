@@ -12,14 +12,13 @@
     </entity>
     <entity name="Episode" representedClassName="Episode" syncable="YES">
         <attribute name="downloadComplete" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
-        <attribute name="downloadProgress" optional="YES" attributeType="Float" defaultValueString="0" syncable="YES"/>
         <attribute name="downloadTask" optional="YES" attributeType="Transformable" valueTransformerName="dTask" syncable="YES"/>
         <attribute name="duration" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="fileName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="guid" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="isDownloading" optional="YES" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="link" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="mediaBytes" optional="YES" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="mediaBytes" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <attribute name="mediaType" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="mediaURL" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="playbackPosition" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
@@ -58,7 +57,7 @@
     </entity>
     <elements>
         <element name="Clip" positionX="-20" positionY="-387" width="128" height="163"/>
-        <element name="Episode" positionX="-225" positionY="-675" width="128" height="358"/>
+        <element name="Episode" positionX="-225" positionY="-675" width="128" height="345"/>
         <element name="Playlist" positionX="-288" positionY="-265" width="128" height="148"/>
         <element name="Podcast" positionX="-398" positionY="-541" width="128" height="223"/>
     </elements>

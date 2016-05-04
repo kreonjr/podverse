@@ -69,17 +69,17 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         navigationItem.title = "Playlist"
         
         if pvMediaPlayer.nowPlayingEpisode != nil || pvMediaPlayer.nowPlayingClip != nil {
-            let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: "showPlaylistShare:")
-            let playerBarButton = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: "segueToNowPlaying:")
+            let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: #selector(PlaylistViewController.showPlaylistShare(_:)))
+            let playerBarButton = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: #selector(PlaylistViewController.segueToNowPlaying(_:)))
             navigationItem.rightBarButtonItems = [playerBarButton, shareBarButton]
         } else {
-            let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: "showPlaylistShare:")
+            let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: #selector(PlaylistViewController.showPlaylistShare(_:)))
             navigationItem.rightBarButtonItem = shareBarButton
         }
         
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVMediaPlayer.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func viewWillDisappear(animated: Bool) {

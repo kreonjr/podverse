@@ -13,7 +13,7 @@ class DownloadsTableViewController: UITableViewController {
 
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
-    var episodes:[Episode] {
+    var episodes:[DownloadingEpisode] {
         get {
             return DLEpisodesList.shared.downloadingEpisodes
         }
@@ -24,7 +24,9 @@ class DownloadsTableViewController: UITableViewController {
     }
     
     func reloadDownloadTable() {
-        self.tableView.reloadData()
+        dispatch_async(dispatch_get_main_queue()) {
+            self.tableView.reloadData()
+        }
     }
     
     func removePlayerNavButton(notification: NSNotification) {
@@ -37,12 +39,12 @@ class DownloadsTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadData:", name: Constants.kDownloadHasProgressed, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadData:", name: Constants.kDownloadHasFinished, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "pauseOrResumeDownloadData:", name: Constants.kDownloadHasPausedOrResumed, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.reloadDownloadData(_:)), name: Constants.kDownloadHasProgressed, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.reloadDownloadData(_:)), name: Constants.kDownloadHasFinished, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.pauseOrResumeDownloadData(_:)), name: Constants.kDownloadHasPausedOrResumed, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "reloadDownloadTable", name: Constants.kUpdateDownloadsTable, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.reloadDownloadTable), name: Constants.kUpdateDownloadsTable, object: nil)
     }
     
     func reloadDownloadData(notification:NSNotification) {
@@ -106,53 +108,28 @@ class DownloadsTableViewController: UITableViewController {
 
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell: DownloadsTableViewCell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! DownloadsTableViewCell
-        let episode = DLEpisodesList.shared.downloadingEpisodes[indexPath.row]
+        let downloadingEpisode = DLEpisodesList.shared.downloadingEpisodes[indexPath.row]
         
-        cell.title!.text = episode.title
+        cell.title?.text = downloadingEpisode.title
         
-        if let imageData = episode.podcast.imageData {
+        if let imageData = downloadingEpisode.imageData {
             if let image = UIImage(data: imageData) {
                 cell.pvImage?.image = image
             }
         }
-
-        if cell.pvImage?.image == nil {
-            if let itunesImageData = episode.podcast.itunesImage {
-                if let itunesImage = UIImage(data: itunesImageData) {
-                    cell.pvImage?.image = itunesImage
-                }
-            }
-        }
         
-        if episode.downloadComplete == true {
+        if downloadingEpisode.downloadComplete == true {
             cell.downloadStatus.text = "Finished"
-            cell.progress.progress = 1.0
-            
-            if let mediaBytes = episode.mediaBytes {
-                if Int(mediaBytes) > 0 {
-                    // Format the total bytes into a human readable KB or MB number
-                    let dataFormatter = NSByteCountFormatter()
-                    let formattedTotalBytes = dataFormatter.stringFromByteCount(Int64(Int(mediaBytes)))
-                    cell.progressBytes.text = "\(formattedTotalBytes)"
-                } else {
-                    cell.progressBytes.text = ""
-                }
-            } else {
-                cell.progressBytes.text = ""
-            }
         }
-        else if episode.taskIdentifier != nil {
+        else if downloadingEpisode.taskIdentifier != nil {
             cell.downloadStatus.text = "Downloading"
-            // TODO: show the actual progress and progressBytes. Since the progress and progressBytes is not saved to the NSManagedObject (they are currently provided only via notification userinfo), I was not sure how to display those values here.
-            cell.progress.progress = 0.0
-            cell.progressBytes.text = ""
         }
         else {
             cell.downloadStatus.text = "Paused"
-            // TODO: show the actual progress and progressBytes. Since the progress and progressBytes is not saved to the NSManagedObject (they are currently provided only via notification userinfo), I was not sure how to display those values here.
-            cell.progress.progress = 0.0
-            cell.progressBytes.text = ""
         }
+        
+        cell.progress.progress = Float(0)
+        cell.progressBytes.text = ""
 
         return cell
     }
@@ -162,8 +139,26 @@ class DownloadsTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let episode = DLEpisodesList.shared.downloadingEpisodes[indexPath.row]
-        PVDownloader.sharedInstance.pauseOrResumeDownloadingEpisode(episode)
+        let moc = CoreDataHelper.sharedInstance.managedObjectContext
+        
+        let downloadingEpisode = DLEpisodesList.shared.downloadingEpisodes[indexPath.row]
+        
+        guard let mediaUrl =  downloadingEpisode.mediaURL else {
+            return
+        }
+        
+        let predicate = NSPredicate(format: "mediaURL == %@", mediaUrl)
+        guard let episode = CoreDataHelper.fetchEntities("Episode", predicate: predicate, moc: moc).first as? Episode else {
+            return
+        }
+        
+        startDownloadingEpisode(episode)
+    }
+    
+    private func startDownloadingEpisode(episode:Episode) {
+        let downloader = PVDownloader()
+        downloader.moc = episode.managedObjectContext
+        downloader.pauseOrResumeDownloadingEpisode(episode)
     }
     
     /*

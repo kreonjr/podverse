@@ -35,7 +35,11 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var playlistManager = PlaylistManager.sharedInstance
     
+    var managedObjectContext:NSManagedObjectContext!
+    
     var podcastsArray = [Podcast]()
+    
+    let coreDataHelper = CoreDataHelper.sharedInstance
     
     var refreshControl: UIRefreshControl!
     
@@ -72,20 +76,19 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         
         refreshControl = UIRefreshControl()
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh all podcasts")
-        refreshControl.addTarget(self, action: "refreshPodcastFeeds", forControlEvents: UIControlEvents.ValueChanged)
+        refreshControl.addTarget(self, action: #selector(PodcastsTableViewController.refreshPodcastFeeds), forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
                 
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "loadData", name: Constants.kDownloadHasFinished, object: nil)
-
-        let episodeArray = CoreDataHelper.sharedInstance.fetchEntities("Episode", predicate: nil) as! [Episode]
-        for episode in episodeArray {
-            episode.taskIdentifier = nil
-        }
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PodcastsTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PodcastsTableViewController.loadData), name: Constants.kDownloadHasFinished, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PodcastsTableViewController.loadData), name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
         
-        for episode:Episode in DLEpisodesList.shared.downloadingEpisodes {
-            PVDownloader.sharedInstance.startDownloadingEpisode(episode)
-        }
+        //TODO: Investigate why this is needed
+//        let moc = CoreDataHelper().managedObjectContext
+//        let episodeArray = CoreDataHelper.fetchEntities("Episode", predicate: nil, moc:moc) as! [Episode]
+//        for episode in episodeArray {
+//            episode.taskIdentifier = nil
+//        }
         
         refreshPodcastFeeds()
         startCheckSubscriptionsForNewEpisodesTimer()
@@ -103,14 +106,19 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func refreshPodcastFeeds() {
-        let podcastArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as! [Podcast]
-        for var i = 0; i < podcastArray.count; i++ {
-            let feedURL = NSURL(string: podcastArray[i].feedURL)
+        let moc = self.coreDataHelper.managedObjectContext
+        let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
+        let podcastArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:moc) as! [Podcast]
+
+        for podcast in podcastArray {
+            let feedURL = NSURL(string:podcast.feedURL)
             
-            let feedParser = PVFeedParser(shouldGetMostRecent: true, shouldSubscribe:false )
-            feedParser.delegate = self
-            if let feedURLString = feedURL?.absoluteString {
-                feedParser.parsePodcastFeed(feedURLString)
+            dispatch_async(Constants.feedParsingQueue) {
+                let feedParser = PVFeedParser(onlyGetMostRecentEpisode: true, shouldSubscribe:false)
+                feedParser.delegate = self
+                if let feedURLString = feedURL?.absoluteString {
+                    feedParser.parsePodcastFeed(feedURLString)
+                }
             }
         }
     }
@@ -122,17 +130,8 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-                
-        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)        
-    }
 
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
     }
 
     // MARK: - Table view data source
@@ -160,9 +159,9 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if segmentedControl.selectedSegmentIndex == 0 {
             return podcastsArray.count
-        } else {
-            return playlists.count
         }
+        
+        return playlists.count
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -285,7 +284,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
                     }
                 }
                 
-                PVSubscriber.unsubscribeFromPodcast(podcastToRemove)
+                PVSubscriber.unsubscribeFromPodcast(podcastToRemove, moc:podcastToRemove.managedObjectContext)
                 podcastsArray.removeAtIndex(indexPath.row)
                 
                 self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
@@ -332,7 +331,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         if segue.identifier == "Show Episodes" {
             let episodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
             if let index = tableView.indexPathForSelectedRow {
-                episodesTableViewController.selectedPodcast = podcastsArray[index.row]
+                episodesTableViewController.selectedPodcastId = podcastsArray[index.row].objectID
             }
             episodesTableViewController.showAllEpisodes = false
         } else if segue.identifier == "Show Playlist" {
@@ -359,27 +358,28 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     // Check if a new episode is available for a subscribed podcast; if true, download that episode.
     // TODO: shouldn't we check via push notifications? Rather than a timer that continuously runs in the background?
     func startCheckSubscriptionsForNewEpisodesTimer() {
-        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: "refreshAllData", userInfo: nil, repeats: true)
+        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: #selector(PodcastsTableViewController.refreshAllData), userInfo: nil, repeats: true)
     }
     
     func loadData() {
         let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
-        podcastsArray = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: podcastsPredicate) as! [Podcast]
-        podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+        self.managedObjectContext = coreDataHelper.managedObjectContext
+        self.podcastsArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:managedObjectContext) as! [Podcast]
+
         
-        // TODO: The answer in the SO link below claims that using a string in a predicate can cause performance issues. Well below we are passing a podcast object as the NSPredicate. If strings can cause performance issues, wouldn't this cause egregiously horrible performance issues? I know this "fetchOnlyEntityWithMostRecentPubDate" has had mutating array crashes in the past (although I haven't seen it happen since mid-February). Could it be that we are using a bad predicate? If yes, how can we make this more performant?
-        // http://stackoverflow.com/questions/30368945/saving-coredata-on-background-thread-causes-fetching-into-a-deadlock-and-crash
+        self.podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+
+        //TODO (Somewhere else, not in the view controller) Set pubdate in cell equal to most recent episode's pubdate
+//            for podcast in self.podcastsArray {
+//                let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+//                let mostRecentEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate, moc:moc) as! [Episode]
+//                if mostRecentEpisodeArray.count > 0 {
+//                    if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
+//                        podcast.lastPubDate = mostRecentEpisodePubDate
+//                    }
+//                }
+//            }
         
-        // Set pubdate in cell equal to most recent episode's pubdate
-        for podcast in podcastsArray {
-            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-            let mostRecentEpisodeArray = CoreDataHelper.sharedInstance.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate) as! [Episode]
-            if mostRecentEpisodeArray.count > 0 {
-                if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
-                    podcast.lastPubDate = mostRecentEpisodePubDate
-                }
-            }
-        }
         
         self.reloadTable()
     }
@@ -391,13 +391,12 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
 
 extension PodcastsTableViewController: PVFeedParserDelegate {
     func feedParsingComplete(feedURL:String?) {
-        if let url = feedURL, let index = podcastsArray.indexOf({ url == $0.feedURL }) {
+        if let url = feedURL, let index = self.podcastsArray.indexOf({ url == $0.feedURL }) {
             self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
         }
-    }
-    
-    func feedItemParsed() {
-        loadData()
+        else {
+            self.loadData()
+        }
     }
 }
 

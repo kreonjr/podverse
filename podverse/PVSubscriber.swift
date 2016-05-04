@@ -11,30 +11,23 @@ import CoreData
 
 class PVSubscriber {
 
-    static func subscribeToPodcast(feedURLString: String) {
-        dispatch_async(Constants.feedParsingQueue) { () -> Void in
-            let feedParser = PVFeedParser(shouldGetMostRecent: false, shouldSubscribe: true)
+    static func subscribeToPodcast(feedURLString: String, podcastTableDelegate:PodcastsTableViewController?) {
+        dispatch_async(Constants.feedParsingQueue) {
+            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe: true)
+            feedParser.delegate = podcastTableDelegate
             feedParser.parsePodcastFeed(feedURLString)
         }
     }
     
-    static func unsubscribeFromPodcast(podcast:Podcast) {
+    static func unsubscribeFromPodcast(podcast:Podcast, moc:NSManagedObjectContext?) {
         let alsoDelete = PVDeleter.checkIfPodcastShouldBeRemoved(podcast, isUnsubscribing: true)
-        
+        podcast.isSubscribed = false
+
         if alsoDelete {
             PVDeleter.deletePodcast(podcast)
-        } else {
-            dispatch_async(Constants.feedParsingQueue) { () -> Void in
-                podcast.isSubscribed = false
-                
-                let episodesToRemove = podcast.episodes.allObjects as! [Episode]
-                for var i = 0; i < episodesToRemove.count; i++ {
-                    PVDeleter.deleteEpisode(episodesToRemove[i],completion: nil)
-                }
-                
-                CoreDataHelper.sharedInstance.saveCoreData(nil)
-            }
-        }
+        } 
+
+        CoreDataHelper.saveCoreData(moc, completionBlock:nil)
     }
     
 }

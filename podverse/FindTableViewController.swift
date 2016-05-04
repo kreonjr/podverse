@@ -14,6 +14,16 @@ class FindTableViewController: UITableViewController {
     
     var findSearchArray = ["Search", "Add Podcast by RSS"]
     
+    var podcastVC:PodcastsTableViewController? {
+        get {
+            if let navController = self.tabBarController?.viewControllers?.first as? UINavigationController, podcastTable = navController.topViewController as? PodcastsTableViewController {
+                return podcastTable
+            }
+            
+            return nil
+        }
+    }
+    
     func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Find to Now Playing", sender: nil)
     }
@@ -27,7 +37,7 @@ class FindTableViewController: UITableViewController {
     override func viewDidAppear(animated: Bool) {
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(FindTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func viewDidLoad() {
@@ -88,8 +98,9 @@ class FindTableViewController: UITableViewController {
                 addByRSSAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
                 
                 addByRSSAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
-                    let textField = addByRSSAlert.textFields![0] as UITextField
-                    PVSubscriber.subscribeToPodcast(textField.text!)
+                    if let textField = addByRSSAlert.textFields?[0], text = textField.text {
+                        PVSubscriber.subscribeToPodcast(text, podcastTableDelegate: self.podcastVC)
+                    }
                 }))
                 
                 presentViewController(addByRSSAlert, animated: true, completion: nil)

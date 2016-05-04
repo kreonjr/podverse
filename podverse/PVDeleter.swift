@@ -9,22 +9,26 @@
 import UIKit
 import CoreData
 
-class PVDeleter: NSObject {    
+class PVDeleter {
     
     static func deletePodcast(podcast: Podcast) {
         let episodesToRemove = podcast.episodes.allObjects as! [Episode]
         
         // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
-        for var i = 0; i < episodesToRemove.count; i++ {
-            deleteEpisode(episodesToRemove[i],completion: nil)
+        for episode in episodesToRemove {
+            PVDeleter.deleteEpisode(episode, completion: nil)
         }
 
-        CoreDataHelper.sharedInstance.deleteItemFromCoreData(podcast)
+        CoreDataHelper.deleteItemFromCoreData(podcast, moc: CoreDataHelper.sharedInstance.managedObjectContext)
+        
+        CoreDataHelper.saveCoreData(podcast.managedObjectContext, completionBlock: nil)
     }
     
     static func deleteEpisode(episode: Episode, completion:(()->())? ) {
         // Get the downloadSession, and if there is a downloadSession with a matching taskIdentifier as episode's taskIdentifier, then cancel the downloadSession
-        let downloadSession = PVDownloader.sharedInstance.downloadSession
+        let downloader = PVDownloader()
+        downloader.moc = episode.managedObjectContext
+        let downloadSession = downloader.downloadSession
         downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
             for episodeDownloadTask in downloadTasks {
                 if episodeDownloadTask.taskIdentifier == episode.taskIdentifier {
@@ -34,11 +38,8 @@ class PVDeleter: NSObject {
         }
         
         // If the episode is currently in the episodeDownloadArray, then delete the episode from the episodeDownloadArray
-        if DLEpisodesList.shared.downloadingEpisodes.contains(episode) {
-            let episodeDownloadArrayIndex = DLEpisodesList.shared.downloadingEpisodes.indexOf(episode)
-            DLEpisodesList.shared.downloadingEpisodes.removeAtIndex(episodeDownloadArrayIndex!)
-        }
-        
+        DLEpisodesList.removeDownloadingEpisodeWithMediaURL(episode.mediaURL)
+
         // If the episode is currently now playing, then remove the now playing episode, and remove the Player button from the navbar using kPlayerHasNoItem
         if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
             if episode == nowPlayingEpisode {
@@ -58,11 +59,11 @@ class PVDeleter: NSObject {
         }
         
         // If the episode or a clip from the episode is currently a playlistItem in a local playlist, then do not delete the episode item from Core Data
-        var alsoDelete = checkIfEpisodeShouldBeRemoved(episode)
-        
-        if alsoDelete == true {
-            CoreDataHelper.sharedInstance.deleteItemFromCoreData(episode)
+        if checkIfEpisodeShouldBeRemoved(episode) == true {
+            CoreDataHelper.deleteItemFromCoreData(episode, moc: CoreDataHelper.sharedInstance.managedObjectContext)
         }
+        
+        CoreDataHelper.saveCoreData(episode.managedObjectContext, completionBlock: nil)
     }
     
     // TODO: handle removing clips
@@ -97,13 +98,18 @@ class PVDeleter: NSObject {
             SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
                 playlist.title = "This playlist has been deleted"
                 playlist.url = response["url"] as? String
-                CoreDataHelper.sharedInstance.saveCoreData(nil)
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    CoreDataHelper.saveCoreData(playlist.managedObjectContext, completionBlock: nil)
+                })
+                
                 }) { (error) -> Void in
                     print("Not saved to server. Error: ", error?.localizedDescription)
                 }.call()
         }
         
-        CoreDataHelper.sharedInstance.deleteItemFromCoreData(playlist)
+        CoreDataHelper.deleteItemFromCoreData(playlist, moc:playlist.managedObjectContext)
+        
+        CoreDataHelper.saveCoreData(playlist.managedObjectContext, completionBlock: nil)
     }
     
     static func deletePlaylistItem(playlist:Playlist, item:AnyObject) {
@@ -127,7 +133,9 @@ class PVDeleter: NSObject {
         
         SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
             playlist.url = response["url"] as? String
-            CoreDataHelper.sharedInstance.saveCoreData(nil)
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                CoreDataHelper.saveCoreData(playlist.managedObjectContext, completionBlock: nil)
+            })
         }) { (error) -> Void in
                 print("Not saved to server. Error: ", error?.localizedDescription)
         }.call()
@@ -143,7 +151,7 @@ class PVDeleter: NSObject {
             }
         }
         
-        if let allPlaylists = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: nil) as? [Playlist] {
+        if let allPlaylists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc:podcast.managedObjectContext) as? [Playlist] {
             outerLoop: for playlist in allPlaylists {
                 for item in playlist.allItems {
                     if let episode = item as? Episode {
@@ -172,6 +180,7 @@ class PVDeleter: NSObject {
     }
     
     static func checkIfEpisodeShouldBeRemoved(episode: Episode) -> Bool {
+        let moc = CoreDataHelper.sharedInstance.managedObjectContext
         var alsoDelete = true
         
         if episode.podcast.isSubscribed == true {
@@ -179,7 +188,7 @@ class PVDeleter: NSObject {
             return alsoDelete
         }
         
-        if let allPlaylists = CoreDataHelper.sharedInstance.fetchEntities("Playlist", predicate: nil) as? [Playlist] {
+        if let allPlaylists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: moc) as? [Playlist] {
             outerLoop: for playlist in allPlaylists {
                 for item in playlist.allItems {
                     if let episode = item as? Episode {

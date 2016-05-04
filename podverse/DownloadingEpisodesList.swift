@@ -8,12 +8,20 @@
 
 import Foundation
 
-struct DLEpisodesList {
+final class DLEpisodesList {
     static var shared = DLEpisodesList()
     
-    var downloadingEpisodes = [Episode]() {
+    var downloadingEpisodes = [DownloadingEpisode]() {
         didSet {
             NSNotificationCenter.defaultCenter().postNotificationName(Constants.kUpdateDownloadsTable, object: nil)
         }
     }
+    
+    static func removeDownloadingEpisodeWithMediaURL(mediaURL:String?) {
+        // If the episode is currently in the episodeDownloadArray, then delete the episode from the episodeDownloadArray
+        if let mediaURL = mediaURL, index = DLEpisodesList.shared.downloadingEpisodes.indexOf({ $0.mediaURL == mediaURL }) {
+            DLEpisodesList.shared.downloadingEpisodes.removeAtIndex(index)
+        }
+    }
 }
+

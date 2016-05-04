@@ -15,14 +15,24 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     
     @IBOutlet weak var tableView: UITableView!
     
-    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    
     var iTunesSearchPodcastArray = [SearchResultPodcast]()
     var iTunesSearchPodcastFeedURLArray: [NSURL] = []
     
     func removePlayerNavButton(notification: NSNotification) {
         dispatch_async(dispatch_get_main_queue()) {
             PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
+        }
+    }
+    
+    let moc = CoreDataHelper.sharedInstance.managedObjectContext
+    
+    var podcastVC:PodcastsTableViewController? {
+        get {
+            if let navController = self.tabBarController?.viewControllers?.first as? UINavigationController, podcastTable = navController.topViewController as? PodcastsTableViewController {
+                return podcastTable
+            }
+            
+            return nil
         }
     }
     
@@ -35,7 +45,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "removePlayerNavButton:", name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(FindSearchTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func viewWillDisappear(animated: Bool) {
@@ -74,11 +84,8 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
                                 	self.presentViewController(addByRSSAlert, animated: true, completion: nil)
                             	})
-                            } else {                                
-                                for (var i = 0; i < results.count; i++) {
-                                    
-                                    let podcastJSON: AnyObject = results[i]
-                                    
+                            } else {
+                                for podcastJSON in results {
                                     let searchResultPodcast = SearchResultPodcast()
                                     
                                     searchResultPodcast.feedURL = podcastJSON["feedUrl"] as? String
@@ -133,6 +140,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         searchItunesFor(searchBar.text!)
+        searchBar.resignFirstResponder()
     }
     
     override func didReceiveMemoryWarning() {
@@ -176,7 +184,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         var isSubscribed = false
         
         
-        if let savedPodcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as? [Podcast] {
+        if let savedPodcasts = CoreDataHelper.fetchEntities("Podcast", predicate: nil, moc:moc) as? [Podcast] {
             for savedPodcast in savedPodcasts {
                 if iTunesSearchPodcast.feedURL == savedPodcast.feedURL {
                     if savedPodcast.isSubscribed == true {
@@ -189,16 +197,15 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         if isSubscribed == false {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
                 if let feedURL = iTunesSearchPodcast.feedURL {
-                    PVSubscriber.subscribeToPodcast(feedURL)
-                    
+                    PVSubscriber.subscribeToPodcast(feedURL, podcastTableDelegate: self.podcastVC)
                 }
             }))
         }
         else {
             searchResultPodcastActions.addAction(UIAlertAction(title: "Unsubscribe", style: .Default, handler: { action in
-                if let podcasts = CoreDataHelper.sharedInstance.fetchEntities("Podcast", predicate: nil) as? [Podcast] {
+                if let podcasts = CoreDataHelper.fetchEntities("Podcast", predicate: nil, moc:self.moc) as? [Podcast] {
                     if let index = podcasts.indexOf({ $0.feedURL == iTunesSearchPodcast.feedURL }) {
-                        PVSubscriber.unsubscribeFromPodcast(podcasts[index])
+                        PVSubscriber.unsubscribeFromPodcast(podcasts[index], moc: self.moc)
                     }
                 }
             }))

@@ -58,11 +58,11 @@ class PVMediaPlayer: NSObject {
                 print(error.localizedDescription)
         }
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "playInterrupted:", name: AVAudioSessionInterruptionNotification, object: AVAudioSession.sharedInstance())
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVMediaPlayer.playInterrupted(_:)), name: AVAudioSessionInterruptionNotification, object: AVAudioSession.sharedInstance())
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "headphonesWereUnplugged:", name: AVAudioSessionRouteChangeNotification, object: AVAudioSession.sharedInstance())
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVMediaPlayer.headphonesWereUnplugged(_:)), name: AVAudioSessionRouteChangeNotification, object: AVAudioSession.sharedInstance())
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "playerDidFinishPlaying:", name: AVPlayerItemDidPlayToEndTimeNotification, object: avPlayer.currentItem)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVMediaPlayer.playerDidFinishPlaying(_:)), name: AVPlayerItemDidPlayToEndTimeNotification, object: avPlayer.currentItem)
     }
     
     func headphonesWereUnplugged(notification: NSNotification) {
@@ -120,7 +120,8 @@ class PVMediaPlayer: NSObject {
     func saveCurrentTimeAsPlaybackPosition() {
         if let playingEpisode = self.nowPlayingEpisode {
             playingEpisode.playbackPosition = CMTimeGetSeconds(avPlayer.currentTime())
-            CoreDataHelper.sharedInstance.saveCoreData(nil)
+            
+            CoreDataHelper.saveCoreData(playingEpisode.managedObjectContext, completionBlock:nil)
         }
     }
     
@@ -316,7 +317,7 @@ class PVMediaPlayer: NSObject {
     // If there is a now playing episode or clip, add Now Playing button to nav bar
     func addPlayerNavButton(vc: UIViewController) {
         if nowPlayingEpisode != nil || nowPlayingClip != nil {
-            vc.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: vc, action: "segueToNowPlaying:")
+            vc.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: vc, action: Selector("segueToNowPlaying:"))
         }
         else {
             vc.navigationItem.rightBarButtonItem = nil

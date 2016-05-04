@@ -30,6 +30,6 @@ class Podcast: NSManagedObject {
     }
     
     func removeEpisodeObject(value: Episode) {
-        self.mutableSetValueForKey("episode").removeObject(value)
+        self.mutableSetValueForKey("episodes").removeObject(value)
     }
 }

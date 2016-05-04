@@ -10,9 +10,8 @@ import Foundation
 import CoreData
 @objc(Episode)
 
-class Episode: NSManagedObject {
+class Episode:NSManagedObject {
     @NSManaged var downloadComplete: Bool
-    @NSManaged var downloadProgress: NSNumber?
     @NSManaged var duration: NSNumber?
     @NSManaged var fileName: String?
     @NSManaged var guid: String?
