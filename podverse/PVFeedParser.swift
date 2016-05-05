@@ -31,12 +31,14 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func parsePodcastFeed(feedURLString: String) {
-        self.feedURL = feedURLString
-        let feedParser = CustomFeedParser(feedURL: feedURLString)
-        feedParser.delegate = self
-        feedParser.parsingType = .Full
-        feedParser.parse()
-        print("feedParser did start")
+        dispatch_async(Constants.feedParsingQueue) { 
+            self.feedURL = feedURLString
+            let feedParser = CustomFeedParser(feedURL: feedURLString)
+            feedParser.delegate = self
+            feedParser.parsingType = .Full
+            feedParser.parse()
+            print("feedParser did start")
+        }
     }
     
     func feedParser(parser: FeedParser, didParseChannel channel: FeedChannel) {

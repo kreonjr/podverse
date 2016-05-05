@@ -30,9 +30,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     @IBOutlet weak var addPlaylistByURL: UIButton!
-    
-    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    
+        
     var playlistManager = PlaylistManager.sharedInstance
     
     var managedObjectContext:NSManagedObjectContext!
@@ -79,9 +77,9 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         refreshControl.addTarget(self, action: #selector(PodcastsTableViewController.refreshPodcastFeeds), forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
                 
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PodcastsTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PodcastsTableViewController.loadData), name: Constants.kDownloadHasFinished, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PodcastsTableViewController.loadData), name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(loadData), name: Constants.kDownloadHasFinished, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(loadData), name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
         
         //TODO: Investigate why this is needed
 //        let moc = CoreDataHelper().managedObjectContext
@@ -101,7 +99,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     func refreshAllData() {
         refreshPodcastFeeds()
         PlaylistManager.sharedInstance.refreshPlaylists { () -> Void in
-            self.tableView.reloadSections(NSIndexSet(index: 1), withRowAnimation: .None)
+            self.tableView.reloadData()
         }
     }
     
@@ -403,6 +401,12 @@ extension PodcastsTableViewController: PVFeedParserDelegate {
 extension PodcastsTableViewController:PlaylistManagerDelegate {
     func playlistAddedByUrl() {
         self.reloadTable()
+    }
+    
+    func itemAddedToPlaylist() {
+        PlaylistManager.sharedInstance.refreshPlaylists { () -> Void in
+            self.reloadTable()
+        }
     }
 }
 

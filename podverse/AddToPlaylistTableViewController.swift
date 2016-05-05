@@ -7,12 +7,14 @@
 //
 
 import UIKit
+import CoreData
 
 class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
-        let pvMediaPlayer = PVMediaPlayer.sharedInstance
+    let pvMediaPlayer = PVMediaPlayer.sharedInstance
     let playlistManager = PlaylistManager.sharedInstance
+    var managedObjectContext:NSManagedObjectContext!
     
     var episode:Episode?
     var clip:Clip?
@@ -20,6 +22,7 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     var validPlaylists:[Playlist]!
 
     func loadData() {
+        managedObjectContext = CoreDataHelper.sharedInstance.managedObjectContext
         validPlaylists = playlistManager.playlists
         // TODO: there has to be a better way to do this...
         for (index , playlist) in validPlaylists.enumerate() {
@@ -132,11 +135,12 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let playlist = validPlaylists[indexPath.row]
+        let playlist = CoreDataHelper.fetchEntityWithID(validPlaylists[indexPath.row].objectID, moc: self.managedObjectContext) as! Playlist
+        
         if let c = clip {
-            playlistManager.addItemToPlaylist(playlist, clip: c, episode: nil, moc: playlist.managedObjectContext)
+            playlistManager.addItemToPlaylist(playlist, clip: c, episode: nil, moc: self.managedObjectContext)
         } else if let e = episode {
-            playlistManager.addItemToPlaylist(playlist, clip: nil, episode: e, moc: playlist.managedObjectContext)
+            playlistManager.addItemToPlaylist(playlist, clip: nil, episode: e, moc: self.managedObjectContext)
         }
     }
     

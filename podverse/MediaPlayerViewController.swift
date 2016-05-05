@@ -60,7 +60,11 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         pvMediaPlayer.delegate = self
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(MediaPlayerViewController.dismissKeyboard)))
-        self.clipper = ((self.childViewControllers.first as! UINavigationController).topViewController as? PVClipperViewController)
+        guard let navVC = self.childViewControllers.first as? UINavigationController else {
+            return
+        }
+        
+        self.clipper = (navVC.topViewController as? PVClipperViewController)
         
         if let duration = pvMediaPlayer.nowPlayingEpisode.duration {
             self.clipper?.totalDuration = Int(duration)
