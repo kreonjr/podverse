@@ -24,20 +24,9 @@ class FindTableViewController: UITableViewController {
         }
     }
     
-    func segueToNowPlaying(sender: UIBarButtonItem) {
-        self.performSegueWithIdentifier("Find to Now Playing", sender: nil)
-    }
-    
-    func removePlayerNavButton(notification: NSNotification) {
-        dispatch_async(dispatch_get_main_queue()) {
-            PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
-        }
-    }
-    
     override func viewDidAppear(animated: Bool) {
-        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(FindTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
+        super.viewDidAppear(animated)
+        self.addPlayerNavButton()
     }
     
     override func viewDidLoad() {
@@ -46,11 +35,8 @@ class FindTableViewController: UITableViewController {
         
         // Set navigation bar styles
         self.navigationItem.title = "Find"
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButton), name: Constants.kPlayerHasNoItem, object: nil)
     }
 
     override func didReceiveMemoryWarning() {

@@ -71,14 +71,17 @@ class PodcastsTableViewController: UIViewController {
         refreshControl.addTarget(self, action: #selector(refreshData), forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
                 
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(reloadPodcastData), name: Constants.kDownloadHasFinished, object: nil)
         
         refreshPodcastFeeds()
         refreshPlaylists()
         startCheckSubscriptionsForNewEpisodesTimer()
-        
-        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        self.addPlayerNavButton()
     }
     
     func refreshData() {
@@ -158,9 +161,9 @@ class PodcastsTableViewController: UIViewController {
         }
     }
 
-    func removePlayerNavButton(notification: NSNotification) {
+    func removePlayerNavButtonAndReload() {
+        self.removePlayerNavButton()
         self.reloadPodcastData()
-        PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
     }
     
     @IBAction func addPlaylistByURL(sender: AnyObject) {
@@ -197,7 +200,7 @@ class PodcastsTableViewController: UIViewController {
         self.reloadTable()
     }
     
-    func segueToNowPlaying(sender: UIBarButtonItem) {
+    override func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Podcasts to Now Playing", sender: nil)
     }
 }

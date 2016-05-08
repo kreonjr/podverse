@@ -18,12 +18,6 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     var iTunesSearchPodcastArray = [SearchResultPodcast]()
     var iTunesSearchPodcastFeedURLArray: [NSURL] = []
     
-    func removePlayerNavButton(notification: NSNotification) {
-        dispatch_async(dispatch_get_main_queue()) {
-            PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
-        }
-    }
-    
     let moc = CoreDataHelper.sharedInstance.managedObjectContext
     
     var podcastVC:PodcastsTableViewController? {
@@ -40,17 +34,13 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         super.viewDidLoad()
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         searchBar.delegate = self
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButton), name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(FindSearchTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
+        self.addPlayerNavButton()
     }
     
     func searchItunesFor(searchText: String) {
@@ -134,7 +124,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         }
     }
     
-    func segueToNowPlaying(sender: UIBarButtonItem) {
+    override func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Find Search to Now Playing", sender: nil)
     }
     

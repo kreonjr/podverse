@@ -38,23 +38,19 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
         }
     }
     
-    func segueToNowPlaying(sender: UIBarButtonItem) {
+    override func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Clips to Now Playing", sender: nil)
     }
     
-    func removePlayerNavButton(notification: NSNotification) {
-        dispatch_async(dispatch_get_main_queue()) {
-            self.loadData()
-            self.pvMediaPlayer.removePlayerNavButton(self)
-        }
+    func removePlayerButtonAndReload() {
+        self.removePlayerNavButton()
+        self.loadData()
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ClipsTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
+        self.addPlayerNavButton()
     }
     
     override func viewDidLoad() {
@@ -73,13 +69,10 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
             headerImageView.image = itunesImage
         }
         
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
+
         headerSummaryLabel.text = selectedEpisode.summary
         loadData()
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
     }
 
     override func didReceiveMemoryWarning() {
@@ -122,7 +115,7 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let selectedClip = clipsArray[indexPath.row]
-        self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(selectedClip)
+        self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(selectedClip.objectID)
         self.performSegueWithIdentifier("Clips to Now Playing", sender: nil)
     }
 

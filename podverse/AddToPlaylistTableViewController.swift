@@ -23,7 +23,7 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToPlaylistTableViewController.navBackToMediaPlayer), name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(navBackToMediaPlayer), name: Constants.kPlayerHasNoItem, object: nil)
         
         self.navigationController?.navigationBar.barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)
         

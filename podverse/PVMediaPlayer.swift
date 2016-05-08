@@ -9,6 +9,7 @@
 import UIKit
 import AVFoundation
 import MediaPlayer
+import CoreData
 
 protocol PVMediaPlayerDelegate {
     func setMediaPlayerVCPlayPauseIcon()
@@ -16,25 +17,19 @@ protocol PVMediaPlayerDelegate {
     func clipFinishedPlaying(currentClip:Clip)
 }
 
-class PVMediaPlayer: NSObject {
+class PVMediaPlayer {
 
     static let sharedInstance = PVMediaPlayer()
-    
     var avPlayer = AVPlayer()
-    
     var docDirectoryURL: NSURL?
-    
     var nowPlayingEpisode: Episode!
     var nowPlayingClip: Clip!
-    
     var mediaPlayerIsPlaying = false
-    
     var delegate: PVMediaPlayerDelegate?
-    
     var boundaryObserver:AnyObject?
+    var moc:NSManagedObjectContext!
     
-    override init() {
-        super.init()
+    init() {
 
         // Enable the media player to continue playing in the background and on the lock screen
         do {
@@ -63,9 +58,11 @@ class PVMediaPlayer: NSObject {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVMediaPlayer.headphonesWereUnplugged(_:)), name: AVAudioSessionRouteChangeNotification, object: AVAudioSession.sharedInstance())
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVMediaPlayer.playerDidFinishPlaying(_:)), name: AVPlayerItemDidPlayToEndTimeNotification, object: avPlayer.currentItem)
+        
+        moc = CoreDataHelper.sharedInstance.backgroundContext
     }
     
-    func headphonesWereUnplugged(notification: NSNotification) {
+    @objc func headphonesWereUnplugged(notification: NSNotification) {
         if let info = notification.userInfo {
             if let reasonKey = info[AVAudioSessionRouteChangeReasonKey] as? UInt {
                 let reason = AVAudioSessionRouteChangeReason(rawValue: reasonKey)
@@ -109,7 +106,7 @@ class PVMediaPlayer: NSObject {
         return false
     }
     
-    func playerDidFinishPlaying(note: NSNotification) {
+    @objc func playerDidFinishPlaying(note: NSNotification) {
         if nowPlayingClip == nil {
             self.delegate?.episodeFinishedPlaying(nowPlayingEpisode)   
         } else {
@@ -233,8 +230,8 @@ class PVMediaPlayer: NSObject {
         NSNotificationCenter.defaultCenter().postNotificationName(Constants.kNowPlayingTimeHasChanged, object: self, userInfo: nowPlayingTimeHasChangedUserInfo)
     }
     
-    func loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode: Episode) {
-        nowPlayingEpisode = episode
+    func loadEpisodeDownloadedMediaFileOrStreamAndPlay(episodeID: NSManagedObjectID) {
+        nowPlayingEpisode = CoreDataHelper.fetchEntityWithID(episodeID, moc: moc) as! Episode
         nowPlayingClip = nil
         
         if nowPlayingEpisode.fileName != nil {
@@ -261,9 +258,9 @@ class PVMediaPlayer: NSObject {
         self.setPlayingInfo(nowPlayingEpisode)
     }
     
-    func loadClipDownloadedMediaFileOrStreamAndPlay(clip: Clip) {
-        nowPlayingEpisode = clip.episode
-        nowPlayingClip = clip
+    func loadClipDownloadedMediaFileOrStreamAndPlay(clipID: NSManagedObjectID) {
+        nowPlayingClip = CoreDataHelper.fetchEntityWithID(clipID, moc: moc) as! Clip
+        nowPlayingEpisode = CoreDataHelper.fetchEntityWithID(nowPlayingClip.episode.objectID, moc: moc) as! Episode
         
 //        if nowPlayingEpisode.fileName != nil {
 //            var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
@@ -292,7 +289,7 @@ class PVMediaPlayer: NSObject {
         self.setPlayingInfo(nowPlayingEpisode)
     }
     
-    func playInterrupted(notification: NSNotification) {
+    @objc func playInterrupted(notification: NSNotification) {
         if notification.name == AVAudioSessionInterruptionNotification && notification.userInfo != nil {
             var info = notification.userInfo!
             var intValue: UInt = 0
@@ -314,21 +311,6 @@ class PVMediaPlayer: NSObject {
         }
     }
     
-    // If there is a now playing episode or clip, add Now Playing button to nav bar
-    func addPlayerNavButton(vc: UIViewController) {
-        if nowPlayingEpisode != nil || nowPlayingClip != nil {
-            vc.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: vc, action: Selector("segueToNowPlaying:"))
-        }
-        else {
-            vc.navigationItem.rightBarButtonItem = nil
-        }
-    }
-    
-    // If there is not a now playing episode or clip, remove Now Playing button from nav bar if present
-    func removePlayerNavButton(vc: UIViewController) {
-        if nowPlayingEpisode == nil && nowPlayingClip == nil {
-            vc.navigationItem.rightBarButtonItem = nil
-        }
-    }
+
     
 }

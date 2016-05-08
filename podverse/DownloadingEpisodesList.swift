@@ -13,7 +13,9 @@ final class DLEpisodesList {
     
     var downloadingEpisodes = [DownloadingEpisode]() {
         didSet {
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kUpdateDownloadsTable, object: nil)
+            dispatch_async(dispatch_get_main_queue()) { 
+                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kUpdateDownloadsTable, object: nil)
+            }
         }
     }
     
