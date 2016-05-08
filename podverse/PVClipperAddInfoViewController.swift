@@ -115,9 +115,10 @@ class PVClipperAddInfoViewController: UIViewController {
             }
             
             strongSelf.clip?.clipUrl = response["clipUri"] as? String
-
+            
+            CoreDataHelper.saveCoreData(strongSelf.moc, completionBlock:nil)
+            
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                
                 let alert = UIAlertController(title: "Clip saved with URL:", message: strongSelf.clip?.clipUrl, preferredStyle: .Alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
                 alert.addAction(UIAlertAction(title: "Copy", style: .Default, handler: { (action) -> Void in
@@ -125,13 +126,12 @@ class PVClipperAddInfoViewController: UIViewController {
                 }))
                 strongSelf.presentViewController(alert, animated: true, completion: nil)
                 
-                for playlist in PlaylistManager.sharedInstance.playlists {
+                let playlists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: strongSelf.moc) as! [Playlist]
+                for playlist in playlists {
                     if playlist.title == Constants.kMyClipsPlaylist {
                         PlaylistManager.sharedInstance.addItemToPlaylist(playlist, clip: strongSelf.clip, episode: nil, moc:strongSelf.moc)
                     }
                 }
-                
-                CoreDataHelper.saveCoreData(strongSelf.moc, completionBlock:nil)
             })
         }) { (error) -> Void in
             dispatch_async(dispatch_get_main_queue(), { () -> Void in

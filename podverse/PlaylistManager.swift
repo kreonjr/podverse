@@ -12,20 +12,13 @@ import CoreData
 protocol PlaylistManagerDelegate {
     func playlistAddedByUrl()
     func itemAddedToPlaylist()
+    func didSavePlaylist()
 }
 
 final class PlaylistManager {
 
     static let sharedInstance = PlaylistManager()
-    let moc = CoreDataHelper.sharedInstance.managedObjectContext
-
     var delegate:PlaylistManagerDelegate?
-    
-    var playlists:[Playlist] {
-        get {
-            return CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc:PlaylistManager.sharedInstance.moc) as! [Playlist]
-        }
-    }
     
     func addPlaylistByUrlString(urlString: String) {
         var urlComponentArray = urlString.componentsSeparatedByString("/")
@@ -43,9 +36,9 @@ final class PlaylistManager {
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
                     
                         let moc = CoreDataHelper.sharedInstance.backgroundContext
-                        let playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:moc)
-                        PlaylistManager.JSONToPlaylist(playlist, JSONDict: response)
-                        
+                        var playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:moc)
+                    playlist = PlaylistManager.JSONToPlaylist(playlist, JSONDict: response, moc:moc)
+                    
                         CoreDataHelper.saveCoreData(moc, completionBlock:{ (finished) in
                             dispatch_async(dispatch_get_main_queue()) {
                                 PlaylistManager.sharedInstance.delegate?.playlistAddedByUrl()
@@ -62,15 +55,16 @@ final class PlaylistManager {
     
     func refreshPlaylists(completion:()->Void) {
         let dispatchGroup = dispatch_group_create()
+        let managedObjectContext = CoreDataHelper.sharedInstance.backgroundContext
+        let playlists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: managedObjectContext) as! [Playlist]
         for playlist in playlists {
             if let playlistId = playlist.playlistId {
                 dispatch_group_enter(dispatchGroup)
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
-                    let moc = CoreDataHelper.sharedInstance.backgroundContext
-                    let playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:moc)
-                    PlaylistManager.JSONToPlaylist(playlist, JSONDict: response)
+                    var playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:managedObjectContext)
+                    playlist = PlaylistManager.JSONToPlaylist(playlist, JSONDict: response, moc: managedObjectContext)
                     
-                    CoreDataHelper.saveCoreData(moc, completionBlock:{ (finished) in
+                    CoreDataHelper.saveCoreData(managedObjectContext, completionBlock:{ (finished) in
                         print("Playlist refreshed")
                         dispatch_group_leave(dispatchGroup)
                     })
@@ -86,8 +80,7 @@ final class PlaylistManager {
         }
     }
     
-    static func JSONToPlaylist(playlist:Playlist, JSONDict:Dictionary<String,AnyObject>) {
-        let moc = CoreDataHelper.sharedInstance.managedObjectContext
+    static func JSONToPlaylist(playlist:Playlist, JSONDict:Dictionary<String,AnyObject>, moc:NSManagedObjectContext) -> Playlist {
         if let title = JSONDict["playlistTitle"] as? String {
             playlist.title = title
         }
@@ -218,7 +211,7 @@ final class PlaylistManager {
             }
         }
         
-        CoreDataHelper.saveCoreData(moc, completionBlock:nil)
+        return playlist
     }
     
     func clipToPlaylistItemJSON(clip:Clip) -> Dictionary<String,AnyObject> {
@@ -271,7 +264,11 @@ final class PlaylistManager {
     func createDefaultPlaylists() {
         // If no playlists are saved, then create the "My Clips" and "My Episodes" playlists
         let moc = CoreDataHelper.sharedInstance.backgroundContext
-        if self.playlists.count < 1 {
+        let fetchRequest = NSFetchRequest()
+        let entityDescription = NSEntityDescription.entityForName("Playlist" as String, inManagedObjectContext: moc)
+        fetchRequest.entity = entityDescription
+        
+        if moc.countForFetchRequest(fetchRequest, error: nil) < 1 {
             let myEpisodesPlaylist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
             myEpisodesPlaylist.title = Constants.kMyEpisodesPlaylist
             self.savePlaylist(myEpisodesPlaylist, moc:moc)
@@ -316,7 +313,7 @@ final class PlaylistManager {
             
                 CoreDataHelper.saveCoreData(moc, completionBlock: { (saved) -> Void in
                     dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+                        self.delegate?.didSavePlaylist()
                     })
 
                 })

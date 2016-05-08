@@ -314,7 +314,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             episodesArray.removeAtIndex(indexPath.row)
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             if let podcastTableVC = self.navigationController?.viewControllers.first as? PodcastsTableViewController {
-                podcastTableVC.loadData()
+                podcastTableVC.reloadPodcastData()
             }
         }
     }

@@ -14,16 +14,64 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     @IBOutlet weak var tableView: UITableView!
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
     let playlistManager = PlaylistManager.sharedInstance
-    var managedObjectContext:NSManagedObjectContext!
-    
+    var managedObjectContext = CoreDataHelper.sharedInstance.managedObjectContext
     var episode:Episode?
     var clip:Clip?
     
     var validPlaylists:[Playlist]!
 
-    func loadData() {
-        managedObjectContext = CoreDataHelper.sharedInstance.managedObjectContext
-        validPlaylists = playlistManager.playlists
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToPlaylistTableViewController.navBackToMediaPlayer), name: Constants.kPlayerHasNoItem, object: nil)
+        
+        self.navigationController?.navigationBar.barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)
+        
+        if pvMediaPlayer.nowPlayingClip != nil {
+            clip = pvMediaPlayer.nowPlayingClip
+        } else if pvMediaPlayer.nowPlayingEpisode != nil {
+            episode = pvMediaPlayer.nowPlayingEpisode
+        }
+        
+        navigationItem.title = "Add to Playlist"
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .Plain, target: self, action: #selector(showCreatePlaylistAlert))
+        
+        loadData()
+        playlistManager.delegate = self
+    }
+    
+    func showCreatePlaylistAlert() {
+        let createPlaylistAlert = UIAlertController(title: "Add New Playlist", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
+        
+        createPlaylistAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
+            textField.placeholder = "title of playlist"
+        })
+        
+        createPlaylistAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
+        
+        createPlaylistAlert.addAction(UIAlertAction(title: "Save", style: .Default, handler: { (action: UIAlertAction!) in
+            let textField = createPlaylistAlert.textFields![0] as UITextField
+            if let playlistTitle = textField.text {
+                let moc = CoreDataHelper.sharedInstance.managedObjectContext
+                
+                let playlist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
+                playlist.title = playlistTitle
+                CoreDataHelper.saveCoreData(moc, completionBlock:nil)
+                self.playlistManager.savePlaylist(playlist, moc:moc)
+            }
+        }))
+    
+        presentViewController(createPlaylistAlert, animated: true, completion: nil)
+    }
+    
+    func navBackToMediaPlayer() {
+        if let mediaPlayerVC = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as? MediaPlayerViewController {
+            self.navigationController?.popToViewController(mediaPlayerVC, animated: true)
+        }
+    }
+    
+    private func loadData() {
+        validPlaylists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: managedObjectContext) as! [Playlist]
         // TODO: there has to be a better way to do this...
         for (index , playlist) in validPlaylists.enumerate() {
             if clip == nil {
@@ -55,68 +103,8 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
                 }
             }
         }
+        
         tableView.reloadData()
-    }
-    
-    func showcreatePlaylistAlert() {
-        let createPlaylistAlert = UIAlertController(title: "Add New Playlist", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
-        
-        createPlaylistAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
-            textField.placeholder = "title of playlist"
-        })
-        
-        createPlaylistAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
-        
-        createPlaylistAlert.addAction(UIAlertAction(title: "Save", style: .Default, handler: { (action: UIAlertAction!) in
-            let textField = createPlaylistAlert.textFields![0] as UITextField
-            if let playlistTitle = textField.text {
-                let moc = CoreDataHelper.sharedInstance.managedObjectContext
-                
-                let playlist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
-                playlist.title = playlistTitle
-                CoreDataHelper.saveCoreData(moc, completionBlock:nil)
-                self.playlistManager.savePlaylist(playlist, moc:moc)
-            }
-        }))
-    
-        presentViewController(createPlaylistAlert, animated: true, completion: nil)
-    }
-    
-    func navBackToMediaPlayer() {
-        if let mediaPlayerVC = self.navigationController?.viewControllers[(self.navigationController?.viewControllers.count)! - 2] as? MediaPlayerViewController {
-            self.navigationController?.popToViewController(mediaPlayerVC, animated: true)
-        }
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToPlaylistTableViewController.navBackToMediaPlayer), name: Constants.kPlayerHasNoItem, object: nil)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToPlaylistTableViewController.navBackToMediaPlayer), name: Constants.kItemAddedToPlaylistNotification, object: nil)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AddToPlaylistTableViewController.loadData), name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
-        
-        self.navigationController?.navigationBar.barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)
-        
-        if pvMediaPlayer.nowPlayingClip != nil {
-            clip = pvMediaPlayer.nowPlayingClip
-        } else if pvMediaPlayer.nowPlayingEpisode != nil {
-            episode = pvMediaPlayer.nowPlayingEpisode
-        }
-        
-        loadData()
-    }
-
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        // Set navigation bar styles
-        navigationItem.title = "Add to Playlist"
-        
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "New", style: .Plain, target: self, action: #selector(AddToPlaylistTableViewController.showcreatePlaylistAlert))
-        
-        loadData()
     }
     
     // MARK: - Table view data source
@@ -143,33 +131,20 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
             playlistManager.addItemToPlaylist(playlist, clip: nil, episode: e, moc: self.managedObjectContext)
         }
     }
-    
-//    // Override to support editing the table view.
-//    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-//        if editingStyle == .Delete {
-//            //            let podcastToRemove = podcastArray[indexPath.row]
-//            //
-//            //            // Remove Player button if the now playing episode was one of the podcast's episodes
-//            //            let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
-//            //            if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-//            //                if allPodcastEpisodes.contains(nowPlayingEpisode) {
-//            //                    self.navigationItem.rightBarButtonItem = nil
-//            //                }
-//            //            }
-//            //
-//            //            PVDeleter.sharedInstance.deletePodcast(podcastToRemove)
-//            //            podcastArray.removeAtIndex(indexPath.row)
-//            //            
-//            //            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-//        }
-//    }
-//    
-//    // MARK: - Navigation
-//    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-//        if segue.identifier == "Playlist to Now Playing" {
-//            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-//            mediaPlayerViewController.hidesBottomBarWhenPushed = true
-//        }
-//    }
+}
 
+
+extension AddToPlaylistTableViewController: PlaylistManagerDelegate {
+    func itemAddedToPlaylist() {
+        self.navBackToMediaPlayer()
+        self.loadData()
+    }
+    
+    func playlistAddedByUrl() {
+        self.loadData()
+    }
+    
+    func didSavePlaylist() {
+        self.loadData()
+    }
 }
