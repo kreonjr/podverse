@@ -94,6 +94,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
             PVMediaPlayer.sharedInstance.setPlayingInfo(nowPlayingEpisode)
         }
+        
+         UIApplication.sharedApplication().applicationIconBadgeNumber = 0
     }
 
     func applicationWillEnterForeground(application: UIApplication) {
@@ -110,6 +112,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if PVMediaPlayer.sharedInstance.avPlayer.rate == 1 {
             PVMediaPlayer.sharedInstance.saveCurrentTimeAsPlaybackPosition()
         }
+        
+         UIApplication.sharedApplication().applicationIconBadgeNumber = 0
     }
 }
 
