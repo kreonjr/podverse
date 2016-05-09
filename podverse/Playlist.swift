@@ -45,21 +45,21 @@ class Playlist: NSManagedObject {
     private func removeEpisodeObject(episode: Episode) {
         self.mutableSetValueForKey("episodes").removeObject(episode)
         
-        let alsoDeletePodcast = PVDeleter.checkIfPodcastShouldBeRemoved(episode.podcast, isUnsubscribing: false)
+        let alsoDeletePodcast = PVDeleter.checkIfPodcastShouldBeRemoved(episode.podcast.objectID, isUnsubscribing: false)
         
         if alsoDeletePodcast {
-            PVDeleter.deletePodcast(episode.podcast)
+            PVDeleter.deletePodcast(episode.podcast.objectID)
         }
         
     }
     
-    private func removeClipObject(value: Clip) {
-        self.mutableSetValueForKey("clips").removeObject(value)
+    private func removeClipObject(clip: Clip) {
+        self.mutableSetValueForKey("clips").removeObject(clip)
         
-        let alsoDeletePodcast = PVDeleter.checkIfPodcastShouldBeRemoved(value.episode.podcast, isUnsubscribing: false)
+        let alsoDeletePodcast = PVDeleter.checkIfPodcastShouldBeRemoved(clip.episode.podcast.objectID, isUnsubscribing: false)
         
         if alsoDeletePodcast {
-            PVDeleter.deletePodcast(value.episode.podcast)
+            PVDeleter.deletePodcast(clip.episode.podcast.objectID)
         }
     }
     

@@ -195,7 +195,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
             searchResultPodcastActions.addAction(UIAlertAction(title: "Unsubscribe", style: .Default, handler: { action in
                 if let podcasts = CoreDataHelper.fetchEntities("Podcast", predicate: nil, moc:self.moc) as? [Podcast] {
                     if let index = podcasts.indexOf({ $0.feedURL == iTunesSearchPodcast.feedURL }) {
-                        PVSubscriber.unsubscribeFromPodcast(podcasts[index], moc: self.moc)
+                        PVSubscriber.unsubscribeFromPodcast(podcasts[index])
                     }
                 }
             }))
