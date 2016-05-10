@@ -19,15 +19,19 @@ class PVSubscriber {
         }
     }
     
-    static func unsubscribeFromPodcast(podcast:Podcast) {
-        let alsoDelete = PVDeleter.checkIfPodcastShouldBeRemoved(podcast.objectID, isUnsubscribing: true)
-        podcast.isSubscribed = false
-        
-        CoreDataHelper.saveCoreData(podcast.managedObjectContext, completionBlock: { completed in
-            if alsoDelete {
-                PVDeleter.deletePodcast(podcast.objectID)
-            }
-        })
+    static func unsubscribeFromPodcast(podcastID:NSManagedObjectID) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+            let moc = CoreDataHelper.sharedInstance.backgroundContext
+            let podcast = CoreDataHelper.fetchEntityWithID(podcastID, moc: moc) as! Podcast
+            let alsoDelete = PVDeleter.checkIfPodcastShouldBeRemoved(podcast, isUnsubscribing: true, moc:moc)
+            podcast.isSubscribed = false
+            
+            CoreDataHelper.saveCoreData(moc, completionBlock: { completed in
+                if alsoDelete {
+                    PVDeleter.deletePodcast(podcast.objectID)
+                }
+            })
+        }
     }
     
 }

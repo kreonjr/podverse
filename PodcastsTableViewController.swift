@@ -362,7 +362,7 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
                 podcastsArray.removeAtIndex(indexPath.row)
                 self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 
-                PVSubscriber.unsubscribeFromPodcast(podcastToRemove)
+                PVSubscriber.unsubscribeFromPodcast(podcastToRemove.objectID)
             }
         } else {
             if indexPath.row > 1 {

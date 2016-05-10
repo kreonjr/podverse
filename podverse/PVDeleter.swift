@@ -12,13 +12,14 @@ import CoreData
 class PVDeleter {
     
     static func deletePodcast(podcastID: NSManagedObjectID) {
-        let moc = CoreDataHelper.sharedInstance.managedObjectContext
+        let moc = CoreDataHelper.sharedInstance.backgroundContext
         let podcast = CoreDataHelper.fetchEntityWithID(podcastID, moc: moc) as! Podcast
         let episodesToRemove = podcast.episodes.allObjects as! [Episode]
         
         // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
         for episode in episodesToRemove {
-            PVDeleter.deleteEpisode(episode, completion: nil)
+            let episodeToRemove = CoreDataHelper.fetchEntityWithID(episode.objectID, moc: moc) as! Episode
+            PVDeleter.deleteEpisode(episodeToRemove, completion: nil)
         }
 
         CoreDataHelper.deleteItemFromCoreData(podcast, moc: moc)
@@ -31,27 +32,40 @@ class PVDeleter {
         let downloader = PVDownloader()
         downloader.moc = episode.managedObjectContext
         let downloadSession = downloader.downloadSession
+        let episodeIndex = DLEpisodesList.shared.downloadingEpisodes.indexOf({ $0.mediaURL == episode.mediaURL})
         downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
             for episodeDownloadTask in downloadTasks {
-                if episodeDownloadTask.taskIdentifier == episode.taskIdentifier {
+                if let index = episodeIndex, taskID = DLEpisodesList.shared.downloadingEpisodes[index].taskIdentifier where taskID == episodeDownloadTask.taskIdentifier {
                     episodeDownloadTask.cancel()
+                    
+                    dispatch_async(dispatch_get_main_queue(), { 
+                        if let tabBarCntrl = (UIApplication.sharedApplication().delegate as! AppDelegate).window?.rootViewController as? UITabBarController {
+                            if let badgeValue = tabBarCntrl.tabBar.items?.last?.badgeValue, badgeInt = Int(badgeValue) {
+                                tabBarCntrl.tabBar.items?.last?.badgeValue = "\(badgeInt - 1)"
+                                if tabBarCntrl.tabBar.items?.last?.badgeValue == "0" {
+                                    tabBarCntrl.tabBar.items?.last?.badgeValue = nil
+                                }
+                            }
+                        }
+                    })
                 }
             }
         }
         
         // If the episode is currently in the episodeDownloadArray, then delete the episode from the episodeDownloadArray
         DLEpisodesList.removeDownloadingEpisodeWithMediaURL(episode.mediaURL)
-
-        // If the episode is currently now playing, then remove the now playing episode, and remove the Player button from the navbar using kPlayerHasNoItem
-        if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-            if episode == nowPlayingEpisode {
-                PVMediaPlayer.sharedInstance.avPlayer.pause()
-                PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
-                })
+        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            // If the episode is currently now playing, then remove the now playing episode, and remove the Player button from the navbar using kPlayerHasNoItem
+            if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+                if episode == nowPlayingEpisode {
+                    PVMediaPlayer.sharedInstance.avPlayer.pause()
+                    PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
+                    
+                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
+                    
+                }
             }
-        }
+        })
         
         //TODO: is the deleteEpisodeFromDiskWithName redundant because of the deleteItemFromCoreData?
         // Delete the episode from CoreData and the disk, and update the UI
@@ -143,9 +157,10 @@ class PVDeleter {
         }.call()
     }
     
-    static func checkIfPodcastShouldBeRemoved(podcastID: NSManagedObjectID, isUnsubscribing: Bool) -> Bool {
-        let moc = CoreDataHelper.sharedInstance.managedObjectContext
-        let podcast = CoreDataHelper.fetchEntityWithID(podcastID, moc: moc) as! Podcast
+    static func checkIfPodcastShouldBeRemoved(podcast: Podcast, isUnsubscribing: Bool, moc:NSManagedObjectContext?) -> Bool {
+        guard let moc = moc else {
+            return true
+        }
         
         var alsoDelete = true
         
