@@ -18,10 +18,10 @@ class PodcastsTableViewController: UIViewController {
         {
         case 0:
             addPlaylistByURL.hidden = true
-            reloadTable()
+            self.tableView.reloadData()
         case 1:
             addPlaylistByURL.hidden = false
-            reloadTable()
+            self.tableView.reloadData()
         default:
             break;
         }
@@ -34,6 +34,12 @@ class PodcastsTableViewController: UIViewController {
     var podcastsArray = [Podcast]()
     let coreDataHelper = CoreDataHelper.sharedInstance
     var refreshControl: UIRefreshControl!
+    private var itemsParsing = 0
+    private var totalItemsToParse = 0
+    @IBOutlet weak var parsingActivity: UIActivityIndicatorView!
+    @IBOutlet weak var parsingActivityLabel: UILabel!
+    @IBOutlet weak var parsingActivityBar: UIProgressView!
+    @IBOutlet weak var parsingActivityContainer: UIView!
     
     private let REFRESH_PODCAST_TIME:Double = 3600
     
@@ -73,6 +79,7 @@ class PodcastsTableViewController: UIViewController {
                 
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(reloadPodcastData), name: Constants.kDownloadHasFinished, object: nil)
+        updateParsingActivity()
         
         reloadPodcastData()
         refreshPodcastFeeds()
@@ -96,7 +103,8 @@ class PodcastsTableViewController: UIViewController {
     
     private func refreshPlaylists() {
         PlaylistManager.sharedInstance.refreshPlaylists { () -> Void in
-            self.reloadTable()
+            self.refreshControl.endRefreshing()
+            self.tableView.reloadData()
         }
     }
     
@@ -104,7 +112,8 @@ class PodcastsTableViewController: UIViewController {
         let moc = self.coreDataHelper.managedObjectContext
         let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
         let podcastArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:moc) as! [Podcast]
-
+        totalItemsToParse = podcastsArray.count
+        
         for podcast in podcastArray {
             let feedURL = NSURL(string:podcast.feedURL)
             
@@ -113,9 +122,14 @@ class PodcastsTableViewController: UIViewController {
                 feedParser.delegate = self
                 if let feedURLString = feedURL?.absoluteString {
                     feedParser.parsePodcastFeed(feedURLString)
+                    dispatch_async(dispatch_get_main_queue(), { 
+                        self.updateParsingActivity()
+                    })
                 }
             }
         }
+        
+        refreshControl.endRefreshing()
     }
     
     private func showAddPlaylistByURLAlert() {
@@ -136,11 +150,6 @@ class PodcastsTableViewController: UIViewController {
         }))
         
         presentViewController(addPlaylistByURLAlert, animated: true, completion: nil)
-    }
-    
-    private func reloadTable() {
-        tableView.reloadData()
-        refreshControl?.endRefreshing()
     }
     
     // MARK: - Navigation
@@ -198,11 +207,26 @@ class PodcastsTableViewController: UIViewController {
             }
         
         
-        self.reloadTable()
+        self.tableView.reloadData()
     }
     
     override func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Podcasts to Now Playing", sender: nil)
+    }
+    
+    private func updateParsingActivity() {
+        self.parsingActivityLabel.text = "\(self.itemsParsing) of \(self.podcastsArray.count) parsed"
+        self.parsingActivityBar.progress = Float(self.itemsParsing)/Float(self.podcastsArray.count)
+        
+        if self.itemsParsing == self.podcastsArray.count || self.itemsParsing == 0 {
+            self.itemsParsing = 0
+            self.parsingActivityContainer.hidden = true
+            self.parsingActivity.stopAnimating()
+        }
+        else {
+            self.parsingActivityContainer.hidden = false
+            self.parsingActivity.startAnimating()
+        }
     }
 }
 
@@ -336,11 +360,10 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
                         self.navigationItem.rightBarButtonItem = nil
                     }
                 }
-                
-                PVSubscriber.unsubscribeFromPodcast(podcastToRemove, moc:podcastToRemove.managedObjectContext)
                 podcastsArray.removeAtIndex(indexPath.row)
-                
                 self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                
+                PVSubscriber.unsubscribeFromPodcast(podcastToRemove)
             }
         } else {
             if indexPath.row > 1 {
@@ -388,6 +411,13 @@ extension PodcastsTableViewController: PVFeedParserDelegate {
         else {
             self.reloadPodcastData()
         }
+        
+        itemsParsing += 1
+        updateParsingActivity()
+    }
+    
+    func feedParsingStarted() {
+        updateParsingActivity()
     }
 }
 

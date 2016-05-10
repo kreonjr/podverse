@@ -12,6 +12,7 @@ import CoreData
 @objc protocol PVFeedParserDelegate {
    func feedParsingComplete(feedURL:String?)
    optional func feedItemParsed()
+   optional func feedParsingStarted()
 }
 
 class PVFeedParser: NSObject, FeedParserDelegate {
@@ -38,6 +39,9 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             feedParser.parsingType = .Full
             feedParser.parse()
             print("feedParser did start")
+            dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                self.delegate?.feedParsingStarted?()
+            }
         }
     }
     

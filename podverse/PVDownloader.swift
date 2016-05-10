@@ -46,6 +46,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             let task = self.beginBackgroundTask()
             downloadTask.resume()
             self.endBackgroundTask(task)
+            
+            incrementBadge()
         }
     }
     
@@ -211,8 +213,12 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     CoreDataHelper.saveCoreData(self.moc, completionBlock: { (saved) -> Void in
                         let downloadHasFinishedUserInfo = ["episode":episode]
                         
-                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
+                        dispatch_async(dispatch_get_main_queue(), {[weak self] () -> Void in
+                            guard let strongSelf = self else {
+                                return
+                            }
+                            
+                            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasFinished, object: strongSelf, userInfo: downloadHasFinishedUserInfo)
                             
                             let notification = UILocalNotification()
                             notification.applicationIconBadgeNumber = UIApplication.sharedApplication().applicationIconBadgeNumber + 1
@@ -220,6 +226,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                             notification.alertAction = "open"
                             notification.soundName = UILocalNotificationDefaultSoundName // play default sound
                             UIApplication.sharedApplication().scheduleLocalNotification(notification)
+                            
+                            strongSelf.decrementBadge()
                         })
                     })
                 }
@@ -267,5 +275,29 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
 
     func endBackgroundTask(taskID: UIBackgroundTaskIdentifier) {
         UIApplication.sharedApplication().endBackgroundTask(taskID)
+    }
+    
+    private func incrementBadge() {
+        dispatch_async(dispatch_get_main_queue(), {
+            if let tabBarCntrl = self.appDelegate.window?.rootViewController as? UITabBarController {
+                if let badgeValue = tabBarCntrl.tabBar.items?.last?.badgeValue, badgeInt = Int(badgeValue) {
+                    tabBarCntrl.tabBar.items?.last?.badgeValue = "\(badgeInt + 1)"
+                }
+                else {
+                    tabBarCntrl.tabBar.items?.last?.badgeValue = "1"
+                }
+            }
+        })
+    }
+    
+    private func decrementBadge() {
+        if let tabBarCntrl = self.appDelegate.window?.rootViewController as? UITabBarController {
+            if let badgeValue = tabBarCntrl.tabBar.items?.last?.badgeValue, badgeInt = Int(badgeValue) {
+                tabBarCntrl.tabBar.items?.last?.badgeValue = "\(badgeInt - 1)"
+                if tabBarCntrl.tabBar.items?.last?.badgeValue == "0" {
+                    tabBarCntrl.tabBar.items?.last?.badgeValue = nil
+                }
+            }
+        }
     }
 }

@@ -11,7 +11,9 @@ import CoreData
 
 class PVDeleter {
     
-    static func deletePodcast(podcast: Podcast) {
+    static func deletePodcast(podcastID: NSManagedObjectID) {
+        let moc = CoreDataHelper.sharedInstance.managedObjectContext
+        let podcast = CoreDataHelper.fetchEntityWithID(podcastID, moc: moc) as! Podcast
         let episodesToRemove = podcast.episodes.allObjects as! [Episode]
         
         // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
@@ -19,9 +21,9 @@ class PVDeleter {
             PVDeleter.deleteEpisode(episode, completion: nil)
         }
 
-        CoreDataHelper.deleteItemFromCoreData(podcast, moc: CoreDataHelper.sharedInstance.managedObjectContext)
+        CoreDataHelper.deleteItemFromCoreData(podcast, moc: moc)
         
-        CoreDataHelper.saveCoreData(podcast.managedObjectContext, completionBlock: nil)
+        CoreDataHelper.saveCoreData(moc, completionBlock: nil)
     }
     
     static func deleteEpisode(episode: Episode, completion:(()->())? ) {
@@ -60,7 +62,7 @@ class PVDeleter {
         
         // If the episode or a clip from the episode is currently a playlistItem in a local playlist, then do not delete the episode item from Core Data
         if checkIfEpisodeShouldBeRemoved(episode) == true {
-            CoreDataHelper.deleteItemFromCoreData(episode, moc: CoreDataHelper.sharedInstance.managedObjectContext)
+            CoreDataHelper.deleteItemFromCoreData(episode, moc: episode.managedObjectContext)
         }
         
         CoreDataHelper.saveCoreData(episode.managedObjectContext, completionBlock: nil)
@@ -141,7 +143,10 @@ class PVDeleter {
         }.call()
     }
     
-    static func checkIfPodcastShouldBeRemoved(podcast: Podcast, isUnsubscribing: Bool) -> Bool {
+    static func checkIfPodcastShouldBeRemoved(podcastID: NSManagedObjectID, isUnsubscribing: Bool) -> Bool {
+        let moc = CoreDataHelper.sharedInstance.managedObjectContext
+        let podcast = CoreDataHelper.fetchEntityWithID(podcastID, moc: moc) as! Podcast
+        
         var alsoDelete = true
         
         if isUnsubscribing != true {
@@ -151,7 +156,7 @@ class PVDeleter {
             }
         }
         
-        if let allPlaylists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc:podcast.managedObjectContext) as? [Playlist] {
+        if let allPlaylists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc:moc) as? [Playlist] {
             outerLoop: for playlist in allPlaylists {
                 for item in playlist.allItems {
                     if let episode = item as? Episode {
