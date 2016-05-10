@@ -74,6 +74,7 @@ class PodcastsTableViewController: UIViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(reloadPodcastData), name: Constants.kDownloadHasFinished, object: nil)
         
+        reloadPodcastData()
         refreshPodcastFeeds()
         refreshPlaylists()
         startCheckSubscriptionsForNewEpisodesTimer()
