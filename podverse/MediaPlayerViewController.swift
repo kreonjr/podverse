@@ -60,7 +60,11 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         pvMediaPlayer.delegate = self
         
         self.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(MediaPlayerViewController.dismissKeyboard)))
-        self.clipper = ((self.childViewControllers.first as! UINavigationController).topViewController as? PVClipperViewController)
+        guard let navVC = self.childViewControllers.first as? UINavigationController else {
+            return
+        }
+        
+        self.clipper = (navVC.topViewController as? PVClipperViewController)
         
         if let duration = pvMediaPlayer.nowPlayingEpisode.duration {
             self.clipper?.totalDuration = Int(duration)
@@ -93,10 +97,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         episodeTitle?.text = pvMediaPlayer.nowPlayingEpisode.title
         
         if let nowPlayingClip = pvMediaPlayer.nowPlayingClip {
-            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(nowPlayingClip.duration) as String
+            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(nowPlayingClip.duration)
         }
         else {
-            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(pvMediaPlayer.nowPlayingEpisode.duration!) as String
+            totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(pvMediaPlayer.nowPlayingEpisode.duration)
         }
         
         // TODO: wtf? Why do I have to set scrollEnabled = to false and then true? If I do not, then the summary UITextView has extra black space on the bottom, and the UITextView is not scrollable.

@@ -9,12 +9,10 @@
 import UIKit
 import CoreData
 
-class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class PodcastsTableViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
-    
     @IBOutlet weak var segmentedControl: UISegmentedControl!
-    
     @IBAction func indexChanged(sender: UISegmentedControl) {
         switch segmentedControl.selectedSegmentIndex
         {
@@ -30,24 +28,19 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     @IBOutlet weak var addPlaylistByURL: UIButton!
-    
-    var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    
+        
     var playlistManager = PlaylistManager.sharedInstance
-    
     var managedObjectContext:NSManagedObjectContext!
-    
     var podcastsArray = [Podcast]()
-    
     let coreDataHelper = CoreDataHelper.sharedInstance
-    
     var refreshControl: UIRefreshControl!
     
     private let REFRESH_PODCAST_TIME:Double = 3600
     
     var playlists:[Playlist] {
         get {
-            let unsortedPlaylists = PlaylistManager.sharedInstance.playlists
+            let moc = coreDataHelper.managedObjectContext
+            let unsortedPlaylists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: moc) as! [Playlist]
             var sortedPlaylists = unsortedPlaylists.sort({ $0.title.lowercaseString < $1.title.lowercaseString })
             
             for (index , playlist) in sortedPlaylists.enumerate() {
@@ -67,45 +60,47 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationItem.title = "Podverse"
-        
-        addPlaylistByURL.hidden = true
-
-        playlistManager.delegate = self
+        navigationItem.title = "Podverse"
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+
+        addPlaylistByURL.hidden = true
+        playlistManager.delegate = self
         
         refreshControl = UIRefreshControl()
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh all podcasts")
-        refreshControl.addTarget(self, action: #selector(PodcastsTableViewController.refreshPodcastFeeds), forControlEvents: UIControlEvents.ValueChanged)
+        refreshControl.addTarget(self, action: #selector(refreshData), forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
                 
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PodcastsTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PodcastsTableViewController.loadData), name: Constants.kDownloadHasFinished, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PodcastsTableViewController.loadData), name: Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(reloadPodcastData), name: Constants.kDownloadHasFinished, object: nil)
         
-        //TODO: Investigate why this is needed
-//        let moc = CoreDataHelper().managedObjectContext
-//        let episodeArray = CoreDataHelper.fetchEntities("Episode", predicate: nil, moc:moc) as! [Episode]
-//        for episode in episodeArray {
-//            episode.taskIdentifier = nil
-//        }
-        
+        reloadPodcastData()
         refreshPodcastFeeds()
+        refreshPlaylists()
         startCheckSubscriptionsForNewEpisodesTimer()
-        
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        self.addPlayerNavButton()
+    }
+    
+    func refreshData() {
+        if segmentedControl.selectedSegmentIndex == 0 {
+            refreshPodcastFeeds()
+        }
+        else {
+            refreshPlaylists()
+        }
+    }
+    
+    private func refreshPlaylists() {
         PlaylistManager.sharedInstance.refreshPlaylists { () -> Void in
             self.reloadTable()
         }
     }
     
-    func refreshAllData() {
-        refreshPodcastFeeds()
-        PlaylistManager.sharedInstance.refreshPlaylists { () -> Void in
-            self.tableView.reloadSections(NSIndexSet(index: 1), withRowAnimation: .None)
-        }
-    }
-    
-    func refreshPodcastFeeds() {
+    private func refreshPodcastFeeds() {
         let moc = self.coreDataHelper.managedObjectContext
         let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
         let podcastArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:moc) as! [Podcast]
@@ -123,17 +118,95 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
         }
     }
     
-    func removePlayerNavButton(notification: NSNotification) {
-        self.loadData()
-        PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
+    private func showAddPlaylistByURLAlert() {
+        let addPlaylistByURLAlert = UIAlertController(title: "Add Playlist By URL", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
+        
+        addPlaylistByURLAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
+            textField.placeholder = "http://podverse.tv/playlist/..."
+        })
+        
+        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
+        
+        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
+            let textField = addPlaylistByURLAlert.textFields![0] as UITextField
+            if let urlString = textField.text {
+                self.playlistManager.addPlaylistByUrlString(urlString)
+            }
+            self.reloadPodcastData()
+        }))
+        
+        presentViewController(addPlaylistByURLAlert, animated: true, completion: nil)
     }
     
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-
-        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
+    private func reloadTable() {
+        tableView.reloadData()
+        refreshControl?.endRefreshing()
+    }
+    
+    // MARK: - Navigation
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "Show Episodes" {
+            let episodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
+            if let index = tableView.indexPathForSelectedRow {
+                episodesTableViewController.selectedPodcastId = podcastsArray[index.row].objectID
+            }
+            episodesTableViewController.showAllEpisodes = false
+        } else if segue.identifier == "Show Playlist" {
+            let playlistViewController = segue.destinationViewController as! PlaylistViewController
+            if let index = tableView.indexPathForSelectedRow {
+                playlistViewController.playlist = playlists[index.row]
+            }
+        } else if segue.identifier == "Podcasts to Now Playing" {
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
+        }
     }
 
+    func removePlayerNavButtonAndReload() {
+        self.removePlayerNavButton()
+        self.reloadPodcastData()
+    }
+    
+    @IBAction func addPlaylistByURL(sender: AnyObject) {
+        showAddPlaylistByURLAlert()
+    }
+    
+    // This function runs once on app load, then runs in the background every 30 minutes.
+    // Check if a new episode is available for a subscribed podcast; if true, download that episode.
+    // TODO: shouldn't we check via push notifications? Rather than a timer that continuously runs in the background?
+    func startCheckSubscriptionsForNewEpisodesTimer() {
+        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: #selector(refreshData), userInfo: nil, repeats: true)
+    }
+    
+    func reloadPodcastData() {
+        let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
+        self.managedObjectContext = coreDataHelper.managedObjectContext
+        self.podcastsArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:managedObjectContext) as! [Podcast]
+
+        
+        self.podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+
+        //TODO (Somewhere else, not in the view controller) Set pubdate in cell equal to most recent episode's pubdate
+            for podcast in self.podcastsArray {
+                let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+                let mostRecentEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate, moc:managedObjectContext) as! [Episode]
+                if mostRecentEpisodeArray.count > 0 {
+                    if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
+                        podcast.lastPubDate = mostRecentEpisodePubDate
+                    }
+                }
+            }
+        
+        
+        self.reloadTable()
+    }
+    
+    override func segueToNowPlaying(sender: UIBarButtonItem) {
+        self.performSegueWithIdentifier("Podcasts to Now Playing", sender: nil)
+    }
+}
+
+extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSource {
     // MARK: - Table view data source
 
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -243,26 +316,6 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
             self.performSegueWithIdentifier("Show Playlist", sender: nil)
         }
     }
-
-    func showAddPlaylistByURLAlert() {
-        let addPlaylistByURLAlert = UIAlertController(title: "Add Playlist By URL", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
-        
-        addPlaylistByURLAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
-            textField.placeholder = "http://podverse.tv/playlist/..."
-        })
-        
-        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
-        
-        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
-            let textField = addPlaylistByURLAlert.textFields![0] as UITextField
-            if let urlString = textField.text {
-                self.playlistManager.addPlaylistByUrlString(urlString)
-            }
-            self.loadData()
-        }))
-        
-        presentViewController(addPlaylistByURLAlert, animated: true, completion: nil)
-    }
     
     // Override to support conditional editing of the table view.
     func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
@@ -323,69 +376,7 @@ class PodcastsTableViewController: UIViewController, UITableViewDataSource, UITa
                 self.presentViewController(alert, animated: true, completion: nil)
             }
         }
-
-    }
-
-    // MARK: - Navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "Show Episodes" {
-            let episodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
-            if let index = tableView.indexPathForSelectedRow {
-                episodesTableViewController.selectedPodcastId = podcastsArray[index.row].objectID
-            }
-            episodesTableViewController.showAllEpisodes = false
-        } else if segue.identifier == "Show Playlist" {
-            let playlistViewController = segue.destinationViewController as! PlaylistViewController
-            if let index = tableView.indexPathForSelectedRow {
-                playlistViewController.playlist = playlists[index.row]
-            }
-        } else if segue.identifier == "Podcasts to Now Playing" {
-            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
-            mediaPlayerViewController.hidesBottomBarWhenPushed = true
-        }
-    }
-    
-    func reloadTable() {
-        tableView.reloadData()
-        refreshControl?.endRefreshing()
-    }
-
-    @IBAction func addPlaylistByURL(sender: AnyObject) {
-        showAddPlaylistByURLAlert()
-    }
-    
-    // This function runs once on app load, then runs in the background every 30 minutes.
-    // Check if a new episode is available for a subscribed podcast; if true, download that episode.
-    // TODO: shouldn't we check via push notifications? Rather than a timer that continuously runs in the background?
-    func startCheckSubscriptionsForNewEpisodesTimer() {
-        NSTimer.scheduledTimerWithTimeInterval(REFRESH_PODCAST_TIME, target: self, selector: #selector(PodcastsTableViewController.refreshAllData), userInfo: nil, repeats: true)
-    }
-    
-    func loadData() {
-        let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
-        self.managedObjectContext = coreDataHelper.managedObjectContext
-        self.podcastsArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:managedObjectContext) as! [Podcast]
-
         
-        self.podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
-
-        //TODO (Somewhere else, not in the view controller) Set pubdate in cell equal to most recent episode's pubdate
-//            for podcast in self.podcastsArray {
-//                let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-//                let mostRecentEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate, moc:moc) as! [Episode]
-//                if mostRecentEpisodeArray.count > 0 {
-//                    if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
-//                        podcast.lastPubDate = mostRecentEpisodePubDate
-//                    }
-//                }
-//            }
-        
-        
-        self.reloadTable()
-    }
-    
-    func segueToNowPlaying(sender: UIBarButtonItem) {
-        self.performSegueWithIdentifier("Podcasts to Now Playing", sender: nil)
     }
 }
 
@@ -395,14 +386,22 @@ extension PodcastsTableViewController: PVFeedParserDelegate {
             self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
         }
         else {
-            self.loadData()
+            self.reloadPodcastData()
         }
     }
 }
 
 extension PodcastsTableViewController:PlaylistManagerDelegate {
     func playlistAddedByUrl() {
-        self.reloadTable()
+        refreshPlaylists()
+    }
+    
+    func itemAddedToPlaylist() {
+        refreshPlaylists()
+    }
+    
+    func didSavePlaylist() {
+        refreshPlaylists()
     }
 }
 

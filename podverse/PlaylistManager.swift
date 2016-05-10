@@ -11,21 +11,14 @@ import CoreData
 
 protocol PlaylistManagerDelegate {
     func playlistAddedByUrl()
+    func itemAddedToPlaylist()
+    func didSavePlaylist()
 }
 
 final class PlaylistManager {
 
     static let sharedInstance = PlaylistManager()
-    
     var delegate:PlaylistManagerDelegate?
-    
-    var playlists:[Playlist] {
-        get {
-            
-            let moc = CoreDataHelper.sharedInstance.managedObjectContext
-            return CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc:moc) as! [Playlist]
-        }
-    }
     
     func addPlaylistByUrlString(urlString: String) {
         var urlComponentArray = urlString.componentsSeparatedByString("/")
@@ -43,9 +36,9 @@ final class PlaylistManager {
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
                     
                         let moc = CoreDataHelper.sharedInstance.backgroundContext
-                        let playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:moc)
-                        PlaylistManager.JSONToPlaylist(playlist, JSONDict: response)
-                        
+                        var playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:moc)
+                    playlist = PlaylistManager.JSONToPlaylist(playlist, JSONDict: response, moc:moc)
+                    
                         CoreDataHelper.saveCoreData(moc, completionBlock:{ (finished) in
                             dispatch_async(dispatch_get_main_queue()) {
                                 PlaylistManager.sharedInstance.delegate?.playlistAddedByUrl()
@@ -62,17 +55,16 @@ final class PlaylistManager {
     
     func refreshPlaylists(completion:()->Void) {
         let dispatchGroup = dispatch_group_create()
+        let managedObjectContext = CoreDataHelper.sharedInstance.backgroundContext
+        let playlists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: managedObjectContext) as! [Playlist]
         for playlist in playlists {
             if let playlistId = playlist.playlistId {
                 dispatch_group_enter(dispatchGroup)
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
-
-                    let moc = CoreDataHelper.sharedInstance.backgroundContext
-                    let playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:moc)
-                    PlaylistManager.JSONToPlaylist(playlist, JSONDict: response)
+                    var playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:managedObjectContext)
+                    playlist = PlaylistManager.JSONToPlaylist(playlist, JSONDict: response, moc: managedObjectContext)
                     
-                    CoreDataHelper.saveCoreData(moc, completionBlock:{ (finished) in
-                        PlaylistManager.sharedInstance.delegate?.playlistAddedByUrl()
+                    CoreDataHelper.saveCoreData(managedObjectContext, completionBlock:{ (finished) in
                         print("Playlist refreshed")
                         dispatch_group_leave(dispatchGroup)
                     })
@@ -88,8 +80,7 @@ final class PlaylistManager {
         }
     }
     
-    static func JSONToPlaylist(playlist:Playlist, JSONDict:Dictionary<String,AnyObject>) {
-        let moc = CoreDataHelper.sharedInstance.managedObjectContext
+    static func JSONToPlaylist(playlist:Playlist, JSONDict:Dictionary<String,AnyObject>, moc:NSManagedObjectContext) -> Playlist {
         if let title = JSONDict["playlistTitle"] as? String {
             playlist.title = title
         }
@@ -220,7 +211,7 @@ final class PlaylistManager {
             }
         }
         
-        CoreDataHelper.saveCoreData(moc, completionBlock:nil)
+        return playlist
     }
     
     func clipToPlaylistItemJSON(clip:Clip) -> Dictionary<String,AnyObject> {
@@ -273,7 +264,11 @@ final class PlaylistManager {
     func createDefaultPlaylists() {
         // If no playlists are saved, then create the "My Clips" and "My Episodes" playlists
         let moc = CoreDataHelper.sharedInstance.backgroundContext
-        if self.playlists.count < 1 {
+        let fetchRequest = NSFetchRequest()
+        let entityDescription = NSEntityDescription.entityForName("Playlist" as String, inManagedObjectContext: moc)
+        fetchRequest.entity = entityDescription
+        
+        if moc.countForFetchRequest(fetchRequest, error: nil) < 1 {
             let myEpisodesPlaylist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
             myEpisodesPlaylist.title = Constants.kMyEpisodesPlaylist
             self.savePlaylist(myEpisodesPlaylist, moc:moc)
@@ -287,7 +282,6 @@ final class PlaylistManager {
     func addItemToPlaylist(playlist: Playlist, clip: Clip?, episode: Episode?,  moc:NSManagedObjectContext?) {
         if let c = clip {
             playlist.addClipObject(c)
-            
         }
         
         if let e = episode  {
@@ -295,34 +289,38 @@ final class PlaylistManager {
         }
         
         SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
-            playlist.url = response["url"] as? String
-            
-            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                CoreDataHelper.saveCoreData(moc, completionBlock: nil)
-                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kItemAddedToPlaylistNotification, object: nil)
-            })
+            if let managedObjectContext = moc {
+                let playlist = CoreDataHelper.fetchEntityWithID(playlist.objectID, moc: managedObjectContext) as! Playlist
+                playlist.url = response["url"] as? String
+                CoreDataHelper.saveCoreData(managedObjectContext, completionBlock: { (saved) in
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kItemAddedToPlaylistNotification, object: nil)
+                        self.delegate?.itemAddedToPlaylist()
+                    })
+                })
+            }
         }) { (error) -> Void in
             print("Not saved to server. Error: ", error?.localizedDescription)
+            CoreDataHelper.saveCoreData(moc, completionBlock: nil)
         }.call()
     }
     
     func savePlaylist(playlist: Playlist, moc:NSManagedObjectContext) {
-        CoreDataHelper.saveCoreData(moc) { (saved) -> Void in
-            let playlist = playlist
-            SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
-                playlist.playlistId = response["_id"] as? String
-                playlist.url = response["url"] as? String
-                
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    CoreDataHelper.saveCoreData(moc, completionBlock: { (saved) -> Void in
-                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kRefreshAddToPlaylistTableDataNotification, object: nil)
+        let playlist = playlist
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
+            playlist.playlistId = response["_id"] as? String
+            playlist.url = response["url"] as? String
+            
+                CoreDataHelper.saveCoreData(moc, completionBlock: { (saved) -> Void in
+                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                        self.delegate?.didSavePlaylist()
                     })
+
                 })
-                
-            }) { (error) -> Void in
-                print("Not saved to server. Error: ", error?.localizedDescription)
-            }.call()
-        }
+            
+        }) { (error) -> Void in
+            print("Not saved to server. Error: ", error?.localizedDescription)
+        }.call()
     }
     
     

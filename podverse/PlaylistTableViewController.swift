@@ -21,15 +21,9 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         tableView.reloadData()
     }
     
-    func segueToNowPlaying(sender: UIBarButtonItem) {
-        performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
-    }
-    
-    func removePlayerNavButton(notification: NSNotification) {
-        dispatch_async(dispatch_get_main_queue()) {
-            self.loadData()
-            self.pvMediaPlayer.removePlayerNavButton(self)
-        }
+    func removePlayerNavButtonAndReload() {
+        self.removePlayerNavButton()
+        self.loadData()
     }
     
     func showPlaylistShare(sender: UIBarButtonItem) {
@@ -58,6 +52,8 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
                 playlistItems.append(episode)
             }
         }
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -77,19 +73,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
             navigationItem.rightBarButtonItem = shareBarButton
         }
         
-        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVMediaPlayer.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
-    }
-    
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-        NSNotificationCenter.defaultCenter().removeObserver(self, name: Constants.kPlayerHasNoItem, object: nil)
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        self.addPlayerNavButton()
     }
     
     // MARK: - Table view data source
@@ -181,12 +165,12 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
 
             if episode.fileName != nil {
                 playlistItemActions.addAction(UIAlertAction(title: "Play", style: .Default, handler: { action in
-                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode)
+                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode.objectID)
                     self.performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
                 }))
             } else {
                 playlistItemActions.addAction(UIAlertAction(title: "Stream", style: .Default, handler: { action in
-                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode)
+                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode.objectID)
                     self.performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
                 }))
             }
@@ -203,12 +187,12 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
             
             if clip.episode.fileName != nil {
                 playlistItemActions.addAction(UIAlertAction(title: "Play", style: .Default, handler: { action in
-                    self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip)
+                    self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip.objectID)
                     self.performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
                 }))
             } else {
                 playlistItemActions.addAction(UIAlertAction(title: "Stream", style: .Default, handler: { action in
-                    self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip)
+                    self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip.objectID)
                     self.performSegueWithIdentifier("Playlist to Now Playing", sender: nil)
                 }))
             }

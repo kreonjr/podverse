@@ -429,7 +429,7 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
             endMinuteTextField.resignFirstResponder()
             endSecTextField.resignFirstResponder()
             
-            destinationVC.episode = episode
+            destinationVC.episodeID = episode.objectID
             destinationVC.startTime = startTime
             destinationVC.endTime = endTime
         }

@@ -49,8 +49,12 @@ class PVUtility: NSObject {
         return NSNumber(integer: hoursMinutesSecondsToSeconds(hours, minutes: minutes, seconds: seconds))
     }
     
-    static func convertNSNumberToHHMMSSString (durationNSNumber : NSNumber) -> (String) {
-        let duration: Int = durationNSNumber.integerValue
+    static func convertNSNumberToHHMMSSString (durationNSNumber : NSNumber?) -> String {
+        guard let durationNumber = durationNSNumber else {
+            return ""
+        }
+        
+        let duration: Int = durationNumber.integerValue
         var hours = String(duration / 3600) + ":"
         if hours == "0:" {
             hours = ""

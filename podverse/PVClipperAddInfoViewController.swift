@@ -15,8 +15,10 @@ class PVClipperAddInfoViewController: UIViewController {
     var startTime:Int?
     var endTime:Int?
     var clip:Clip?
-    var episode:Episode!
+    var episodeID:NSManagedObjectID!
     var isEditingClip:Bool = false
+    var moc = CoreDataHelper.sharedInstance.managedObjectContext
+    var episode:Episode!
     
     @IBOutlet weak var clipTitleTextField: UITextField!
     
@@ -31,6 +33,7 @@ class PVClipperAddInfoViewController: UIViewController {
         self.navigationItem.leftBarButtonItem = backButton
         
         clipTitleTextField.text = clip?.title
+        episode = CoreDataHelper.fetchEntityWithID(episodeID, moc: moc) as! Episode
     }
     
     func popViewController() {
@@ -67,7 +70,6 @@ class PVClipperAddInfoViewController: UIViewController {
     }
     
     func saveClipWithTitle(clipTitle:String) {
-        let moc = CoreDataHelper.sharedInstance.managedObjectContext
         if clip == nil {
             clip = (CoreDataHelper.insertManagedObject("Clip", moc:moc) as! Clip)
             episode.addClipObject(clip!)
@@ -107,25 +109,29 @@ class PVClipperAddInfoViewController: UIViewController {
     }
     
     final private func saveClip(clip:Clip) {
-        let saveClipWS = SaveClipToServer(clip: clip, completionBlock: { (response) -> Void in
-            self.clip?.clipUrl = response["clipUri"] as? String
-
+        let saveClipWS = SaveClipToServer(clip: clip, completionBlock: {[weak self] (response) -> Void in
+            guard let strongSelf = self else {
+                return
+            }
+            
+            strongSelf.clip?.clipUrl = response["clipUri"] as? String
+            
+            CoreDataHelper.saveCoreData(strongSelf.moc, completionBlock:nil)
+            
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                
-                let alert = UIAlertController(title: "Clip saved with URL:", message: self.clip?.clipUrl, preferredStyle: .Alert)
+                let alert = UIAlertController(title: "Clip saved with URL:", message: strongSelf.clip?.clipUrl, preferredStyle: .Alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
                 alert.addAction(UIAlertAction(title: "Copy", style: .Default, handler: { (action) -> Void in
-                    UIPasteboard.generalPasteboard().string = self.clip?.clipUrl ?? ""
+                    UIPasteboard.generalPasteboard().string = strongSelf.clip?.clipUrl ?? ""
                 }))
-                self.presentViewController(alert, animated: true, completion: nil)
+                strongSelf.presentViewController(alert, animated: true, completion: nil)
                 
-                for playlist in PlaylistManager.sharedInstance.playlists {
+                let playlists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: strongSelf.moc) as! [Playlist]
+                for playlist in playlists {
                     if playlist.title == Constants.kMyClipsPlaylist {
-                        PlaylistManager.sharedInstance.addItemToPlaylist(playlist, clip: self.clip, episode: nil, moc:clip.managedObjectContext)
+                        PlaylistManager.sharedInstance.addItemToPlaylist(playlist, clip: strongSelf.clip, episode: nil, moc:strongSelf.moc)
                     }
                 }
-                
-                CoreDataHelper.saveCoreData(clip.managedObjectContext, completionBlock:nil)
             })
         }) { (error) -> Void in
             dispatch_async(dispatch_get_main_queue(), { () -> Void in

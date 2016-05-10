@@ -19,32 +19,33 @@ class DownloadsTableViewController: UITableViewController {
         }
     }
     
-    func segueToNowPlaying(sender: UIBarButtonItem) {
+    override func segueToNowPlaying(sender: UIBarButtonItem) {
         self.performSegueWithIdentifier("Downloads to Now Playing", sender: nil)
     }
     
     func reloadDownloadTable() {
-        dispatch_async(dispatch_get_main_queue()) {
-            self.tableView.reloadData()
-        }
+        self.tableView.reloadData()
     }
     
-    func removePlayerNavButton(notification: NSNotification) {
-        dispatch_async(dispatch_get_main_queue()) {
-            self.reloadDownloadTable()
-            PVMediaPlayer.sharedInstance.removePlayerNavButton(self)
-        }
+    func removePlayerButtonAndReload() {
+        self.reloadDownloadTable()
+        self.removePlayerNavButton()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.reloadDownloadData(_:)), name: Constants.kDownloadHasProgressed, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.reloadDownloadData(_:)), name: Constants.kDownloadHasFinished, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.pauseOrResumeDownloadData(_:)), name: Constants.kDownloadHasPausedOrResumed, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(reloadDownloadData(_:)), name: Constants.kDownloadHasProgressed, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(reloadDownloadData(_:)), name: Constants.kDownloadHasFinished, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(pauseOrResumeDownloadData(_:)), name: Constants.kDownloadHasPausedOrResumed, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.removePlayerNavButton(_:)), name: Constants.kPlayerHasNoItem, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(DownloadsTableViewController.reloadDownloadTable), name: Constants.kUpdateDownloadsTable, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(reloadDownloadTable), name: Constants.kUpdateDownloadsTable, object: nil)
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        self.addPlayerNavButton()
     }
     
     func reloadDownloadData(notification:NSNotification) {
@@ -82,16 +83,6 @@ class DownloadsTableViewController: UITableViewController {
                 }
             }
         }
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        PVMediaPlayer.sharedInstance.addPlayerNavButton(self)
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-        
     }
 
     // MARK: - Table view data source
