@@ -70,6 +70,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             NSUserDefaults.standardUserDefaults().setBool(true, forKey: "AppHasLaunchedOnce")
             PlaylistManager.sharedInstance.createDefaultPlaylists()
         }
+        
+        // Currently we are setting taskIdentifier values = nil on app launch. This wipes CoreData references to downloadingEpisodes that did not complete before the app was last closed or crashed.
+        let moc = CoreDataHelper.sharedInstance.managedObjectContext
+        let episodeArray = CoreDataHelper.fetchEntities("Episode", predicate: nil, moc: moc) as! [Episode]
+        for episode in episodeArray {
+            episode.taskIdentifier = nil
+        }
+        CoreDataHelper.saveCoreData(moc, completionBlock: nil)
                         
         Fabric.with([Crashlytics.self])
         return true

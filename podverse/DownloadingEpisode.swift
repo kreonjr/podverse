@@ -14,6 +14,7 @@ final class DownloadingEpisode:Equatable {
     var downloadComplete:Bool?
     var mediaURL: String?
     var imageData:NSData?
+    var taskResumeData:NSData?
     
     init(episode:Episode) {
         title = episode.title

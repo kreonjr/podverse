@@ -49,42 +49,34 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
     }
     
-    func pauseOrResumeDownloadingEpisode(episode: Episode) {
+    func pauseOrResumeDownloadingEpisode(episode: DownloadingEpisode) {
         // If the episode has already downloaded, then do nothing
         if (episode.downloadComplete == true) {
             episode.taskIdentifier = nil
         }
         // Else if the episode download is paused, then resume the download
-        else if episode.taskResumeData != nil {
-            if let downloadTaskResumeData = episode.taskResumeData {
-                let downloadTask = downloadSession.downloadTaskWithResumeData(downloadTaskResumeData)
-                episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
-                episode.taskResumeData = nil
-                
-                downloadTask.resume()
-            }
+        else if let downloadTaskResumeData = episode.taskResumeData {
+            let downloadTask = downloadSession.downloadTaskWithResumeData(downloadTaskResumeData)
+            episode.taskIdentifier = downloadTask.taskIdentifier
+            episode.taskResumeData = nil
+            downloadTask.resume()
+            self.postPauseOrResumeNotification(downloadTask.taskIdentifier, pauseOrResume: "Downloading")
         }
         // Else if the episode is currently downloading, then pause the download
         else if let taskIdentifier = episode.taskIdentifier {
             downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
                 for episodeDownloadTask in downloadTasks {
-                    if episodeDownloadTask.taskIdentifier == taskIdentifier.integerValue {
+                    if episodeDownloadTask.taskIdentifier == taskIdentifier {
                         episodeDownloadTask.cancelByProducingResumeData() {resumeData in
+                            self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Paused")
+                            episode.taskIdentifier = nil
                             if (resumeData != nil) {
-                                self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Paused")
-                                
                                 episode.taskResumeData = resumeData
-                                episode.taskIdentifier = nil
-                                CoreDataHelper.saveCoreData(episode.managedObjectContext, completionBlock:nil)
                             }
                         }
                     }
                 }
             }
-        }
-        // Else start or restart the download
-        else {
-          startDownloadingEpisode(episode)
         }
     }
     

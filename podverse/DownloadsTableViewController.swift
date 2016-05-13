@@ -139,26 +139,14 @@ class DownloadsTableViewController: UITableViewController {
     }
 
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let moc = CoreDataHelper.sharedInstance.managedObjectContext
-        
         let downloadingEpisode = DLEpisodesList.shared.downloadingEpisodes[indexPath.row]
         
-        guard let mediaUrl =  downloadingEpisode.mediaURL else {
+        guard downloadingEpisode.mediaURL != nil else {
             return
         }
         
-        let predicate = NSPredicate(format: "mediaURL == %@", mediaUrl)
-        guard let episode = CoreDataHelper.fetchEntities("Episode", predicate: predicate, moc: moc).first as? Episode else {
-            return
-        }
-        
-        startDownloadingEpisode(episode)
-    }
-    
-    private func startDownloadingEpisode(episode:Episode) {
         let downloader = PVDownloader()
-        downloader.moc = episode.managedObjectContext
-        downloader.pauseOrResumeDownloadingEpisode(episode)
+        downloader.pauseOrResumeDownloadingEpisode(downloadingEpisode)
     }
     
     /*
