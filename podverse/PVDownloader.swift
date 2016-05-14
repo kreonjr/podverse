@@ -115,6 +115,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             // Get the corresponding episode object by its taskIdentifier value
             if let episodeDownloadIndex = DLEpisodesList.shared.downloadingEpisodes.indexOf({$0.taskIdentifier == downloadTask.taskIdentifier}) {
                 let episode = DLEpisodesList.shared.downloadingEpisodes[episodeDownloadIndex]
+                episode.totalBytesWritten = Float(totalBytesWritten)
+                episode.totalBytesExpectedToWrite = Float(totalBytesExpectedToWrite)
                 
                 let downloadHasProgressedUserInfo:[NSObject:AnyObject] = ["mediaUrl":episode.mediaURL ?? "",
                     "totalBytes": Double(totalBytesExpectedToWrite),

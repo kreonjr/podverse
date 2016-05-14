@@ -120,16 +120,18 @@ class DownloadsTableViewController: UITableViewController {
         
         if downloadingEpisode.downloadComplete == true {
             cell.downloadStatus.text = "Finished"
+            cell.progress.progress = Float(1)
         }
         else if downloadingEpisode.taskIdentifier != nil {
             cell.downloadStatus.text = "Downloading"
+            cell.progress.progress = downloadingEpisode.progress
         }
         else {
             cell.downloadStatus.text = "Paused"
+            cell.progress.progress = downloadingEpisode.progress
         }
         
-        cell.progress.progress = Float(0)
-        cell.progressBytes.text = ""
+        cell.progressBytes.text = downloadingEpisode.formattedTotalBytesDownloaded
 
         return cell
     }
