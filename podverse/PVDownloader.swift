@@ -208,6 +208,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                         dispatch_async(dispatch_get_main_queue(), { () -> Void in
                             NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasFinished, object: self, userInfo: downloadHasFinishedUserInfo)
                             
+                            // TODO: When a download finishes and Podverse is in the background, two localnotifications show in the UI. Why are we receiving two instead of one, when only one notification is getting scheduled below?
                             let notification = UILocalNotification()
                             notification.applicationIconBadgeNumber = UIApplication.sharedApplication().applicationIconBadgeNumber + 1
                             notification.alertBody = podcastTitle + " - " + episodeTitle // text that will be displayed in the notification
@@ -223,6 +224,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
     }
     
+    // TODO: I don't really understand why we have URLSessionDidFinishEventsForBackgroundURLSession here. We don't need the notification since those are handled in didFinishDownloadingToURL. Maybe this can be removed...
     func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
         downloadSession.getTasksWithCompletionHandler {[weak self] (dataTasks, uploadTasks, downloadTasks) -> Void in
             guard let strongSelf = self else {
@@ -234,16 +236,16 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     
                     strongSelf.appDelegate.backgroundTransferCompletionHandler = nil
                     
-                    NSOperationQueue.mainQueue().addOperationWithBlock() {
-                        completionHandler?()
-                        
-                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                            let localNotification = UILocalNotification()
-                            localNotification.alertBody = "All files have been downloaded!"
-                            
-                            UIApplication.sharedApplication().presentLocalNotificationNow(localNotification)
-                        })
-                    }
+//                    NSOperationQueue.mainQueue().addOperationWithBlock() {
+//                        completionHandler?()
+//                        
+//                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
+//                            let localNotification = UILocalNotification()
+//                            localNotification.alertBody = "All files have been downloaded!"
+//                            
+//                            UIApplication.sharedApplication().presentLocalNotificationNow(localNotification)
+//                        })
+//                    }
                 }
             }
             
