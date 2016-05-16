@@ -51,42 +51,34 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
     }
     
-    func pauseOrResumeDownloadingEpisode(episode: Episode) {
+    func pauseOrResumeDownloadingEpisode(episode: DownloadingEpisode) {
         // If the episode has already downloaded, then do nothing
         if (episode.downloadComplete == true) {
             episode.taskIdentifier = nil
         }
         // Else if the episode download is paused, then resume the download
-        else if episode.taskResumeData != nil {
-            if let downloadTaskResumeData = episode.taskResumeData {
-                let downloadTask = downloadSession.downloadTaskWithResumeData(downloadTaskResumeData)
-                episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
-                episode.taskResumeData = nil
-                
-                downloadTask.resume()
-            }
+        else if let downloadTaskResumeData = episode.taskResumeData {
+            let downloadTask = downloadSession.downloadTaskWithResumeData(downloadTaskResumeData)
+            episode.taskIdentifier = downloadTask.taskIdentifier
+            episode.taskResumeData = nil
+            downloadTask.resume()
+            self.postPauseOrResumeNotification(downloadTask.taskIdentifier, pauseOrResume: "Downloading")
         }
         // Else if the episode is currently downloading, then pause the download
         else if let taskIdentifier = episode.taskIdentifier {
             downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
                 for episodeDownloadTask in downloadTasks {
-                    if episodeDownloadTask.taskIdentifier == taskIdentifier.integerValue {
+                    if episodeDownloadTask.taskIdentifier == taskIdentifier {
                         episodeDownloadTask.cancelByProducingResumeData() {resumeData in
+                            self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Paused")
+                            episode.taskIdentifier = nil
                             if (resumeData != nil) {
-                                self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Paused")
-                                
                                 episode.taskResumeData = resumeData
-                                episode.taskIdentifier = nil
-                                CoreDataHelper.saveCoreData(episode.managedObjectContext, completionBlock:nil)
                             }
                         }
                     }
                 }
             }
-        }
-        // Else start or restart the download
-        else {
-          startDownloadingEpisode(episode)
         }
     }
     
@@ -125,6 +117,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             // Get the corresponding episode object by its taskIdentifier value
             if let episodeDownloadIndex = DLEpisodesList.shared.downloadingEpisodes.indexOf({$0.taskIdentifier == downloadTask.taskIdentifier}) {
                 let episode = DLEpisodesList.shared.downloadingEpisodes[episodeDownloadIndex]
+                episode.totalBytesWritten = Float(totalBytesWritten)
+                episode.totalBytesExpectedToWrite = Float(totalBytesExpectedToWrite)
                 
                 let downloadHasProgressedUserInfo:[NSObject:AnyObject] = ["mediaUrl":episode.mediaURL ?? "",
                     "totalBytes": Double(totalBytesExpectedToWrite),
@@ -220,6 +214,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                             
                             NSNotificationCenter.defaultCenter().postNotificationName(Constants.kDownloadHasFinished, object: strongSelf, userInfo: downloadHasFinishedUserInfo)
                             
+                            // TODO: When a download finishes and Podverse is in the background, two localnotifications show in the UI. Why are we receiving two instead of one, when only one notification is getting scheduled below?
                             let notification = UILocalNotification()
                             notification.applicationIconBadgeNumber = UIApplication.sharedApplication().applicationIconBadgeNumber + 1
                             notification.alertBody = podcastTitle + " - " + episodeTitle // text that will be displayed in the notification
@@ -234,33 +229,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             } catch {
                 print(error)
             }
-        }
-    }
-    
-    func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
-        downloadSession.getTasksWithCompletionHandler {[weak self] (dataTasks, uploadTasks, downloadTasks) -> Void in
-            guard let strongSelf = self else {
-                return
-            }
-            if (downloadTasks.count == 0) {
-                if (strongSelf.appDelegate.backgroundTransferCompletionHandler != nil) {
-                    let completionHandler: (() -> Void)? = strongSelf.appDelegate.backgroundTransferCompletionHandler
-                    
-                    strongSelf.appDelegate.backgroundTransferCompletionHandler = nil
-                    
-                    NSOperationQueue.mainQueue().addOperationWithBlock() {
-                        completionHandler?()
-                        
-                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                            let localNotification = UILocalNotification()
-                            localNotification.alertBody = "All files have been downloaded!"
-                            
-                            UIApplication.sharedApplication().presentLocalNotificationNow(localNotification)
-                        })
-                    }
-                }
-            }
-            
         }
     }
     
