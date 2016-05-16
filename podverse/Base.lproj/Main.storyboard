@@ -126,7 +126,7 @@
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8 / 10" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.65000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="Vnu-69-YIj">
                                         <rect key="frame" x="38" y="10" width="43" height="21"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
@@ -627,7 +627,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Bpm-pc-Wru">
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Bpm-pc-Wru">
                                 <rect key="frame" x="20" y="110" width="90" height="90"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="90" id="PP9-uR-gKr"/>
@@ -664,109 +664,6 @@
                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HuG-Be-hwC" userLabel="Player Buttons">
-                                <rect key="frame" x="4" y="540" width="592" height="60"/>
-                                <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZGR-gy-QCk">
-                                        <rect key="frame" x="544" y="6" width="40" height="48"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="48" id="0Se-2s-oTJ"/>
-                                            <constraint firstAttribute="width" constant="40" id="x2s-zu-tli"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="18"/>
-                                        <state key="normal" title="">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="audio:" destination="jDs-me-457" eventType="touchUpInside" id="rMy-H8-2WM"/>
-                                        </connections>
-                                    </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XHR-DX-zSS">
-                                        <rect key="frame" x="8" y="6" width="40" height="48"/>
-                                        <constraints>
-                                            <constraint firstAttribute="width" constant="40" id="4H3-u7-Jzy"/>
-                                            <constraint firstAttribute="height" constant="48" id="EER-h3-p85"/>
-                                        </constraints>
-                                        <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="18"/>
-                                        <state key="normal" title="">
-                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="speed:" destination="jDs-me-457" eventType="touchUpInside" id="kD8-US-hQd"/>
-                                        </connections>
-                                    </button>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DgW-MT-GBg">
-                                        <rect key="frame" x="198" y="6" width="196" height="48"/>
-                                        <subviews>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ONH-ZH-K7A">
-                                                <rect key="frame" x="136" y="0.0" width="60" height="48"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="60" id="UfJ-Hg-W1a"/>
-                                                    <constraint firstAttribute="height" constant="48" id="bn1-9B-2OT"/>
-                                                </constraints>
-                                                <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="18"/>
-                                                <state key="normal" title="">
-                                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                </state>
-                                                <connections>
-                                                    <action selector="skip:" destination="jDs-me-457" eventType="touchUpInside" id="lip-be-nOO"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j4a-e6-r4k">
-                                                <rect key="frame" x="68" y="0.0" width="60" height="48"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="60" id="F7s-VF-XHj"/>
-                                                    <constraint firstAttribute="height" constant="48" id="uOx-SK-Y3z"/>
-                                                </constraints>
-                                                <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="18"/>
-                                                <state key="normal" title="">
-                                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                </state>
-                                                <connections>
-                                                    <action selector="playPause:" destination="jDs-me-457" eventType="touchUpInside" id="uI7-qH-3Mg"/>
-                                                </connections>
-                                            </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Lv-Ej-qy8">
-                                                <rect key="frame" x="0.0" y="0.0" width="60" height="48"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="7Qm-yy-c87"/>
-                                                    <constraint firstAttribute="width" constant="60" id="8gV-3N-X0I"/>
-                                                    <constraint firstAttribute="height" constant="48" id="Czp-bt-2iV"/>
-                                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="48" id="i1i-jd-MAT"/>
-                                                </constraints>
-                                                <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="18"/>
-                                                <state key="normal" title="">
-                                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                                </state>
-                                                <connections>
-                                                    <action selector="previous:" destination="jDs-me-457" eventType="touchUpInside" id="H3l-zu-Jlw"/>
-                                                </connections>
-                                            </button>
-                                        </subviews>
-                                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                        <constraints>
-                                            <constraint firstItem="j4a-e6-r4k" firstAttribute="leading" secondItem="6Lv-Ej-qy8" secondAttribute="trailing" constant="8" id="2c4-fX-ien"/>
-                                            <constraint firstItem="ONH-ZH-K7A" firstAttribute="top" secondItem="DgW-MT-GBg" secondAttribute="top" id="3oi-dT-K8H"/>
-                                            <constraint firstItem="ONH-ZH-K7A" firstAttribute="leading" secondItem="j4a-e6-r4k" secondAttribute="trailing" constant="8" id="Agu-lS-whu"/>
-                                            <constraint firstItem="6Lv-Ej-qy8" firstAttribute="top" secondItem="DgW-MT-GBg" secondAttribute="top" id="Mhf-kJ-NXZ"/>
-                                            <constraint firstAttribute="height" constant="48" id="YvV-kj-IhV"/>
-                                            <constraint firstItem="j4a-e6-r4k" firstAttribute="top" secondItem="DgW-MT-GBg" secondAttribute="top" id="nFv-i4-gRF"/>
-                                            <constraint firstAttribute="width" constant="196" id="pGB-qk-fhf"/>
-                                            <constraint firstItem="j4a-e6-r4k" firstAttribute="centerX" secondItem="DgW-MT-GBg" secondAttribute="centerX" id="vh0-K9-KC3"/>
-                                        </constraints>
-                                    </view>
-                                </subviews>
-                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
-                                <constraints>
-                                    <constraint firstItem="DgW-MT-GBg" firstAttribute="top" secondItem="HuG-Be-hwC" secondAttribute="top" constant="6" id="7Jj-8v-dtd"/>
-                                    <constraint firstAttribute="trailing" secondItem="ZGR-gy-QCk" secondAttribute="trailing" constant="8" id="VM4-rF-hl6"/>
-                                    <constraint firstItem="ZGR-gy-QCk" firstAttribute="top" secondItem="HuG-Be-hwC" secondAttribute="top" constant="6" id="Z7x-qs-pR0"/>
-                                    <constraint firstItem="DgW-MT-GBg" firstAttribute="centerX" secondItem="HuG-Be-hwC" secondAttribute="centerX" id="c3X-cd-hW4"/>
-                                    <constraint firstItem="XHR-DX-zSS" firstAttribute="top" secondItem="HuG-Be-hwC" secondAttribute="top" constant="6" id="kA3-f4-xcB"/>
-                                    <constraint firstItem="XHR-DX-zSS" firstAttribute="leading" secondItem="HuG-Be-hwC" secondAttribute="leading" constant="8" id="lge-bA-qdl"/>
-                                    <constraint firstAttribute="height" constant="60" id="zPc-0C-LBW"/>
-                                </constraints>
-                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Q0k-LP-hIb" userLabel="Time Skip View">
                                 <rect key="frame" x="168" y="503" width="264" height="40"/>
                                 <subviews>
@@ -871,6 +768,119 @@
                                     <segue destination="bYg-qw-sLf" kind="embed" identifier="show_clip_maker" id="Rg6-zu-quq"/>
                                 </connections>
                             </containerView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="HuG-Be-hwC" userLabel="Player Buttons">
+                                <rect key="frame" x="4" y="540" width="592" height="60"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZGR-gy-QCk">
+                                        <rect key="frame" x="544" y="6" width="40" height="48"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="48" id="0Se-2s-oTJ"/>
+                                            <constraint firstAttribute="width" constant="40" id="x2s-zu-tli"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="18"/>
+                                        <state key="normal" title="">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="audio:" destination="jDs-me-457" eventType="touchUpInside" id="rMy-H8-2WM"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XHR-DX-zSS">
+                                        <rect key="frame" x="8" y="6" width="40" height="48"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="40" id="4H3-u7-Jzy"/>
+                                            <constraint firstAttribute="height" constant="48" id="EER-h3-p85"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="18"/>
+                                        <state key="normal" title="">
+                                            <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="speed:" destination="jDs-me-457" eventType="touchUpInside" id="kD8-US-hQd"/>
+                                        </connections>
+                                    </button>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DgW-MT-GBg">
+                                        <rect key="frame" x="198" y="6" width="196" height="48"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ONH-ZH-K7A">
+                                                <rect key="frame" x="136" y="0.0" width="60" height="48"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="60" id="UfJ-Hg-W1a"/>
+                                                    <constraint firstAttribute="height" constant="48" id="bn1-9B-2OT"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="18"/>
+                                                <state key="normal" title="">
+                                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="skip:" destination="jDs-me-457" eventType="touchUpInside" id="lip-be-nOO"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j4a-e6-r4k">
+                                                <rect key="frame" x="68" y="0.0" width="60" height="48"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="60" id="F7s-VF-XHj"/>
+                                                    <constraint firstAttribute="height" constant="48" id="uOx-SK-Y3z"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="18"/>
+                                                <state key="normal" title="">
+                                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="playPause:" destination="jDs-me-457" eventType="touchUpInside" id="uI7-qH-3Mg"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6Lv-Ej-qy8">
+                                                <rect key="frame" x="0.0" y="0.0" width="60" height="48"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="60" id="7Qm-yy-c87"/>
+                                                    <constraint firstAttribute="width" constant="60" id="8gV-3N-X0I"/>
+                                                    <constraint firstAttribute="height" constant="48" id="Czp-bt-2iV"/>
+                                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="48" id="i1i-jd-MAT"/>
+                                                </constraints>
+                                                <fontDescription key="fontDescription" name="FontAwesome" family="FontAwesome" pointSize="18"/>
+                                                <state key="normal" title="">
+                                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="previous:" destination="jDs-me-457" eventType="touchUpInside" id="H3l-zu-Jlw"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <constraints>
+                                            <constraint firstItem="j4a-e6-r4k" firstAttribute="leading" secondItem="6Lv-Ej-qy8" secondAttribute="trailing" constant="8" id="2c4-fX-ien"/>
+                                            <constraint firstItem="ONH-ZH-K7A" firstAttribute="top" secondItem="DgW-MT-GBg" secondAttribute="top" id="3oi-dT-K8H"/>
+                                            <constraint firstItem="ONH-ZH-K7A" firstAttribute="leading" secondItem="j4a-e6-r4k" secondAttribute="trailing" constant="8" id="Agu-lS-whu"/>
+                                            <constraint firstItem="6Lv-Ej-qy8" firstAttribute="top" secondItem="DgW-MT-GBg" secondAttribute="top" id="Mhf-kJ-NXZ"/>
+                                            <constraint firstAttribute="height" constant="48" id="YvV-kj-IhV"/>
+                                            <constraint firstItem="j4a-e6-r4k" firstAttribute="top" secondItem="DgW-MT-GBg" secondAttribute="top" id="nFv-i4-gRF"/>
+                                            <constraint firstAttribute="width" constant="196" id="pGB-qk-fhf"/>
+                                            <constraint firstItem="j4a-e6-r4k" firstAttribute="centerX" secondItem="DgW-MT-GBg" secondAttribute="centerX" id="vh0-K9-KC3"/>
+                                        </constraints>
+                                    </view>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="X 2.5" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.59999999999999998" translatesAutoresizingMaskIntoConstraints="NO" id="A1G-kQ-6sS">
+                                        <rect key="frame" x="48" y="6" width="36" height="48"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="DgW-MT-GBg" firstAttribute="top" secondItem="HuG-Be-hwC" secondAttribute="top" constant="6" id="7Jj-8v-dtd"/>
+                                    <constraint firstItem="6Lv-Ej-qy8" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="A1G-kQ-6sS" secondAttribute="trailing" constant="5" id="9Ip-oJ-hnC"/>
+                                    <constraint firstItem="A1G-kQ-6sS" firstAttribute="top" secondItem="XHR-DX-zSS" secondAttribute="top" id="LyZ-Wn-mQj"/>
+                                    <constraint firstAttribute="trailing" secondItem="ZGR-gy-QCk" secondAttribute="trailing" constant="8" id="VM4-rF-hl6"/>
+                                    <constraint firstItem="ZGR-gy-QCk" firstAttribute="top" secondItem="HuG-Be-hwC" secondAttribute="top" constant="6" id="Z7x-qs-pR0"/>
+                                    <constraint firstItem="DgW-MT-GBg" firstAttribute="centerX" secondItem="HuG-Be-hwC" secondAttribute="centerX" id="c3X-cd-hW4"/>
+                                    <constraint firstItem="XHR-DX-zSS" firstAttribute="top" secondItem="HuG-Be-hwC" secondAttribute="top" constant="6" id="kA3-f4-xcB"/>
+                                    <constraint firstItem="XHR-DX-zSS" firstAttribute="leading" secondItem="HuG-Be-hwC" secondAttribute="leading" constant="8" id="lge-bA-qdl"/>
+                                    <constraint firstItem="A1G-kQ-6sS" firstAttribute="leading" secondItem="XHR-DX-zSS" secondAttribute="trailing" id="mUU-qg-iXW"/>
+                                    <constraint firstItem="A1G-kQ-6sS" firstAttribute="bottom" secondItem="XHR-DX-zSS" secondAttribute="bottom" id="ufs-Zr-eqB"/>
+                                    <constraint firstAttribute="height" constant="60" id="zPc-0C-LBW"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
@@ -915,6 +925,7 @@
                         <outlet property="previousButton" destination="6Lv-Ej-qy8" id="sNq-j7-Eo1"/>
                         <outlet property="skipButton" destination="ONH-ZH-K7A" id="ORQ-0P-aS2"/>
                         <outlet property="speedButton" destination="XHR-DX-zSS" id="Zgy-pu-AaN"/>
+                        <outlet property="speedLabel" destination="A1G-kQ-6sS" id="YMG-aa-5sb"/>
                         <outlet property="summary" destination="b3j-as-jbT" id="GJ5-fO-Rs0"/>
                         <outlet property="totalTime" destination="3Ny-HB-6Yl" id="nDY-pm-xbY"/>
                         <segue destination="Qjc-8A-PaB" kind="show" identifier="Add to Playlist" id="VIJ-x5-VAD"/>

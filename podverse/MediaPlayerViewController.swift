@@ -10,6 +10,56 @@ import UIKit
 import CoreData
 import AVFoundation
 
+enum PlayingSpeed {
+    case Quarter, Half, ThreeQuarts, Regular, TimeAndQuarter, TimeAndHalf, Double, DoubleAndHalf
+    
+    var speedText:String {
+        get {
+            switch self {
+                case .Quarter:
+                    return "X .25"
+                case .Half:
+                    return "X .5"
+                case .ThreeQuarts:
+                    return "X .75"
+                case .Regular:
+                    return ""
+                case .TimeAndQuarter:
+                    return "X 1.25"
+                case .TimeAndHalf:
+                    return "X 1.5"
+                case .Double:
+                    return "X 2"
+                case .DoubleAndHalf:
+                    return "X 2.5"
+            }
+        }
+    }
+    
+    var speedVaue:Float {
+        get {
+            switch self {
+            case .Quarter:
+                return 0.25
+            case .Half:
+                return 0.5
+            case .ThreeQuarts:
+                return 0.75
+            case .Regular:
+                return 1
+            case .TimeAndQuarter:
+                return 1.25
+            case .TimeAndHalf:
+                return 1.5
+            case .Double:
+                return 2
+            case .DoubleAndHalf:
+                return 2.5
+            }
+        }
+    }
+}
+
 class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     let makeClipString = "Make Clip"
@@ -23,6 +73,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
     
     var nowPlayingCurrentTimeTimer: NSTimer!
+    var playerSpeedRate:PlayingSpeed = .Regular
     
     @IBOutlet weak var mediaPlayerImage: UIImageView!
     @IBOutlet weak var podcastTitle: UILabel!
@@ -41,6 +92,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     @IBOutlet weak var makeClipContainerView: UIView!
     
+    @IBOutlet weak var speedLabel: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -103,9 +155,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
             totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(pvMediaPlayer.nowPlayingEpisode.duration)
         }
         
-        // TODO: wtf? Why do I have to set scrollEnabled = to false and then true? If I do not, then the summary UITextView has extra black space on the bottom, and the UITextView is not scrollable.
-        summary?.scrollEnabled = false
-        summary?.scrollEnabled = true
         if let episodeSummary = pvMediaPlayer.nowPlayingEpisode.summary {
             summary?.text = PVUtility.removeHTMLFromString(episodeSummary)
         }
@@ -114,6 +163,11 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         }
         
         setPlayPauseIcon()
+        updateSpeedLabel()
+    }
+    
+    private func updateSpeedLabel() {
+        self.speedLabel.text = playerSpeedRate.speedText
     }
     
     func dismissKeyboard (){
@@ -158,25 +212,35 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     @IBAction func speed(sender: AnyObject) {
         // TODO: update the Speed icon when rate is changed
         
-        let player = pvMediaPlayer.avPlayer
-        switch player.rate {
-        case 1.0:
-            player.rate = 1.25
-        case 1.25:
-            player.rate = 1.5
-        case 1.5:
-            player.rate = 2.0
-        case 2.0:
-            player.rate = 2.5
-        case 2.5:
-            player.rate = 0.75
-        case 0.75:
-            player.rate = 0.5
-        case 0.5:
-            player.rate = 1.0
-        default:
-            player.rate = 1.0
+        switch playerSpeedRate {
+            case .Regular:
+                playerSpeedRate = .TimeAndQuarter
+                break
+            case .TimeAndQuarter:
+                playerSpeedRate = .TimeAndHalf
+                break
+            case .TimeAndHalf:
+                playerSpeedRate = .Double
+                break
+            case .Double:
+                playerSpeedRate = .DoubleAndHalf
+                break
+            case .DoubleAndHalf:
+                playerSpeedRate = .Quarter
+                break
+            case .Quarter:
+                playerSpeedRate = .Half
+                break
+            case .Half:
+                playerSpeedRate = .ThreeQuarts
+                break
+            case .ThreeQuarts:
+                playerSpeedRate = .Regular
+                break
         }
+        
+        pvMediaPlayer.avPlayer.rate = playerSpeedRate.speedVaue
+        updateSpeedLabel()
     }
     
     @IBAction func audio(sender: AnyObject) {

@@ -42,7 +42,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(17.0)]
         
         // Alert the user to enable background notifications
-        // TODO: Shouldn't this be moved to somewhere like the AppDelegate?
         let registerUserNotificationSettings = UIApplication.instancesRespondToSelector(#selector(UIApplication.registerUserNotificationSettings(_:)))
         if registerUserNotificationSettings {
             let types: UIUserNotificationType = [.Alert , .Sound]
