@@ -302,7 +302,7 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
                 cell.pvImage?.image = itunesImage
             }
             else {
-                cell.pvImage?.image = UIImage(named: "Blank52")
+                cell.pvImage?.image = UIImage(named: "PodverseIcon")
             }
         } else {
             let playlist = playlists[indexPath.row]
@@ -314,7 +314,7 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
             
             cell.totalClips?.text = "\(playlist.allItems.count) items"
             
-            cell.pvImage?.image = UIImage(named: "Blank52")
+            cell.pvImage?.image = UIImage(named: "PodverseIcon")
 
             for item in playlist.allItems {
                 if let episode = item as? Episode {

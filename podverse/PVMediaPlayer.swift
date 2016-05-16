@@ -167,7 +167,7 @@ class PVMediaPlayer {
                 let podcastImage = UIImage(data: podcastImageData)
                 mpImage = MPMediaItemArtwork(image: podcastImage!)
             } else {
-                mpImage = MPMediaItemArtwork(image: UIImage(named: "AppIcon")!)
+                mpImage = MPMediaItemArtwork(image: UIImage(named: "PodverseIcon")!)
             }
             
             if let playbackDuration = nowPlayingEpisode.duration {
