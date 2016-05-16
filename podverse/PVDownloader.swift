@@ -224,34 +224,6 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         }
     }
     
-    // TODO: I don't really understand why we have URLSessionDidFinishEventsForBackgroundURLSession here. We don't need the notification since those are handled in didFinishDownloadingToURL. Maybe this can be removed...
-    func URLSessionDidFinishEventsForBackgroundURLSession(session: NSURLSession) {
-        downloadSession.getTasksWithCompletionHandler {[weak self] (dataTasks, uploadTasks, downloadTasks) -> Void in
-            guard let strongSelf = self else {
-                return
-            }
-            if (downloadTasks.count == 0) {
-                if (strongSelf.appDelegate.backgroundTransferCompletionHandler != nil) {
-                    let completionHandler: (() -> Void)? = strongSelf.appDelegate.backgroundTransferCompletionHandler
-                    
-                    strongSelf.appDelegate.backgroundTransferCompletionHandler = nil
-                    
-//                    NSOperationQueue.mainQueue().addOperationWithBlock() {
-//                        completionHandler?()
-//                        
-//                        dispatch_async(dispatch_get_main_queue(), { () -> Void in
-//                            let localNotification = UILocalNotification()
-//                            localNotification.alertBody = "All files have been downloaded!"
-//                            
-//                            UIApplication.sharedApplication().presentLocalNotificationNow(localNotification)
-//                        })
-//                    }
-                }
-            }
-            
-        }
-    }
-    
     func executeIfBackground(synchronousFunction: () -> ()) {
         
     }
