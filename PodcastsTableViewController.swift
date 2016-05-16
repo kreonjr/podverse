@@ -106,7 +106,7 @@ class PodcastsTableViewController: UIViewController {
         if let unsubscribedPodcastInfo = notification.userInfo {
             for(index, podcast) in self.podcastsArray.enumerate() {
                 if podcast.feedURL == unsubscribedPodcastInfo["feedURL"] as? String {
-                    //TODO: Any additional view controllers pushed on this nav stack need to be checked and popped
+                    //ATTENTION NOTE: Any additional view controllers pushed on this nav stack need to be checked and popped
                     if let topVC = self.navigationController?.topViewController as? EpisodesTableViewController where topVC.selectedPodcast.feedURL == podcast.feedURL {
                         self.navigationController?.popToRootViewControllerAnimated(false)
                     }
@@ -215,17 +215,13 @@ class PodcastsTableViewController: UIViewController {
         
         self.podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
 
-        //TODO (Somewhere else, not in the view controller) Set pubdate in cell equal to most recent episode's pubdate
-            for podcast in self.podcastsArray {
-                let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
-                let mostRecentEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate, moc:managedObjectContext) as! [Episode]
-                if mostRecentEpisodeArray.count > 0 {
-                    if let mostRecentEpisodePubDate = mostRecentEpisodeArray[0].pubDate {
-                        podcast.lastPubDate = mostRecentEpisodePubDate
-                    }
-                }
+        for podcast in self.podcastsArray {
+            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+            let mostRecentEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate, moc:managedObjectContext) as! [Episode]
+            if let mostRecentEpisodePubDate = mostRecentEpisodeArray.first?.pubDate {
+                podcast.lastPubDate = mostRecentEpisodePubDate
             }
-        
+        }
         
         self.tableView.reloadData()
     }
@@ -292,8 +288,7 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
             let episodesDownloaded = episodes.filter{ $0.fileName != nil }
             cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
             
-            //TODO: Calculate all clips in podcast
-            cell.totalClips?.text = "\(0) clips"
+            cell.totalClips?.text = "\(podcast.totalClips) clips"
             
             cell.lastPublishedDate?.text = ""
             if let lastPubDate = podcast.lastPubDate {
