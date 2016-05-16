@@ -10,56 +10,6 @@ import UIKit
 import CoreData
 import AVFoundation
 
-enum PlayingSpeed {
-    case Quarter, Half, ThreeQuarts, Regular, TimeAndQuarter, TimeAndHalf, Double, DoubleAndHalf
-    
-    var speedText:String {
-        get {
-            switch self {
-                case .Quarter:
-                    return "X .25"
-                case .Half:
-                    return "X .5"
-                case .ThreeQuarts:
-                    return "X .75"
-                case .Regular:
-                    return ""
-                case .TimeAndQuarter:
-                    return "X 1.25"
-                case .TimeAndHalf:
-                    return "X 1.5"
-                case .Double:
-                    return "X 2"
-                case .DoubleAndHalf:
-                    return "X 2.5"
-            }
-        }
-    }
-    
-    var speedVaue:Float {
-        get {
-            switch self {
-            case .Quarter:
-                return 0.25
-            case .Half:
-                return 0.5
-            case .ThreeQuarts:
-                return 0.75
-            case .Regular:
-                return 1
-            case .TimeAndQuarter:
-                return 1.25
-            case .TimeAndHalf:
-                return 1.5
-            case .Double:
-                return 2
-            case .DoubleAndHalf:
-                return 2.5
-            }
-        }
-    }
-}
-
 class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     let makeClipString = "Make Clip"
