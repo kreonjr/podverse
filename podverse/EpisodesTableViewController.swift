@@ -97,9 +97,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(selectedEpisode.objectID)
                 self.performSegueWithIdentifier("Episodes to Now Playing", sender: nil)
             } else {
-                let downloader = PVDownloader()
-                downloader.moc = selectedEpisode.managedObjectContext
-                downloader.startDownloadingEpisode(selectedEpisode)
+                PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
                 cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
             }
         }
@@ -245,9 +243,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                     episodeActions.addAction(UIAlertAction(title: "Downloading Episode", style: .Default, handler: nil))
                 } else {
                     episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
-                        let downloader = PVDownloader()
-                        downloader.moc = selectedEpisode.managedObjectContext
-                        downloader.startDownloadingEpisode(selectedEpisode)
+                         PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
                         let cell = tableView.cellForRowAtIndexPath(indexPath) as! EpisodesTableCell
                         cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
                     }))

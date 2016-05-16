@@ -16,6 +16,8 @@ struct Constants {
     
     static let kDownloadHasPausedOrResumed = "downloadHasPausedOrResumed"
     
+    static let kUnsubscribeFromPodcast = "unsubscribeFromPodcast"
+    
     static let kUpdateDownloadsTable = "updateDownloadTable"
 
     static let kNowPlayingTimeHasChanged = "nowPlayingTimeHasChanged"

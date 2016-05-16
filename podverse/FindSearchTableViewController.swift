@@ -195,7 +195,14 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
             searchResultPodcastActions.addAction(UIAlertAction(title: "Unsubscribe", style: .Default, handler: { action in
                 if let podcasts = CoreDataHelper.fetchEntities("Podcast", predicate: nil, moc:self.moc) as? [Podcast] {
                     if let index = podcasts.indexOf({ $0.feedURL == iTunesSearchPodcast.feedURL }) {
-                        PVSubscriber.unsubscribeFromPodcast(podcasts[index])
+                        
+                        let unsubscribedPodcastUserInfo:[NSObject:AnyObject] = ["feedURL":iTunesSearchPodcast.feedURL ?? ""]
+
+                        PVSubscriber.unsubscribeFromPodcast(podcasts[index].objectID, completionBlock: {
+                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kUnsubscribeFromPodcast, object: self, userInfo: unsubscribedPodcastUserInfo)
+                            })
+                        })
                     }
                 }
             }))
@@ -214,6 +221,8 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         }))
         
         searchResultPodcastActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        
+        dispatch_async(dispatch_get_main_queue(), {})
         
         self.presentViewController(searchResultPodcastActions, animated: false, completion: nil)
     }

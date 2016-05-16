@@ -157,9 +157,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
                 }
                 
                 if strongSelf.shouldDownloadMostRecentEpisode == true {
-                    let downloader = PVDownloader()
-                    downloader.moc = strongSelf.moc
-                    downloader.startDownloadingEpisode(newEpisode)
+                    PVDownloader.sharedInstance.startDownloadingEpisode(newEpisode)
                     strongSelf.shouldDownloadMostRecentEpisode = false
                 }
                 
@@ -234,9 +232,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             if latestEpisodeArray.count > 0 {
                 if let latestEpisode = latestEpisodeArray[0] as? Episode {
                     if latestEpisode.downloadComplete != true {
-                        let downloader = PVDownloader()
-                        downloader.moc = self.moc
-                        downloader.startDownloadingEpisode(latestEpisode)
+                        PVDownloader.sharedInstance.startDownloadingEpisode(latestEpisode)
                     }
                 }
             }
