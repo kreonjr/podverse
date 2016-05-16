@@ -185,7 +185,7 @@ class PodcastsTableViewController: UIViewController {
             if let index = tableView.indexPathForSelectedRow {
                 playlistViewController.playlistObjectId = playlists[index.row].objectID
             }
-        } else if segue.identifier == "To Now Playing" {
+        } else if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }

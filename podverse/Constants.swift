@@ -48,4 +48,6 @@ struct Constants {
             }
         }
     }
+    
+    static let TO_PLAYER_SEGUE_ID = "To Now Playing"
 }

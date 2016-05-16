@@ -54,7 +54,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         
         if pvMediaPlayer.nowPlayingEpisode != nil || pvMediaPlayer.nowPlayingClip != nil {
             let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: #selector(PlaylistViewController.showPlaylistShare(_:)))
-            let playerBarButton = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: #selector(PlaylistViewController.segueToNowPlaying(_:)))
+            let playerBarButton = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: #selector(PlaylistViewController.segueToNowPlaying))
             navigationItem.rightBarButtonItems = [playerBarButton, shareBarButton]
         } else {
             let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: #selector(PlaylistViewController.showPlaylistShare(_:)))
@@ -173,12 +173,12 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
             if episode.fileName != nil {
                 playlistItemActions.addAction(UIAlertAction(title: "Play", style: .Default, handler: { action in
                 self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode.objectID)
-                    self.performSegueWithIdentifier("To Now Playing", sender: nil)
+                    self.segueToNowPlaying()
                 }))
             } else {
                 playlistItemActions.addAction(UIAlertAction(title: "Stream", style: .Default, handler: { action in
                 self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode.objectID)
-                    self.performSegueWithIdentifier("To Now Playing", sender: nil)
+                    self.segueToNowPlaying()
                 }))
             }
             
@@ -195,12 +195,12 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
             if clip.episode.fileName != nil {
                 playlistItemActions.addAction(UIAlertAction(title: "Play", style: .Default, handler: { action in
                     self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip.objectID)
-                    self.performSegueWithIdentifier("To Now Playing", sender: nil)
+                    self.segueToNowPlaying()
                 }))
             } else {
                 playlistItemActions.addAction(UIAlertAction(title: "Stream", style: .Default, handler: { action in
                     self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip.objectID)
-                    self.performSegueWithIdentifier("To Now Playing", sender: nil)
+                    self.segueToNowPlaying()
                 }))
             }
             
@@ -253,7 +253,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     
     // MARK: - Navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "To Now Playing" {
+        if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }

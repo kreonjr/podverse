@@ -233,7 +233,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                 podcastProfileViewController.searchResultPodcast = iTunesSearchPodcastArray[index.row]
             }
         }
-        else if segue.identifier == "To Now Playing" {
+        else if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }

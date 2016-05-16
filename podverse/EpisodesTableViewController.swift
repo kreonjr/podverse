@@ -91,7 +91,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                     pvMediaPlayer.saveCurrentTimeAsPlaybackPosition()
                 }
                 pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(selectedEpisode.objectID)
-                self.performSegueWithIdentifier("To Now Playing", sender: nil)
+                self.segueToNowPlaying()
             } else {
                 PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
                 cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
@@ -232,7 +232,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             if selectedEpisode.fileName != nil {
                 episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
                     self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(selectedEpisode.objectID)
-                    self.performSegueWithIdentifier("To Now Playing", sender: nil)
+                    self.segueToNowPlaying()
                 }))
             } else {
                 if selectedEpisode.taskIdentifier != nil {
@@ -255,7 +255,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             
             episodeActions.addAction(UIAlertAction (title: "Stream Episode", style: .Default, handler: { action in
                 self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(selectedEpisode.objectID)
-                self.performSegueWithIdentifier("To Now Playing", sender: nil)
+                self.segueToNowPlaying()
             }))
             
             episodeActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
@@ -313,7 +313,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "To Now Playing" {
+        if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         } else if segue.identifier == "Show Clips" {

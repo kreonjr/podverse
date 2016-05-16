@@ -112,7 +112,7 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let selectedClip = clipsArray[indexPath.row]
         self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(selectedClip.objectID)
-        self.performSegueWithIdentifier("To Now Playing", sender: nil)
+        self.segueToNowPlaying()
     }
 
 
@@ -155,7 +155,7 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "To Now Playing" {
+        if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
