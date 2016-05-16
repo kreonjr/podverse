@@ -27,7 +27,7 @@ extension UIViewController {
     }
     
     func segueToNowPlaying(sender: UIBarButtonItem) {
-        self.performSegueWithIdentifier("Find to Now Playing", sender: nil)
+        self.performSegueWithIdentifier("To Now Playing", sender: nil)
     }
 }
 

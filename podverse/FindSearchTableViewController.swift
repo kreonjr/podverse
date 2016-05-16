@@ -124,10 +124,6 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         }
     }
     
-    override func segueToNowPlaying(sender: UIBarButtonItem) {
-        self.performSegueWithIdentifier("Find Search to Now Playing", sender: nil)
-    }
-    
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         searchItunesFor(searchBar.text!)
         searchBar.resignFirstResponder()
@@ -237,7 +233,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                 podcastProfileViewController.searchResultPodcast = iTunesSearchPodcastArray[index.row]
             }
         }
-        else if segue.identifier == "Find Search to Now Playing" {
+        else if segue.identifier == "To Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }

@@ -183,9 +183,9 @@ class PodcastsTableViewController: UIViewController {
         } else if segue.identifier == "Show Playlist" {
             let playlistViewController = segue.destinationViewController as! PlaylistViewController
             if let index = tableView.indexPathForSelectedRow {
-                playlistViewController.playlist = playlists[index.row]
+                playlistViewController.playlistObjectId = playlists[index.row].objectID
             }
-        } else if segue.identifier == "Podcasts to Now Playing" {
+        } else if segue.identifier == "To Now Playing" {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
@@ -228,10 +228,6 @@ class PodcastsTableViewController: UIViewController {
         
         
         self.tableView.reloadData()
-    }
-    
-    override func segueToNowPlaying(sender: UIBarButtonItem) {
-        self.performSegueWithIdentifier("Podcasts to Now Playing", sender: nil)
     }
     
     private func updateParsingActivity() {
