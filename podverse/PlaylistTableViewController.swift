@@ -42,35 +42,27 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
         
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        loadData()
+        tableView.reloadData()
         
         // Set navigation bar styles
         navigationItem.title = "Playlist"
         
-        if pvMediaPlayer.nowPlayingEpisode != nil || pvMediaPlayer.nowPlayingClip != nil {
-            let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: #selector(PlaylistViewController.showPlaylistShare(_:)))
-            let playerBarButton = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: #selector(PlaylistViewController.segueToNowPlaying))
-            navigationItem.rightBarButtonItems = [playerBarButton, shareBarButton]
-        } else {
-            let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: #selector(PlaylistViewController.showPlaylistShare(_:)))
-            navigationItem.rightBarButtonItem = shareBarButton
-        }
+        let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: #selector(PlaylistViewController.showPlaylistShare(_:)))
         
-        self.addPlayerNavButton()
+        navigationItem.rightBarButtonItems = [shareBarButton]
     }
     
-    func loadData() {
-        tableView.reloadData()
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        if pvMediaPlayer.nowPlayingEpisode != nil || pvMediaPlayer.nowPlayingClip != nil {
+            let playerBarButton = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: #selector(PlaylistViewController.segueToNowPlaying))
+            navigationItem.rightBarButtonItems?.insert(playerBarButton, atIndex: 0)
+        }
     }
     
     func removePlayerNavButtonAndReload() {
         self.removePlayerNavButton()
-        self.loadData()
+        self.tableView.reloadData()
     }
     
     func showPlaylistShare(sender: UIBarButtonItem) {
