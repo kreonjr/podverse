@@ -48,7 +48,7 @@ class Playlist: NSManagedObject {
         let alsoDeletePodcast = PVDeleter.checkIfPodcastShouldBeRemoved(episode.podcast, isUnsubscribing: false, moc:episode.managedObjectContext)
         
         if alsoDeletePodcast {
-            PVDeleter.deletePodcast(episode.podcast.objectID)
+            PVDeleter.deletePodcast(episode.podcast.objectID, completionBlock: nil)
         }
         
     }
@@ -59,7 +59,7 @@ class Playlist: NSManagedObject {
         let alsoDeletePodcast = PVDeleter.checkIfPodcastShouldBeRemoved(clip.episode.podcast, isUnsubscribing: false, moc:clip.managedObjectContext)
         
         if alsoDeletePodcast {
-            PVDeleter.deletePodcast(clip.episode.podcast.objectID)
+            PVDeleter.deletePodcast(clip.episode.podcast.objectID, completionBlock: nil)
         }
     }
     

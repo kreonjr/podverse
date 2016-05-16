@@ -11,7 +11,7 @@ import CoreData
 
 class PVDeleter {
     
-    static func deletePodcast(podcastID: NSManagedObjectID) {
+    static func deletePodcast(podcastID: NSManagedObjectID, completionBlock:(()->Void)?) {
         let moc = CoreDataHelper.sharedInstance.backgroundContext
         let podcast = CoreDataHelper.fetchEntityWithID(podcastID, moc: moc) as! Podcast
         let episodesToRemove = podcast.episodes.allObjects as! [Episode]
@@ -24,37 +24,36 @@ class PVDeleter {
 
         CoreDataHelper.deleteItemFromCoreData(podcast, moc: moc)
         
-        CoreDataHelper.saveCoreData(moc, completionBlock: nil)
+        CoreDataHelper.saveCoreData(moc) { (saved) in
+            completionBlock?()
+        }
     }
     
     static func deleteEpisode(episode: Episode, completion:(()->())? ) {
         // Get the downloadSession, and if there is a downloadSession with a matching taskIdentifier as episode's taskIdentifier, then cancel the downloadSession
-        let downloader = PVDownloader()
-        downloader.moc = episode.managedObjectContext
-        let downloadSession = downloader.downloadSession
-        let episodeIndex = DLEpisodesList.shared.downloadingEpisodes.indexOf({ $0.mediaURL == episode.mediaURL})
+        let episodePodcastFeedURL = episode.podcast.feedURL
+        let downloadSession = PVDownloader.sharedInstance.downloadSession
         downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
             for episodeDownloadTask in downloadTasks {
-                if let index = episodeIndex, taskID = DLEpisodesList.shared.downloadingEpisodes[index].taskIdentifier where taskID == episodeDownloadTask.taskIdentifier {
+                if  let _ = DLEpisodesList.shared.downloadingEpisodes.find({ $0.taskIdentifier == episodeDownloadTask.taskIdentifier && $0.podcastRSSFeedURL == episodePodcastFeedURL })  {
                     episodeDownloadTask.cancel()
-                    
-                    dispatch_async(dispatch_get_main_queue(), { 
-                        if let tabBarCntrl = (UIApplication.sharedApplication().delegate as! AppDelegate).window?.rootViewController as? UITabBarController {
-                            if let badgeValue = tabBarCntrl.tabBar.items?.last?.badgeValue, badgeInt = Int(badgeValue) {
-                                tabBarCntrl.tabBar.items?.last?.badgeValue = "\(badgeInt - 1)"
-                                if tabBarCntrl.tabBar.items?.last?.badgeValue == "0" {
-                                    tabBarCntrl.tabBar.items?.last?.badgeValue = nil
-                                }
-                            }
-                        }
-                    })
                 }
             }
         }
-        
+
         // If the episode is currently in the episodeDownloadArray, then delete the episode from the episodeDownloadArray
         DLEpisodesList.removeDownloadingEpisodeWithMediaURL(episode.mediaURL)
+        
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
+            if let tabBarCntrl = (UIApplication.sharedApplication().delegate as! AppDelegate).window?.rootViewController as? UITabBarController {
+                if let badgeValue = tabBarCntrl.tabBar.items?.last?.badgeValue, badgeInt = Int(badgeValue) {
+                    tabBarCntrl.tabBar.items?.last?.badgeValue = "\(badgeInt - 1)"
+                    if tabBarCntrl.tabBar.items?.last?.badgeValue == "0" {
+                        tabBarCntrl.tabBar.items?.last?.badgeValue = nil
+                    }
+                }
+            }
+            
             // If the episode is currently now playing, then remove the now playing episode, and remove the Player button from the navbar using kPlayerHasNoItem
             if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
                 if episode == nowPlayingEpisode {

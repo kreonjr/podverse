@@ -19,7 +19,7 @@ class PVSubscriber {
         }
     }
     
-    static func unsubscribeFromPodcast(podcastID:NSManagedObjectID) {
+    static func unsubscribeFromPodcast(podcastID:NSManagedObjectID, completionBlock:(()->Void)?) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
             let moc = CoreDataHelper.sharedInstance.backgroundContext
             let podcast = CoreDataHelper.fetchEntityWithID(podcastID, moc: moc) as! Podcast
@@ -28,7 +28,12 @@ class PVSubscriber {
             
             CoreDataHelper.saveCoreData(moc, completionBlock: { completed in
                 if alsoDelete {
-                    PVDeleter.deletePodcast(podcast.objectID)
+                    PVDeleter.deletePodcast(podcast.objectID, completionBlock: {
+                        completionBlock?()
+                    })
+                }
+                else {
+                    completionBlock?()
                 }
             })
         }

@@ -17,6 +17,7 @@ final class DownloadingEpisode:Equatable {
     var taskResumeData:NSData?
     var totalBytesWritten:Float?
     var totalBytesExpectedToWrite:Float?
+    var podcastRSSFeedURL:String?
     
     var progress: Float {
         get {
@@ -54,6 +55,7 @@ final class DownloadingEpisode:Equatable {
         downloadComplete = episode.downloadComplete
         mediaURL = episode.mediaURL
         imageData = episode.podcast.imageData ?? episode.podcast.itunesImage
+        podcastRSSFeedURL = episode.podcast.feedURL
     }
 }
 

@@ -11,9 +11,8 @@ import CoreData
 
 class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate {
 
+    static let sharedInstance = PVDownloader()
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
-    var moc:NSManagedObjectContext?
-    
     var docDirectoryURL: NSURL?
     var downloadSession: NSURLSession!
         
@@ -135,17 +134,16 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
 
         let fileManager = NSFileManager.defaultManager()
         print("did finish downloading")
-        
+        let moc = CoreDataHelper.sharedInstance.backgroundContext
         // Get the corresponding episode object by its taskIdentifier value
-        if let episodeDownloadIndex = DLEpisodesList.shared.downloadingEpisodes.indexOf({$0.taskIdentifier == downloadTask.taskIdentifier}) {
-            let downloadingEpisode = DLEpisodesList.shared.downloadingEpisodes[episodeDownloadIndex]
+        if let downloadingEpisode = DLEpisodesList.shared.downloadingEpisodes.find({$0.taskIdentifier == downloadTask.taskIdentifier}) {
             
             guard let mediaUrl =  downloadingEpisode.mediaURL else {
                 return
             }
             
             let predicate = NSPredicate(format: "mediaURL == %@", mediaUrl)
-            guard let episode = CoreDataHelper.fetchEntities("Episode", predicate: predicate, moc: self.moc).first as? Episode else {
+            guard let episode = CoreDataHelper.fetchEntities("Episode", predicate: predicate, moc: moc).first as? Episode else {
                 return
             }
             
@@ -204,7 +202,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                     
                     let podcastTitle = episode.podcast.title
                     // Save the downloadedMediaFileDestination with the object
-                    CoreDataHelper.saveCoreData(self.moc, completionBlock: { (saved) -> Void in
+                    CoreDataHelper.saveCoreData(moc, completionBlock: { (saved) -> Void in
                         let downloadHasFinishedUserInfo = ["episode":episode]
                         
                         dispatch_async(dispatch_get_main_queue(), {[weak self] () -> Void in

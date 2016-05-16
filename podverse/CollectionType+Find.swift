@@ -1,5 +1,5 @@
 //
-//  Extensions.swift
+//  CollectionType+Find.swift
 //  podverse
 //
 //  Created by Mitchell Downey on 9/26/15.

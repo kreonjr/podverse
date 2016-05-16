@@ -79,6 +79,7 @@ class PodcastsTableViewController: UIViewController {
                 
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(reloadPodcastData), name: Constants.kDownloadHasFinished, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(unsubscribeFromPodcast(_:)), name: Constants.kUnsubscribeFromPodcast, object: nil)
         updateParsingActivity()
         
         reloadPodcastData()
@@ -98,6 +99,25 @@ class PodcastsTableViewController: UIViewController {
         }
         else {
             refreshPlaylists()
+        }
+    }
+    
+    func unsubscribeFromPodcast(notification:NSNotification) {
+        if let unsubscribedPodcastInfo = notification.userInfo {
+            for(index, podcast) in self.podcastsArray.enumerate() {
+                if podcast.feedURL == unsubscribedPodcastInfo["feedURL"] as? String {
+                    //TODO: Any additional view controllers pushed on this nav stack need to be checked and popped
+                    if let topVC = self.navigationController?.topViewController as? EpisodesTableViewController where topVC.selectedPodcast.feedURL == podcast.feedURL {
+                        self.navigationController?.popToRootViewControllerAnimated(false)
+                    }
+                    else if let topVC = self.navigationController?.topViewController as? ClipsTableViewController where topVC.selectedPodcast.feedURL == podcast.feedURL {
+                        self.navigationController?.popToRootViewControllerAnimated(false)
+                    }
+                    
+                    podcastsArray.removeAtIndex(index)
+                    self.tableView.reloadData()
+                }
+            }
         }
     }
     
@@ -363,7 +383,7 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
                 podcastsArray.removeAtIndex(indexPath.row)
                 self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 
-                PVSubscriber.unsubscribeFromPodcast(podcastToRemove.objectID)
+                PVSubscriber.unsubscribeFromPodcast(podcastToRemove.objectID, completionBlock: nil)
             }
         } else {
             if indexPath.row > 1 {
