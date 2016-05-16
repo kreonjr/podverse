@@ -167,8 +167,7 @@ class PVMediaPlayer {
                 let podcastImage = UIImage(data: podcastImageData)
                 mpImage = MPMediaItemArtwork(image: podcastImage!)
             } else {
-                // TODO: Replace Blank52 with a square Podverse logo
-                mpImage = MPMediaItemArtwork(image: UIImage(named: "Blank52")!)
+                mpImage = MPMediaItemArtwork(image: UIImage(named: "AppIcon")!)
             }
             
             if let playbackDuration = nowPlayingEpisode.duration {

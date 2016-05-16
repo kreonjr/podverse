@@ -66,7 +66,6 @@ class PVDeleter {
             }
         })
         
-        //TODO: is the deleteEpisodeFromDiskWithName redundant because of the deleteItemFromCoreData?
         // Delete the episode from CoreData and the disk, and update the UI
         if let fileName = episode.fileName {
             PVUtility.deleteEpisodeFromDiskWithName(fileName)

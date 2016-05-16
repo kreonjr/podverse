@@ -385,7 +385,6 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
                 if editingStyle == .Delete {
                     let playlistToRemove = playlists[indexPath.row]
                     
-                    //TODO: alert the user to ask if they want to delete the playlist locally only, locally and from the server, or cancel
                     let deletePlaylistAlert = UIAlertController(title: "Delete Playlist", message: "Do you want to delete this playlist locally, or both locally and on podverse.fm?", preferredStyle: UIAlertControllerStyle.Alert)
                     
                     deletePlaylistAlert.addAction(UIAlertAction(title: "Locally", style: .Default, handler: { (action: UIAlertAction!) in
