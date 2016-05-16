@@ -24,8 +24,6 @@ struct Constants {
     
     static let kPlayerHasNoItem = "playerHasNoItem"
     
-    static let kClipperWillDisplay = "clipperWillDisplay"
-    
     static let feedParsingQueue = dispatch_queue_create("FEED_PARSER_QUEUE", DISPATCH_QUEUE_SERIAL);
     
     static let kRefreshAddToPlaylistTableDataNotification = "refreshPodcastTableDataNotification"

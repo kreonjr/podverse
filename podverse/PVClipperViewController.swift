@@ -61,8 +61,6 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
         let endLabelTapGesture = UITapGestureRecognizer(target: self, action: #selector(PVClipperViewController.playFromEndTime))
         endLabel.userInteractionEnabled = true
         endLabel.addGestureRecognizer(endLabelTapGesture)
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVClipperViewController.navToInitialTextField), name: Constants.kClipperWillDisplay, object: nil)
     }
     
     override func viewWillAppear(animated: Bool) {

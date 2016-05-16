@@ -210,8 +210,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     }
     
     @IBAction func speed(sender: AnyObject) {
-        // TODO: update the Speed icon when rate is changed
-        
         switch playerSpeedRate {
             case .Regular:
                 playerSpeedRate = .TimeAndQuarter
@@ -282,7 +280,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         }
     }
     
-    // TODO: how do I pass the PVMediaPlayer's updateNowPlayingCurrentTimeNotification directly into the selector paramter of the scheduledTimerWithTimeInterval? Creating another function to call the PVMediaPlayer's function seems redundant...
     func updateNowPlayingCurrentTimeNotification() {
         pvMediaPlayer.updateNowPlayingCurrentTimeNotification()
     }
@@ -361,11 +358,9 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
                 PVClipper.endTime = Int(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime())) + 60
                 PVClipper.updateUI()
                 PVClipper.currentEpisode = pvMediaPlayer.nowPlayingEpisode
+                PVClipper.navToInitialTextField()
             }
             buttonMakeClip.setTitle(hideClipper, forState: .Normal)
-            
-            // TODO: I tried implementing this kClipperWillDisplay -> navToInitialTextField() feature using a protocol and extension (attempting to reproduce the way the PlaylistManagerDelegate works), but I couldn't get it to work. Maybe I am missing something because the PlaylistManager is an NSObject, but this class is a UIViewController? Anyway this postNotification approach seems to be working fine, but I would like to understand sometime why I could not get the protocol + extension approach to work here.
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kClipperWillDisplay, object: nil)
         }
     }
     
