@@ -56,12 +56,11 @@ class PVDeleter {
             
             // If the episode is currently now playing, then remove the now playing episode, and remove the Player button from the navbar using kPlayerHasNoItem
             if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-                if episode == nowPlayingEpisode {
+                if episode.objectID == nowPlayingEpisode.objectID {
                     PVMediaPlayer.sharedInstance.avPlayer.pause()
                     PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
                     
-                        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
-                    
+                    NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
                 }
             }
         })
@@ -87,8 +86,11 @@ class PVDeleter {
         
         // Remove Player button if the now playing episode was one of the playlists episodes or clips
         if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-            if let episodes = playlist.episodes {
-                if (episodes.contains{$0 as? Episode == nowPlayingEpisode}) {
+            if let episodes = playlist.episodes?.allObjects as? [Episode] {
+                if (episodes.contains{$0.objectID == nowPlayingEpisode.objectID}) {
+                    PVMediaPlayer.sharedInstance.avPlayer.pause()
+                    PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
+                    
                     dispatch_async(dispatch_get_main_queue(), { () -> Void in
                         NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
                     })
@@ -96,8 +98,11 @@ class PVDeleter {
             }
         }
         if let nowPlayingClip = PVMediaPlayer.sharedInstance.nowPlayingClip {
-            if let clips = playlist.clips {
-                if (clips.contains{$0 as? Clip == nowPlayingClip}) {
+            if let clips = playlist.clips?.allObjects as? [Clip] {
+                if (clips.contains{$0.objectID == nowPlayingClip.objectID}) {
+                    PVMediaPlayer.sharedInstance.avPlayer.pause()
+                    PVMediaPlayer.sharedInstance.nowPlayingClip = nil
+                    
                     dispatch_async(dispatch_get_main_queue(), { () -> Void in
                         NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
                     })
@@ -130,14 +135,20 @@ class PVDeleter {
     static func deletePlaylistItem(playlist:Playlist, item:AnyObject) {
         // Remove Player button if the now playing episode was one of the playlists episodes or clips
         if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-            if nowPlayingEpisode == item as? Episode {
+            if nowPlayingEpisode.objectID == (item as? Episode)?.objectID {
+                PVMediaPlayer.sharedInstance.avPlayer.pause()
+                PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
+                
                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
                     NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
                 })
             }
         }
         if let nowPlayingClip = PVMediaPlayer.sharedInstance.nowPlayingClip {
-            if nowPlayingClip == item as? Clip {
+            if nowPlayingClip.objectID == (item as? Clip)?.objectID {
+                PVMediaPlayer.sharedInstance.avPlayer.pause()
+                PVMediaPlayer.sharedInstance.nowPlayingClip = nil
+                
                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
                     NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
                 })
