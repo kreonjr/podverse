@@ -210,7 +210,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         }
         
         dispatch_async(dispatch_get_main_queue()) { () -> Void in
-            self.delegate?.feedParsingComplete(nil)
+            self.delegate?.feedParsingComplete(podcast.feedURL)
         }
     }
     
