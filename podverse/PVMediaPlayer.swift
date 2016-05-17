@@ -57,7 +57,7 @@ class PVMediaPlayer {
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVMediaPlayer.headphonesWereUnplugged(_:)), name: AVAudioSessionRouteChangeNotification, object: AVAudioSession.sharedInstance())
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVMediaPlayer.playerDidFinishPlaying(_:)), name: AVPlayerItemDidPlayToEndTimeNotification, object: avPlayer.currentItem)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVMediaPlayer.playerDidFinishPlaying), name: AVPlayerItemDidPlayToEndTimeNotification, object: avPlayer.currentItem)
         
         moc = CoreDataHelper.sharedInstance.backgroundContext
     }
@@ -106,7 +106,7 @@ class PVMediaPlayer {
         return false
     }
     
-    @objc func playerDidFinishPlaying(note: NSNotification) {
+    @objc func playerDidFinishPlaying() {
         if nowPlayingClip == nil {
             self.delegate?.episodeFinishedPlaying(nowPlayingEpisode)   
         } else {
