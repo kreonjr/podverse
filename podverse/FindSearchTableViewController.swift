@@ -152,7 +152,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         
         cell.title?.text = podcast.title
         cell.artist?.text = podcast.artistName
-        cell.pvImage?.image = UIImage(named: "Blank52")
+        cell.pvImage?.image = UIImage(named: "PodverseIcon")
 
         if let imageUrl = NSURL(string:podcast.imageURL!) {
             UIImage.downloadImageWithURL(imageUrl, completion: { (completed, image) -> () in

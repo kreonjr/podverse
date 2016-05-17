@@ -115,7 +115,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
                 cell.pvImage?.image = itunesImage
             }
             else {
-                cell.pvImage?.image = UIImage(named: "Blank52")
+                cell.pvImage?.image = UIImage(named: "PodverseIcon")
             }
             
             let status = "played/unplayed"
@@ -137,7 +137,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
                 cell.pvImage?.image = itunesImage
             }
             else {
-                cell.pvImage?.image = UIImage(named: "Blank52")
+                cell.pvImage?.image = UIImage(named: "PodverseIcon")
             }
             
             if let pubDate = clip.episode.pubDate {

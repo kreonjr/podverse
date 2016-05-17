@@ -24,6 +24,16 @@ class Podcast: NSManagedObject {
     @NSManaged var title: String
     @NSManaged var isSubscribed: Bool
     @NSManaged var episodes: NSSet
+    var totalClips:Int {
+        get {
+            var totalClips = 0
+            for episode in episodes.allObjects as! [Episode] {
+                totalClips += episode.clips.allObjects.count
+            }
+            
+            return totalClips
+        }
+    }
     
     func addEpisodeObject(value: Episode) {
         self.mutableSetValueForKey("episodes").addObject(value)

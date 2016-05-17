@@ -23,6 +23,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
     
     var nowPlayingCurrentTimeTimer: NSTimer!
+    var playerSpeedRate:PlayingSpeed = .Regular
     
     @IBOutlet weak var mediaPlayerImage: UIImageView!
     @IBOutlet weak var podcastTitle: UILabel!
@@ -41,6 +42,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     @IBOutlet weak var makeClipContainerView: UIView!
     
+    @IBOutlet weak var speedLabel: UILabel!
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -103,9 +105,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
             totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(pvMediaPlayer.nowPlayingEpisode.duration)
         }
         
-        // TODO: wtf? Why do I have to set scrollEnabled = to false and then true? If I do not, then the summary UITextView has extra black space on the bottom, and the UITextView is not scrollable.
-        summary?.scrollEnabled = false
-        summary?.scrollEnabled = true
         if let episodeSummary = pvMediaPlayer.nowPlayingEpisode.summary {
             summary?.text = PVUtility.removeHTMLFromString(episodeSummary)
         }
@@ -114,6 +113,11 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         }
         
         setPlayPauseIcon()
+        updateSpeedLabel()
+    }
+    
+    private func updateSpeedLabel() {
+        self.speedLabel.text = playerSpeedRate.speedText
     }
     
     func dismissKeyboard (){
@@ -156,27 +160,35 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     }
     
     @IBAction func speed(sender: AnyObject) {
-        // TODO: update the Speed icon when rate is changed
-        
-        let player = pvMediaPlayer.avPlayer
-        switch player.rate {
-        case 1.0:
-            player.rate = 1.25
-        case 1.25:
-            player.rate = 1.5
-        case 1.5:
-            player.rate = 2.0
-        case 2.0:
-            player.rate = 2.5
-        case 2.5:
-            player.rate = 0.75
-        case 0.75:
-            player.rate = 0.5
-        case 0.5:
-            player.rate = 1.0
-        default:
-            player.rate = 1.0
+        switch playerSpeedRate {
+            case .Regular:
+                playerSpeedRate = .TimeAndQuarter
+                break
+            case .TimeAndQuarter:
+                playerSpeedRate = .TimeAndHalf
+                break
+            case .TimeAndHalf:
+                playerSpeedRate = .Double
+                break
+            case .Double:
+                playerSpeedRate = .DoubleAndHalf
+                break
+            case .DoubleAndHalf:
+                playerSpeedRate = .Quarter
+                break
+            case .Quarter:
+                playerSpeedRate = .Half
+                break
+            case .Half:
+                playerSpeedRate = .ThreeQuarts
+                break
+            case .ThreeQuarts:
+                playerSpeedRate = .Regular
+                break
         }
+        
+        pvMediaPlayer.avPlayer.rate = playerSpeedRate.speedVaue
+        updateSpeedLabel()
     }
     
     @IBAction func audio(sender: AnyObject) {
@@ -218,7 +230,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         }
     }
     
-    // TODO: how do I pass the PVMediaPlayer's updateNowPlayingCurrentTimeNotification directly into the selector paramter of the scheduledTimerWithTimeInterval? Creating another function to call the PVMediaPlayer's function seems redundant...
     func updateNowPlayingCurrentTimeNotification() {
         pvMediaPlayer.updateNowPlayingCurrentTimeNotification()
     }
@@ -297,11 +308,9 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
                 PVClipper.endTime = Int(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime())) + 60
                 PVClipper.updateUI()
                 PVClipper.currentEpisode = pvMediaPlayer.nowPlayingEpisode
+                PVClipper.navToInitialTextField()
             }
             buttonMakeClip.setTitle(hideClipper, forState: .Normal)
-            
-            // TODO: I tried implementing this kClipperWillDisplay -> navToInitialTextField() feature using a protocol and extension (attempting to reproduce the way the PlaylistManagerDelegate works), but I couldn't get it to work. Maybe I am missing something because the PlaylistManager is an NSObject, but this class is a UIViewController? Anyway this postNotification approach seems to be working fine, but I would like to understand sometime why I could not get the protocol + extension approach to work here.
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kClipperWillDisplay, object: nil)
         }
     }
     
