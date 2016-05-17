@@ -13,6 +13,7 @@ import CoreData
    func feedParsingComplete(feedURL:String?)
    optional func feedItemParsed()
    optional func feedParsingStarted()
+   optional func feedParserChannelParsed()
 }
 
 class PVFeedParser: NSObject, FeedParserDelegate {
@@ -98,7 +99,11 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         }
         currentPodcast = podcast
         
-        CoreDataHelper.saveCoreData(moc, completionBlock: nil)
+        CoreDataHelper.saveCoreData(moc, completionBlock: { completed in
+            dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                self.delegate?.feedParserChannelParsed?()
+            }
+        })
     }
     
     func feedParser(parser: FeedParser, didParseItem item: FeedItem) {
