@@ -126,7 +126,7 @@
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8 / 10" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.65000000000000002" translatesAutoresizingMaskIntoConstraints="NO" id="Vnu-69-YIj">
                                         <rect key="frame" x="38" y="10" width="43" height="21"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
@@ -181,7 +181,7 @@
                         <outlet property="tableView" destination="bVH-xt-Ob5" id="tby-vu-7B7"/>
                         <segue destination="jfK-O4-nvL" kind="show" identifier="Show Episodes" id="Wxg-po-9OF"/>
                         <segue destination="QaS-ox-B9v" kind="show" identifier="Show Playlist" id="Eqj-Vy-Alg"/>
-                        <segue destination="jDs-me-457" kind="show" identifier="Podcasts to Now Playing" id="fwx-gG-V2G"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="To Now Playing" id="fwx-gG-V2G"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yec-mx-vO6" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -369,7 +369,7 @@
                         <outlet property="headerSummaryLabel" destination="LOq-p7-G5w" id="LTS-gX-rvf"/>
                         <outlet property="headerView" destination="Sgy-kf-zDQ" id="eVX-5m-HMz"/>
                         <outlet property="tableView" destination="Zi8-pK-weV" id="0TF-9T-zJv"/>
-                        <segue destination="jDs-me-457" kind="show" identifier="Episodes to Now Playing" id="ug1-KO-0I5"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="To Now Playing" id="ug1-KO-0I5"/>
                         <segue destination="w0b-bb-hu2" kind="show" identifier="Show Clips" id="Vxi-eO-V9n"/>
                     </connections>
                 </viewController>
@@ -515,7 +515,7 @@
                         <outlet property="headerSummaryLabel" destination="Oz6-yG-qZf" id="dRd-ak-ItB"/>
                         <outlet property="headerView" destination="7Mz-qe-lLf" id="dPc-5a-cfU"/>
                         <outlet property="tableView" destination="EiQ-w1-APP" id="QSa-p4-LXJ"/>
-                        <segue destination="jDs-me-457" kind="show" identifier="Clips to Now Playing" id="CAr-w1-zrt"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="To Now Playing" id="CAr-w1-zrt"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="QxJ-Wy-uAm" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -922,7 +922,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gtd-Og-dc0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4535" y="1021"/>
+            <point key="canvasLocation" x="4508" y="1221"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="jNn-5c-44i">
@@ -1271,7 +1271,7 @@
                         <barButtonItem key="backBarButtonItem" title=" " id="ju5-3M-fuB"/>
                     </navigationItem>
                     <connections>
-                        <segue destination="jDs-me-457" kind="show" identifier="Find to Now Playing" id="TGC-Eq-beX"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="To Now Playing" id="TGC-Eq-beX"/>
                         <segue destination="RGb-c9-5c2" kind="show" identifier="Search for Podcasts" id="3FJ-Fu-qtZ"/>
                     </connections>
                 </tableViewController>
@@ -1369,7 +1369,7 @@
                         <outlet property="searchBar" destination="JA2-8J-nh6" id="YZb-f6-Qts"/>
                         <outlet property="tableView" destination="Fb6-Sb-O07" id="1y7-Gv-Vav"/>
                         <segue destination="pXc-eT-gZd" kind="show" identifier="Show Podcast Profile" id="YZs-t6-IMw"/>
-                        <segue destination="jDs-me-457" kind="show" identifier="Find Search to Now Playing" id="ltZ-MZ-73u"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="To Now Playing" id="ltZ-MZ-73u"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pHl-D1-pLL" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1518,7 +1518,7 @@
                     </view>
                     <connections>
                         <outlet property="tableView" destination="Lhk-s2-uMY" id="QTy-11-7lx"/>
-                        <segue destination="jDs-me-457" kind="show" identifier="Playlist to Now Playing" id="SeK-Nv-Ovw"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="To Now Playing" id="SeK-Nv-Ovw"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sik-8l-1AU" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1721,7 +1721,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </refreshControl>
                     <connections>
-                        <segue destination="jDs-me-457" kind="show" identifier="Downloads to Now Playing" id="Xc1-wE-NTg"/>
+                        <segue destination="jDs-me-457" kind="show" identifier="To Now Playing" id="Xc1-wE-NTg"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="RED-61-AXE" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1736,6 +1736,6 @@
         <image name="Tab-Podcasts" width="25" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="fwx-gG-V2G"/>
+        <segue reference="SeK-Nv-Ovw"/>
     </inferredMetricsTieBreakers>
 </document>

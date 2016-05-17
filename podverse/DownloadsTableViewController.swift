@@ -19,10 +19,6 @@ class DownloadsTableViewController: UITableViewController {
         }
     }
     
-    override func segueToNowPlaying(sender: UIBarButtonItem) {
-        self.performSegueWithIdentifier("Downloads to Now Playing", sender: nil)
-    }
-    
     func reloadDownloadTable() {
         self.tableView.reloadData()
     }
@@ -137,7 +133,7 @@ class DownloadsTableViewController: UITableViewController {
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == "Downloads to Now Playing" {
+        if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }

@@ -12,7 +12,7 @@ extension UIViewController {
     // If there is a now playing episode or clip, add Now Playing button to nav bar
     func addPlayerNavButton() {
         if PVMediaPlayer.sharedInstance.nowPlayingEpisode != nil || PVMediaPlayer.sharedInstance.nowPlayingClip != nil {
-            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: #selector(segueToNowPlaying(_:)))
+            navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: #selector(segueToNowPlaying))
         }
         else {
             navigationItem.rightBarButtonItem = nil
@@ -26,8 +26,8 @@ extension UIViewController {
         }
     }
     
-    func segueToNowPlaying(sender: UIBarButtonItem) {
-        self.performSegueWithIdentifier("Find to Now Playing", sender: nil)
+    func segueToNowPlaying() {
+        self.performSegueWithIdentifier(Constants.TO_PLAYER_SEGUE_ID, sender: nil)
     }
 }
 
