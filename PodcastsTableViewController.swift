@@ -291,15 +291,26 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
                 cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
             }
             
-            if let imageData = podcast.imageData, image = UIImage(data: imageData) {
-                cell.pvImage?.image = image
-            }
-            else if let itunesImageData = podcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
-                cell.pvImage?.image = itunesImage
-            }
-            else {
-                cell.pvImage?.image = UIImage(named: "PodverseIcon")
-            }
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { 
+                var cellImage:UIImage?
+
+                if let imageData = podcast.imageData, image = UIImage(data: imageData) {
+                    cellImage = image
+                }
+                else if let itunesImageData = podcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
+                    cellImage = itunesImage
+                }
+                else {
+                    cellImage = UIImage(named: "PodverseIcon")
+                }
+                
+                dispatch_async(dispatch_get_main_queue(), { 
+                    if let visibleRows = self.tableView.indexPathsForVisibleRows where visibleRows.contains(indexPath) {
+                        let existingCell = self.tableView.cellForRowAtIndexPath(indexPath) as! PodcastsTableCell
+                        existingCell.pvImage.image = cellImage
+                    }
+                })
+            })
         } else {
             let playlist = playlists[indexPath.row]
             cell.title?.text = playlist.title
@@ -428,6 +439,10 @@ extension PodcastsTableViewController: PVFeedParserDelegate {
     
     func feedParsingStarted() {
         updateParsingActivity()
+    }
+    
+    func feedParserChannelParsed() {
+        self.reloadPodcastData()
     }
 }
 
