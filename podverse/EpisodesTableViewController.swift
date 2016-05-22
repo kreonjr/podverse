@@ -68,7 +68,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             headerImageView.image = itunesImage
         }
         
-        headerSummaryLabel.text = selectedPodcast.summary
+        headerSummaryLabel.text = PVUtility.removeHTMLFromString(selectedPodcast.summary)
         
         self.title = selectedPodcast.title
 

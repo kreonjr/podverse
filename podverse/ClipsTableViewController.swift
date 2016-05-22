@@ -67,7 +67,7 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
 
-        headerSummaryLabel.text = selectedEpisode.summary
+        headerSummaryLabel.text = PVUtility.removeHTMLFromString(selectedEpisode.summary)
         loadData()
     }
 
