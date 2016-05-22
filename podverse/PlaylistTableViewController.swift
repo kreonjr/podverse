@@ -108,11 +108,8 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
                 cell.itemPubDate?.text = PVUtility.formatDateToString(pubDate)
             }
             
-            if let imageData = episode.podcast.imageData, image = UIImage(data: imageData) {
+            if let imageData = episode.podcast.imageThumbData, image = UIImage(data: imageData) {
                 cell.pvImage?.image = image
-            }
-            else if let itunesImageData = episode.podcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
-                cell.pvImage?.image = itunesImage
             }
             else {
                 cell.pvImage?.image = UIImage(named: "PodverseIcon")
@@ -130,11 +127,8 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
             
             cell.podcastTitle?.text = clip.episode.podcast.title
             
-            if let imageData = clip.episode.podcast.imageData, image = UIImage(data: imageData) {
+            if let imageData = clip.episode.podcast.imageThumbData, image = UIImage(data: imageData) {
                 cell.pvImage?.image = image
-            }
-            else if let itunesImageData = clip.episode.podcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
-                cell.pvImage?.image = itunesImage
             }
             else {
                 cell.pvImage?.image = UIImage(named: "PodverseIcon")

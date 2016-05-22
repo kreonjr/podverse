@@ -13,7 +13,7 @@ final class DownloadingEpisode:Equatable {
     var taskIdentifier:Int?
     var downloadComplete:Bool?
     var mediaURL: String?
-    var imageData:NSData?
+    var imageThumbData:NSData?
     var taskResumeData:NSData?
     var totalBytesWritten:Float?
     var totalBytesExpectedToWrite:Float?
@@ -54,7 +54,7 @@ final class DownloadingEpisode:Equatable {
         taskIdentifier = episode.taskIdentifier?.integerValue
         downloadComplete = episode.downloadComplete
         mediaURL = episode.mediaURL
-        imageData = episode.podcast.imageData ?? episode.podcast.itunesImage
+        imageThumbData = episode.podcast.imageThumbData
         podcastRSSFeedURL = episode.podcast.feedURL
     }
 }

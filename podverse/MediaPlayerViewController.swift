@@ -89,9 +89,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip, rightBarButtonAddToList], animated: false)
         
         // Populate the Media Player UI with the current episode's information
-        if let itunesImageData = pvMediaPlayer.nowPlayingEpisode.podcast.itunesImage {
-            mediaPlayerImage.image = UIImage(data: itunesImageData)
-        } else if let imageData = pvMediaPlayer.nowPlayingEpisode.podcast.imageData {
+        if let imageData = pvMediaPlayer.nowPlayingEpisode.podcast.imageThumbData {
             mediaPlayerImage.image = UIImage(data: imageData)
         }
         

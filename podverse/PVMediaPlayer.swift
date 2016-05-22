@@ -211,6 +211,7 @@ class PVMediaPlayer {
                 episodeTitle = eTitle
             }
             
+            // Use full-size image for setPlayingInfo / MPNowPlayingInfoCenter
             if let podcastiTunesImageData = self.nowPlayingEpisode.podcast.itunesImage {
                 let podcastiTunesImage = UIImage(data: podcastiTunesImageData)
                 mpImage = MPMediaItemArtwork(image: podcastiTunesImage!)
