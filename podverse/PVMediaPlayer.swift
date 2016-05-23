@@ -99,10 +99,9 @@ class PVMediaPlayer {
         // Remote control events are overridden in the AppDelegate and set in remoteControlReceivedWithEvent
         do {
             try AVAudioSession.sharedInstance().setCategory(AVAudioSessionCategoryPlayback)
-                print("Receiving remote control events")
-                UIApplication.sharedApplication().beginReceivingRemoteControlEvents()
+            UIApplication.sharedApplication().beginReceivingRemoteControlEvents()
         } catch let error as NSError {
-                print(error.localizedDescription)
+            print(error.localizedDescription)
         }
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(PVMediaPlayer.playInterrupted(_:)), name: AVAudioSessionInterruptionNotification, object: AVAudioSession.sharedInstance())
@@ -136,8 +135,8 @@ class PVMediaPlayer {
     }
     
     func playOrPause() -> (Bool) {
-        if avPlayer.currentItem != nil && self.nowPlayingEpisode != nil {
-            self.setPlayingInfo(self.nowPlayingEpisode)
+        if avPlayer.currentItem != nil {
+            self.setPlayingInfo()
             
             if avPlayer.rate == 0 {
                 avPlayer.play()
@@ -160,7 +159,7 @@ class PVMediaPlayer {
     
     @objc func playerDidFinishPlaying() {
         if nowPlayingClip == nil {
-            self.delegate?.episodeFinishedPlaying(nowPlayingEpisode)   
+            self.delegate?.episodeFinishedPlaying(nowPlayingEpisode)
         } else {
             self.delegate?.clipFinishedPlaying(nowPlayingClip)
         }
@@ -197,41 +196,42 @@ class PVMediaPlayer {
         }
     }
     
-    func setPlayingInfo(episode: Episode) {
-        if nowPlayingEpisode != nil {
-            var podcastTitle: String!
-            var episodeTitle: String!
-            var mpImage: MPMediaItemArtwork!
-            var mpDuration: NSNumber!
-            var mpElapsedPlaybackTime: NSNumber!
-            let mpRate = avPlayer.rate
-            
-            podcastTitle = self.nowPlayingEpisode.podcast.title
-            
-            if let eTitle = self.nowPlayingEpisode.title {
-                episodeTitle = eTitle
-            }
-            
-            // Use full-size image for setPlayingInfo / MPNowPlayingInfoCenter
-            if let podcastiTunesImageData = self.nowPlayingEpisode.podcast.itunesImage {
-                let podcastiTunesImage = UIImage(data: podcastiTunesImageData)
-                mpImage = MPMediaItemArtwork(image: podcastiTunesImage!)
-            } else if let podcastImageData = self.nowPlayingEpisode.podcast.imageData {
-                let podcastImage = UIImage(data: podcastImageData)
-                mpImage = MPMediaItemArtwork(image: podcastImage!)
-            } else {
-                mpImage = MPMediaItemArtwork(image: UIImage(named: "PodverseIcon")!)
-            }
-            
-            if let playbackDuration = nowPlayingEpisode.duration {
-                mpDuration = playbackDuration
-            }
-            
-            let elapsedPlaybackCMTime = CMTimeGetSeconds(avPlayer.currentTime())
-            mpElapsedPlaybackTime = NSNumber(double: elapsedPlaybackCMTime)
-            
-            MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: episodeTitle, MPMediaItemPropertyArtwork: mpImage, MPMediaItemPropertyPlaybackDuration: mpDuration, MPNowPlayingInfoPropertyElapsedPlaybackTime: mpElapsedPlaybackTime, MPNowPlayingInfoPropertyPlaybackRate: mpRate]
+    func setPlayingInfo() {
+        guard let episode =  nowPlayingEpisode else {
+            return
         }
+
+        var podcastTitle: String!
+        var episodeTitle: String!
+        var mpImage: MPMediaItemArtwork!
+        var mpDuration: NSNumber!
+        var mpElapsedPlaybackTime: NSNumber!
+        let mpRate = avPlayer.rate
+        
+        podcastTitle = episode.podcast.title
+        
+        if let eTitle = episode.title {
+            episodeTitle = eTitle
+        }
+        
+        if let podcastiTunesImageData = episode.podcast.itunesImage {
+            let podcastiTunesImage = UIImage(data: podcastiTunesImageData)
+            mpImage = MPMediaItemArtwork(image: podcastiTunesImage!)
+        } else if let podcastImageData = episode.podcast.imageData {
+            let podcastImage = UIImage(data: podcastImageData)
+            mpImage = MPMediaItemArtwork(image: podcastImage!)
+        } else {
+            mpImage = MPMediaItemArtwork(image: UIImage(named: "PodverseIcon")!)
+        }
+        
+        if let playbackDuration = episode.duration {
+            mpDuration = playbackDuration
+        }
+        
+        let elapsedPlaybackCMTime = CMTimeGetSeconds(avPlayer.currentTime())
+        mpElapsedPlaybackTime = NSNumber(double: elapsedPlaybackCMTime)
+        
+        MPNowPlayingInfoCenter.defaultCenter().nowPlayingInfo = [MPMediaItemPropertyArtist: podcastTitle, MPMediaItemPropertyTitle: episodeTitle, MPMediaItemPropertyArtwork: mpImage, MPMediaItemPropertyPlaybackDuration: mpDuration, MPNowPlayingInfoPropertyElapsedPlaybackTime: mpElapsedPlaybackTime, MPNowPlayingInfoPropertyPlaybackRate: mpRate]
     }
     
     func clearPlayingInfo() {
@@ -276,12 +276,6 @@ class PVMediaPlayer {
         mediaPlayerIsPlaying = true
     }
     
-    func updateNowPlayingCurrentTimeNotification() {
-        let nowPlayingCurrentTime = CMTimeGetSeconds(avPlayer.currentTime())
-        let nowPlayingTimeHasChangedUserInfo = ["nowPlayingCurrentTime":nowPlayingCurrentTime]
-        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kNowPlayingTimeHasChanged, object: self, userInfo: nowPlayingTimeHasChangedUserInfo)
-    }
-    
     func loadEpisodeDownloadedMediaFileOrStreamAndPlay(episodeID: NSManagedObjectID) {
         nowPlayingEpisode = CoreDataHelper.fetchEntityWithID(episodeID, moc: moc) as! Episode
         nowPlayingClip = nil
@@ -307,7 +301,7 @@ class PVMediaPlayer {
             playOrPause()
         }
         
-        self.setPlayingInfo(nowPlayingEpisode)
+        self.setPlayingInfo()
     }
     
     func loadClipDownloadedMediaFileOrStreamAndPlay(clipID: NSManagedObjectID) {
@@ -317,11 +311,11 @@ class PVMediaPlayer {
 //        if nowPlayingEpisode.fileName != nil {
 //            var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
 //            self.docDirectoryURL = URLs[0]
-//            
+//
 //            if let fileName = nowPlayingEpisode.fileName, let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName) {
 //                let playerItem = AVPlayerItem(URL: destinationURL)
 //                avPlayer = AVPlayer(playerItem: playerItem)
-//                
+//
 //                let endTime = CMTimeMakeWithSeconds(Double(clip.endTime!), 1)
 //                let endTimeValue = NSValue(CMTime: endTime)
 //                self.boundaryObserver = avPlayer.addBoundaryTimeObserverForTimes([endTimeValue], queue: nil, usingBlock: {
@@ -330,15 +324,15 @@ class PVMediaPlayer {
 //                        self.avPlayer.removeTimeObserver(observer)
 //                    }
 //                })
-//                
+//
 //                goToTime(Double(clip.startTime))
 //            }
 //        } else {
-            PVClipStreamer.sharedInstance.streamClip(nowPlayingClip)
-            playOrPause()
+        PVClipStreamer.sharedInstance.streamClip(nowPlayingClip)
+        playOrPause()
 //        }
         
-        self.setPlayingInfo(nowPlayingEpisode)
+        self.setPlayingInfo()
     }
     
     @objc func playInterrupted(notification: NSNotification) {
@@ -362,7 +356,4 @@ class PVMediaPlayer {
             }
         }
     }
-    
-
-    
 }

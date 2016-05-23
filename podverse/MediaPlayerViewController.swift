@@ -49,9 +49,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         // Make sure the Play/Pause button displays properly after returning from background
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MediaPlayerViewController.setPlayPauseIcon), name: UIApplicationWillEnterForegroundNotification, object: nil)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MediaPlayerViewController.updateNowPlayingCurrentTime(_:)), name:
-            Constants.kNowPlayingTimeHasChanged, object: nil)
-        
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
         // If no nowPlaying episode or clip exists, then nav back out of MediaPlayerVC
@@ -112,6 +109,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         
         setPlayPauseIcon()
         updateSpeedLabel()
+        
+        pvMediaPlayer.avPlayer.addPeriodicTimeObserverForInterval(CMTimeMake(1, 1), queue: dispatch_get_main_queue()) { (currentTime) in
+            self.updateCurrentTime(CMTimeGetSeconds(currentTime))
+        }
     }
     
     private func updateSpeedLabel() {
@@ -208,30 +209,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         pvMediaPlayer.previousTime(60)
     }
     
-    func updateNowPlayingCurrentTime(notification: NSNotification) {
-        if let nowPlayingCurrentTime = notification.userInfo?["nowPlayingCurrentTime"] as? Float {
-            currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(nowPlayingCurrentTime)
-            
-            var totalTime: Float = 0.0
-            
-            if let clip = pvMediaPlayer.nowPlayingClip {
-                totalTime = Float(clip.duration)
-            } else if let episode = pvMediaPlayer.nowPlayingEpisode {
-                totalTime = Float(episode.duration!)
-            } else {
-                dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                    self.navigationController?.popViewControllerAnimated(true)
-                })
-            }
-            
-            nowPlayingSlider.value = nowPlayingCurrentTime / totalTime
-        }
-    }
-    
-    func updateNowPlayingCurrentTimeNotification() {
-        pvMediaPlayer.updateNowPlayingCurrentTimeNotification()
-    }
-    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -244,10 +221,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         if pvMediaPlayer.avPlayer.currentItem == nil {
             self.navigationController?.popViewControllerAnimated(true)
         } else {
-
-            // Start timer to check every half second if the now playing current time has changed
-            nowPlayingCurrentTimeTimer = NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: #selector(MediaPlayerViewController.updateNowPlayingCurrentTimeNotification), userInfo: nil, repeats: true)
-            
             // If currentTime != 0.0, then immediately insert the currentTime in its label; else manually set the currentTime label to 00:00.
             if CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()) != 0.0 {
                 currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(Float(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime())))
@@ -346,4 +319,21 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         })
     }    
 
+    func updateCurrentTime(currentTime: Double) {
+        self.currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(currentTime)
+        
+        var totalTime:Double? = 0.0
+        
+        if let clip = pvMediaPlayer.nowPlayingClip {
+            totalTime = clip.duration.doubleValue
+        } else if let episode = pvMediaPlayer.nowPlayingEpisode {
+            totalTime = episode.duration?.doubleValue
+        } else {
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                self.navigationController?.popViewControllerAnimated(true)
+            })
+        }
+        
+        nowPlayingSlider.value = Float(currentTime / (totalTime ?? 1))
+    }
 }
