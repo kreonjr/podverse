@@ -1313,7 +1313,7 @@
                                 <rect key="frame" x="0.0" y="108" width="600" height="443"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" rowHeight="100" id="eSz-IU-2In" customClass="FindSearchTableViewCell" customModule="podverse" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="FindTableViewCell" rowHeight="100" id="eSz-IU-2In" customClass="FindSearchTableViewCell" customModule="podverse" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="28" width="600" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="eSz-IU-2In" id="uMr-Se-Xrh">
@@ -1747,6 +1747,6 @@
         <image name="Tab-Podcasts" width="25" height="25"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="SeK-Nv-Ovw"/>
+        <segue reference="ltZ-MZ-73u"/>
     </inferredMetricsTieBreakers>
 </document>

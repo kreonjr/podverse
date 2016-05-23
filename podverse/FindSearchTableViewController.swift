@@ -145,8 +145,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! FindSearchTableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("FindTableViewCell", forIndexPath: indexPath) as! FindSearchTableViewCell
         
         let podcast = iTunesSearchPodcastArray[indexPath.row]
         
@@ -154,7 +153,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         cell.artist?.text = podcast.artistName
         cell.pvImage?.image = UIImage(named: "PodverseIcon")
 
-        if let imageUrl = NSURL(string:podcast.imageURL!) {
+        if let imageUrlString = podcast.imageURL, imageUrl = NSURL(string:imageUrlString) {
             UIImage.downloadImageWithURL(imageUrl, completion: { (completed, image) -> () in
                 cell.pvImage?.image = image
             })
