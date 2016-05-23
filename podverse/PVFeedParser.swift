@@ -86,6 +86,12 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             podcast.itunesImage = NSData(contentsOfURL: itunesImageUrl)
         }
         
+        if let downloadedImageData = podcast.imageData {
+            podcast.imageThumbData = PVImageManipulator.resizeImageData(downloadedImageData)
+        } else if let downloadedImageData = podcast.itunesImage {
+            podcast.imageThumbData = PVImageManipulator.resizeImageData(downloadedImageData)
+        }
+        
         if let lastBuildDate = channel.channelLastBuildDate {
             podcast.lastBuildDate = lastBuildDate
         }

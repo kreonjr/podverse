@@ -58,16 +58,13 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
         
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
         
-        if let imageData = selectedPodcast.imageData, image = UIImage(data: imageData) {
+        if let imageData = selectedPodcast.imageThumbData, image = UIImage(data: imageData) {
             headerImageView.image = image
-        }
-        else if let itunesImageData = selectedPodcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
-            headerImageView.image = itunesImage
         }
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
 
-        headerSummaryLabel.text = selectedEpisode.summary
+        headerSummaryLabel.text = PVUtility.removeHTMLFromString(selectedEpisode.summary)
         loadData()
     }
 

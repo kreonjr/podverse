@@ -73,6 +73,7 @@ class PVMediaPlayer {
     static let sharedInstance = PVMediaPlayer()
     var avPlayer = AVPlayer()
     var docDirectoryURL: NSURL?
+    // TODO: I think the nowPlayingEpisode and nowPlayingClip should maybe have been ? instead of !, since a nowPlayingEpisode and nowPlayingClip can sometimes be nil.
     var nowPlayingEpisode: Episode!
     var nowPlayingClip: Clip!
     var mediaPlayerIsPlaying = false

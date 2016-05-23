@@ -71,9 +71,14 @@ class PVUtility: NSObject {
         return "\(hours)\(minutes)\(seconds)"
     }
     
-    static func removeHTMLFromString (string: String) -> (String) {
-        let str = string.stringByReplacingOccurrencesOfString("<[^>]+>", withString: "", options: .RegularExpressionSearch, range: nil)
-        return str
+    static func removeHTMLFromString (string: String?) -> (String?) {
+        if let str = string {
+            let s = str.stringByReplacingOccurrencesOfString("<[^>]+>", withString: "", options: .RegularExpressionSearch, range: nil)
+            return s
+            
+        } else {
+            return nil
+        }
     }
     
     static func formatDateToString (date: NSDate) -> String {

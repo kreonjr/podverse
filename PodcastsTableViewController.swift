@@ -294,11 +294,8 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { 
                 var cellImage:UIImage?
 
-                if let imageData = podcast.imageData, image = UIImage(data: imageData) {
+                if let imageData = podcast.imageThumbData, image = UIImage(data: imageData) {
                     cellImage = image
-                }
-                else if let itunesImageData = podcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
-                    cellImage = itunesImage
                 }
                 else {
                     cellImage = UIImage(named: "PodverseIcon")
@@ -325,26 +322,16 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
 
             for item in playlist.allItems {
                 if let episode = item as? Episode {
-                    if let imageData = episode.podcast.imageData {
+                    if let imageData = episode.podcast.imageThumbData {
                         if let image = UIImage(data: imageData) {
                             cell.pvImage?.image = image
-                        }
-                    }
-                    else if let itunesImageData = episode.podcast.itunesImage {
-                        if let itunesImage = UIImage(data: itunesImageData) {
-                            cell.pvImage?.image = itunesImage
                         }
                     }
                 }
                 else if let clip = item as? Clip {
-                    if let imageData = clip.episode.podcast.imageData {
+                    if let imageData = clip.episode.podcast.imageThumbData {
                         if let image = UIImage(data: imageData) {
                             cell.pvImage?.image = image
-                        }
-                    }
-                    else if let itunesImageData = clip.episode.podcast.itunesImage {
-                        if let itunesImage = UIImage(data: itunesImageData) {
-                            cell.pvImage?.image = itunesImage
                         }
                     }
                 }

@@ -61,14 +61,11 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         
         self.episodesArray = unsortedEpisodes.sortedArrayUsingDescriptors([sortDescriptor]) as! [Episode]
         
-        if let imageData = selectedPodcast.imageData, image = UIImage(data: imageData)  {
+        if let imageData = selectedPodcast.imageThumbData, image = UIImage(data: imageData)  {
             headerImageView.image = image
         }
-        else if let itunesImageData = selectedPodcast.itunesImage, itunesImage = UIImage(data: itunesImageData) {
-            headerImageView.image = itunesImage
-        }
         
-        headerSummaryLabel.text = selectedPodcast.summary
+        headerSummaryLabel.text = PVUtility.removeHTMLFromString(selectedPodcast.summary)
         
         self.title = selectedPodcast.title
 
