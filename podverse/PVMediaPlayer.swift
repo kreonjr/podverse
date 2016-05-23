@@ -275,12 +275,6 @@ class PVMediaPlayer {
         mediaPlayerIsPlaying = true
     }
     
-    func updateNowPlayingCurrentTimeNotification() {
-        let nowPlayingCurrentTime = CMTimeGetSeconds(avPlayer.currentTime())
-        let nowPlayingTimeHasChangedUserInfo = ["nowPlayingCurrentTime":nowPlayingCurrentTime]
-        NSNotificationCenter.defaultCenter().postNotificationName(Constants.kNowPlayingTimeHasChanged, object: self, userInfo: nowPlayingTimeHasChangedUserInfo)
-    }
-    
     func loadEpisodeDownloadedMediaFileOrStreamAndPlay(episodeID: NSManagedObjectID) {
         nowPlayingEpisode = CoreDataHelper.fetchEntityWithID(episodeID, moc: moc) as! Episode
         nowPlayingClip = nil

@@ -84,12 +84,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func skipBackwardEvent() {
         PVMediaPlayer.sharedInstance.previousTime(15)
-        PVMediaPlayer.sharedInstance.setPlayingInfo(PVMediaPlayer.sharedInstance.nowPlayingEpisode)
+        PVMediaPlayer.sharedInstance.setPlayingInfo()
     }
     
     func skipForwardEvent() {
         PVMediaPlayer.sharedInstance.skipTime(15)
-        PVMediaPlayer.sharedInstance.setPlayingInfo(PVMediaPlayer.sharedInstance.nowPlayingEpisode)
+        PVMediaPlayer.sharedInstance.setPlayingInfo()
     }
     
     func playOrPauseEvent() {
@@ -98,8 +98,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func applicationDidEnterBackground(application: UIApplication) {
         // If the app has entered the background, then it may be the case that the device has locked, and we should update the MPNowPlayingInfoCenter with the latest information.
-        if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-            PVMediaPlayer.sharedInstance.setPlayingInfo(nowPlayingEpisode)
+        if let _ = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+            PVMediaPlayer.sharedInstance.setPlayingInfo()
         }
         
          UIApplication.sharedApplication().applicationIconBadgeNumber = 0
