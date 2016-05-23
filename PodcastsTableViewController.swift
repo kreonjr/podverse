@@ -413,15 +413,17 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
 
 extension PodcastsTableViewController: PVFeedParserDelegate {
     func feedParsingComplete(feedURL:String?) {
-        if let url = feedURL, let index = self.podcastsArray.indexOf({ url == $0.feedURL }) {
-            self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
+        if segmentedControl.selectedSegmentIndex == 0 {
+            if let url = feedURL, let index = self.podcastsArray.indexOf({ url == $0.feedURL }) {
+                self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
+            }
+            else {
+                self.reloadPodcastData()
+            }
+            
+            itemsParsing += 1
+            updateParsingActivity()
         }
-        else {
-            self.reloadPodcastData()
-        }
-        
-        itemsParsing += 1
-        updateParsingActivity()
     }
     
     func feedParsingStarted() {
