@@ -78,12 +78,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         CoreDataHelper.saveCoreData(moc, completionBlock: nil)
         
-        if NSUserDefaults.standardUserDefaults().objectForKey("userEmail") == nil {
+        if NSUserDefaults.standardUserDefaults().objectForKey("userEmail") == nil && NSUserDefaults.standardUserDefaults().objectForKey("noThanksLogin") == nil {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let loginVC = storyboard.instantiateViewControllerWithIdentifier("LoginVC")
             self.window?.rootViewController = loginVC
         }
-                        
+        
         Fabric.with([Crashlytics.self])
         return true
     }

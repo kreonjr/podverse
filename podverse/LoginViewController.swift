@@ -24,12 +24,19 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var emailInput: UITextField!
     
     @IBAction func login(sender: AnyObject) {
-        NSUserDefaults.standardUserDefaults().setObject(emailInput.text, forKey: "userEmail")
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        self.view.window?.rootViewController = storyboard.instantiateInitialViewController()
+        if emailInput.text != "" {
+            NSUserDefaults.standardUserDefaults().setObject(emailInput.text, forKey: Constants.kUserEmailEntered)
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            self.view.window?.rootViewController = storyboard.instantiateInitialViewController()
+        } else {
+            let loginAlert = UIAlertController(title: "Enter Email", message: "Please enter a valid email to login to your account", preferredStyle: UIAlertControllerStyle.Alert)
+            loginAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
+            presentViewController(loginAlert, animated: true, completion: nil)
+        }
     }
     
     @IBAction func dismissView(sender: AnyObject) {
+        NSUserDefaults.standardUserDefaults().setObject(true, forKey: Constants.kNoThanksLogin)
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         self.view.window?.rootViewController = storyboard.instantiateInitialViewController()
     }
