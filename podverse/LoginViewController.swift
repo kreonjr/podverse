@@ -25,7 +25,7 @@ class LoginViewController: UIViewController {
     
     @IBAction func login(sender: AnyObject) {
         if emailInput.text != "" {
-            NSUserDefaults.standardUserDefaults().setObject(emailInput.text, forKey: Constants.kUserEmailEntered)
+            NSUserDefaults.standardUserDefaults().setValue(emailInput.text, forKeyPath: Constants.kUserEmail)
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             self.view.window?.rootViewController = storyboard.instantiateInitialViewController()
         } else {

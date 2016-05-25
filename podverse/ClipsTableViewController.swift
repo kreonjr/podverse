@@ -45,8 +45,7 @@ class ClipsTableViewController: UIViewController, UITableViewDataSource, UITable
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        self.addPlayerNavButton()
+        navigationItem.rightBarButtonItem = self.playerNavButton()
     }
     
     override func viewDidLoad() {

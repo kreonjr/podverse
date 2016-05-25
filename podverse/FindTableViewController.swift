@@ -26,7 +26,7 @@ class FindTableViewController: UITableViewController {
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        self.addPlayerNavButton()
+        navigationItem.rightBarButtonItem = self.playerNavButton()
     }
     
     override func viewDidLoad() {

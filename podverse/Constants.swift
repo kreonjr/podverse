@@ -36,7 +36,7 @@ struct Constants {
     
     static let kNoThanksLogin = "noThanksLogin"
     
-    static let kUserEmailEntered = "userEmailEntered"
+    static let kUserEmail = "userEmail"
     
     static let rootPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, .UserDomainMask, true)[0]
     

@@ -6,11 +6,13 @@
 //  Copyright © 2016 Mitchell Downey. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 class SaveClipToServer:WebService {
     internal init(clip:Clip, completionBlock: (response: Dictionary<String, AnyObject>) -> Void, errorBlock: (error: NSError?) -> Void) {
         super.init(name:"c", completionBlock: completionBlock, errorBlock: errorBlock)
+        
+        let userEmail = NSUserDefaults.standardUserDefaults().stringForKey("userEmail")
         
         setHttpMethod(.METHOD_POST)
         addHeaderWithKey("Content-Type", value: "application/json")
@@ -23,6 +25,7 @@ class SaveClipToServer:WebService {
         addParamWithKey("clip", value: ["title":clip.title ?? "",
                                         "startTime":clip.startTime,
                                         "endTime":clip.endTime,
-                                        "duration":clip.duration ?? 0])
+                                        "duration":clip.duration ?? 0,
+                                        "userEmail":userEmail ?? ""])
     }
 }

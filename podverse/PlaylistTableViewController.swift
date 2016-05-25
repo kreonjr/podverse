@@ -46,17 +46,17 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
         
         // Set navigation bar styles
         navigationItem.title = "Playlist"
-        
-        let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: #selector(PlaylistViewController.showPlaylistShare(_:)))
-        
-        navigationItem.rightBarButtonItems = [shareBarButton]
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        if pvMediaPlayer.nowPlayingEpisode != nil || pvMediaPlayer.nowPlayingClip != nil {
-            let playerBarButton = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: #selector(PlaylistViewController.segueToNowPlaying))
-            navigationItem.rightBarButtonItems?.insert(playerBarButton, atIndex: 0)
+        
+        let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: #selector(PlaylistViewController.showPlaylistShare(_:)))
+        let playerNavButton = self.playerNavButton()
+        if let playerNav = playerNavButton {
+            navigationItem.rightBarButtonItems = [playerNav, shareBarButton]
+        } else {
+            navigationItem.rightBarButtonItems = [shareBarButton]
         }
     }
     
