@@ -286,11 +286,12 @@ class PVMediaPlayer {
             
             if let fileName = nowPlayingEpisode.fileName, let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName) {
                 let playerItem = AVPlayerItem(URL: destinationURL)
-                avPlayer = AVPlayer(playerItem: playerItem)
+                avPlayer.replaceCurrentItemWithPlayerItem(playerItem)
             }
         } else {
             if let urlString = nowPlayingEpisode.mediaURL, let url = NSURL(string: urlString) {
-                avPlayer = AVPlayer(URL:url)
+                let playerItem = AVPlayerItem(URL: url)
+                avPlayer.replaceCurrentItemWithPlayerItem(playerItem)
             }
         }
         
