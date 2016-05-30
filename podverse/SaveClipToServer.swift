@@ -12,7 +12,7 @@ class SaveClipToServer:WebService {
     internal init(clip:Clip, completionBlock: (response: Dictionary<String, AnyObject>) -> Void, errorBlock: (error: NSError?) -> Void) {
         super.init(name:"c", completionBlock: completionBlock, errorBlock: errorBlock)
         
-        let userEmail = NSUserDefaults.standardUserDefaults().stringForKey("userEmail")
+        let userId = NSUserDefaults.standardUserDefaults().stringForKey("userEmail")
         
         setHttpMethod(.METHOD_POST)
         addHeaderWithKey("Content-Type", value: "application/json")
@@ -26,6 +26,6 @@ class SaveClipToServer:WebService {
                                         "startTime":clip.startTime,
                                         "endTime":clip.endTime,
                                         "duration":clip.duration ?? 0,
-                                        "userEmail":userEmail ?? ""])
+                                        "userId":userId ?? ""])
     }
 }

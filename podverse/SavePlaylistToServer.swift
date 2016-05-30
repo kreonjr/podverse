@@ -50,7 +50,7 @@ class SavePlaylistToServer:WebService {
             addParamWithKey("playlistItems", value: playlistItems)
         }
         
-        let userEmail = NSUserDefaults.standardUserDefaults().stringForKey("userEmail")
-        addParamWithKey("userEmail", value: userEmail ?? "")
+        let userId = NSUserDefaults.standardUserDefaults().stringForKey("userEmail")
+        addParamWithKey("userId", value: userId ?? "")
     }
 }
