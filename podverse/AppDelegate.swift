@@ -41,15 +41,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UINavigationBar.appearance().tintColor = UIColor.whiteColor()
         UINavigationBar.appearance().titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor(), NSFontAttributeName: UIFont.boldSystemFontOfSize(17.0)]
         
-        // Alert the user to enable background notifications
-        let registerUserNotificationSettings = UIApplication.instancesRespondToSelector(#selector(UIApplication.registerUserNotificationSettings(_:)))
-        if registerUserNotificationSettings {
-            let types: UIUserNotificationType = [.Alert , .Sound]
-            UIApplication.sharedApplication().registerUserNotificationSettings(UIUserNotificationSettings(forTypes: types, categories: nil))
-        }
-        
         // Ask for permission for Podverse to use push notifications
-        application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge], categories: nil))  // types are UIUserNotificationType members
+        application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: nil))  // types are UIUserNotificationType members
+        application.beginBackgroundTaskWithName("showNotification", expirationHandler: nil)
         
         // Add skip or back 15 seconds to the lock screen media player
         let rcc = MPRemoteCommandCenter.sharedCommandCenter()
