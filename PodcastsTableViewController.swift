@@ -90,7 +90,7 @@ class PodcastsTableViewController: UIViewController {
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        self.addPlayerNavButton()
+        navigationItem.rightBarButtonItem = self.playerNavButton()
     }
     
     func refreshData() {

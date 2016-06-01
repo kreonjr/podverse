@@ -34,6 +34,10 @@ struct Constants {
     
     static let kMyEpisodesPlaylist = "My Episodes"
     
+    static let kNoThanksLogin = "noThanksLogin"
+    
+    static let kUserEmail = "userEmail"
+    
     static let rootPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, .UserDomainMask, true)[0]
     
     static var SERVER_AUTHORIZATION_KEY:String {

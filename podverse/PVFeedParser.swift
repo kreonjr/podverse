@@ -107,7 +107,10 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         
         CoreDataHelper.saveCoreData(moc, completionBlock: { completed in
             dispatch_async(dispatch_get_main_queue()) { () -> Void in
-                self.delegate?.feedParserChannelParsed?()
+                // If only parsing for the latest episode, do not reload the PodcastTableVC after the channel is parsed. This will prevent PodcastTableVC UI from reloading and sticking unnecessarily.
+                if self.onlyGetMostRecent != true {
+                    self.delegate?.feedParserChannelParsed?()
+                }
             }
         })
     }

@@ -8,7 +8,9 @@
 
 import UIKit
 
-class FindTableViewController: UITableViewController {
+class FindTableViewController: UIViewController {
+    
+    @IBOutlet weak var tableView: UITableView!
     
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     
@@ -26,7 +28,7 @@ class FindTableViewController: UITableViewController {
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        self.addPlayerNavButton()
+        navigationItem.rightBarButtonItem = self.playerNavButton()
     }
     
     override func viewDidLoad() {
@@ -42,59 +44,6 @@ class FindTableViewController: UITableViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-
-    // MARK: - Table view data source
-
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    override func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "Podcasts"
-
-    }
-
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return findSearchArray.count
-    }
-
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
-
-        let title = findSearchArray[indexPath.row]
-        cell.textLabel!.text = title
-
-        return cell
-    }
-    
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if indexPath.section == 0 {
-            if indexPath.row == 0 {
-                self.performSegueWithIdentifier("Search for Podcasts", sender: tableView)
-            }
-            else {
-                tableView.deselectRowAtIndexPath(indexPath, animated: false)
-                let addByRSSAlert = UIAlertController(title: "Add Podcast by RSS Feed", message: "Type the RSS feed URL below.", preferredStyle: UIAlertControllerStyle.Alert)
-                
-                addByRSSAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
-                    textField.placeholder = "https://rssfeed.example.com/"
-                })
-                
-                addByRSSAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
-                
-                addByRSSAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
-                    if let textField = addByRSSAlert.textFields?[0], text = textField.text {
-                        PVSubscriber.subscribeToPodcast(text, podcastTableDelegate: self.podcastVC)
-                    }
-                }))
-                
-                presentViewController(addByRSSAlert, animated: true, completion: nil)
-            }
-        }
-        else {
-            // perform segue based on dynamic itunes API data
-        }
     }
 
     /*
@@ -142,4 +91,58 @@ class FindTableViewController: UITableViewController {
         }
     }
 
+}
+
+extension FindTableViewController:UITableViewDelegate, UITableViewDataSource {
+    
+    // MARK: - Table view data source
+    
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "Podcasts"
+        
+    }
+    
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return findSearchArray.count
+    }
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
+        
+        let title = findSearchArray[indexPath.row]
+        cell.textLabel!.text = title
+        
+        return cell
+    }
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if indexPath.section == 0 {
+            if indexPath.row == 0 {
+                self.performSegueWithIdentifier("Search for Podcasts", sender: tableView)
+            }
+            else {
+                tableView.deselectRowAtIndexPath(indexPath, animated: false)
+                let addByRSSAlert = UIAlertController(title: "Add Podcast by RSS Feed", message: "Type the RSS feed URL below.", preferredStyle: UIAlertControllerStyle.Alert)
+                
+                addByRSSAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
+                    textField.placeholder = "https://rssfeed.example.com/"
+                })
+                
+                addByRSSAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
+                
+                addByRSSAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
+                    if let textField = addByRSSAlert.textFields?[0], text = textField.text {
+                        PVSubscriber.subscribeToPodcast(text, podcastTableDelegate: self.podcastVC)
+                    }
+                }))
+                
+                presentViewController(addByRSSAlert, animated: true, completion: nil)
+            }
+        }
+    }
+    
 }

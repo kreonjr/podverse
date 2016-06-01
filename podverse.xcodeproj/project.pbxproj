@@ -10,6 +10,9 @@
 		3010F39C1BC9B64E001DFFF6 /* PVMediaPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */; };
 		3010F39E1BC9D2F0001DFFF6 /* PVClipperViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3010F39D1BC9D2F0001DFFF6 /* PVClipperViewController.swift */; };
 		302F5E811CF2244100775CEA /* PVImageManipulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302F5E801CF2244100775CEA /* PVImageManipulator.swift */; };
+		302F5E851CF2AC9E00775CEA /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302F5E841CF2AC9E00775CEA /* LoginViewController.swift */; };
+		302F5E8D1CF577AD00775CEA /* UITableViewController+MediaPlayerUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302F5E8C1CF577AD00775CEA /* UITableViewController+MediaPlayerUI.swift */; };
+		302F5E8F1CFCD8A200775CEA /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302F5E8E1CFCD8A200775CEA /* SettingsViewController.swift */; };
 		3045E0971C658D4B006477B3 /* AddToPlaylistTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3045E0961C658D4B006477B3 /* AddToPlaylistTableViewCell.swift */; };
 		3047AC531C5462A300F484D5 /* PVClipStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3047AC521C5462A300F484D5 /* PVClipStreamer.swift */; };
 		3048B6891C5F05FF00D1C2C7 /* Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3048B6881C5F05FF00D1C2C7 /* Playlist.swift */; };
@@ -157,6 +160,9 @@
 		3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVMediaPlayer.swift; sourceTree = "<group>"; };
 		3010F39D1BC9D2F0001DFFF6 /* PVClipperViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipperViewController.swift; sourceTree = "<group>"; };
 		302F5E801CF2244100775CEA /* PVImageManipulator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVImageManipulator.swift; sourceTree = "<group>"; };
+		302F5E841CF2AC9E00775CEA /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		302F5E8C1CF577AD00775CEA /* UITableViewController+MediaPlayerUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITableViewController+MediaPlayerUI.swift"; sourceTree = "<group>"; };
+		302F5E8E1CFCD8A200775CEA /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
 		3045E0961C658D4B006477B3 /* AddToPlaylistTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddToPlaylistTableViewCell.swift; sourceTree = "<group>"; };
 		3047AC521C5462A300F484D5 /* PVClipStreamer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipStreamer.swift; sourceTree = "<group>"; };
 		3048B6881C5F05FF00D1C2C7 /* Playlist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Playlist.swift; sourceTree = "<group>"; };
@@ -352,7 +358,9 @@
 			children = (
 				EFB324A11BE59142000936B6 /* PVClipper VCs */,
 				81CCE4E11B52DB8B00DC8346 /* PodcastProfileViewController.swift */,
+				302F5E841CF2AC9E00775CEA /* LoginViewController.swift */,
 				818615CD1B1EB12C006C9731 /* PodcastsTableViewController.swift */,
+				302F5E8E1CFCD8A200775CEA /* SettingsViewController.swift */,
 				818615CB1B1EB10E006C9731 /* EpisodesTableViewController.swift */,
 				818615CF1B1EB144006C9731 /* ClipsTableViewController.swift */,
 				30AA6BCD1C619CEE0093E45E /* PlaylistTableViewController.swift */,
@@ -416,6 +424,7 @@
 			children = (
 				3081B6BC1BB7431C00233E08 /* CollectionType+Find.swift */,
 				EF3913001CDFA65E0056AC9E /* UIViewController+MediaPlayerUI.swift */,
+				302F5E8C1CF577AD00775CEA /* UITableViewController+MediaPlayerUI.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -653,6 +662,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				302F5E851CF2AC9E00775CEA /* LoginViewController.swift in Sources */,
 				815A2E311B50C099002A21A7 /* FindTableViewController.swift in Sources */,
 				EF3799D21BD4981E00211419 /* CustomFeedParser.swift in Sources */,
 				818615D21B1EB206006C9731 /* MediaPlayerViewController.swift in Sources */,
@@ -670,10 +680,12 @@
 				81A3B5161B3A60F5007D9A96 /* DownloadsTableViewController.swift in Sources */,
 				812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */,
 				EF397FFF1C5458A000C91753 /* BaseWebservice.swift in Sources */,
+				302F5E8D1CF577AD00775CEA /* UITableViewController+MediaPlayerUI.swift in Sources */,
 				EF59CECC1BD07AB6002D9DDF /* FeedItem.swift in Sources */,
 				302F5E811CF2244100775CEA /* PVImageManipulator.swift in Sources */,
 				81A3B5181B3A614B007D9A96 /* DownloadsTableViewCell.swift in Sources */,
 				3048B6891C5F05FF00D1C2C7 /* Playlist.swift in Sources */,
+				302F5E8F1CFCD8A200775CEA /* SettingsViewController.swift in Sources */,
 				3072BE2E1C48A2F000CA9C7F /* PVDeleter.swift in Sources */,
 				EF59CECA1BD07AB6002D9DDF /* FeedChannel.swift in Sources */,
 				818615CE1B1EB12C006C9731 /* PodcastsTableViewController.swift in Sources */,
