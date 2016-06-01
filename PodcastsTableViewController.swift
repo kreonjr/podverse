@@ -208,7 +208,7 @@ class PodcastsTableViewController: UIViewController {
     }
     
     func reloadPodcastData() {
-        let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
+        let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", true)
         self.managedObjectContext = coreDataHelper.managedObjectContext
         self.podcastsArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:managedObjectContext) as! [Podcast]
 
@@ -415,6 +415,8 @@ extension PodcastsTableViewController: PVFeedParserDelegate {
     func feedParsingComplete(feedURL:String?) {
         if segmentedControl.selectedSegmentIndex == 0 {
             if let url = feedURL, let index = self.podcastsArray.indexOf({ url == $0.feedURL }) {
+                let podcast = CoreDataHelper.fetchEntityWithID(self.podcastsArray[index].objectID, moc: self.managedObjectContext) as! Podcast
+                self.podcastsArray[index] = podcast
                 self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
             }
             else {

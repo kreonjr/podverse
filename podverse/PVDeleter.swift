@@ -19,7 +19,7 @@ class PVDeleter {
         // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
         for episode in episodesToRemove {
             let episodeToRemove = CoreDataHelper.fetchEntityWithID(episode.objectID, moc: moc) as! Episode
-            PVDeleter.deleteEpisode(episodeToRemove, completion: nil)
+            PVDeleter.deleteEpisode(episodeToRemove.objectID)
         }
 
         CoreDataHelper.deleteItemFromCoreData(podcast, moc: moc)
@@ -29,7 +29,10 @@ class PVDeleter {
         }
     }
     
-    static func deleteEpisode(episode: Episode, completion:(()->())? ) {
+    static func deleteEpisode(episodeID: NSManagedObjectID) {
+        let moc = CoreDataHelper.sharedInstance.backgroundContext
+        let episode = CoreDataHelper.fetchEntityWithID(episodeID, moc: moc) as! Episode
+        
         // Get the downloadSession, and if there is a downloadSession with a matching taskIdentifier as episode's taskIdentifier, then cancel the downloadSession
         let episodePodcastFeedURL = episode.podcast.feedURL
         let downloadSession = PVDownloader.sharedInstance.downloadSession
@@ -73,10 +76,10 @@ class PVDeleter {
         
         // If the episode or a clip from the episode is currently a playlistItem in a local playlist, then do not delete the episode item from Core Data
         if checkIfEpisodeShouldBeRemoved(episode) == true {
-            CoreDataHelper.deleteItemFromCoreData(episode, moc: episode.managedObjectContext)
+            CoreDataHelper.deleteItemFromCoreData(episode, moc: moc)
         }
         
-        CoreDataHelper.saveCoreData(episode.managedObjectContext, completionBlock: nil)
+        CoreDataHelper.saveCoreData(moc, completionBlock: nil)
     }
     
     // TODO: handle removing clips
