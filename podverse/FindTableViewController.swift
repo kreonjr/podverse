@@ -143,9 +143,6 @@ extension FindTableViewController:UITableViewDelegate, UITableViewDataSource {
                 presentViewController(addByRSSAlert, animated: true, completion: nil)
             }
         }
-        else {
-            // perform segue based on dynamic itunes API data
-        }
     }
     
 }
