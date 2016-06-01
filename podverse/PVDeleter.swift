@@ -49,10 +49,10 @@ class PVDeleter {
         
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
             if let tabBarCntrl = (UIApplication.sharedApplication().delegate as! AppDelegate).window?.rootViewController as? UITabBarController {
-                if let badgeValue = tabBarCntrl.tabBar.items?.last?.badgeValue, badgeInt = Int(badgeValue) {
-                    tabBarCntrl.tabBar.items?.last?.badgeValue = "\(badgeInt - 1)"
-                    if tabBarCntrl.tabBar.items?.last?.badgeValue == "0" {
-                        tabBarCntrl.tabBar.items?.last?.badgeValue = nil
+                if let badgeValue = tabBarCntrl.tabBar.items?[TabItems.Downloads.getIndex()].badgeValue, badgeInt = Int(badgeValue) {
+                    tabBarCntrl.tabBar.items?[TabItems.Downloads.getIndex()].badgeValue = "\(badgeInt - 1)"
+                    if tabBarCntrl.tabBar.items?[TabItems.Downloads.getIndex()].badgeValue == "0" {
+                        tabBarCntrl.tabBar.items?[TabItems.Downloads.getIndex()].badgeValue = nil
                     }
                 }
             }

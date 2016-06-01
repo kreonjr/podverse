@@ -279,7 +279,7 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
         if segmentedControl.selectedSegmentIndex == 0 {
             let podcast = podcastsArray[indexPath.row]
             cell.title?.text = podcast.title
-            
+
             let episodes = podcast.episodes.allObjects as! [Episode]
             let episodesDownloaded = episodes.filter{ $0.fileName != nil }
             cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"

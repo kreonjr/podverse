@@ -8,6 +8,23 @@
 import UIKit
 import CoreData
 
+enum TabItems:Int {
+    case Podcasts = 0, Find, Downloads, Settings
+    
+    func getIndex() -> Int {
+        switch self {
+        case .Podcasts:
+            return 0
+        case .Find:
+            return 1
+        case .Downloads:
+            return 2
+        case .Settings:
+            return 3
+        }
+    }
+}
+
 struct Constants {
 
     static let kDownloadHasFinished  = "downloadHasFinished"
