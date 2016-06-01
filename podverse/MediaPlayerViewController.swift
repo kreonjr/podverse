@@ -299,7 +299,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         pvMediaPlayer.nowPlayingEpisode = nil
         pvMediaPlayer.nowPlayingClip = nil
         
-        PVDeleter.deleteEpisode(currentEpisode,completion: nil)
+        PVDeleter.deleteEpisode(currentEpisode.objectID)
         
         dispatch_async(dispatch_get_main_queue(), { () -> Void in
             NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
