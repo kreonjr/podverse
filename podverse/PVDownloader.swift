@@ -218,7 +218,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                             notification.alertBody = podcastTitle + " - " + episodeTitle // text that will be displayed in the notification
                             notification.alertAction = "open"
                             notification.soundName = UILocalNotificationDefaultSoundName // play default sound
-                            UIApplication.sharedApplication().scheduleLocalNotification(notification)
+                            UIApplication.sharedApplication().presentLocalNotificationNow(notification)
                             
                             strongSelf.decrementBadge()
                         })
