@@ -1247,46 +1247,59 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
-                        <segue destination="0Ln-wQ-P7d" kind="relationship" relationship="rootViewController" id="0rX-Hu-HUI"/>
+                        <segue destination="Skh-Gt-fLG" kind="relationship" relationship="rootViewController" id="RMu-YT-1Sx"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="M8O-wE-AQ2" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1669" y="1765"/>
         </scene>
-        <!--Find-->
-        <scene sceneID="u1R-KO-9d9">
+        <!--Find Table View Controller-->
+        <scene sceneID="WLv-hK-HR7">
             <objects>
-                <tableViewController id="0Ln-wQ-P7d" customClass="FindTableViewController" customModule="podverse" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="d4x-gi-4ZL">
+                <viewController id="Skh-Gt-fLG" customClass="FindTableViewController" customModule="podverse" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="VaK-j7-yPm"/>
+                        <viewControllerLayoutGuide type="bottom" id="JzU-xa-RrT"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="OjI-iK-zLb">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="fhE-qd-YAn">
+                                <rect key="frame" x="0.0" y="64" width="600" height="487"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="Cell" id="rwq-XG-hYm">
+                                        <rect key="frame" x="0.0" y="92" width="600" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="rwq-XG-hYm" id="EWR-EB-U65">
+                                            <rect key="frame" x="0.0" y="0.0" width="600" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="Skh-Gt-fLG" id="Rbb-Kg-FT5"/>
+                                    <outlet property="delegate" destination="Skh-Gt-fLG" id="ksy-Zc-KAY"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <prototypes>
-                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="Cell" id="cxo-zF-8p1">
-                                <rect key="frame" x="0.0" y="86" width="600" height="44"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cxo-zF-8p1" id="0Dd-Zc-UFQ">
-                                    <rect key="frame" x="0.0" y="0.0" width="567" height="43.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                </tableViewCellContentView>
-                                <color key="backgroundColor" red="0.99215686270000003" green="0.99215686270000003" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="0Ln-wQ-P7d" id="cy4-Ef-jFo"/>
-                            <outlet property="delegate" destination="0Ln-wQ-P7d" id="5G4-Ac-0Az"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Find" id="qvo-Gc-WRM">
-                        <barButtonItem key="backBarButtonItem" title=" " id="ju5-3M-fuB"/>
-                    </navigationItem>
+                        <constraints>
+                            <constraint firstItem="JzU-xa-RrT" firstAttribute="top" secondItem="fhE-qd-YAn" secondAttribute="bottom" id="IEL-3k-wRe"/>
+                            <constraint firstItem="fhE-qd-YAn" firstAttribute="top" secondItem="VaK-j7-yPm" secondAttribute="bottom" id="ZFr-Jr-BrB"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="fhE-qd-YAn" secondAttribute="trailing" constant="-20" id="ZdI-fY-ODv"/>
+                            <constraint firstItem="fhE-qd-YAn" firstAttribute="leading" secondItem="OjI-iK-zLb" secondAttribute="leadingMargin" constant="-20" id="ZtF-eB-97a"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="CQ0-9G-1rm"/>
                     <connections>
-                        <segue destination="jDs-me-457" kind="show" identifier="To Now Playing" id="TGC-Eq-beX"/>
-                        <segue destination="RGb-c9-5c2" kind="show" identifier="Search for Podcasts" id="3FJ-Fu-qtZ"/>
+                        <outlet property="tableView" destination="fhE-qd-YAn" id="ll2-1S-cKZ"/>
+                        <segue destination="RGb-c9-5c2" kind="show" identifier="Search for Podcasts" id="MRX-x9-xXJ"/>
                     </connections>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="sKU-bf-j6c" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="uK0-4p-hBW" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2382" y="1765"/>
         </scene>
@@ -1944,6 +1957,6 @@
         <image name="banner" width="337" height="61"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="ltZ-MZ-73u"/>
+        <segue reference="ug1-KO-0I5"/>
     </inferredMetricsTieBreakers>
 </document>

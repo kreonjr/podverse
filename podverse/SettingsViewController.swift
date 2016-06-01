@@ -66,7 +66,7 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        return 60
+        return 44
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
