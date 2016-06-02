@@ -168,12 +168,8 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                 }
             }
             
-            // Specify a unique file name and path where the file will stored permanently
-            let currentDateTime = NSDate()
-            let formatter = NSDateFormatter()
-            formatter.dateFormat = "ddMMyyyy-HHmmss"
             // TODO: why must we add .mp3 or .ogg to the end of the file name in order for the media player to play the file? What would happen if a downloaded file is not actually an .mp3 or .ogg?
-            let destinationFilename = formatter.stringFromDate(currentDateTime) + mp3OrOggFileExtension
+            let destinationFilename = NSUUID().UUIDString + mp3OrOggFileExtension
             let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(destinationFilename)
             
             do {
