@@ -5,11 +5,13 @@
   },
   "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
     "47A62715A5801E74905D66DA591CF9DE0053B54B" : 0,
+    "BE6F11D2B0F7EBDD3A2A4B2F7B7F7393B556F9B2" : 0,
     "67620B5EFA902936DF04070AF595B76AB0333747" : 0
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "5C0AB1E6-95EC-4B52-A772-FEE99A8E04A1",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
     "47A62715A5801E74905D66DA591CF9DE0053B54B" : "podverse",
+    "BE6F11D2B0F7EBDD3A2A4B2F7B7F7393B556F9B2" : "podverse\/lib\/Reachability.swift\/",
     "67620B5EFA902936DF04070AF595B76AB0333747" : "podverse\/lib\/Alamofire\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "podverse",
@@ -25,6 +27,11 @@
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/Alamofire\/Alamofire.git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "67620B5EFA902936DF04070AF595B76AB0333747"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/ashleymills\/Reachability.swift",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "BE6F11D2B0F7EBDD3A2A4B2F7B7F7393B556F9B2"
     }
   ]
 }

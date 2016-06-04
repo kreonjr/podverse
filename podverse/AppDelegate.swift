@@ -58,12 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         pauseCommand.addTarget(self, action: #selector(AppDelegate.playOrPauseEvent))
         let playCommand = rcc.playCommand
         playCommand.addTarget(self, action: #selector(AppDelegate.playOrPauseEvent))
-        
-        if NSUserDefaults.standardUserDefaults().boolForKey("AppHasLaunchedOnce") == false {
-            NSUserDefaults.standardUserDefaults().setBool(true, forKey: "AppHasLaunchedOnce")
-            PlaylistManager.sharedInstance.createDefaultPlaylists()
-        }
-        
+
         // Currently we are setting taskIdentifier values = nil on app launch. This wipes CoreData references to downloadingEpisodes that did not complete before the app was last closed or crashed.
         let moc = CoreDataHelper.sharedInstance.managedObjectContext
         let episodeArray = CoreDataHelper.fetchEntities("Episode", predicate: nil, moc: moc) as! [Episode]
@@ -71,6 +66,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             episode.taskIdentifier = nil
         }
         CoreDataHelper.saveCoreData(moc, completionBlock: nil)
+        
+        PVReachability.manager
         
         if NSUserDefaults.standardUserDefaults().objectForKey("userEmail") == nil && NSUserDefaults.standardUserDefaults().objectForKey("noThanksLogin") == nil {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
