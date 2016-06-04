@@ -4,3 +4,6 @@
 [submodule "lib/Alamofire"]
 	path = lib/Alamofire
 	url = https://github.com/Alamofire/Alamofire.git
+[submodule "lib/Reachability.swift"]
+	path = lib/Reachability.swift
+	url = https://github.com/ashleymills/Reachability.swift
