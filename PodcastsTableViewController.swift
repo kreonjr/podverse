@@ -33,6 +33,7 @@ class PodcastsTableViewController: UIViewController {
     var managedObjectContext:NSManagedObjectContext!
     var podcastsArray = [Podcast]()
     let coreDataHelper = CoreDataHelper.sharedInstance
+    let reachability = PVReachability.manager
     var refreshControl: UIRefreshControl!
     private var itemsParsing = 0
     private var totalItemsToParse = 0
@@ -80,6 +81,7 @@ class PodcastsTableViewController: UIViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(reloadPodcastData), name: Constants.kDownloadHasFinished, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(unsubscribeFromPodcast(_:)), name: Constants.kUnsubscribeFromPodcast, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(clearParsingActivity), name: Constants.kInternetIsUnreachable, object: nil)
         updateParsingActivity()
         
         reloadPodcastData()
@@ -95,9 +97,19 @@ class PodcastsTableViewController: UIViewController {
     
     func refreshData() {
         if segmentedControl.selectedSegmentIndex == 0 {
+            if reachability.hasInternetConnection() == false && refreshControl.refreshing == true {
+                showInternetNeededAlert("Connect to WiFi or cellular data to parse podcast feeds.")
+                refreshControl.endRefreshing()
+                return
+            }
             refreshPodcastFeeds()
         }
         else {
+            if reachability.hasInternetConnection() == false && refreshControl.refreshing == true {
+                showInternetNeededAlert("Connect to WiFi or cellular data to refresh playlists.")
+                refreshControl.endRefreshing()
+                return
+            }
             refreshPlaylists()
         }
     }
@@ -153,6 +165,11 @@ class PodcastsTableViewController: UIViewController {
     }
     
     private func showAddPlaylistByURLAlert() {
+        if reachability.hasInternetConnection() == false {
+            showInternetNeededAlert("Connect to WiFi or cellular data to add a playlist by URL.")
+            return
+        }
+        
         let addPlaylistByURLAlert = UIAlertController(title: "Add Playlist By URL", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
         
         addPlaylistByURLAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
@@ -224,6 +241,11 @@ class PodcastsTableViewController: UIViewController {
         }
         
         self.tableView.reloadData()
+    }
+    
+    func clearParsingActivity() {
+        self.itemsParsing = 0
+        self.parsingActivityContainer.hidden = true
     }
     
     private func updateParsingActivity() {
@@ -348,6 +370,7 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
         } else {
             self.performSegueWithIdentifier("Show Playlist", sender: nil)
         }
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     // Override to support conditional editing of the table view.

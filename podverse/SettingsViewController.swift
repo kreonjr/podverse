@@ -83,8 +83,8 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.row == 0 {
-            tableView.deselectRowAtIndexPath(indexPath, animated: false)
             showChangeUserIdAlert()
+            tableView.deselectRowAtIndexPath(indexPath, animated: true)
         }
     }
 }

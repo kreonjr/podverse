@@ -11,13 +11,11 @@ import UIKit
 extension UITableViewController {
     // If there is a now playing episode or clip, add Now Playing button to nav bar
     override func playerNavButton() -> UIBarButtonItem? {
-        if let navigationRightBarItems = navigationItem.rightBarButtonItems {
-            if (PVMediaPlayer.sharedInstance.nowPlayingEpisode != nil || PVMediaPlayer.sharedInstance.nowPlayingClip != nil) && navigationRightBarItems.count < 2 {
-                let playerButton = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: #selector(segueToNowPlaying))
-                
-                return playerButton
-            }
+        if (PVMediaPlayer.sharedInstance.nowPlayingEpisode != nil || PVMediaPlayer.sharedInstance.nowPlayingClip != nil) {
+            let playerButton = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: #selector(segueToNowPlaying))
+            return playerButton
         }
+
         return nil
     }
     

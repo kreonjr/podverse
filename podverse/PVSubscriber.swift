@@ -33,6 +33,12 @@ class PVSubscriber {
                     })
                 }
                 else {
+                    let episodesToRemove = podcast.episodes.allObjects as! [Episode]
+                    // Delete each episode from the moc, cancel current downloadTask, and remove episode from the episodeDownloadArray
+                    for episode in episodesToRemove {
+                        let episodeToRemove = CoreDataHelper.fetchEntityWithID(episode.objectID, moc: moc) as! Episode
+                        PVDeleter.deleteEpisode(episodeToRemove.objectID)
+                    }
                     completionBlock?()
                 }
             })

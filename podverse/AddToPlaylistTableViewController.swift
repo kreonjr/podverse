@@ -15,6 +15,7 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
     let playlistManager = PlaylistManager.sharedInstance
     var managedObjectContext = CoreDataHelper.sharedInstance.managedObjectContext
+    let reachability = PVReachability.manager
     var episode:Episode?
     var clip:Clip?
     
@@ -41,6 +42,11 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     }
     
     func showCreatePlaylistAlert() {
+        if !reachability.hasInternetConnection() {
+            showInternetNeededAlert("Connect to WiFi or cellular data to create a playlist.")
+            return
+        }
+        
         let createPlaylistAlert = UIAlertController(title: "Add New Playlist", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
         
         createPlaylistAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
@@ -123,6 +129,11 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
     }
 
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        if !reachability.hasInternetConnection() {
+            showInternetNeededAlert("Connect to WiFi or cellular data to add to a playlist.")
+            return
+        }
+        
         let playlist = CoreDataHelper.fetchEntityWithID(validPlaylists[indexPath.row].objectID, moc: self.managedObjectContext) as! Playlist
         
         if let c = clip {

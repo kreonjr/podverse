@@ -21,6 +21,9 @@
 		3081B6BD1BB7431C00233E08 /* CollectionType+Find.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3081B6BC1BB7431C00233E08 /* CollectionType+Find.swift */; };
 		30AA6BCE1C619CEE0093E45E /* PlaylistTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30AA6BCD1C619CEE0093E45E /* PlaylistTableViewController.swift */; };
 		30AA6BD61C61A8640093E45E /* PlaylistTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30AA6BD51C61A8640093E45E /* PlaylistTableViewCell.swift */; };
+		30B8A4781D03A128009663D3 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF1C35631D0378BF00F9BF8F /* Reachability.framework */; };
+		30B8A4791D03A128009663D3 /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EF1C35631D0378BF00F9BF8F /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		30B8A4831D03C309009663D3 /* UIViewController+InternetNeededAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B8A4821D03C309009663D3 /* UIViewController+InternetNeededAlert.swift */; };
 		812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
 		812A094F1B42375F00E8F070 /* podverse.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 818615971B1E84CE006C9731 /* podverse.xcdatamodeld */; };
 		813FC8101B5CA992006248BC /* PVSubscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 813FC80F1B5CA992006248BC /* PVSubscriber.swift */; };
@@ -78,6 +81,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		30B8A47A1D03A128009663D3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = EF1C35531D0378BF00F9BF8F /* Reachability.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = AA7344711BE7678B008AFE69;
+			remoteInfo = Reachability;
+		};
 		818615A91B1E84CF006C9731 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 818615881B1E84CE006C9731 /* Project object */;
@@ -200,6 +210,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				EF397FF51C54561C00C91753 /* Alamofire.framework in Embed Frameworks */,
+				30B8A4791D03A128009663D3 /* Reachability.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -221,6 +232,7 @@
 		3081B6BC1BB7431C00233E08 /* CollectionType+Find.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CollectionType+Find.swift"; sourceTree = "<group>"; };
 		30AA6BCD1C619CEE0093E45E /* PlaylistTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewController.swift; sourceTree = "<group>"; };
 		30AA6BD51C61A8640093E45E /* PlaylistTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewCell.swift; sourceTree = "<group>"; };
+		30B8A4821D03C309009663D3 /* UIViewController+InternetNeededAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+InternetNeededAlert.swift"; sourceTree = "<group>"; };
 		812A094E1B422AB300E8F070 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
 		813FC80F1B5CA992006248BC /* PVSubscriber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVSubscriber.swift; sourceTree = "<group>"; };
 		815A2E301B50C099002A21A7 /* FindTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindTableViewController.swift; sourceTree = "<group>"; };
@@ -289,6 +301,7 @@
 				EFD1D4E81C3106FB00666912 /* Crashlytics.framework in Frameworks */,
 				EF397FF41C54561C00C91753 /* Alamofire.framework in Frameworks */,
 				EFD1D4E71C3106FB00666912 /* Fabric.framework in Frameworks */,
+				30B8A4781D03A128009663D3 /* Reachability.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -491,6 +504,7 @@
 			children = (
 				3081B6BC1BB7431C00233E08 /* CollectionType+Find.swift */,
 				EF3913001CDFA65E0056AC9E /* UIViewController+MediaPlayerUI.swift */,
+				30B8A4821D03C309009663D3 /* UIViewController+InternetNeededAlert.swift */,
 				302F5E8C1CF577AD00775CEA /* UITableViewController+MediaPlayerUI.swift */,
 			);
 			name = Extensions;
@@ -561,6 +575,7 @@
 			dependencies = (
 				EF1C356F1D0378F400F9BF8F /* PBXTargetDependency */,
 				EF397FF71C54561C00C91753 /* PBXTargetDependency */,
+				30B8A47B1D03A128009663D3 /* PBXTargetDependency */,
 			);
 			name = podverse;
 			productName = podverse;
@@ -797,6 +812,7 @@
 				302F5E8D1CF577AD00775CEA /* UITableViewController+MediaPlayerUI.swift in Sources */,
 				EF59CECC1BD07AB6002D9DDF /* FeedItem.swift in Sources */,
 				302F5E811CF2244100775CEA /* PVImageManipulator.swift in Sources */,
+				30B8A4831D03C309009663D3 /* UIViewController+InternetNeededAlert.swift in Sources */,
 				81A3B5181B3A614B007D9A96 /* DownloadsTableViewCell.swift in Sources */,
 				3048B6891C5F05FF00D1C2C7 /* Playlist.swift in Sources */,
 				302F5E8F1CFCD8A200775CEA /* SettingsViewController.swift in Sources */,
@@ -847,6 +863,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		30B8A47B1D03A128009663D3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Reachability;
+			targetProxy = 30B8A47A1D03A128009663D3 /* PBXContainerItemProxy */;
+		};
 		818615AA1B1E84CF006C9731 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8186158F1B1E84CE006C9731 /* podverse */;

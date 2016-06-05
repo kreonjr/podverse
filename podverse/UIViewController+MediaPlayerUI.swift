@@ -11,8 +11,7 @@ import UIKit
 extension UIViewController {
     // If there is a now playing episode or clip, add Now Playing button to nav bar
     func playerNavButton() -> UIBarButtonItem? {
-        let navigationRightBarItems = navigationItem.rightBarButtonItems
-        if (PVMediaPlayer.sharedInstance.nowPlayingEpisode != nil || PVMediaPlayer.sharedInstance.nowPlayingClip != nil) && navigationRightBarItems?.count < 2 {
+        if (PVMediaPlayer.sharedInstance.nowPlayingEpisode != nil || PVMediaPlayer.sharedInstance.nowPlayingClip != nil) {
                 let playerButton = UIBarButtonItem(title: "Player", style: .Plain, target: self, action: #selector(segueToNowPlaying))
                 
                 return playerButton
