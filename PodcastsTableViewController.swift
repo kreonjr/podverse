@@ -17,17 +17,18 @@ class PodcastsTableViewController: UIViewController {
         switch segmentedControl.selectedSegmentIndex
         {
         case 0:
-            addPlaylistByURL.hidden = true
+            showSubscribeToPodcastsIfNoneAreSubscribed()
             self.tableView.reloadData()
         case 1:
-            addPlaylistByURL.hidden = false
+            bottomButton.setTitle("Add Playlist by URL", forState: .Normal)
+            bottomButton.hidden = false
             self.tableView.reloadData()
         default:
             break;
         }
     }
     
-    @IBOutlet weak var addPlaylistByURL: UIButton!
+    @IBOutlet weak var bottomButton: UIButton!
         
     var playlistManager = PlaylistManager.sharedInstance
     var managedObjectContext:NSManagedObjectContext!
@@ -70,7 +71,7 @@ class PodcastsTableViewController: UIViewController {
         navigationItem.title = "Podverse"
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
 
-        addPlaylistByURL.hidden = true
+        bottomButton.hidden = true
         playlistManager.delegate = self
         
         refreshControl = UIRefreshControl()
@@ -93,6 +94,7 @@ class PodcastsTableViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         navigationItem.rightBarButtonItem = self.playerNavButton()
+        showSubscribeToPodcastsIfNoneAreSubscribed()
     }
     
     func refreshData() {
@@ -161,7 +163,18 @@ class PodcastsTableViewController: UIViewController {
             }
         }
         
+        showSubscribeToPodcastsIfNoneAreSubscribed()
+        
         refreshControl.endRefreshing()
+    }
+    
+    private func showSubscribeToPodcastsIfNoneAreSubscribed() {
+        if podcastsArray.count == 0 && segmentedControl.selectedSegmentIndex == 0 {
+            bottomButton.setTitle("Subscribe to a podcast", forState: .Normal)
+            bottomButton.hidden = false
+        } else if podcastsArray.count > 0 && segmentedControl.selectedSegmentIndex == 0 {
+            bottomButton.hidden = true
+        }
     }
     
     private func showAddPlaylistByURLAlert() {
@@ -213,8 +226,13 @@ class PodcastsTableViewController: UIViewController {
         self.reloadPodcastData()
     }
     
-    @IBAction func addPlaylistByURL(sender: AnyObject) {
-        showAddPlaylistByURLAlert()
+    
+    @IBAction func bottomButtonAction(sender: AnyObject) {
+        if segmentedControl.selectedSegmentIndex == 0 {
+            tabBarController?.selectedIndex = 1
+        } else if segmentedControl.selectedSegmentIndex == 1 {
+            showAddPlaylistByURLAlert()
+        }
     }
     
     // This function runs once on app load, then runs in the background every 30 minutes.
@@ -396,6 +414,8 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
                 self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 
                 PVSubscriber.unsubscribeFromPodcast(podcastToRemove.objectID, completionBlock: nil)
+                
+                showSubscribeToPodcastsIfNoneAreSubscribed()
             }
         } else {
             if indexPath.row > 1 {
