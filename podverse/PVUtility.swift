@@ -9,7 +9,7 @@
 import UIKit
 
 class PVUtility: NSObject {
-   
+    
     static func secondsToHoursMinutesSeconds (seconds : Int) -> (Int, Int, Int) {
         return (seconds / 3600, (seconds % 3600) / 60, (seconds % 3600) % 60)
     }
@@ -87,6 +87,12 @@ class PVUtility: NSObject {
         let dateString = dateFormatter.stringFromDate(date)
         
         return dateString
+    }
+    
+    static func validateEmail(enteredEmail:String) -> Bool {
+        let emailFormat = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        let emailPredicate = NSPredicate(format:"SELF MATCHES %@", emailFormat)
+        return emailPredicate.evaluateWithObject(enteredEmail)
     }
     
     static func deleteEpisodeFromDiskWithName(fileName:String) {

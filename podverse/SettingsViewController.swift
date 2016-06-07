@@ -32,23 +32,47 @@ class SettingsViewController: UIViewController {
     }
     
     func showChangeUserIdAlert() {
-        let createChangeUserIdAlert = UIAlertController(title: "Change your User ID", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
         
-        let currentUserId = NSUserDefaults.standardUserDefaults().stringForKey("userEmail")
+        let createChangeUserIdAlert = UIAlertController(title: "", message: "Please enter a valid email address", preferredStyle: UIAlertControllerStyle.Alert)
         
-        createChangeUserIdAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
-            textField?.text = currentUserId
-        })
-        
-        createChangeUserIdAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
-        
-        createChangeUserIdAlert.addAction(UIAlertAction(title: "Save", style: .Default, handler: { (action: UIAlertAction!) in
-            let textField = createChangeUserIdAlert.textFields![0] as UITextField
-            if let newUserId = textField.text {
-                NSUserDefaults.standardUserDefaults().setValue(newUserId, forKeyPath: Constants.kUserEmail)
-            }
-        }))
-        
+        if let currentUserId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
+            
+            createChangeUserIdAlert.title = PVUtility.validateEmail(currentUserId) ? "Change Your Username" : "Create a Username"
+            
+            createChangeUserIdAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
+                if PVUtility.validateEmail(currentUserId) {
+                    textField?.text = currentUserId
+                }
+            })
+            
+            createChangeUserIdAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
+            
+            createChangeUserIdAlert.addAction(UIAlertAction(title: "Save", style: .Default, handler: { (action: UIAlertAction!) in
+                let textField = createChangeUserIdAlert.textFields![0] as UITextField
+                
+                if let newUserId = textField.text where PVUtility.validateEmail(newUserId) {
+                    let moc = CoreDataHelper.sharedInstance.backgroundContext
+                    
+                    let userCreatedPredicate = NSPredicate(format: "userId == %@", currentUserId, true)
+                    let userClipsArray = CoreDataHelper.fetchEntities("Clip", predicate: userCreatedPredicate, moc:moc) as! [Clip]
+                    for clip in userClipsArray {
+                        // TODO: update the userId for the corresponding clips saved on server when userId is changed
+                        clip.userId = newUserId
+                    }
+                    let userPlaylistsArray = CoreDataHelper.fetchEntities("Playlist", predicate: userCreatedPredicate, moc:moc) as! [Playlist]
+                    for playlist in userPlaylistsArray {
+                        // TODO: update the userId for the corresponding playlists saved on server when userId is changed
+                        playlist.userId = newUserId
+                    }
+                    CoreDataHelper.saveCoreData(moc, completionBlock: nil)
+                    
+                    NSUserDefaults.standardUserDefaults().setValue(newUserId, forKeyPath: Constants.kUserId)
+                    
+                    self.tableView.reloadData()
+                }
+            }))
+            
+        }
         presentViewController(createChangeUserIdAlert, animated: true, completion: nil)
     }
     
@@ -76,7 +100,11 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("settingsCell", forIndexPath: indexPath)
         
-        cell.textLabel?.text = "User ID / Email"
+        if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") where PVUtility.validateEmail(userId) {
+            cell.textLabel?.text = "Change my username"
+        } else {
+            cell.textLabel?.text = "Create new username"
+        }
         
         return cell
     }

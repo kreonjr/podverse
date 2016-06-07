@@ -29,7 +29,6 @@ class PVReachability {
             }
             if NSUserDefaults.standardUserDefaults().boolForKey("DefaultPlaylistsCreated") == false {
                 PlaylistManager.sharedInstance.createDefaultPlaylists()
-                 NSUserDefaults.standardUserDefaults().setBool(true, forKey: "DefaultPlaylistsCreated")
             }
         }
         

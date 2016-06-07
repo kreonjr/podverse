@@ -9,7 +9,7 @@ import Foundation
 import Alamofire
 
 let BASE_URL = "https://podverse.fm/"
-let TEST_URL = "https://podverse.tv/"
+let TEST_URL = "https://podverse.fm/"
 
 
 public enum HTTP_METHOD {

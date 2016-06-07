@@ -51,9 +51,7 @@ struct Constants {
     
     static let kMyEpisodesPlaylist = "My Episodes"
     
-    static let kNoThanksLogin = "noThanksLogin"
-    
-    static let kUserEmail = "userEmail"
+    static let kUserId = "userId"
     
     static let kInternetIsUnreachable = "internetIsUnreachable"
     

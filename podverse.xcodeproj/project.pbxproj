@@ -19,6 +19,8 @@
 		306CA4CD1C65726D001BE391 /* AddToPlaylistTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 306CA4CC1C65726D001BE391 /* AddToPlaylistTableViewController.swift */; };
 		3072BE2E1C48A2F000CA9C7F /* PVDeleter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3072BE2D1C48A2F000CA9C7F /* PVDeleter.swift */; };
 		3081B6BD1BB7431C00233E08 /* CollectionType+Find.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3081B6BC1BB7431C00233E08 /* CollectionType+Find.swift */; };
+		3094FC891D04C6C200501D13 /* GetPlaylistByUserIdFromServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3094FC881D04C6C200501D13 /* GetPlaylistByUserIdFromServer.swift */; };
+		3094FC961D04C6DE00501D13 /* GetClipsByUserIdFromServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3094FC951D04C6DE00501D13 /* GetClipsByUserIdFromServer.swift */; };
 		30AA6BCE1C619CEE0093E45E /* PlaylistTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30AA6BCD1C619CEE0093E45E /* PlaylistTableViewController.swift */; };
 		30AA6BD61C61A8640093E45E /* PlaylistTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30AA6BD51C61A8640093E45E /* PlaylistTableViewCell.swift */; };
 		30B8A4781D03A128009663D3 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF1C35631D0378BF00F9BF8F /* Reachability.framework */; };
@@ -230,6 +232,8 @@
 		306CA4CC1C65726D001BE391 /* AddToPlaylistTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddToPlaylistTableViewController.swift; sourceTree = "<group>"; };
 		3072BE2D1C48A2F000CA9C7F /* PVDeleter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVDeleter.swift; sourceTree = "<group>"; };
 		3081B6BC1BB7431C00233E08 /* CollectionType+Find.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CollectionType+Find.swift"; sourceTree = "<group>"; };
+		3094FC881D04C6C200501D13 /* GetPlaylistByUserIdFromServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetPlaylistByUserIdFromServer.swift; sourceTree = "<group>"; };
+		3094FC951D04C6DE00501D13 /* GetClipsByUserIdFromServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetClipsByUserIdFromServer.swift; sourceTree = "<group>"; };
 		30AA6BCD1C619CEE0093E45E /* PlaylistTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewController.swift; sourceTree = "<group>"; };
 		30AA6BD51C61A8640093E45E /* PlaylistTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewCell.swift; sourceTree = "<group>"; };
 		30B8A4821D03C309009663D3 /* UIViewController+InternetNeededAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+InternetNeededAlert.swift"; sourceTree = "<group>"; };
@@ -528,8 +532,10 @@
 			isa = PBXGroup;
 			children = (
 				EF3980011C545B9900C91753 /* SaveClipToServer.swift */,
+				3094FC951D04C6DE00501D13 /* GetClipsByUserIdFromServer.swift */,
 				EFFD86A01C7AB01E0005014B /* SavePlaylistToServer.swift */,
 				EF51D3C01C83AF2E0004E237 /* GetPlaylistFromServer.swift */,
+				3094FC881D04C6C200501D13 /* GetPlaylistByUserIdFromServer.swift */,
 			);
 			name = WebServices;
 			sourceTree = "<group>";
@@ -803,6 +809,7 @@
 				81DD2CCB1B549C4D00432E0C /* Podcast.swift in Sources */,
 				81CCE4E21B52DB8B00DC8346 /* PodcastProfileViewController.swift in Sources */,
 				81DDBE5F1B24BAF300EF3B9C /* EpisodesTableCell.swift in Sources */,
+				3094FC891D04C6C200501D13 /* GetPlaylistByUserIdFromServer.swift in Sources */,
 				EF3980021C545B9900C91753 /* SaveClipToServer.swift in Sources */,
 				EFAF2A6A1CBB24CB00C8D1CC /* DownloadingEpisode.swift in Sources */,
 				817C54081B4B6976007258F8 /* Constants.swift in Sources */,
@@ -822,6 +829,7 @@
 				EFFD86A11C7AB01E0005014B /* SavePlaylistToServer.swift in Sources */,
 				EF59CECB1BD07AB6002D9DDF /* FeedEnclosure.swift in Sources */,
 				3045E0971C658D4B006477B3 /* AddToPlaylistTableViewCell.swift in Sources */,
+				3094FC961D04C6DE00501D13 /* GetClipsByUserIdFromServer.swift in Sources */,
 				81DD2CC91B549C4D00432E0C /* Clip.swift in Sources */,
 				30AA6BD61C61A8640093E45E /* PlaylistTableViewCell.swift in Sources */,
 				815A2E3B1B522467002A21A7 /* SearchResultPodcast.swift in Sources */,

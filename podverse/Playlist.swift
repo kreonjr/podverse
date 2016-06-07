@@ -12,9 +12,13 @@ class Playlist: NSManagedObject {
     @NSManaged var isPublic: Bool
     @NSManaged var lastUpdated: NSDate?
     @NSManaged var playlistId:String?
+    @NSManaged var userId:String?
 
     @NSManaged var episodes: NSSet?
     @NSManaged var clips: NSSet?
+    
+    @NSManaged var isMyEpisodes: Bool
+    @NSManaged var isMyClips: Bool
     
     var allItems: [AnyObject] {
         get {

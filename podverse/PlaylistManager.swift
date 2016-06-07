@@ -268,14 +268,28 @@ final class PlaylistManager {
         let entityDescription = NSEntityDescription.entityForName("Playlist" as String, inManagedObjectContext: moc)
         fetchRequest.entity = entityDescription
         
-        if moc.countForFetchRequest(fetchRequest, error: nil) < 1 {
-            let myEpisodesPlaylist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
-            myEpisodesPlaylist.title = Constants.kMyEpisodesPlaylist
-            self.savePlaylist(myEpisodesPlaylist, moc:moc)
+        if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
+            let myEpisodesPredicate = NSPredicate(format: "isMyEpisodes == %@", true)
+            let myEpisodesArray = CoreDataHelper.fetchEntities("Playlist", predicate: myEpisodesPredicate, moc:moc) as! [Playlist]
+            if myEpisodesArray.count < 1 {
+                let myEpisodesPlaylist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
+                myEpisodesPlaylist.title = Constants.kMyEpisodesPlaylist
+                myEpisodesPlaylist.isMyEpisodes = true
+                myEpisodesPlaylist.userId = userId
+                self.savePlaylist(myEpisodesPlaylist, moc:moc)
+            }
             
-            let myClipsPlaylist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
-            myClipsPlaylist.title = Constants.kMyClipsPlaylist
-            self.savePlaylist(myClipsPlaylist, moc:moc)
+            let myClipsPredicate = NSPredicate(format: "isMyClips == %@", true)
+            let myClipsArray = CoreDataHelper.fetchEntities("Playlist", predicate: myClipsPredicate, moc:moc) as! [Playlist]
+            if myClipsArray.count < 1 {
+                let myClipsPlaylist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
+                myClipsPlaylist.title = Constants.kMyClipsPlaylist
+                myClipsPlaylist.isMyEpisodes = true
+                myClipsPlaylist.userId = userId
+                self.savePlaylist(myClipsPlaylist, moc:moc)
+            }
+            
+            NSUserDefaults.standardUserDefaults().setBool(true, forKey: "DefaultPlaylistsCreated")
         }
     }
     
@@ -311,11 +325,14 @@ final class PlaylistManager {
             playlist.playlistId = response["_id"] as? String
             playlist.url = response["url"] as? String
             
-                CoreDataHelper.saveCoreData(moc, completionBlock: { (saved) -> Void in
-                    dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                        self.delegate?.didSavePlaylist()
-                    })
+            let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId")
+            playlist.userId = userId
+            
+            CoreDataHelper.saveCoreData(moc, completionBlock: { (saved) -> Void in
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    self.delegate?.didSavePlaylist()
                 })
+            })
             
         }) { (error) -> Void in
             print("Not saved to server. Error: ", error?.localizedDescription)

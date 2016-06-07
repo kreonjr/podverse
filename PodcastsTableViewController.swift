@@ -51,13 +51,11 @@ class PodcastsTableViewController: UIViewController {
             let unsortedPlaylists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: moc) as! [Playlist]
             var sortedPlaylists = unsortedPlaylists.sort({ $0.title.lowercaseString < $1.title.lowercaseString })
             
-            for (index , playlist) in sortedPlaylists.enumerate() {
-                // TODO: This method is problematic. We need a way to distinguish the user's "My Clips" and "My Episodes" playlists WITHOUT depending on the title. 
-                // Currently it depends on the title, and so if you share your "My Clips" or "My Episodes" playlist with me, then the UI will move your playlist to the beginning of the array as if it were my own.
-                if playlist.title == Constants.kMyClipsPlaylist {
+            for (index, playlist) in sortedPlaylists.enumerate() {
+                if playlist.isMyClips {
                     sortedPlaylists.removeAtIndex(index)
                     sortedPlaylists.insert(playlist, atIndex: 0)
-                } else if playlist.title == Constants.kMyEpisodesPlaylist {
+                } else if playlist.isMyEpisodes {
                     sortedPlaylists.removeAtIndex(index)
                     sortedPlaylists.insert(playlist, atIndex: 0)
                 }
@@ -68,6 +66,7 @@ class PodcastsTableViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         navigationItem.title = "Podverse"
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
 
