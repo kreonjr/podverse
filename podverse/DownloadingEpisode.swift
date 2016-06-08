@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreData
 
 final class DownloadingEpisode:Equatable {
     var title:String?
@@ -18,6 +19,9 @@ final class DownloadingEpisode:Equatable {
     var totalBytesWritten:Float?
     var totalBytesExpectedToWrite:Float?
     var podcastRSSFeedURL:String?
+    var wasPausedByUser:Bool?
+    var pausedWithoutResumeData:Bool?
+    var managedEpisodeObjectID:NSManagedObjectID?
     
     var progress: Float {
         get {
@@ -56,6 +60,9 @@ final class DownloadingEpisode:Equatable {
         mediaURL = episode.mediaURL
         imageThumbData = episode.podcast.imageThumbData
         podcastRSSFeedURL = episode.podcast.feedURL
+        wasPausedByUser = false
+        pausedWithoutResumeData = false
+        managedEpisodeObjectID = episode.objectID
     }
 }
 

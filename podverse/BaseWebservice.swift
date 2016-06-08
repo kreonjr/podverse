@@ -9,7 +9,7 @@ import Foundation
 import Alamofire
 
 let BASE_URL = "https://podverse.fm/"
-let TEST_URL = "https://podverse.tv/"
+let TEST_URL = "https://podverse.fm/"
 
 
 public enum HTTP_METHOD {
@@ -38,7 +38,7 @@ public struct ERRORCODES {
 
 public class WebService {
     
-    private let CompletionBlock:(responseDictionary:Dictionary<String, AnyObject>) -> Void
+    private let CompletionBlock:(responseDictionary:AnyObject) -> Void
     private let ErrorBlock:(error:NSError?) -> Void
     
     private let baseURL:String = TEST_URL
@@ -57,7 +57,7 @@ public class WebService {
     public static let VALUE_KEY = "responseValue"
     private var JSONReadingOptions: NSJSONReadingOptions?
     
-    init(name:String, completionBlock:(response:Dictionary<String, AnyObject>) -> Void, errorBlock:(error:NSError?) -> Void) {
+    init(name:String, completionBlock:(response:AnyObject) -> Void, errorBlock:(error:NSError?) -> Void) {
         self.name = name
         CompletionBlock = completionBlock
         ErrorBlock = errorBlock
@@ -138,7 +138,7 @@ public class WebService {
         let minResponse = minResponseCode
         let maxResponse = maxResponseCode
         
-        mRequest.responseJSON(options: self.JSONReadingOptions ?? .AllowFragments, completionHandler: {response  in
+        mRequest.responseJSON(options: self.JSONReadingOptions ?? .AllowFragments, completionHandler: { response  in
             if response.result.isSuccess {
                 guard let rawResponse = response.response else {
                     errorBlock(error: NSError(domain: WebService.WEBSERVICE_ERROR_DOMAIN, code: ERRORCODES.ERROR_BAD_HTTP_RESPONSE, userInfo: [WebService.ERROR_KEY: NSLocalizedString("Invalid Http Response.", comment: "Invalid Http Response.")]));
@@ -146,7 +146,7 @@ public class WebService {
                 }
                 
                 if rawResponse.statusCode >= minResponse && rawResponse.statusCode <= maxResponse {
-                    if let dictionaryResponse = response.result.value as? Dictionary<String, AnyObject> {
+                    if let dictionaryResponse = response.result.value {
                         completionBlock(responseDictionary: dictionaryResponse)
                     }
                     else {

@@ -16,6 +16,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     private var playlist:Playlist!
     var playlistObjectId:NSManagedObjectID!
     private var moc = CoreDataHelper.sharedInstance.managedObjectContext
+    let reachability = PVReachability.manager
     
     var playlistItems = [AnyObject]()
     
@@ -163,6 +164,10 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
                 }))
             } else {
                 playlistItemActions.addAction(UIAlertAction(title: "Stream", style: .Default, handler: { action in
+                if !self.reachability.hasInternetConnection() {
+                    self.showInternetNeededAlert("Connect to WiFi or cellular data to stream an episode.")
+                    return
+                }
                 self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode.objectID)
                     self.segueToNowPlaying()
                 }))
@@ -184,7 +189,12 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
                     self.segueToNowPlaying()
                 }))
             } else {
+                if !self.reachability.hasInternetConnection() {
+                    self.showInternetNeededAlert("Connect to WiFi or cellular data to stream a clip.")
+                    return
+                }
                 playlistItemActions.addAction(UIAlertAction(title: "Stream", style: .Default, handler: { action in
+                    
                     self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip.objectID)
                     self.segueToNowPlaying()
                 }))

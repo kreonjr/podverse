@@ -23,6 +23,7 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     var displayLink: CADisplayLink!
     
     var avPlayer = PVMediaPlayer.sharedInstance.avPlayer
+    let reachability = PVReachability.manager
     
     @IBOutlet weak var startLabel: UILabel!
     @IBOutlet weak var endLabel: UILabel!
@@ -75,6 +76,11 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func showAddClipDetails(sender: AnyObject) {
+        if !reachability.hasInternetConnection() {
+            showInternetNeededAlert("Connect to WiFi or cellular data to make a clip.")
+            return
+        }
+        
         startTime = getStartTimeFromTextFields()
         endTime = getEndTimeFromTextFields()
         

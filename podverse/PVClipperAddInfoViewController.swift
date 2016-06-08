@@ -18,6 +18,7 @@ class PVClipperAddInfoViewController: UIViewController {
     var episodeID:NSManagedObjectID!
     var isEditingClip:Bool = false
     var moc = CoreDataHelper.sharedInstance.managedObjectContext
+    let reachability = PVReachability.manager
     var episode:Episode!
     
     @IBOutlet weak var clipTitleTextField: UITextField!
@@ -41,6 +42,11 @@ class PVClipperAddInfoViewController: UIViewController {
     }
     
     func saveAndGoToReview () {
+        if !reachability.hasInternetConnection() {
+            showInternetNeededAlert("Connect to WiFi or cellular data to make a clip.")
+            return
+        }
+        
         if let clipTitle = clipTitleTextField.text where clipTitle.characters.count > 0 {
             saveClipWithTitle(clipTitle)
         }
@@ -114,7 +120,11 @@ class PVClipperAddInfoViewController: UIViewController {
                 return
             }
             
-            strongSelf.clip?.clipUrl = response["clipUri"] as? String
+            guard let dictResponse = response as? Dictionary<String,AnyObject> else {
+                return
+            }
+            
+            strongSelf.clip?.clipUrl = dictResponse["clipUri"] as? String
             
             CoreDataHelper.saveCoreData(strongSelf.moc, completionBlock:nil)
             

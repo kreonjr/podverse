@@ -15,6 +15,7 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
     var appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
     var docDirectoryURL: NSURL?
     var downloadSession: NSURLSession!
+    let reachability = PVReachability.manager
         
     override init() {
         super.init()
@@ -31,25 +32,33 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
         downloadSession = NSURLSession(configuration: sessionConfiguration, delegate: self, delegateQueue: nil)
     }
     
-    func startDownloadingEpisode (episode: Episode) {
+    func startDownloadingEpisode (episode: Episode) {        
         episode.downloadComplete = false
         if let downloadSourceStringURL = episode.mediaURL, let downloadSourceURL = NSURL(string: downloadSourceStringURL) {
             let downloadTask = downloadSession.downloadTaskWithURL(downloadSourceURL)
             episode.taskIdentifier = NSNumber(integer:downloadTask.taskIdentifier)
-            
+
             let downloadingEpisode = DownloadingEpisode(episode:episode)
             if !DLEpisodesList.shared.downloadingEpisodes.contains(downloadingEpisode) {
                 DLEpisodesList.shared.downloadingEpisodes.append(downloadingEpisode)
+                incrementBadge()
             }
-                
+            // If downloadingEpisode already exists then update it with the new taskIdentifier
+            else {
+                if let matchingDLEpisode = DLEpisodesList.shared.downloadingEpisodes.find({ $0 == downloadingEpisode })  {
+                    matchingDLEpisode.taskIdentifier = episode.taskIdentifier?.integerValue
+                }
+            }
+            
             let task = self.beginBackgroundTask()
             downloadTask.resume()
             self.endBackgroundTask(task)
             
-            incrementBadge()
+            self.postPauseOrResumeNotification(downloadTask.taskIdentifier, pauseOrResume: "Downloading")
         }
     }
     
+    // TODO: this should probably be refactored someday.
     func pauseOrResumeDownloadingEpisode(episode: DownloadingEpisode) {
         // If the episode has already downloaded, then do nothing
         if (episode.downloadComplete == true) {
@@ -60,19 +69,38 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
             let downloadTask = downloadSession.downloadTaskWithResumeData(downloadTaskResumeData)
             episode.taskIdentifier = downloadTask.taskIdentifier
             episode.taskResumeData = nil
+            episode.wasPausedByUser = false
             downloadTask.resume()
             self.postPauseOrResumeNotification(downloadTask.taskIdentifier, pauseOrResume: "Downloading")
         }
-        // Else if the episode is currently downloading, then pause the download
+        else if episode.pausedWithoutResumeData == true {
+            episode.pausedWithoutResumeData = false
+            let moc = CoreDataHelper.sharedInstance.managedObjectContext
+            if let episodeObjectID = episode.managedEpisodeObjectID {
+                if let nsManagedEpisode = CoreDataHelper.fetchEntityWithID(episodeObjectID, moc: moc) as? Episode {
+                    startDownloadingEpisode(nsManagedEpisode)
+                }
+            }
+        }
+        // Else if the episode has a taskIdentifier, then pause the download if it has already begun
         else if let taskIdentifier = episode.taskIdentifier {
             downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
                 for episodeDownloadTask in downloadTasks {
                     if episodeDownloadTask.taskIdentifier == taskIdentifier {
-                        episodeDownloadTask.cancelByProducingResumeData() {resumeData in
-                            self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Paused")
-                            episode.taskIdentifier = nil
+                        episodeDownloadTask.cancelByProducingResumeData() { resumeData in
                             if (resumeData != nil) {
                                 episode.taskResumeData = resumeData
+                                if self.reachability.hasWiFiConnection() == true {
+                                    episode.wasPausedByUser = true
+                                    self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Paused")
+                                }
+                                else {
+                                    self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Connect to WiFi")
+                                }
+                                episode.taskIdentifier = nil
+                            } else {
+                                episode.pausedWithoutResumeData = true
+                                self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Connect to WiFi")
                             }
                         }
                     }

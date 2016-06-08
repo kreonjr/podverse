@@ -21,6 +21,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     let buttonAddToList = UIButton(type: UIButtonType.Custom)
     
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
+    let reachability = PVReachability.manager
     
     var nowPlayingCurrentTimeTimer: NSTimer!
     var playerSpeedRate:PlayingSpeed = .Regular
@@ -262,6 +263,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     }
     
     func toggleMakeClipView(sender: UIButton!) {
+        if !reachability.hasInternetConnection() && makeClipContainerView.hidden {
+            showInternetNeededAlert("Connect to WiFi or cellular data to make a clip.")
+            return
+        }
         makeClipContainerView.hidden = !makeClipContainerView.hidden
 
         if makeClipContainerView.hidden == true {
@@ -286,6 +291,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     }
     
     func addNowPlayingToList() {
+        if !reachability.hasInternetConnection() {
+            showInternetNeededAlert("Connect to WiFi or cellular data to add to a playlist.")
+            return
+        }
         self.performSegueWithIdentifier("Add to Playlist", sender: nil)
     }
     

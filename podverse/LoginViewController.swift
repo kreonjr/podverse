@@ -9,7 +9,10 @@
 import UIKit
 
 class LoginViewController: UIViewController {
-
+    
+    let reachability = PVReachability()
+    let playlistManager = PlaylistManager.sharedInstance
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -24,10 +27,15 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var emailInput: UITextField!
     
     @IBAction func login(sender: AnyObject) {
-        if emailInput.text != "" {
-            NSUserDefaults.standardUserDefaults().setValue(emailInput.text, forKeyPath: Constants.kUserEmail)
+        if let text = emailInput.text where PVUtility.validateEmail(text) {
+            NSUserDefaults.standardUserDefaults().setValue(emailInput.text, forKeyPath: Constants.kUserId)
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             self.view.window?.rootViewController = storyboard.instantiateInitialViewController()
+            if reachability.hasInternetConnection() {
+                playlistManager.getMyPlaylistsFromServer({
+                    self.playlistManager.createDefaultPlaylists()
+                })
+            }
         } else {
             let loginAlert = UIAlertController(title: "Enter Email", message: "Please enter a valid email to login to your account", preferredStyle: UIAlertControllerStyle.Alert)
             loginAlert.addAction(UIAlertAction(title: "Ok", style: .Default, handler: nil))
@@ -36,19 +44,11 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func dismissView(sender: AnyObject) {
-        NSUserDefaults.standardUserDefaults().setObject(true, forKey: Constants.kNoThanksLogin)
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         self.view.window?.rootViewController = storyboard.instantiateInitialViewController()
+        if reachability.hasInternetConnection() {
+            playlistManager.createDefaultPlaylists()
+        }
     }
-    
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }

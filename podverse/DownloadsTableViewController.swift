@@ -12,6 +12,7 @@ import CoreData
 class DownloadsTableViewController: UITableViewController {
 
     let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+    let reachability = PVReachability.manager
     
     var episodes:[DownloadingEpisode] {
         get {
@@ -37,11 +38,14 @@ class DownloadsTableViewController: UITableViewController {
         
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(reloadDownloadTable), name: Constants.kUpdateDownloadsTable, object: nil)
+        
+        refreshControl = nil
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         navigationItem.rightBarButtonItem = self.playerNavButton()
+        reloadDownloadTable()
     }
     
     func reloadDownloadData(notification:NSNotification) {
@@ -101,12 +105,16 @@ class DownloadsTableViewController: UITableViewController {
             cell.downloadStatus.text = "Finished"
             cell.progress.progress = Float(1)
         }
-        else if downloadingEpisode.taskIdentifier != nil {
+        else if downloadingEpisode.taskIdentifier != nil && downloadingEpisode.pausedWithoutResumeData == false && reachability.hasWiFiConnection() == true {
             cell.downloadStatus.text = "Downloading"
             cell.progress.progress = downloadingEpisode.progress
         }
         else {
-            cell.downloadStatus.text = "Paused"
+            if reachability.hasWiFiConnection() || downloadingEpisode.wasPausedByUser == true {
+                cell.downloadStatus.text = "Paused"
+            } else {
+                cell.downloadStatus.text = "Connect to WiFi"
+            }
             cell.progress.progress = downloadingEpisode.progress
         }
         
@@ -125,8 +133,14 @@ class DownloadsTableViewController: UITableViewController {
         guard downloadingEpisode.mediaURL != nil else {
             return
         }
-        
+
+        if reachability.hasWiFiConnection() == false {
+            showInternetNeededAlert("Connect to WiFi to download an episode.")
+            tableView.deselectRowAtIndexPath(indexPath, animated: true)
+            return
+        }
         PVDownloader.sharedInstance.pauseOrResumeDownloadingEpisode(downloadingEpisode)
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
 
     // MARK: - Navigation

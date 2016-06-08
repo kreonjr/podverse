@@ -69,10 +69,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         PVReachability.manager
         
-        if NSUserDefaults.standardUserDefaults().objectForKey("userEmail") == nil && NSUserDefaults.standardUserDefaults().objectForKey("noThanksLogin") == nil {
+        if NSUserDefaults.standardUserDefaults().objectForKey("userId") == nil {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             let loginVC = storyboard.instantiateViewControllerWithIdentifier("LoginVC")
             self.window?.rootViewController = loginVC
+            NSUserDefaults.standardUserDefaults().setObject(NSUUID().UUIDString, forKey: "userId")
         }
         
         Fabric.with([Crashlytics.self])
@@ -120,4 +121,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
          UIApplication.sharedApplication().applicationIconBadgeNumber = 0
     }
 }
-

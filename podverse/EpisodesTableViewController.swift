@@ -34,6 +34,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var moc:NSManagedObjectContext!
     
+    let reachability = PVReachability.manager
+    
     func loadData() {
         
         // Clear the episodes array, then retrieve and sort the full episode or downloaded episode array
@@ -90,6 +92,10 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(selectedEpisode.objectID)
                 self.segueToNowPlaying()
             } else {
+                if reachability.hasInternetConnection() == false {
+                    showInternetNeededAlert("Connect to WiFi or cellular data to download an episode.")
+                    return
+                }
                 PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
                 cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
             }
@@ -218,7 +224,6 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        
         // If not the last item in the array, then perform selected episode actions
         if indexPath.row < episodesArray.count {
             
@@ -236,9 +241,14 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                     episodeActions.addAction(UIAlertAction(title: "Downloading Episode", style: .Default, handler: nil))
                 } else {
                     episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
-                         PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
-                        let cell = tableView.cellForRowAtIndexPath(indexPath) as! EpisodesTableCell
-                        cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
+                        if self.reachability.hasInternetConnection() == true {
+                            PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
+                            let cell = tableView.cellForRowAtIndexPath(indexPath) as! EpisodesTableCell
+                            cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
+                        }
+                        else {
+                            self.showInternetNeededAlert("Connect to WiFi or cellular data to download an episode.")
+                        }
                     }))
                 }
             }
@@ -251,6 +261,10 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             episodeActions.addAction(UIAlertAction (title: "Episode Info", style: .Default, handler: nil))
             
             episodeActions.addAction(UIAlertAction (title: "Stream Episode", style: .Default, handler: { action in
+                if self.reachability.hasInternetConnection() == false {
+                    self.showInternetNeededAlert("Connect to WiFi or cellular data to stream an episode.")
+                    return
+                }
                 self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(selectedEpisode.objectID)
                 self.segueToNowPlaying()
             }))
@@ -263,6 +277,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         else {
             toggleShowAllEpisodes()
         }
+        
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     func toggleShowAllEpisodes() {

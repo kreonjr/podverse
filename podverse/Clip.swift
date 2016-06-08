@@ -19,4 +19,5 @@ class Clip: NSManagedObject {
     @NSManaged var clipUrl: String?
     @NSManaged var playlists: NSSet?
     @NSManaged var dateCreated: NSDate?
+    @NSManaged var userId: String?
 }

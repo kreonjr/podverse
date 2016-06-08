@@ -17,22 +17,24 @@ class PodcastsTableViewController: UIViewController {
         switch segmentedControl.selectedSegmentIndex
         {
         case 0:
-            addPlaylistByURL.hidden = true
+            showSubscribeToPodcastsIfNoneAreSubscribed()
             self.tableView.reloadData()
         case 1:
-            addPlaylistByURL.hidden = false
+            bottomButton.setTitle("Add Playlist by URL", forState: .Normal)
+            bottomButton.hidden = false
             self.tableView.reloadData()
         default:
             break;
         }
     }
     
-    @IBOutlet weak var addPlaylistByURL: UIButton!
+    @IBOutlet weak var bottomButton: UIButton!
         
     var playlistManager = PlaylistManager.sharedInstance
     var managedObjectContext:NSManagedObjectContext!
     var podcastsArray = [Podcast]()
     let coreDataHelper = CoreDataHelper.sharedInstance
+    let reachability = PVReachability.manager
     var refreshControl: UIRefreshControl!
     private var itemsParsing = 0
     private var totalItemsToParse = 0
@@ -49,13 +51,11 @@ class PodcastsTableViewController: UIViewController {
             let unsortedPlaylists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: moc) as! [Playlist]
             var sortedPlaylists = unsortedPlaylists.sort({ $0.title.lowercaseString < $1.title.lowercaseString })
             
-            for (index , playlist) in sortedPlaylists.enumerate() {
-                // TODO: This method is problematic. We need a way to distinguish the user's "My Clips" and "My Episodes" playlists WITHOUT depending on the title. 
-                // Currently it depends on the title, and so if you share your "My Clips" or "My Episodes" playlist with me, then the UI will move your playlist to the beginning of the array as if it were my own.
-                if playlist.title == Constants.kMyClipsPlaylist {
+            for (index, playlist) in sortedPlaylists.enumerate() {
+                if playlist.isMyClips {
                     sortedPlaylists.removeAtIndex(index)
                     sortedPlaylists.insert(playlist, atIndex: 0)
-                } else if playlist.title == Constants.kMyEpisodesPlaylist {
+                } else if playlist.isMyEpisodes {
                     sortedPlaylists.removeAtIndex(index)
                     sortedPlaylists.insert(playlist, atIndex: 0)
                 }
@@ -66,10 +66,11 @@ class PodcastsTableViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         navigationItem.title = "Podverse"
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
 
-        addPlaylistByURL.hidden = true
+        bottomButton.hidden = true
         playlistManager.delegate = self
         
         refreshControl = UIRefreshControl()
@@ -80,6 +81,7 @@ class PodcastsTableViewController: UIViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(reloadPodcastData), name: Constants.kDownloadHasFinished, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(unsubscribeFromPodcast(_:)), name: Constants.kUnsubscribeFromPodcast, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(clearParsingActivity), name: Constants.kInternetIsUnreachable, object: nil)
         updateParsingActivity()
         
         reloadPodcastData()
@@ -91,13 +93,24 @@ class PodcastsTableViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         navigationItem.rightBarButtonItem = self.playerNavButton()
+        showSubscribeToPodcastsIfNoneAreSubscribed()
     }
     
     func refreshData() {
         if segmentedControl.selectedSegmentIndex == 0 {
+            if reachability.hasInternetConnection() == false && refreshControl.refreshing == true {
+                showInternetNeededAlert("Connect to WiFi or cellular data to parse podcast feeds.")
+                refreshControl.endRefreshing()
+                return
+            }
             refreshPodcastFeeds()
         }
         else {
+            if reachability.hasInternetConnection() == false && refreshControl.refreshing == true {
+                showInternetNeededAlert("Connect to WiFi or cellular data to refresh playlists.")
+                refreshControl.endRefreshing()
+                return
+            }
             refreshPlaylists()
         }
     }
@@ -149,10 +162,26 @@ class PodcastsTableViewController: UIViewController {
             }
         }
         
+        showSubscribeToPodcastsIfNoneAreSubscribed()
+        
         refreshControl.endRefreshing()
     }
     
+    private func showSubscribeToPodcastsIfNoneAreSubscribed() {
+        if podcastsArray.count == 0 && segmentedControl.selectedSegmentIndex == 0 {
+            bottomButton.setTitle("Subscribe to a podcast", forState: .Normal)
+            bottomButton.hidden = false
+        } else if podcastsArray.count > 0 && segmentedControl.selectedSegmentIndex == 0 {
+            bottomButton.hidden = true
+        }
+    }
+    
     private func showAddPlaylistByURLAlert() {
+        if reachability.hasInternetConnection() == false {
+            showInternetNeededAlert("Connect to WiFi or cellular data to add a playlist by URL.")
+            return
+        }
+        
         let addPlaylistByURLAlert = UIAlertController(title: "Add Playlist By URL", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
         
         addPlaylistByURLAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
@@ -196,8 +225,13 @@ class PodcastsTableViewController: UIViewController {
         self.reloadPodcastData()
     }
     
-    @IBAction func addPlaylistByURL(sender: AnyObject) {
-        showAddPlaylistByURLAlert()
+    
+    @IBAction func bottomButtonAction(sender: AnyObject) {
+        if segmentedControl.selectedSegmentIndex == 0 {
+            tabBarController?.selectedIndex = 1
+        } else if segmentedControl.selectedSegmentIndex == 1 {
+            showAddPlaylistByURLAlert()
+        }
     }
     
     // This function runs once on app load, then runs in the background every 30 minutes.
@@ -224,6 +258,11 @@ class PodcastsTableViewController: UIViewController {
         }
         
         self.tableView.reloadData()
+    }
+    
+    func clearParsingActivity() {
+        self.itemsParsing = 0
+        self.parsingActivityContainer.hidden = true
     }
     
     private func updateParsingActivity() {
@@ -348,6 +387,7 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
         } else {
             self.performSegueWithIdentifier("Show Playlist", sender: nil)
         }
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     // Override to support conditional editing of the table view.
@@ -373,6 +413,8 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
                 self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 
                 PVSubscriber.unsubscribeFromPodcast(podcastToRemove.objectID, completionBlock: nil)
+                
+                showSubscribeToPodcastsIfNoneAreSubscribed()
             }
         } else {
             if indexPath.row > 1 {
