@@ -9,7 +9,7 @@
 import Foundation
 
 final class GetPlaylistFromServer:WebService {
-    internal init(playlistId:String,completionBlock: (response: Dictionary<String, AnyObject>) -> Void, errorBlock: (error: NSError?) -> Void) {
+    internal init(playlistId:String,completionBlock: (response: AnyObject) -> Void, errorBlock: (error: NSError?) -> Void) {
         super.init(name:"pl/"+playlistId,completionBlock: completionBlock, errorBlock: errorBlock)
     
         self.setHttpMethod(.METHOD_GET)

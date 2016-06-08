@@ -32,7 +32,9 @@ class LoginViewController: UIViewController {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             self.view.window?.rootViewController = storyboard.instantiateInitialViewController()
             if reachability.hasInternetConnection() {
-                playlistManager.createDefaultPlaylists()
+                playlistManager.getMyPlaylistsFromServer({
+                    self.playlistManager.createDefaultPlaylists()
+                })
             }
         } else {
             let loginAlert = UIAlertController(title: "Enter Email", message: "Please enter a valid email to login to your account", preferredStyle: UIAlertControllerStyle.Alert)

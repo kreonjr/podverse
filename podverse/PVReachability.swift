@@ -12,6 +12,7 @@ import Reachability
 class PVReachability {
     static let manager = PVReachability()
     var reachability:Reachability!
+    var playlistManager = PlaylistManager.sharedInstance
     
     init (){
         do {
@@ -28,7 +29,9 @@ class PVReachability {
                 self.resumeDownloadingEpisodes()
             }
             if NSUserDefaults.standardUserDefaults().boolForKey("DefaultPlaylistsCreated") == false {
-                PlaylistManager.sharedInstance.createDefaultPlaylists()
+                self.playlistManager.getMyPlaylistsFromServer({
+                    self.playlistManager.createDefaultPlaylists()
+                })
             }
         }
         

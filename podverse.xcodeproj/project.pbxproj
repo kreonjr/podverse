@@ -458,15 +458,15 @@
 		EF1699AB1CE94FD900E66F7A /* PVHelpers */ = {
 			isa = PBXGroup;
 			children = (
-				81E3578F1B21624500D67634 /* PVUtility.swift */,
-				EF1C35701D037B4100F9BF8F /* PVReachability.swift */,
 				3047AC521C5462A300F484D5 /* PVClipStreamer.swift */,
 				3072BE2D1C48A2F000CA9C7F /* PVDeleter.swift */,
 				81623C281B35D3A100E906FE /* PVDownloader.swift */,
 				81E3578D1B21619F00D67634 /* PVFeedParser.swift */,
-				3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */,
-				813FC80F1B5CA992006248BC /* PVSubscriber.swift */,
 				302F5E801CF2244100775CEA /* PVImageManipulator.swift */,
+				3010F39B1BC9B64E001DFFF6 /* PVMediaPlayer.swift */,
+				EF1C35701D037B4100F9BF8F /* PVReachability.swift */,
+				813FC80F1B5CA992006248BC /* PVSubscriber.swift */,
+				81E3578F1B21624500D67634 /* PVUtility.swift */,
 			);
 			name = PVHelpers;
 			sourceTree = "<group>";

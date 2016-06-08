@@ -9,7 +9,7 @@
 import UIKit
 
 class SaveClipToServer:WebService {
-    internal init(clip:Clip, completionBlock: (response: Dictionary<String, AnyObject>) -> Void, errorBlock: (error: NSError?) -> Void) {
+    internal init(clip:Clip, completionBlock: (response: AnyObject) -> Void, errorBlock: (error: NSError?) -> Void) {
         super.init(name:"c", completionBlock: completionBlock, errorBlock: errorBlock)
         
         let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId")

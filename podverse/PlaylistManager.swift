@@ -34,10 +34,10 @@ final class PlaylistManager {
         
         if (urlComponentArray[0] == "http:" || urlComponentArray[0] == "https:") && (urlComponentArray[1] == "") && (urlComponentArray[2] == "podverse.tv") && (urlComponentArray[3] == "pl") {
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
-                    
+                        let dictResponse = response as! Dictionary<String,AnyObject>
                         let moc = CoreDataHelper.sharedInstance.backgroundContext
                         var playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:moc)
-                    playlist = PlaylistManager.JSONToPlaylist(playlist, JSONDict: response, moc:moc)
+                    playlist = PlaylistManager.JSONToPlaylist(playlist, JSONDict: dictResponse, moc:moc)
                     
                         CoreDataHelper.saveCoreData(moc, completionBlock:{ (finished) in
                             dispatch_async(dispatch_get_main_queue()) {
@@ -54,30 +54,35 @@ final class PlaylistManager {
     }
     
     func refreshPlaylists(completion:()->Void) {
-        let dispatchGroup = dispatch_group_create()
-        let managedObjectContext = CoreDataHelper.sharedInstance.backgroundContext
-        let playlists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: managedObjectContext) as! [Playlist]
-        for playlist in playlists {
-            if let playlistId = playlist.playlistId {
-                dispatch_group_enter(dispatchGroup)
-                GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
-                    var playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:managedObjectContext)
-                    playlist = PlaylistManager.JSONToPlaylist(playlist, JSONDict: response, moc: managedObjectContext)
-                    
-                    CoreDataHelper.saveCoreData(managedObjectContext, completionBlock:{ (finished) in
-                        print("Playlist refreshed")
-                        dispatch_group_leave(dispatchGroup)
-                    })
-                    
-                }) { (error) -> Void in
-                    print("Error y'all \(error?.localizedDescription)")
-                }.call()
+        // TODO: there is redundancy when we always run getMyPlaylistsFromServer then run refreshPlaylists in the completionBlock. getMyPlaylistsFromServer will ensure the playlists the user has created are synced and up-to-date locally on the device, whereas refreshPlaylists will ensure that ALL playlists (including other people's who the user is subscribed to) are up-to-date locally on the device. This means the user will always have their own playlists refreshed twice.
+        getMyPlaylistsFromServer({
+            let dispatchGroup = dispatch_group_create()
+            let managedObjectContext = CoreDataHelper.sharedInstance.backgroundContext
+            let playlists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: managedObjectContext) as! [Playlist]
+            for playlist in playlists {
+                if let playlistId = playlist.playlistId {
+                    dispatch_group_enter(dispatchGroup)
+                    GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
+                        let dictResponse = response as! Dictionary<String,AnyObject>
+                        var playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:managedObjectContext)
+                        playlist = PlaylistManager.JSONToPlaylist(playlist, JSONDict: dictResponse, moc: managedObjectContext)
+                        
+                        CoreDataHelper.saveCoreData(managedObjectContext, completionBlock:{ (finished) in
+                            print("Playlist refreshed")
+                            dispatch_group_leave(dispatchGroup)
+                        })
+                        
+                    }) { (error) -> Void in
+                        print("Error y'all \(error?.localizedDescription)")
+                        }.call()
+                }
             }
-        }
-        
-        dispatch_group_notify(dispatchGroup, dispatch_get_main_queue()) { () -> Void in
-            completion()
-        }
+            
+            dispatch_group_notify(dispatchGroup, dispatch_get_main_queue()) { () -> Void in
+                completion()
+            }
+
+        })
     }
     
     static func JSONToPlaylist(playlist:Playlist, JSONDict:Dictionary<String,AnyObject>, moc:NSManagedObjectContext) -> Playlist {
@@ -97,8 +102,17 @@ final class PlaylistManager {
             playlist.isPublic = isPublic.boolValue
         }
         
+        if let isMyEpisodes = JSONDict["isMyEpisodes"] {
+            playlist.isMyEpisodes = isMyEpisodes.boolValue
+        }
+        
+        if let isMyClips = JSONDict["isMyClips"] {
+            playlist.isMyClips = isMyClips.boolValue
+        }
+        
         if let playlistItems = JSONDict["playlistItems"] as? [Dictionary<String,AnyObject>] {
             if playlistItems.count != playlist.allItems.count {
+                
                 playlist.episodes = NSSet()
                 playlist.clips = NSSet()
                 for playlistItem in playlistItems {
@@ -191,6 +205,7 @@ final class PlaylistManager {
                         
                         if let mediaUrlString = playlistItem["mediaURL"] as? String {
                             episode = CoreDataHelper.retrieveExistingOrCreateNewEpisode(mediaUrlString, moc:moc)
+                            episode.mediaURL = mediaUrlString
                         } else {
                             break
                         }
@@ -206,6 +221,7 @@ final class PlaylistManager {
                         podcast.addEpisodeObject(episode)
                         
                         playlist.addEpisodeObject(episode)
+                        
                     }
                 }
             }
@@ -284,12 +300,39 @@ final class PlaylistManager {
             if myClipsArray.count < 1 {
                 let myClipsPlaylist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
                 myClipsPlaylist.title = Constants.kMyClipsPlaylist
-                myClipsPlaylist.isMyEpisodes = true
+                myClipsPlaylist.isMyClips = true
                 myClipsPlaylist.userId = userId
                 self.savePlaylist(myClipsPlaylist, moc:moc)
             }
             
             NSUserDefaults.standardUserDefaults().setBool(true, forKey: "DefaultPlaylistsCreated")
+        }
+    }
+    
+    func getMyPlaylistsFromServer(completion:()->Void) {
+        if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
+            GetPlaylistsByUserIdFromServer(userId: userId, completionBlock: { (response) -> Void in
+                
+                let dispatchGroup = dispatch_group_create()
+                let playlistsArray = response as! [Dictionary<String,AnyObject>]
+                for playlistDict in playlistsArray {
+                    if let playlistId = playlistDict["_id"] as? String {
+                        dispatch_group_enter(dispatchGroup)
+                        let moc = CoreDataHelper.sharedInstance.backgroundContext
+                        var playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc: moc)
+                        playlist = PlaylistManager.JSONToPlaylist(playlist, JSONDict: playlistDict, moc: moc)
+                        CoreDataHelper.saveCoreData(moc, completionBlock:{ (finished) in
+                            dispatch_group_leave(dispatchGroup)
+                        })
+                    }
+                }
+                dispatch_group_notify(dispatchGroup, dispatch_get_main_queue()) { () -> Void in
+                    completion()
+                }
+            }) { (error) -> Void in
+                // TODO: add error handling
+                print(error)
+            }.call()
         }
     }
     
@@ -305,7 +348,8 @@ final class PlaylistManager {
         SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
             if let managedObjectContext = moc {
                 let playlist = CoreDataHelper.fetchEntityWithID(playlist.objectID, moc: managedObjectContext) as! Playlist
-                playlist.url = response["url"] as? String
+                let dictResponse = response as! Dictionary<String,AnyObject>
+                playlist.url = dictResponse["url"] as? String
                 CoreDataHelper.saveCoreData(managedObjectContext, completionBlock: { (saved) in
                     dispatch_async(dispatch_get_main_queue(), { () -> Void in
                         NSNotificationCenter.defaultCenter().postNotificationName(Constants.kItemAddedToPlaylistNotification, object: nil)
@@ -322,8 +366,9 @@ final class PlaylistManager {
     func savePlaylist(playlist: Playlist, moc:NSManagedObjectContext) {
         let playlist = playlist
         SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
-            playlist.playlistId = response["_id"] as? String
-            playlist.url = response["url"] as? String
+            let dictResponse = response as! Dictionary<String,AnyObject>
+            playlist.playlistId = dictResponse["_id"] as? String
+            playlist.url = dictResponse["url"] as? String
             
             let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId")
             playlist.userId = userId
