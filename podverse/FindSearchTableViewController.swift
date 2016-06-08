@@ -20,10 +20,6 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     
     let moc = CoreDataHelper.sharedInstance.managedObjectContext
     
-    let vcName = "FindSearchTableViewController"
-    
-    let reachability = PVReachability.manager
-    
     var podcastVC:PodcastsTableViewController? {
         get {
             if let navController = self.tabBarController?.viewControllers?.first as? UINavigationController, podcastTable = navController.topViewController as? PodcastsTableViewController {
@@ -112,9 +108,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                             }
                         }
                     } else {
-                        dispatch_async(dispatch_get_main_queue()) {
-                            self.showInternetNeededAlert("Connect to WiFi or cellular data to search for podcasts.")
-                        }
+                        self.showInternetNeededAlert("Connect to WiFi or cellular data to search for podcasts.")
                     }
                 } catch let error as NSError {
                     print(error)
@@ -126,7 +120,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     }
     
     func searchBarShouldBeginEditing(searchBar: UISearchBar) -> Bool {
-        if reachability.hasInternetConnection() == false {
+        if PVReachability.manager.hasInternetConnection() == false {
             searchBar.resignFirstResponder()
             showInternetNeededAlert("Connect to WiFi or cellular data to search for podcasts.")
             return false

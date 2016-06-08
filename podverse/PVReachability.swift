@@ -12,7 +12,6 @@ import Reachability
 class PVReachability {
     static let manager = PVReachability()
     var reachability:Reachability!
-    var playlistManager = PlaylistManager.sharedInstance
     
     init (){
         do {
@@ -29,8 +28,9 @@ class PVReachability {
                 self.resumeDownloadingEpisodes()
             }
             if NSUserDefaults.standardUserDefaults().boolForKey("DefaultPlaylistsCreated") == false {
-                self.playlistManager.getMyPlaylistsFromServer({
-                    self.playlistManager.createDefaultPlaylists()
+                let playlistManager = PlaylistManager.sharedInstance
+                playlistManager.getMyPlaylistsFromServer({
+                    playlistManager.createDefaultPlaylists()
                 })
             }
         }
@@ -39,14 +39,10 @@ class PVReachability {
             if !reachability.isReachableViaWiFi() {
                 self.pauseDownloadingEpisodesUntilWiFi()
             }
-            if let topController = UIApplication.topViewController() {
-                if topController is FindSearchTableViewController {
-                    dispatch_async(dispatch_get_main_queue()) {
-                        topController.showInternetNeededAlert("Connect to WiFi or cellular data to search for podcasts.")
-                    }
-                }
-            }
-            NSNotificationCenter.defaultCenter().postNotificationName(Constants.kInternetIsUnreachable, object: self, userInfo: nil)
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kInternetIsUnreachable, object: self, userInfo: nil)
+            })
         }
         
         do {
@@ -76,6 +72,7 @@ class PVReachability {
         return connectionNeededAlert
     }
     
+    // TODO: move to PVDownloader without causing splash screen to hang indefinitely
     func pauseDownloadingEpisodesUntilWiFi() {
         let downloader = PVDownloader.sharedInstance
         downloader.downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in
@@ -91,6 +88,7 @@ class PVReachability {
         }
     }
     
+    // TODO: move to PVDownloader without causing splash screen to hang indefinitely
     func resumeDownloadingEpisodes() {
         let downloader = PVDownloader.sharedInstance
         downloader.downloadSession.getTasksWithCompletionHandler { dataTasks, uploadTasks, downloadTasks in

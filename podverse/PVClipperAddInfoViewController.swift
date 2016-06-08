@@ -120,7 +120,9 @@ class PVClipperAddInfoViewController: UIViewController {
                 return
             }
             
-            let dictResponse = response as! Dictionary<String,AnyObject>
+            guard let dictResponse = response as? Dictionary<String,AnyObject> else {
+                return
+            }
             
             strongSelf.clip?.clipUrl = dictResponse["clipUri"] as? String
             

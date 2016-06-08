@@ -11,7 +11,9 @@ import UIKit
 extension UIViewController {
     func showInternetNeededAlert(message: String) {
         let internetNeededAlert = PVReachability.manager.createInternetConnectionNeededAlert(message)
-        presentViewController(internetNeededAlert, animated: true, completion: nil)
+        dispatch_async(dispatch_get_main_queue(), {
+            self.presentViewController(internetNeededAlert, animated: true, completion: nil)
+        })
     }
 }
 
