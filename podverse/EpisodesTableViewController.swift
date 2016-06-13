@@ -110,6 +110,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             
             let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe: false)
             feedParser.delegate = strongSelf
+            ParsingPodcastsURLs.shared.urls.append(strongSelf.selectedPodcast.feedURL)
             feedParser.parsePodcastFeed(strongSelf.selectedPodcast.feedURL)
         }
     }

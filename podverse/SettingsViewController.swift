@@ -33,47 +33,54 @@ class SettingsViewController: UIViewController {
     
     func showChangeUserIdAlert() {
         
-        let createChangeUserIdAlert = UIAlertController(title: "", message: "Please enter a valid email address", preferredStyle: UIAlertControllerStyle.Alert)
+        // TODO: remove this alert below, then uncomment and update the alert below it when we can update userIds on the clips and playlists stored on the server
+        let featureNotAvailableAlert = UIAlertController(title: "Feature Not Available", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
         
-        if let currentUserId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
-            
-            createChangeUserIdAlert.title = PVUtility.validateEmail(currentUserId) ? "Change Your Username" : "Create a Username"
-            
-            createChangeUserIdAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
-                if PVUtility.validateEmail(currentUserId) {
-                    textField?.text = currentUserId
-                }
-            })
-            
-            createChangeUserIdAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
-            
-            createChangeUserIdAlert.addAction(UIAlertAction(title: "Save", style: .Default, handler: { (action: UIAlertAction!) in
-                let textField = createChangeUserIdAlert.textFields![0] as UITextField
-                
-                if let newUserId = textField.text where PVUtility.validateEmail(newUserId) {
-                    let moc = CoreDataHelper.sharedInstance.backgroundContext
-                    
-                    let userCreatedPredicate = NSPredicate(format: "userId == %@", currentUserId, true)
-                    let userClipsArray = CoreDataHelper.fetchEntities("Clip", predicate: userCreatedPredicate, moc:moc) as! [Clip]
-                    for clip in userClipsArray {
-                        // TODO: update the userId for the corresponding clips saved on server when userId is changed
-                        clip.userId = newUserId
-                    }
-                    let userPlaylistsArray = CoreDataHelper.fetchEntities("Playlist", predicate: userCreatedPredicate, moc:moc) as! [Playlist]
-                    for playlist in userPlaylistsArray {
-                        // TODO: update the userId for the corresponding playlists saved on server when userId is changed
-                        playlist.userId = newUserId
-                    }
-                    CoreDataHelper.saveCoreData(moc, completionBlock: nil)
-                    
-                    NSUserDefaults.standardUserDefaults().setValue(newUserId, forKeyPath: Constants.kUserId)
-                    
-                    self.tableView.reloadData()
-                }
-            }))
-            
-        }
-        presentViewController(createChangeUserIdAlert, animated: true, completion: nil)
+        featureNotAvailableAlert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+        
+        presentViewController(featureNotAvailableAlert, animated: true, completion: nil)
+        
+//        let createChangeUserIdAlert = UIAlertController(title: "", message: "Please enter a valid email address", preferredStyle: UIAlertControllerStyle.Alert)
+//        
+//        if let currentUserId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
+//            
+//            createChangeUserIdAlert.title = PVUtility.validateEmail(currentUserId) ? "Change Your Username" : "Create a Username"
+//            
+//            createChangeUserIdAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
+//                if PVUtility.validateEmail(currentUserId) {
+//                    textField?.text = currentUserId
+//                }
+//            })
+//            
+//            createChangeUserIdAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
+//            
+//            createChangeUserIdAlert.addAction(UIAlertAction(title: "Save", style: .Default, handler: { (action: UIAlertAction!) in
+//                let textField = createChangeUserIdAlert.textFields![0] as UITextField
+//                
+//                if let newUserId = textField.text where PVUtility.validateEmail(newUserId) {
+//                    let moc = CoreDataHelper.sharedInstance.backgroundContext
+//                    
+//                    let userCreatedPredicate = NSPredicate(format: "userId == %@", currentUserId, true)
+//                    let userClipsArray = CoreDataHelper.fetchEntities("Clip", predicate: userCreatedPredicate, moc:moc) as! [Clip]
+//                    for clip in userClipsArray {
+//                        // TODO: update the userId for the corresponding clips saved on server when userId is changed
+//                        clip.userId = newUserId
+//                    }
+//                    let userPlaylistsArray = CoreDataHelper.fetchEntities("Playlist", predicate: userCreatedPredicate, moc:moc) as! [Playlist]
+//                    for playlist in userPlaylistsArray {
+//                        // TODO: update the userId for the corresponding playlists saved on server when userId is changed
+//                        playlist.userId = newUserId
+//                    }
+//                    CoreDataHelper.saveCoreData(moc, completionBlock: nil)
+//                    
+//                    NSUserDefaults.standardUserDefaults().setValue(newUserId, forKeyPath: Constants.kUserId)
+//                    
+//                    self.tableView.reloadData()
+//                }
+//            }))
+//            
+//        }
+//        presentViewController(createChangeUserIdAlert, animated: true, completion: nil)
     }
     
 }

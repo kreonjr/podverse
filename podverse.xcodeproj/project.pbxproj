@@ -21,6 +21,7 @@
 		3081B6BD1BB7431C00233E08 /* CollectionType+Find.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3081B6BC1BB7431C00233E08 /* CollectionType+Find.swift */; };
 		3094FC891D04C6C200501D13 /* GetPlaylistByUserIdFromServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3094FC881D04C6C200501D13 /* GetPlaylistByUserIdFromServer.swift */; };
 		3094FC961D04C6DE00501D13 /* GetClipsByUserIdFromServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3094FC951D04C6DE00501D13 /* GetClipsByUserIdFromServer.swift */; };
+		3094FC9A1D0E4BAB00501D13 /* ParsingPodcastsURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3094FC991D0E4BAB00501D13 /* ParsingPodcastsURLs.swift */; };
 		30AA6BCE1C619CEE0093E45E /* PlaylistTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30AA6BCD1C619CEE0093E45E /* PlaylistTableViewController.swift */; };
 		30AA6BD61C61A8640093E45E /* PlaylistTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30AA6BD51C61A8640093E45E /* PlaylistTableViewCell.swift */; };
 		30B8A4781D03A128009663D3 /* Reachability.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EF1C35631D0378BF00F9BF8F /* Reachability.framework */; };
@@ -234,6 +235,7 @@
 		3081B6BC1BB7431C00233E08 /* CollectionType+Find.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CollectionType+Find.swift"; sourceTree = "<group>"; };
 		3094FC881D04C6C200501D13 /* GetPlaylistByUserIdFromServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetPlaylistByUserIdFromServer.swift; sourceTree = "<group>"; };
 		3094FC951D04C6DE00501D13 /* GetClipsByUserIdFromServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetClipsByUserIdFromServer.swift; sourceTree = "<group>"; };
+		3094FC991D0E4BAB00501D13 /* ParsingPodcastsURLs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParsingPodcastsURLs.swift; sourceTree = "<group>"; };
 		30AA6BCD1C619CEE0093E45E /* PlaylistTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewController.swift; sourceTree = "<group>"; };
 		30AA6BD51C61A8640093E45E /* PlaylistTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewCell.swift; sourceTree = "<group>"; };
 		30B8A4821D03C309009663D3 /* UIViewController+InternetNeededAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+InternetNeededAlert.swift"; sourceTree = "<group>"; };
@@ -414,9 +416,10 @@
 		EF16999A1CE94A1000E66F7A /* Custom Classes */ = {
 			isa = PBXGroup;
 			children = (
-				EF70B0761C574BC800234FF2 /* DownloadingEpisodesList.swift */,
 				818615BF1B1E950D006C9731 /* CoreDataHelper.swift */,
+				EF70B0761C574BC800234FF2 /* DownloadingEpisodesList.swift */,
 				EFAF2A691CBB24CB00C8D1CC /* DownloadingEpisode.swift */,
+				3094FC991D0E4BAB00501D13 /* ParsingPodcastsURLs.swift */,
 			);
 			name = "Custom Classes";
 			sourceTree = "<group>";
@@ -855,6 +858,7 @@
 				EF59CECE1BD07AB6002D9DDF /* NSDate+FeedsDate.swift in Sources */,
 				EF1C35711D037B4100F9BF8F /* PVReachability.swift in Sources */,
 				3081B6BD1BB7431C00233E08 /* CollectionType+Find.swift in Sources */,
+				3094FC9A1D0E4BAB00501D13 /* ParsingPodcastsURLs.swift in Sources */,
 				306CA4CD1C65726D001BE391 /* AddToPlaylistTableViewController.swift in Sources */,
 				EF70B0771C574BC800234FF2 /* DownloadingEpisodesList.swift in Sources */,
 			);
