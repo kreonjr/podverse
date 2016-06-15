@@ -268,7 +268,7 @@ class PodcastsTableViewController: UIViewController {
         self.parsingActivityLabel.text = "\(parsingPodcastsURLs.itemsParsing) of \(parsingPodcastsURLs.urls.count) parsed"
         self.parsingActivityBar.progress = Float(parsingPodcastsURLs.itemsParsing)/Float(parsingPodcastsURLs.urls.count)
         
-        if parsingPodcastsURLs.itemsParsing == parsingPodcastsURLs.urls.count {
+        if parsingPodcastsURLs.itemsParsing >= parsingPodcastsURLs.urls.count {
             self.parsingActivityContainer.hidden = true
             self.parsingActivity.stopAnimating()
         }
