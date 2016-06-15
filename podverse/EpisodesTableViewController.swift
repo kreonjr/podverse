@@ -89,7 +89,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 if pvMediaPlayer.avPlayer.rate == 1 {
                     pvMediaPlayer.saveCurrentTimeAsPlaybackPosition()
                 }
-                pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(selectedEpisode.objectID)
+                pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(selectedEpisode.objectID, paused: false)
                 self.segueToNowPlaying()
             } else {
                 if reachability.hasInternetConnection() == false {
@@ -234,7 +234,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             
             if selectedEpisode.fileName != nil {
                 episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
-                    self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(selectedEpisode.objectID)
+                    self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(selectedEpisode.objectID, paused: false)
                     self.segueToNowPlaying()
                 }))
             } else {
@@ -266,7 +266,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                     self.showInternetNeededAlert("Connect to WiFi or cellular data to stream an episode.")
                     return
                 }
-                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(selectedEpisode.objectID)
+                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(selectedEpisode.objectID, paused: false)
                 self.segueToNowPlaying()
             }))
             

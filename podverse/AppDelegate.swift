@@ -76,6 +76,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             NSUserDefaults.standardUserDefaults().setObject(NSUUID().UUIDString, forKey: "userId")
         }
         
+        // If an episode was playing when the app last closed, then load the episode in the media player on app launch
+        if let lastPlayingEpisodeURL = NSUserDefaults.standardUserDefaults().URLForKey("lastPlayingEpisodeURL") {
+            if let lastPlayingEpisodeObjectID = CoreDataHelper.sharedInstance.persistentStoreCoordinator.managedObjectIDForURIRepresentation(lastPlayingEpisodeURL) {
+                PVMediaPlayer.sharedInstance.loadEpisodeDownloadedMediaFileOrStream(lastPlayingEpisodeObjectID, paused: true)
+            }
+        }
+        
         Fabric.with([Crashlytics.self])
         return true
     }
