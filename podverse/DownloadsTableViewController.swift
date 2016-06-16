@@ -65,6 +65,8 @@ class DownloadsTableViewController: UITableViewController {
                         if cell.progress.progress == 1.0 {
                             cell.downloadStatus.text = "Finished"
                             cell.progressBytes.text = "\(formattedTotalFileBytes)"
+                        } else {
+                            cell.downloadStatus.text = "Downloading"
                         }
                                         
                         return

@@ -224,7 +224,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         } else {
             // If currentTime != 0.0, then immediately insert the currentTime in its label; else manually set the currentTime label to 00:00.
             if CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()) != 0.0 {
-                currentTime?.text = PVUtility.convertNSNumberToHHMMSSString(Float(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime())))
+                updateCurrentTime(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()))
             } else {
                 currentTime?.text = "00:00"
             }
@@ -307,6 +307,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         pvMediaPlayer.clearPlayingInfo()
         pvMediaPlayer.nowPlayingEpisode = nil
         pvMediaPlayer.nowPlayingClip = nil
+        NSUserDefaults.standardUserDefaults().removeObjectForKey(Constants.kLastPlayingEpisodeURL)
         
         PVDeleter.deleteEpisode(currentEpisode.objectID)
         

@@ -1772,7 +1772,7 @@
         <scene sceneID="ogG-iM-ZGo">
             <objects>
                 <navigationController id="zBY-YG-1kz" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Settings" id="wbD-tN-OeH">
+                    <tabBarItem key="tabBarItem" title="Settings" image="Tab-Settings" id="wbD-tN-OeH">
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="color" keyPath="tintColor">
                                 <color key="value" red="0.16078431372549018" green="0.40784313725490196" blue="0.69411764705882351" alpha="1" colorSpace="calibratedRGB"/>
@@ -1955,6 +1955,7 @@
         <image name="Tab-Downloads" width="25" height="25"/>
         <image name="Tab-Find" width="25" height="25"/>
         <image name="Tab-Podcasts" width="25" height="25"/>
+        <image name="Tab-Settings" width="25" height="25"/>
         <image name="banner" width="337" height="61"/>
     </resources>
     <inferredMetricsTieBreakers>

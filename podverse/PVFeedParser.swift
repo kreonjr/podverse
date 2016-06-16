@@ -25,6 +25,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     var latestEpisodePubDate:NSDate?
     var delegate:PVFeedParserDelegate?
     let moc = CoreDataHelper.sharedInstance.backgroundContext
+    let parsingPodcasts = ParsingPodcastsList.shared
     
     init(onlyGetMostRecentEpisode:Bool, shouldSubscribe:Bool) {
         onlyGetMostRecent = onlyGetMostRecentEpisode
@@ -169,6 +170,9 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func feedParserParsingAborted(parser: FeedParser) {
+        parsingPodcasts.itemsParsing += 1
+        parsingPodcasts.clearParsingPodcastsIfFinished()
+        
         guard let podcast = currentPodcast else {
             // If podcast is nil, then the RSS feed was invalid for the parser, and we should return out of successfullyParsedURL
 
@@ -200,6 +204,9 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func feedParser(parser: FeedParser, successfullyParsedURL url: String) {
+        parsingPodcasts.itemsParsing += 1
+        parsingPodcasts.clearParsingPodcastsIfFinished()
+        
         guard let podcast = currentPodcast else {
             return
         }

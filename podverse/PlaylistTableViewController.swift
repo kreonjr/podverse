@@ -159,7 +159,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
 
             if episode.fileName != nil {
                 playlistItemActions.addAction(UIAlertAction(title: "Play", style: .Default, handler: { action in
-                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode.objectID)
+                    self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(episode.objectID, paused: false)
                     self.segueToNowPlaying()
                 }))
             } else {
@@ -168,7 +168,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
                     self.showInternetNeededAlert("Connect to WiFi or cellular data to stream an episode.")
                     return
                 }
-                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStreamAndPlay(episode.objectID)
+                    self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(episode.objectID, paused: false)
                     self.segueToNowPlaying()
                 }))
             }

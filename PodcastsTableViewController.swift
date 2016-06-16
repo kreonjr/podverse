@@ -34,10 +34,9 @@ class PodcastsTableViewController: UIViewController {
     var managedObjectContext:NSManagedObjectContext!
     var podcastsArray = [Podcast]()
     let coreDataHelper = CoreDataHelper.sharedInstance
+    let parsingPodcasts = ParsingPodcastsList.shared
     let reachability = PVReachability.manager
     var refreshControl: UIRefreshControl!
-    private var itemsParsing = 0
-    private var totalItemsToParse = 0
     @IBOutlet weak var parsingActivity: UIActivityIndicatorView!
     @IBOutlet weak var parsingActivityLabel: UILabel!
     @IBOutlet weak var parsingActivityBar: UIProgressView!
@@ -145,9 +144,9 @@ class PodcastsTableViewController: UIViewController {
         let moc = self.coreDataHelper.managedObjectContext
         let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", NSNumber(bool: true))
         let podcastArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:moc) as! [Podcast]
-        totalItemsToParse = podcastsArray.count
         
         for podcast in podcastArray {
+            parsingPodcasts.urls.append(podcast.feedURL)
             let feedURL = NSURL(string:podcast.feedURL)
             
             dispatch_async(Constants.feedParsingQueue) {
@@ -261,16 +260,15 @@ class PodcastsTableViewController: UIViewController {
     }
     
     func clearParsingActivity() {
-        self.itemsParsing = 0
+        parsingPodcasts.itemsParsing = 0
         self.parsingActivityContainer.hidden = true
     }
     
-    private func updateParsingActivity() {
-        self.parsingActivityLabel.text = "\(self.itemsParsing) of \(self.podcastsArray.count) parsed"
-        self.parsingActivityBar.progress = Float(self.itemsParsing)/Float(self.podcastsArray.count)
+    func updateParsingActivity() {
+        self.parsingActivityLabel.text = "\(parsingPodcasts.itemsParsing) of \(parsingPodcasts.urls.count) parsed"
+        self.parsingActivityBar.progress = Float(parsingPodcasts.itemsParsing)/Float(parsingPodcasts.urls.count)
         
-        if self.itemsParsing == self.podcastsArray.count || self.itemsParsing == 0 {
-            self.itemsParsing = 0
+        if parsingPodcasts.itemsParsing >= parsingPodcasts.urls.count {
             self.parsingActivityContainer.hidden = true
             self.parsingActivity.stopAnimating()
         }
@@ -464,8 +462,6 @@ extension PodcastsTableViewController: PVFeedParserDelegate {
             else {
                 self.reloadPodcastData()
             }
-            
-            itemsParsing += 1
             updateParsingActivity()
         }
     }

@@ -276,7 +276,7 @@ class PVMediaPlayer {
         mediaPlayerIsPlaying = true
     }
     
-    func loadEpisodeDownloadedMediaFileOrStreamAndPlay(episodeID: NSManagedObjectID) {
+    func loadEpisodeDownloadedMediaFileOrStream(episodeID: NSManagedObjectID, paused: Bool) {
         nowPlayingEpisode = CoreDataHelper.fetchEntityWithID(episodeID, moc: moc) as! Episode
         nowPlayingClip = nil
         
@@ -287,6 +287,9 @@ class PVMediaPlayer {
             if let fileName = nowPlayingEpisode.fileName, let destinationURL = self.docDirectoryURL?.URLByAppendingPathComponent(fileName) {
                 let playerItem = AVPlayerItem(URL: destinationURL)
                 avPlayer.replaceCurrentItemWithPlayerItem(playerItem)
+                
+                // Remember the downloaded episode loaded in media player so, if the app closes while the episode is playing or paused, it can be reloaded on app launch.
+                NSUserDefaults.standardUserDefaults().setURL(nowPlayingEpisode.objectID.URIRepresentation(), forKey: Constants.kLastPlayingEpisodeURL)
             }
         } else {
             if let urlString = nowPlayingEpisode.mediaURL, let url = NSURL(string: urlString) {
@@ -295,11 +298,19 @@ class PVMediaPlayer {
             }
         }
         
-        // If the episode has a playback position, then continue from that point, else play from the beginning
-        if let playbackPosition = nowPlayingEpisode.playbackPosition {
-            goToTime(Double(playbackPosition))
+        if paused == false {
+            // If the episode has a playback position, then continue from that point, else play from the beginning
+            if let playbackPosition = nowPlayingEpisode.playbackPosition {
+                goToTime(Double(playbackPosition))
+            } else {
+                playOrPause()
+            }
         } else {
-            playOrPause()
+            // If the episode should be loaded and paused, then seek to the playbackPosition without playing
+            if let playbackPosition = nowPlayingEpisode.playbackPosition {
+                let resultTime = CMTimeMakeWithSeconds(Double(playbackPosition), 1)
+                avPlayer.seekToTime(resultTime)
+            }
         }
         
         self.setPlayingInfo()
