@@ -307,8 +307,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         pvMediaPlayer.clearPlayingInfo()
         pvMediaPlayer.nowPlayingEpisode = nil
         pvMediaPlayer.nowPlayingClip = nil
-        
-        NSUserDefaults.standardUserDefaults().setURL(nil, forKey: "lastPlayingEpisodeURL")
+        NSUserDefaults.standardUserDefaults().removeObjectForKey(Constants.kLastPlayingEpisodeURL)
         
         PVDeleter.deleteEpisode(currentEpisode.objectID)
         

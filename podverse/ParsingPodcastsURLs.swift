@@ -1,5 +1,5 @@
 //
-//  ParsingPodcastsList.swift
+//  ParsingPodcasts.swift
 //  podverse
 //
 //  Created by Mitch on 6/12/16.
@@ -8,15 +8,15 @@
 
 import Foundation
 
-final class ParsingPodcastsURLs {
-    static var shared = ParsingPodcastsURLs()
+final class ParsingPodcastsList {
+    static var shared = ParsingPodcastsList()
     var urls = [String]()
     var itemsParsing = 0
     
     func clearParsingPodcastsIfFinished() {
         if itemsParsing == urls.count {
             itemsParsing = 0
-            urls = [String]()
+            urls.removeAll()
         }
     }
 }

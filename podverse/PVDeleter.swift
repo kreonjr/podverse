@@ -62,8 +62,7 @@ class PVDeleter {
                 if episode.objectID == nowPlayingEpisode.objectID {
                     PVMediaPlayer.sharedInstance.avPlayer.pause()
                     PVMediaPlayer.sharedInstance.nowPlayingEpisode = nil
-                    
-                    NSUserDefaults.standardUserDefaults().setObject(nil, forKey: "lastPlayingEpisodeURL")
+                    NSUserDefaults.standardUserDefaults().removeObjectForKey(Constants.kLastPlayingEpisodeURL)
                     
                     NSNotificationCenter.defaultCenter().postNotificationName(Constants.kPlayerHasNoItem, object: nil)
                 }

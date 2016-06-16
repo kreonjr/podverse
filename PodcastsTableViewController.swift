@@ -34,7 +34,7 @@ class PodcastsTableViewController: UIViewController {
     var managedObjectContext:NSManagedObjectContext!
     var podcastsArray = [Podcast]()
     let coreDataHelper = CoreDataHelper.sharedInstance
-    let parsingPodcastsURLs = ParsingPodcastsURLs.shared
+    let parsingPodcasts = ParsingPodcastsList.shared
     let reachability = PVReachability.manager
     var refreshControl: UIRefreshControl!
     @IBOutlet weak var parsingActivity: UIActivityIndicatorView!
@@ -146,7 +146,7 @@ class PodcastsTableViewController: UIViewController {
         let podcastArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:moc) as! [Podcast]
         
         for podcast in podcastArray {
-            parsingPodcastsURLs.urls.append(podcast.feedURL)
+            parsingPodcasts.urls.append(podcast.feedURL)
             let feedURL = NSURL(string:podcast.feedURL)
             
             dispatch_async(Constants.feedParsingQueue) {
@@ -260,15 +260,15 @@ class PodcastsTableViewController: UIViewController {
     }
     
     func clearParsingActivity() {
-        parsingPodcastsURLs.itemsParsing = 0
+        parsingPodcasts.itemsParsing = 0
         self.parsingActivityContainer.hidden = true
     }
     
     func updateParsingActivity() {
-        self.parsingActivityLabel.text = "\(parsingPodcastsURLs.itemsParsing) of \(parsingPodcastsURLs.urls.count) parsed"
-        self.parsingActivityBar.progress = Float(parsingPodcastsURLs.itemsParsing)/Float(parsingPodcastsURLs.urls.count)
+        self.parsingActivityLabel.text = "\(parsingPodcasts.itemsParsing) of \(parsingPodcasts.urls.count) parsed"
+        self.parsingActivityBar.progress = Float(parsingPodcasts.itemsParsing)/Float(parsingPodcasts.urls.count)
         
-        if parsingPodcastsURLs.itemsParsing >= parsingPodcastsURLs.urls.count {
+        if parsingPodcasts.itemsParsing >= parsingPodcasts.urls.count {
             self.parsingActivityContainer.hidden = true
             self.parsingActivity.stopAnimating()
         }
