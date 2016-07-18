@@ -20,8 +20,18 @@ final class PlaylistManager {
     static let sharedInstance = PlaylistManager()
     var delegate:PlaylistManagerDelegate?
     
-    func addPlaylistByUrlString(urlString: String) {
+    func addPlaylistByUrlString(urlString: String, completion:((errorString:String?)->())?) {
+        if urlString.characters.count == 0 {
+            completion?(errorString:"You must provide a url path")
+            return
+        }
+        
         var urlComponentArray = urlString.componentsSeparatedByString("/")
+        if urlComponentArray.count < 4 {
+            completion?(errorString:"You must provide a valid URL path")
+            return
+        }
+        
         let playlistId = urlComponentArray[4]
         if urlComponentArray[3] == "playlist" {
             urlComponentArray[3] = "pl"
@@ -32,7 +42,7 @@ final class PlaylistManager {
             urlComponentArray[4] = idComponentArray[0]
         }
         
-        if (urlComponentArray[0] == "http:" || urlComponentArray[0] == "https:") && (urlComponentArray[1] == "") && (urlComponentArray[2] == "podverse.tv") && (urlComponentArray[3] == "pl") {
+        if (urlComponentArray[0] == "http:" || urlComponentArray[0] == "https:") && (urlComponentArray[1] == "") && (urlComponentArray[2] == "podverse.fm") && (urlComponentArray[3] == "pl") {
                 GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
                     guard let dictResponse = response as? Dictionary<String,AnyObject> else {
                         return
@@ -43,14 +53,15 @@ final class PlaylistManager {
                 
                     CoreDataHelper.saveCoreData(moc, completionBlock:{ (finished) in
                         dispatch_async(dispatch_get_main_queue()) {
-                            PlaylistManager.sharedInstance.delegate?.playlistAddedByUrl()
+                            self.delegate?.playlistAddedByUrl()
+                            completion?(errorString:nil)
                         }
                     })
                 }) { (error) -> Void in
-                        print("Error y'all \(error?.localizedDescription)")
+                    completion?(errorString: error?.localizedDescription)
                 }.call()
         } else {
-            print("Error: invalid URL")
+            completion?(errorString: "The URL you enter is invalid")
         }
         
     }

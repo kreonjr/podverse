@@ -184,17 +184,21 @@ class PodcastsTableViewController: UIViewController {
         let addPlaylistByURLAlert = UIAlertController(title: "Add Playlist By URL", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
         
         addPlaylistByURLAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
-            textField.placeholder = "http://podverse.tv/playlist/..."
+            textField.placeholder = "http://podverse.fm/playlist/..."
         })
         
         addPlaylistByURLAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
         
-        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
-            let textField = addPlaylistByURLAlert.textFields![0] as UITextField
-            if let urlString = textField.text {
-                self.playlistManager.addPlaylistByUrlString(urlString)
+        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction) in
+            if let textField = addPlaylistByURLAlert.textFields?[0], urlString = textField.text {
+                self.playlistManager.addPlaylistByUrlString(urlString, completion: { (errorString) in
+                    if let error = errorString {
+                        let alert = UIAlertController(title: "Error", message: error, preferredStyle: .Alert)
+                        alert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+                        self.presentViewController(alert, animated: true, completion: nil)
+                    }
+                })
             }
-            self.reloadPodcastData()
         }))
         
         presentViewController(addPlaylistByURLAlert, animated: true, completion: nil)
