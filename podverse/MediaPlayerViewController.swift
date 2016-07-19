@@ -50,7 +50,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         // Make sure the Play/Pause button displays properly after returning from background
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(MediaPlayerViewController.setPlayPauseIcon), name: UIApplicationWillEnterForegroundNotification, object: nil)
         
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        self.navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        self.navigationController?.navigationBar.barTintColor = UIColor(red: 0.0/255.0, green: 0.0/255.0, blue: 0.0/255.0, alpha: 1.0)
+        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), forBarMetrics: UIBarMetrics.Default)
+        self.navigationController?.navigationBar.shadowImage = UIImage()
         
         // If no nowPlaying episode or clip exists, then nav back out of MediaPlayerVC
         if pvMediaPlayer.nowPlayingEpisode == nil && pvMediaPlayer.nowPlayingClip == nil {
@@ -65,18 +68,12 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         }
         
         self.clipper = (navVC.topViewController as? PVClipperViewController)
-        
-        if let duration = pvMediaPlayer.nowPlayingEpisode.duration {
-            self.clipper?.totalDuration = Int(duration)
-        }
 
         buttonMakeClip.frame = CGRectMake(0, 0, 100, 90)
         buttonMakeClip.setTitle(makeClipString, forState: .Normal)
         buttonMakeClip.titleLabel!.font = UIFont(name: "System", size: 18)
         buttonMakeClip.addTarget(self, action: #selector(MediaPlayerViewController.toggleMakeClipView(_:)), forControlEvents: .TouchUpInside)
         let rightBarButtonMakeClip: UIBarButtonItem = UIBarButtonItem(customView: buttonMakeClip)
-        
-        makeClipContainerView.hidden = true
         
         buttonAddToList.frame = CGRectMake(0, 0, 100, 90)
         buttonAddToList.setTitle(addToList, forState: .Normal)
@@ -85,6 +82,56 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         let rightBarButtonAddToList: UIBarButtonItem = UIBarButtonItem(customView: buttonAddToList)
         
         self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip, rightBarButtonAddToList], animated: false)
+        
+        pvMediaPlayer.avPlayer.addPeriodicTimeObserverForInterval(CMTimeMake(1, 1), queue: dispatch_get_main_queue()) { (currentTime) in
+            self.updateCurrentTime(CMTimeGetSeconds(currentTime))
+        }
+        
+        loadDataForCurrentItem()
+        
+        checkPreviousNextButtons()
+    }
+    
+    private func checkPreviousNextButtons() {
+        if pvMediaPlayer.nowPlayingEpisode != nil {
+            var episodes = CoreDataHelper.fetchEntities("Episode", predicate: nil, moc: pvMediaPlayer.moc) as! [Episode]
+            self.skipButton.enabled = true
+            self.skipButton.alpha = 1.0
+            self.previousButton.enabled = true
+            self.previousButton.alpha = 1.0
+            
+            episodes.sortInPlace({
+                guard let pubDate = $1.pubDate else {
+                    return false
+                }
+                
+                return $0.pubDate?.compare(pubDate) == .OrderedAscending
+            })
+            
+            for (index, episode) in episodes.enumerate() {
+                if episode.mediaURL == pvMediaPlayer.nowPlayingEpisode.mediaURL {
+                    if index - 1 == 0 {
+                        self.skipButton.enabled = false
+                        self.skipButton.alpha = 0.5
+                    }
+                    
+                    if index == episodes.count - 1 {
+                        self.previousButton.enabled = false
+                        self.previousButton.alpha = 0.5
+                    }
+
+                    return
+                }
+            }
+        }
+    }
+    
+    private func loadDataForCurrentItem() {
+        if let duration = pvMediaPlayer.nowPlayingEpisode.duration {
+            self.clipper?.totalDuration = Int(duration)
+        }
+        
+        makeClipContainerView.hidden = true
         
         // Populate the Media Player UI with the current episode's information
         if let imageData = pvMediaPlayer.nowPlayingEpisode.podcast.imageThumbData {
@@ -108,12 +155,15 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
             summary.text = ""
         }
         
+        // If currentTime != 0.0, then immediately insert the currentTime in its label; else manually set the currentTime label to 00:00.
+        if CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()) != 0.0 {
+            updateCurrentTime(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()))
+        } else {
+            currentTime?.text = "00:00"
+        }
+        
         setPlayPauseIcon()
         updateSpeedLabel()
-        
-        pvMediaPlayer.avPlayer.addPeriodicTimeObserverForInterval(CMTimeMake(1, 1), queue: dispatch_get_main_queue()) { (currentTime) in
-            self.updateCurrentTime(CMTimeGetSeconds(currentTime))
-        }
     }
     
     private func updateSpeedLabel() {
@@ -154,9 +204,77 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     }
     
     @IBAction func skip(sender: AnyObject) {
+        if pvMediaPlayer.nowPlayingEpisode != nil {
+            var episodes = CoreDataHelper.fetchEntities("Episode", predicate: nil, moc: pvMediaPlayer.moc) as! [Episode]
+            self.skipButton.enabled = true
+            self.skipButton.alpha = 1.0
+            
+            episodes.sortInPlace({
+                guard let pubDate = $1.pubDate else {
+                    return false
+                }
+                
+                return $0.pubDate?.compare(pubDate) == .OrderedAscending
+            })
+            
+            for (index, episode) in episodes.enumerate() {
+                if episode.mediaURL == pvMediaPlayer.nowPlayingEpisode.mediaURL && index > 0 {
+                    pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(episodes[index - 1].objectID, paused: false)
+                    loadDataForCurrentItem()
+                    
+                    if index - 2 == 0 {
+                        self.skipButton.enabled = false
+                        self.skipButton.alpha = 0.5
+                    }
+                    
+                    self.previousButton.enabled = false
+                    self.previousButton.alpha = 0.5
+                    if index > 1 {
+                        self.previousButton.enabled = true
+                        self.previousButton.alpha = 1.0
+                    }
+                    
+                    return
+                }
+            }
+        }
     }
     
     @IBAction func previous(sender: AnyObject) {
+        if pvMediaPlayer.nowPlayingEpisode != nil {
+            var episodes = CoreDataHelper.fetchEntities("Episode", predicate: nil, moc: pvMediaPlayer.moc) as! [Episode]
+            self.previousButton.enabled = true
+            self.previousButton.alpha = 1.0
+            
+            episodes.sortInPlace({
+                guard let pubDate = $1.pubDate else {
+                    return false
+                }
+                
+                return $0.pubDate?.compare(pubDate) == .OrderedDescending
+            })
+            
+            for (index, episode) in episodes.enumerate() {
+                if episode.mediaURL == pvMediaPlayer.nowPlayingEpisode.mediaURL && index > 0 {
+                    pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(episodes[index - 1].objectID, paused: false)
+                    loadDataForCurrentItem()
+                    
+                    if index - 2 == 0 {
+                        self.previousButton.enabled = false
+                        self.previousButton.alpha = 0.5
+                    }
+                    
+                    self.skipButton.enabled = false
+                    self.skipButton.alpha = 0.5
+                    if index > 1 {
+                        self.skipButton.enabled = true
+                        self.skipButton.alpha = 1.0
+                    }
+                    
+                    return
+                }
+            }
+        }
     }
     
     @IBAction func speed(sender: AnyObject) {
@@ -208,29 +326,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     
     @IBAction func previous1minute(sender: AnyObject) {
         pvMediaPlayer.previousTime(60)
-    }
-    
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        self.navigationController?.navigationBar.barTintColor = UIColor(red: 0.0/255.0, green: 0.0/255.0, blue: 0.0/255.0, alpha: 1.0)
-        
-        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), forBarMetrics: UIBarMetrics.Default)
-        self.navigationController?.navigationBar.shadowImage = UIImage()
-        
-        // If loading the MediaPlayerVC when with no currentItem in the avPlayer, then nav back a page. Else load the MediaPlayerVC with the current item and related info.
-        if pvMediaPlayer.avPlayer.currentItem == nil {
-            self.navigationController?.popViewControllerAnimated(true)
-        } else {
-            // If currentTime != 0.0, then immediately insert the currentTime in its label; else manually set the currentTime label to 00:00.
-            if CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()) != 0.0 {
-                updateCurrentTime(CMTimeGetSeconds(pvMediaPlayer.avPlayer.currentTime()))
-            } else {
-                currentTime?.text = "00:00"
-            }
-            
-            setPlayPauseIcon()
-        }
     }
     
     func setPlayPauseIcon() {
