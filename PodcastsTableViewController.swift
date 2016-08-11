@@ -73,7 +73,7 @@ class PodcastsTableViewController: UIViewController {
                 loginVC.delegate = self
                 self.presentViewController(loginVC, animated: false, completion: nil)
             }
-            //NSUserDefaults.standardUserDefaults().setObject(NSUUID().UUIDString, forKey: "ONE_TIME_LOGIN")
+            NSUserDefaults.standardUserDefaults().setObject(NSUUID().UUIDString, forKey: "ONE_TIME_LOGIN")
         }
         
         navigationItem.title = "Podverse"
