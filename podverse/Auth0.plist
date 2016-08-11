@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+   Auth0.plist
+   podverse
+
+   Created by Creon on 8/10/16.
+   Copyright (c) 2016 Mitchell Downey. All rights reserved.
+-->
+<plist version="1.0">
+    <dict>
+        <key>ClientId</key>
+        <string>tTGQrl5CenMDdpzcKNpmLIginyRgBJNN</string>
+        <key>Domain</key>
+        <string>mitchd.auth0.com</string>
+    </dict>
+</plist>

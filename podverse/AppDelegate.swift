@@ -12,7 +12,7 @@ import AVFoundation
 import MediaPlayer
 import Fabric
 import Crashlytics
-
+import Lock
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -33,6 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+        A0Lock.sharedLock().applicationLaunchedWithOptions(launchOptions)
         UIApplication.sharedApplication().statusBarStyle = .LightContent
         
         UINavigationBar.appearance().translucent = false
@@ -68,13 +69,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         CoreDataHelper.saveCoreData(moc, completionBlock: nil)
         
         PVReachability.manager
-        
-        if NSUserDefaults.standardUserDefaults().objectForKey("userId") == nil {
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let loginVC = storyboard.instantiateViewControllerWithIdentifier("LoginVC")
-            self.window?.rootViewController = loginVC
-            NSUserDefaults.standardUserDefaults().setObject(NSUUID().UUIDString, forKey: "userId")
-        }
         
         // If an episode was playing when the app last closed, then load the episode in the media player on app launch
         if let lastPlayingEpisodeURL = NSUserDefaults.standardUserDefaults().URLForKey(Constants.kLastPlayingEpisodeURL) {
@@ -126,5 +120,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
          UIApplication.sharedApplication().applicationIconBadgeNumber = 0
+    }
+    
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject) -> Bool {
+        return A0Lock.sharedLock().handleURL(url, sourceApplication: sourceApplication)
+    }
+    
+    func application(application: UIApplication, continueUserActivity userActivity: NSUserActivity, restorationHandler: ([AnyObject]?) -> Void) -> Bool {
+        return A0Lock.sharedLock().continueUserActivity(userActivity, restorationHandler:restorationHandler)
     }
 }
