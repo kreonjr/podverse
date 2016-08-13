@@ -21,3 +21,6 @@ xcuserdata
 *.xcuserstate
 *.xcscmblueprint
 *ServerKey.plist
+*.xcworkspace
+Pods
+Podfile.lock
