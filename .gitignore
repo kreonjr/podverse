@@ -21,3 +21,4 @@ xcuserdata
 *.xcuserstate
 *.xcscmblueprint
 *ServerKey.plist
+*Auth0.plist

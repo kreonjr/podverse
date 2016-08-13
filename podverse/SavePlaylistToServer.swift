@@ -11,7 +11,7 @@ import Foundation
 class SavePlaylistToServer:WebService {
     internal init(playlist:Playlist, newPlaylist:Bool = false, completionBlock: (response: AnyObject) -> Void, errorBlock: (error: NSError?) -> Void) {
         
-        var name = "pl"
+        var name = "playlists"
         if let id = playlist.playlistId where newPlaylist == false {
             name += "/\(id)"
         }
@@ -26,41 +26,46 @@ class SavePlaylistToServer:WebService {
         
         addHeaderWithKey("Content-Type", value: "application/json")
         
-        addParamWithKey("playlistTitle", value: playlist.title)
-        
-        var playlistItems = [Dictionary<String,AnyObject>]()
-        
-        if let episodes = playlist.episodes {
-            for episode in episodes {
-                let episodeJSON = PlaylistManager.sharedInstance.episodeToPlaylistItemJSON(episode as! Episode)
-                playlistItems.append(episodeJSON)
-                
-            }
+        if let idToken = NSUserDefaults.standardUserDefaults().stringForKey("idToken") {
+            addHeaderWithKey("Authorization", value: idToken)
         }
         
-        if let clips = playlist.clips {
-            for clip in clips {
-                let clipJSON = PlaylistManager.sharedInstance.clipToPlaylistItemJSON(clip as! Clip)
-                playlistItems.append(clipJSON)
-                
-            }
-        }
+        addParamWithKey("title", value: "Riveting title")
+        addParamWithKey("ownerId", value: "cartman@podverse.fm")
         
-        if playlistItems.count > 0 {
-            addParamWithKey("playlistItems", value: playlistItems)
-        }
-        
-        if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
-            addParamWithKey("userId", value: userId)
-        }
-        
-        if playlist.isMyEpisodes {
-            addParamWithKey("isMyEpisodes", value: playlist.isMyEpisodes)
-        }
-        
-        if playlist.isMyClips {
-            addParamWithKey("isMyClips", value: playlist.isMyClips)
-        }
+//        var playlistItems = [Dictionary<String,AnyObject>]()
+//        
+//        if let episodes = playlist.episodes {
+//            for episode in episodes {
+//                let episodeJSON = PlaylistManager.sharedInstance.episodeToPlaylistItemJSON(episode as! Episode)
+//                playlistItems.append(episodeJSON)
+//                
+//            }
+//        }
+//        
+//        if let clips = playlist.clips {
+//            for clip in clips {
+//                let clipJSON = PlaylistManager.sharedInstance.clipToPlaylistItemJSON(clip as! Clip)
+//                playlistItems.append(clipJSON)
+//                
+//            }
+//        }
+//        
+//        if playlistItems.count > 0 {
+//            addParamWithKey("playlistItems", value: playlistItems)
+//        }
+//        
+//        if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
+//            addParamWithKey("userId", value: userId)
+//        }
+//        
+//        if playlist.isMyEpisodes {
+//            addParamWithKey("isMyEpisodes", value: playlist.isMyEpisodes)
+//        }
+//        
+//        if playlist.isMyClips {
+//            addParamWithKey("isMyClips", value: playlist.isMyClips)
+//        }
         
     }
 }
