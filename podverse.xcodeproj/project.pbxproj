@@ -28,7 +28,6 @@
 		30B8A4791D03A128009663D3 /* Reachability.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = EF1C35631D0378BF00F9BF8F /* Reachability.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		30B8A4831D03C309009663D3 /* UIViewController+InternetNeededAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B8A4821D03C309009663D3 /* UIViewController+InternetNeededAlert.swift */; };
 		30BB4A5A1D57C2C900BBBEC9 /* ServerKey.plist in Resources */ = {isa = PBXBuildFile; fileRef = 30BB4A591D57C2C900BBBEC9 /* ServerKey.plist */; };
-		30BB4A811D57C43900BBBEC9 /* Auth0.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30BB4A6D1D57C41500BBBEC9 /* Auth0.framework */; };
 		812A094D1B422A4700E8F070 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818615951B1E84CE006C9731 /* AppDelegate.swift */; };
 		812A094F1B42375F00E8F070 /* podverse.xcdatamodeld in Resources */ = {isa = PBXBuildFile; fileRef = 818615971B1E84CE006C9731 /* podverse.xcdatamodeld */; };
 		813FC8101B5CA992006248BC /* PVSubscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 813FC80F1B5CA992006248BC /* PVSubscriber.swift */; };
@@ -91,62 +90,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = AA7344711BE7678B008AFE69;
 			remoteInfo = Reachability;
-		};
-		30BB4A6C1D57C41500BBBEC9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30BB4A5B1D57C41500BBBEC9 /* Auth0.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5F06DD781CC448B10011842B;
-			remoteInfo = Auth0.iOS;
-		};
-		30BB4A6E1D57C41500BBBEC9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30BB4A5B1D57C41500BBBEC9 /* Auth0.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5F06DD851CC448C90011842B;
-			remoteInfo = Auth0.macOS;
-		};
-		30BB4A701D57C41500BBBEC9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30BB4A5B1D57C41500BBBEC9 /* Auth0.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5F23E6B91D4ACA7100C3F2D9;
-			remoteInfo = Auth0.watchOS;
-		};
-		30BB4A721D57C41500BBBEC9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30BB4A5B1D57C41500BBBEC9 /* Auth0.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5F23E6F61D4B87F000C3F2D9;
-			remoteInfo = Auth0.tvOS;
-		};
-		30BB4A741D57C41500BBBEC9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30BB4A5B1D57C41500BBBEC9 /* Auth0.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5F06DDA01CC451540011842B;
-			remoteInfo = Auth0Tests.iOS;
-		};
-		30BB4A761D57C41500BBBEC9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30BB4A5B1D57C41500BBBEC9 /* Auth0.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5F06DDAF1CC451700011842B;
-			remoteInfo = Auth0Tests.macOS;
-		};
-		30BB4A781D57C41500BBBEC9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30BB4A5B1D57C41500BBBEC9 /* Auth0.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5F331AF91D4BB24C00AE4382;
-			remoteInfo = Auth0Tests.tvOS;
-		};
-		30BB4A7A1D57C41500BBBEC9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 30BB4A5B1D57C41500BBBEC9 /* Auth0.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 5F3965C71CF67DD800CDE7C0;
-			remoteInfo = OAuth2;
 		};
 		818615A91B1E84CF006C9731 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -297,7 +240,6 @@
 		30AA6BD51C61A8640093E45E /* PlaylistTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlaylistTableViewCell.swift; sourceTree = "<group>"; };
 		30B8A4821D03C309009663D3 /* UIViewController+InternetNeededAlert.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+InternetNeededAlert.swift"; sourceTree = "<group>"; };
 		30BB4A591D57C2C900BBBEC9 /* ServerKey.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = ServerKey.plist; sourceTree = "<group>"; };
-		30BB4A5B1D57C41500BBBEC9 /* Auth0.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Auth0.xcodeproj; path = lib/Auth0/Auth0.xcodeproj; sourceTree = SOURCE_ROOT; };
 		812A094E1B422AB300E8F070 /* Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bridging-Header.h"; sourceTree = "<group>"; };
 		813FC80F1B5CA992006248BC /* PVSubscriber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVSubscriber.swift; sourceTree = "<group>"; };
 		815A2E301B50C099002A21A7 /* FindTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FindTableViewController.swift; sourceTree = "<group>"; };
@@ -362,7 +304,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30BB4A811D57C43900BBBEC9 /* Auth0.framework in Frameworks */,
 				EFD1D4E81C3106FB00666912 /* Crashlytics.framework in Frameworks */,
 				EF397FF41C54561C00C91753 /* Alamofire.framework in Frameworks */,
 				EFD1D4E71C3106FB00666912 /* Fabric.framework in Frameworks */,
@@ -380,21 +321,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		30BB4A5C1D57C41500BBBEC9 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				30BB4A6D1D57C41500BBBEC9 /* Auth0.framework */,
-				30BB4A6F1D57C41500BBBEC9 /* Auth0.framework */,
-				30BB4A711D57C41500BBBEC9 /* Auth0.framework */,
-				30BB4A731D57C41500BBBEC9 /* Auth0.framework */,
-				30BB4A751D57C41500BBBEC9 /* Auth0Tests.xctest */,
-				30BB4A771D57C41500BBBEC9 /* Auth0Tests.xctest */,
-				30BB4A791D57C41500BBBEC9 /* Auth0Tests.xctest */,
-				30BB4A7B1D57C41500BBBEC9 /* OAuth2.app */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		7631984921B25193880208CD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -551,7 +477,6 @@
 		EF1699AC1CE9500600E66F7A /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
-				30BB4A5B1D57C41500BBBEC9 /* Auth0.xcodeproj */,
 				EF397FDC1C54558A00C91753 /* Alamofire.xcodeproj */,
 				EF1C35531D0378BF00F9BF8F /* Reachability.xcodeproj */,
 				EFD1D4E51C3106FA00666912 /* Fabric.framework */,
@@ -726,10 +651,6 @@
 					ProjectRef = EF397FDC1C54558A00C91753 /* Alamofire.xcodeproj */;
 				},
 				{
-					ProductGroup = 30BB4A5C1D57C41500BBBEC9 /* Products */;
-					ProjectRef = 30BB4A5B1D57C41500BBBEC9 /* Auth0.xcodeproj */;
-				},
-				{
 					ProductGroup = EF1C35541D0378BF00F9BF8F /* Products */;
 					ProjectRef = EF1C35531D0378BF00F9BF8F /* Reachability.xcodeproj */;
 				},
@@ -743,62 +664,6 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		30BB4A6D1D57C41500BBBEC9 /* Auth0.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Auth0.framework;
-			remoteRef = 30BB4A6C1D57C41500BBBEC9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		30BB4A6F1D57C41500BBBEC9 /* Auth0.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Auth0.framework;
-			remoteRef = 30BB4A6E1D57C41500BBBEC9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		30BB4A711D57C41500BBBEC9 /* Auth0.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Auth0.framework;
-			remoteRef = 30BB4A701D57C41500BBBEC9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		30BB4A731D57C41500BBBEC9 /* Auth0.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Auth0.framework;
-			remoteRef = 30BB4A721D57C41500BBBEC9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		30BB4A751D57C41500BBBEC9 /* Auth0Tests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = Auth0Tests.xctest;
-			remoteRef = 30BB4A741D57C41500BBBEC9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		30BB4A771D57C41500BBBEC9 /* Auth0Tests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = Auth0Tests.xctest;
-			remoteRef = 30BB4A761D57C41500BBBEC9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		30BB4A791D57C41500BBBEC9 /* Auth0Tests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = Auth0Tests.xctest;
-			remoteRef = 30BB4A781D57C41500BBBEC9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		30BB4A7B1D57C41500BBBEC9 /* OAuth2.app */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.application;
-			path = OAuth2.app;
-			remoteRef = 30BB4A7A1D57C41500BBBEC9 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		EF1C35631D0378BF00F9BF8F /* Reachability.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
