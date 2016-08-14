@@ -7,18 +7,26 @@ import CoreData
 @objc(Playlist)
 
 class Playlist: NSManagedObject {
+    
+    @NSManaged var id:String?
+    @NSManaged var slug: String?
+    @NSManaged var podverseURL: String?
+    
+    @NSManaged var ownerId:String
+    
     @NSManaged var title: String
-    @NSManaged var url: String?
-    @NSManaged var isPublic: Bool
+    
+    @NSManaged var dateCreated: NSDate?
     @NSManaged var lastUpdated: NSDate?
-    @NSManaged var playlistId:String?
-    @NSManaged var userId:String?
-
-    @NSManaged var episodes: NSSet?
-    @NSManaged var clips: NSSet?
+    
+    // TODO: how do we add this enumerator?
+    // @NSManaged var sharePermission: NSEnumerator = ["isPublic", "isSharableWithLink", "isPrivate"]
     
     @NSManaged var isMyEpisodes: Bool
     @NSManaged var isMyClips: Bool
+
+    @NSManaged var episodes: NSSet?
+    @NSManaged var clips: NSSet?
     
     var allItems: [AnyObject] {
         get {

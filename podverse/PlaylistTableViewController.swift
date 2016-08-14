@@ -67,7 +67,7 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     }
     
     func showPlaylistShare(sender: UIBarButtonItem) {
-        let playlistPageUrl = playlist.url!.stringByReplacingOccurrencesOfString("/pl/", withString: "/playlist/", options: NSStringCompareOptions.LiteralSearch, range: nil)
+        let playlistPageUrl = playlist.podverseURL!.stringByReplacingOccurrencesOfString("/pl/", withString: "/playlist/", options: NSStringCompareOptions.LiteralSearch, range: nil)
         let alert = UIAlertController(title: "Link to Playlist Page", message: playlistPageUrl, preferredStyle: .Alert)
         alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
         alert.addAction(UIAlertAction(title: "Copy", style: .Default, handler: { (action) -> Void in

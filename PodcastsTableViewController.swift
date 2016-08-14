@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import Lock
 
 class PodcastsTableViewController: UIViewController {
 
@@ -65,6 +66,15 @@ class PodcastsTableViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        if NSUserDefaults.standardUserDefaults().objectForKey("ONE_TIME_LOGIN") == nil {
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                if let loginVC = storyboard.instantiateViewControllerWithIdentifier("LoginVC") as? LoginViewController {
+                loginVC.delegate = self
+                self.presentViewController(loginVC, animated: false, completion: nil)
+            }
+            NSUserDefaults.standardUserDefaults().setObject(NSUUID().UUIDString, forKey: "ONE_TIME_LOGIN")
+        }
         
         navigationItem.title = "Podverse"
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
@@ -486,6 +496,22 @@ extension PodcastsTableViewController:PlaylistManagerDelegate {
     
     func didSavePlaylist() {
         refreshPlaylists()
+    }
+}
+
+extension PodcastsTableViewController:LoginModalDelegate {
+    func loginTapped() {
+        let lock = A0Lock.sharedLock()
+        let controller = lock.newLockViewController()
+        controller.closable = true
+        
+        controller.onAuthenticationBlock = {(profile, token) in
+            NSUserDefaults.standardUserDefaults().setObject(token?.idToken, forKey: "idToken")
+            NSUserDefaults.standardUserDefaults().setObject(profile?.userId, forKey: "userId")
+            self.dismissViewControllerAnimated(true, completion: nil)
+        }
+        
+        lock.presentLockController(controller, fromController: self, presentationStyle: .Custom)
     }
 }
 

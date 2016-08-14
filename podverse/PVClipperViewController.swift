@@ -69,7 +69,9 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
         
         if let existingClip = clip {
             startTime = existingClip.startTime.integerValue
-            endTime = existingClip.endTime.integerValue 
+            if let eTime = existingClip.endTime {
+                endTime = eTime.integerValue
+            }
         }
         
         updateUI()

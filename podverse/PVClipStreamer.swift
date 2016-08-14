@@ -134,8 +134,8 @@ class PVClipStreamer: NSObject, AVAssetResourceLoaderDelegate, NSURLConnectionDa
             startBytesRange = metadataBytesOffset + Int((Double(clip.startTime) / episodeDuration) * Double(remoteFileSize - metadataBytesOffset))
             
             // If clip has a valid end time, then use it to determine the End Byte Range Request value. Else use the full episode file size as the End Byte Range Request value.
-            if clip.endTime != 0 {
-                endBytesRange = metadataBytesOffset + Int((Double(clip.endTime) / episodeDuration) * Double(remoteFileSize - metadataBytesOffset))
+            if let endTime = clip.endTime {
+                endBytesRange = metadataBytesOffset + Int((Double(endTime) / episodeDuration) * Double(remoteFileSize - metadataBytesOffset))
             } else {
                 endBytesRange = Int(remoteFileSize)
             }

@@ -95,16 +95,6 @@ class PVClipperAddInfoViewController: UIViewController {
             clip?.endTime = 0
         }
         
-        if let clipEnd = clip?.endTime, clipStart = clip?.startTime, episodeDuration = episode.duration {
-            if clipEnd != 0 {
-                let clipDuration = NSNumber(integer: Int(clipEnd) - clipStart.integerValue)
-                clip?.duration = clipDuration
-            } else {
-                let clipDuration = NSNumber(integer: Int(episodeDuration) - clipStart.integerValue)
-                clip?.duration = clipDuration
-            }
-        }
-        
         clip?.dateCreated = NSDate()
         
         if let unwrappedClip = clip {
@@ -124,15 +114,15 @@ class PVClipperAddInfoViewController: UIViewController {
                 return
             }
             
-            strongSelf.clip?.clipUrl = dictResponse["url"] as? String
+            strongSelf.clip?.podverseURL = dictResponse["podverseURL"] as? String
             
             CoreDataHelper.saveCoreData(strongSelf.moc, completionBlock:nil)
             
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                let alert = UIAlertController(title: "Clip saved with URL:", message: strongSelf.clip?.clipUrl, preferredStyle: .Alert)
+                let alert = UIAlertController(title: "Clip saved with URL:", message: strongSelf.clip?.podverseURL, preferredStyle: .Alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
                 alert.addAction(UIAlertAction(title: "Copy", style: .Default, handler: { (action) -> Void in
-                    UIPasteboard.generalPasteboard().string = strongSelf.clip?.clipUrl ?? ""
+                    UIPasteboard.generalPasteboard().string = strongSelf.clip?.podverseURL ?? ""
                 }))
                 strongSelf.presentViewController(alert, animated: true, completion: nil)
                 

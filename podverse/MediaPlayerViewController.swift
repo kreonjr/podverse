@@ -128,8 +128,8 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         let currentSliderValue = Float64(sender.value)
         var totalTime: Float64 = 0.0
         
-        if let clip = pvMediaPlayer.nowPlayingClip {
-            totalTime = Float64(clip.duration)
+        if let clip = pvMediaPlayer.nowPlayingClip, let duration = clip.duration {
+            totalTime = Float64(duration)
         } else {
             if let duration = pvMediaPlayer.nowPlayingEpisode.duration {
                 totalTime = Float64(duration)
@@ -334,8 +334,8 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         
         var totalTime:Double? = 0.0
         
-        if let clip = pvMediaPlayer.nowPlayingClip {
-            totalTime = clip.duration.doubleValue
+        if let clip = pvMediaPlayer.nowPlayingClip, let duration = clip.duration {
+            totalTime = duration.doubleValue
         } else if let episode = pvMediaPlayer.nowPlayingEpisode {
             totalTime = episode.duration?.doubleValue
         } else {

@@ -61,16 +61,5 @@ struct Constants {
     
     static let rootPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, .UserDomainMask, true)[0]
     
-    static var SERVER_AUTHORIZATION_KEY:String {
-        get {
-            if let plistPath = NSBundle.mainBundle().pathForResource("ServerKey", ofType: "plist"), let dict = NSDictionary(contentsOfFile: plistPath), key = dict["ServerKey"] as? String {
-                return key
-            }
-            else {
-                return ""
-            }
-        }
-    }
-    
     static let TO_PLAYER_SEGUE_ID = "To Now Playing"
 }
