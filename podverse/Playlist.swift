@@ -9,7 +9,6 @@ import CoreData
 class Playlist: NSManagedObject {
     
     @NSManaged var id:String?
-    @NSManaged var slug: String?
     @NSManaged var podverseURL: String?
     
     @NSManaged var ownerId:String

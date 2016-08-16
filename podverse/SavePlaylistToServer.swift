@@ -34,10 +34,6 @@ class SavePlaylistToServer:WebService {
             addParamWithKey("ownerId", value: ownerId)
         }
         
-        if let slug = playlist.slug {
-            addParamWithKey("slug", value: slug)
-        }
-        
         if let title = playlist.title {
             addParamWithKey("title", value: title)   
         }

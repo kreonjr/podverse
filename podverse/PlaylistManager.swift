@@ -99,10 +99,6 @@ final class PlaylistManager {
         if let id = JSONDict["id"] as? String {
             playlist.id = id
         }
-
-        if let slug = JSONDict["slug"] as? String {
-            playlist.slug = slug
-        }
         
         if let title = JSONDict["title"] as? String {
             playlist.title = title
@@ -448,10 +444,6 @@ final class PlaylistManager {
         
         if let id = dictResponse["id"] as? String {
             playlist.id = id
-        }
-        
-        if let slug = dictResponse["slug"] as? String {
-            playlist.slug = slug
         }
         
         if let title = dictResponse["title"] as? String {
