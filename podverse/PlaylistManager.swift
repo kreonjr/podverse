@@ -379,16 +379,25 @@ final class PlaylistManager {
     }
     
     func addItemToPlaylist(playlist: Playlist, clip: Clip?, episode: Episode?,  moc:NSManagedObjectContext?) {
+        
+        var mediaRefId: String?
+        
         if let c = clip {
             playlist.addClipObject(c)
-            
+            mediaRefId = c.mediaRefId
+        }
+
+//        TODO: add mediaRefId somehow
+//        if let e = episode  {
+//            playlist.addEpisodeObject(e)
+//        }
+        
+        guard let mRefId = mediaRefId else {
+            return
         }
         
-        if let e = episode  {
-            playlist.addEpisodeObject(e)
-        }
-        
-        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.id == nil), completionBlock: { (response) -> Void in
+
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.id == nil), addMediaRefId: mRefId, completionBlock: { (response) -> Void in
             if let managedObjectContext = moc {
                 var playlist = CoreDataHelper.fetchEntityWithID(playlist.objectID, moc: managedObjectContext) as! Playlist
                 guard let dictResponse = response as? Dictionary<String,AnyObject> else {
@@ -411,12 +420,13 @@ final class PlaylistManager {
         }) { (error) -> Void in
             print("Not saved to server. Error: ", error?.localizedDescription)
             CoreDataHelper.saveCoreData(moc, completionBlock: nil)
-        }.call()
+            }.call()
+
     }
     
     func savePlaylist(playlist: Playlist, moc:NSManagedObjectContext) {
         var playlist = playlist
-        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.id == nil), completionBlock: { (response) -> Void in
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.id == nil), addMediaRefId: nil, completionBlock: { (response) -> Void in
             guard let dictResponse = response as? Dictionary<String,AnyObject> else {
                 return
             }

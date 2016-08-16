@@ -27,12 +27,7 @@ class LoginViewController: UIViewController {
     
     @IBAction func dismissView(sender: AnyObject) {
         self.dismissViewControllerAnimated(true, completion: nil)
-        
-        // TODO: If connected to the internet, get anonymous access_token and userId from the web server, then create default playlists.
-//        self.playlistManager.getMyPlaylistsFromServer({
-//            self.playlistManager.createDefaultPlaylists()
-//        })
-        
+        PVAuth.loginAsAnon()
     }
 
 }

@@ -523,13 +523,8 @@ extension PodcastsTableViewController:LoginModalDelegate {
             self.dismissViewControllerAnimated(true, completion: nil)
         }
         
-        
         controller.onUserDismissBlock = {() in
-
-            // TODO: If connected to the internet, get anonymous access_token and userId from the web server, then create default playlists.
-//            self.playlistManager.getMyPlaylistsFromServer({
-//                self.playlistManager.createDefaultPlaylists()
-//            })
+            PVAuth.loginAsAnon()
         }
         
         lock.presentLockController(controller, fromController: self, presentationStyle: .Custom)

@@ -118,7 +118,7 @@ class PVDeleter {
         }
         
         if deleteFromServer == true {
-            SavePlaylistToServer(playlist: playlist, completionBlock: { (response) -> Void in
+            SavePlaylistToServer(playlist: playlist, addMediaRefId: nil, completionBlock: { (response) -> Void in
                 playlist.title = "This playlist has been deleted"
                 playlist.podverseURL = response["podverseURL"] as? String
                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
@@ -160,7 +160,7 @@ class PVDeleter {
         
         playlist.removePlaylistItem(item)
         
-        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.id == nil), completionBlock: { (response) -> Void in
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.id == nil), addMediaRefId: nil, completionBlock: { (response) -> Void in
             playlist.podverseURL = response["podverseURL"] as? String
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
                 CoreDataHelper.saveCoreData(playlist.managedObjectContext, completionBlock: nil)

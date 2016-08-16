@@ -114,7 +114,37 @@ class PVClipperAddInfoViewController: UIViewController {
                 return
             }
             
-            strongSelf.clip?.podverseURL = dictResponse["podverseURL"] as? String
+            if let mediaRefId = dictResponse["mediaRefId"] as? String {
+                strongSelf.clip?.mediaRefId = mediaRefId
+            }
+            
+            if let podverseURL = dictResponse["podverseURL"] as? String {
+                strongSelf.clip?.podverseURL = podverseURL
+            }
+            
+            if let ownerId = dictResponse["ownerId"] as? String {
+                strongSelf.clip?.ownerId = ownerId
+            }
+            
+            if let title = dictResponse["title"] as? String {
+                strongSelf.clip?.title = title
+            }
+            
+            if let startTime = dictResponse["startTime"] as? NSNumber {
+                strongSelf.clip?.startTime = startTime
+            }
+            
+            if let endTime = dictResponse["endTime"] as? NSNumber {
+                strongSelf.clip?.endTime = endTime
+            }
+            
+            if let dateCreated = dictResponse["dateCreated"] as? String {
+                strongSelf.clip?.dateCreated = PVUtility.formatStringToDate(dateCreated)
+            }
+            
+            if let lastUpdated = dictResponse["lastUpdated"] as? String {
+                strongSelf.clip?.lastUpdated = PVUtility.formatStringToDate(lastUpdated)
+            }
             
             CoreDataHelper.saveCoreData(strongSelf.moc, completionBlock:nil)
             

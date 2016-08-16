@@ -9,7 +9,7 @@
 import Foundation
 
 class SavePlaylistToServer:WebService {
-    internal init(playlist:Playlist, newPlaylist:Bool = false, completionBlock: (response: AnyObject) -> Void, errorBlock: (error: NSError?) -> Void) {
+    internal init(playlist:Playlist, newPlaylist:Bool = false, addMediaRefId: String?, completionBlock: (response: AnyObject) -> Void, errorBlock: (error: NSError?) -> Void) {
         
         var name = "playlists"
         if let id = playlist.id where newPlaylist == false {
@@ -46,7 +46,10 @@ class SavePlaylistToServer:WebService {
         addParamWithKey("isMyEpisodes", value: playlist.isMyEpisodes)
         
         addParamWithKey("isMyClips", value: playlist.isMyClips)
-
+        
+        if let mediaRefId = addMediaRefId {
+            addParamWithKey("mediaRefs", value: [mediaRefId])
+        }
         
 //        var playlistItems = [Dictionary<String,AnyObject>]()
 //        
