@@ -11,7 +11,7 @@ import CoreData
 @objc(Clip)
 
 class Clip: NSManagedObject {
-    @NSManaged var id: String
+    @NSManaged var mediaRefId: String
     @NSManaged var podverseURL: String?
     
     @NSManaged var ownerId: String?

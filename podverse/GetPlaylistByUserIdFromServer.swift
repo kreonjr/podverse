@@ -10,7 +10,9 @@ import Foundation
 
 class GetPlaylistsByUserIdFromServer:WebService {
     internal init(userId:String,completionBlock: (response: AnyObject) -> Void, errorBlock: (error: NSError?) -> Void) {
-        super.init(name:"pl?userId="+userId,completionBlock: completionBlock, errorBlock: errorBlock)
+        let uId = PVUtility.encodePipeInString(userId)
+        
+        super.init(name:"playlists?ownerId="+uId,completionBlock: completionBlock, errorBlock: errorBlock)
         self.setHttpMethod(.METHOD_GET)
     }
 }

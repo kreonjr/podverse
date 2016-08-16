@@ -14,7 +14,7 @@ class Playlist: NSManagedObject {
     
     @NSManaged var ownerId:String
     
-    @NSManaged var title: String
+    @NSManaged var title: String?
     
     @NSManaged var dateCreated: NSDate?
     @NSManaged var lastUpdated: NSDate?

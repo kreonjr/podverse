@@ -34,25 +34,23 @@ class SavePlaylistToServer:WebService {
             addParamWithKey("ownerId", value: ownerId)
         }
         
-        addParamWithKey("title", value: playlist.title)
-        
         if let slug = playlist.slug {
             addParamWithKey("slug", value: slug)
         }
         
-        if let dateCreated = playlist.dateCreated {
-            addParamWithKey("dateCreated", value: dateCreated)
-            
-            if let lastUpdated = playlist.lastUpdated {
-                addParamWithKey("lastUpdated", value: lastUpdated)
-            } else {
-                let date = NSDate().toString()
-                addParamWithKey("lastUpdated", value: date)
-            }
-        } else {
-            let date = NSDate().toString()
-            addParamWithKey("dateCreated", value: date)
+        if let title = playlist.title {
+            addParamWithKey("title", value: title)   
         }
+
+//        Pass enum to servier
+//        if let sharePermission = playlist.sharePermission {
+//            addParamWithKey("")
+//        }
+        
+        addParamWithKey("isMyEpisodes", value: playlist.isMyEpisodes)
+        
+        addParamWithKey("isMyClips", value: playlist.isMyClips)
+
         
 //        var playlistItems = [Dictionary<String,AnyObject>]()
 //        
@@ -76,17 +74,6 @@ class SavePlaylistToServer:WebService {
 //            addParamWithKey("playlistItems", value: playlistItems)
 //        }
 //        
-//        if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
-//            addParamWithKey("userId", value: userId)
-//        }
-//        
-//        if playlist.isMyEpisodes {
-//            addParamWithKey("isMyEpisodes", value: playlist.isMyEpisodes)
-//        }
-//        
-//        if playlist.isMyClips {
-//            addParamWithKey("isMyClips", value: playlist.isMyClips)
-//        }
-        
+
     }
 }

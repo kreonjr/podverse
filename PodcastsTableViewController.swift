@@ -49,7 +49,7 @@ class PodcastsTableViewController: UIViewController {
         get {
             let moc = coreDataHelper.managedObjectContext
             let unsortedPlaylists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: moc) as! [Playlist]
-            var sortedPlaylists = unsortedPlaylists.sort({ $0.title.lowercaseString < $1.title.lowercaseString })
+            var sortedPlaylists = unsortedPlaylists.sort({ $0.title?.lowercaseString < $1.title?.lowercaseString })
             
             for (index, playlist) in sortedPlaylists.enumerate() {
                 if playlist.isMyClips {
@@ -66,7 +66,8 @@ class PodcastsTableViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        var isFirstTimeAppOpened: Bool = false
+        
         if NSUserDefaults.standardUserDefaults().objectForKey("ONE_TIME_LOGIN") == nil {
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
                 if let loginVC = storyboard.instantiateViewControllerWithIdentifier("LoginVC") as? LoginViewController {
@@ -74,6 +75,7 @@ class PodcastsTableViewController: UIViewController {
                 self.presentViewController(loginVC, animated: false, completion: nil)
             }
             NSUserDefaults.standardUserDefaults().setObject(NSUUID().UUIDString, forKey: "ONE_TIME_LOGIN")
+            isFirstTimeAppOpened = true
         }
         
         navigationItem.title = "Podverse"
@@ -93,9 +95,12 @@ class PodcastsTableViewController: UIViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(clearParsingActivity), name: Constants.kInternetIsUnreachable, object: nil)
         updateParsingActivity()
         
-        reloadPodcastData()
-        refreshPodcastFeeds()
-        refreshPlaylists()
+        if isFirstTimeAppOpened != true {
+            reloadPodcastData()
+            refreshPodcastFeeds()
+            refreshPlaylists()
+        }
+
         startCheckSubscriptionsForNewEpisodesTimer()
     }
     
@@ -500,6 +505,8 @@ extension PodcastsTableViewController:PlaylistManagerDelegate {
 }
 
 extension PodcastsTableViewController:LoginModalDelegate {
+    // TODO: what happens if a user logs into a different account through the app?
+    
     func loginTapped() {
         let lock = A0Lock.sharedLock()
         let controller = lock.newLockViewController()
@@ -508,7 +515,21 @@ extension PodcastsTableViewController:LoginModalDelegate {
         controller.onAuthenticationBlock = {(profile, token) in
             NSUserDefaults.standardUserDefaults().setObject(token?.idToken, forKey: "idToken")
             NSUserDefaults.standardUserDefaults().setObject(profile?.userId, forKey: "userId")
+            
+            self.playlistManager.getMyPlaylistsFromServer({
+                self.playlistManager.createDefaultPlaylists()
+            })
+            
             self.dismissViewControllerAnimated(true, completion: nil)
+        }
+        
+        
+        controller.onUserDismissBlock = {() in
+
+            // TODO: If connected to the internet, get anonymous access_token and userId from the web server, then create default playlists.
+//            self.playlistManager.getMyPlaylistsFromServer({
+//                self.playlistManager.createDefaultPlaylists()
+//            })
         }
         
         lock.presentLockController(controller, fromController: self, presentationStyle: .Custom)

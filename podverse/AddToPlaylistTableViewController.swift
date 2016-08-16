@@ -93,7 +93,7 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
             }
         }
         
-        validPlaylists.sortInPlace({ $0.title.lowercaseString < $1.title.lowercaseString })
+        validPlaylists.sortInPlace({ $0.title?.lowercaseString < $1.title?.lowercaseString })
         for (index , playlist) in validPlaylists.enumerate() {
             if clip == nil {
                 if playlist.title == Constants.kMyEpisodesPlaylist {

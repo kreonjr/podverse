@@ -81,12 +81,24 @@ class PVUtility: NSObject {
         }
     }
     
+    static func encodePipeInString (string: String) -> (String) {
+        let s = string.stringByReplacingOccurrencesOfString("|", withString: "%7C", options: .LiteralSearch, range: nil)
+        return s
+    }
+    
     static func formatDateToString (date: NSDate) -> String {
         let dateFormatter = NSDateFormatter()
         dateFormatter.dateStyle = NSDateFormatterStyle.ShortStyle
         let dateString = dateFormatter.stringFromDate(date)
         
         return dateString
+    }
+    
+    static func formatStringToDate (string: String) -> NSDate? {
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd hh:mm:ss.SSSSxxx"
+        let date = dateFormatter.dateFromString(string)
+        return date
     }
     
     static func validateEmail(enteredEmail:String) -> Bool {

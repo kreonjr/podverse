@@ -151,8 +151,20 @@ class CoreDataHelper:NSObject {
         }
     }
     
+    static func retrieveExistingOrCreateNewClip(mediaRefId: String, moc:NSManagedObjectContext) -> Clip {
+        let predicate = NSPredicate(format: "mediaRefId == %@", mediaRefId)
+        let clipSet = CoreDataHelper.fetchEntities("Clip", predicate: predicate,moc: moc) as! [Clip]
+        if clipSet.count > 0 {
+            let clip = clipSet[0]
+            return clip
+        } else {
+            let clip = CoreDataHelper.insertManagedObject("Clip", moc:moc) as! Clip
+            return clip
+        }
+    }
+    
     static func retrieveExistingOrCreateNewPlaylist(playlistId: String, moc:NSManagedObjectContext?) -> Playlist {
-        let predicate = NSPredicate(format: "playlistId == %@", playlistId)
+        let predicate = NSPredicate(format: "id == %@", playlistId)
         let playlistSet = CoreDataHelper.fetchEntities("Playlist", predicate: predicate, moc:moc) as! [Playlist]
         if playlistSet.count > 0 {
             let playlist = playlistSet[0]
