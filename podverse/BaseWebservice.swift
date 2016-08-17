@@ -143,7 +143,9 @@ public class WebService {
                 
                 if rawResponse.statusCode >= minResponse && rawResponse.statusCode <= maxResponse {
                     if let dictionaryResponse = response.result.value {
-                        completionBlock(responseDictionary: dictionaryResponse)
+                        dispatch_async(dispatch_get_main_queue(), { 
+                            completionBlock(responseDictionary: dictionaryResponse)
+                        })
                     }
                     else {
                         errorBlock(error: NSError(domain: WebService.WEBSERVICE_ERROR_DOMAIN, code: ERRORCODES.ERROR_BAD_RESPONSE_VALUE, userInfo: [WebService.ERROR_KEY: NSLocalizedString("Invalid Response Value.", comment: "Invalid Response Value.")]));

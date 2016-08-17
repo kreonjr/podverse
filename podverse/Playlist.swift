@@ -4,7 +4,24 @@
 
 import Foundation
 import CoreData
+
+enum PlaylistSharePermission {
+    case Public, Private, LinkShared
+    
+    var value:String {
+        switch self {
+        case .Public:
+            return "isPublic"
+        case .Private:
+            return "isPrivate"
+        case .LinkShared:
+            return "isSharableWithLink"
+        }
+    }
+}
+
 @objc(Playlist)
+
 
 class Playlist: NSManagedObject {
     
@@ -18,8 +35,7 @@ class Playlist: NSManagedObject {
     @NSManaged var dateCreated: NSDate?
     @NSManaged var lastUpdated: NSDate?
     
-    // TODO: how do we add this enumerator?
-    // @NSManaged var sharePermission: NSEnumerator = ["isPublic", "isSharableWithLink", "isPrivate"]
+    @NSManaged var sharePermission: String?
     
     @NSManaged var isMyEpisodes: Bool
     @NSManaged var isMyClips: Bool

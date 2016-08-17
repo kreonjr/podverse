@@ -63,6 +63,7 @@
 		81E4FE671B2E11D600A10A77 /* fontawesome-webfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */; };
 		B646167C20C69324688B0F40 /* Pods_podverse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F5DF7821A8144906CE0807 /* Pods_podverse.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		E73AF68C1D5C1B390097FD87 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = E73AF68B1D5C1B390097FD87 /* Auth0.plist */; };
+		E7ED92D71D63F27E0016CC6D /* SaveEpisodeToServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7ED92D61D63F27E0016CC6D /* SaveEpisodeToServer.swift */; };
 		EF1C35711D037B4100F9BF8F /* PVReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF1C35701D037B4100F9BF8F /* PVReachability.swift */; };
 		EF3799D21BD4981E00211419 /* CustomFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF3799D11BD4981E00211419 /* CustomFeedParser.swift */; };
 		EF3913011CDFA65E0056AC9E /* UIViewController+MediaPlayerUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF3913001CDFA65E0056AC9E /* UIViewController+MediaPlayerUI.swift */; };
@@ -286,6 +287,7 @@
 		D2F5DF7821A8144906CE0807 /* Pods_podverse.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_podverse.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD7A4B4D2732F3B4E10AFB09 /* Pods-podverse.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-podverse.debug.xcconfig"; path = "Pods/Target Support Files/Pods-podverse/Pods-podverse.debug.xcconfig"; sourceTree = "<group>"; };
 		E73AF68B1D5C1B390097FD87 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = "<group>"; };
+		E7ED92D61D63F27E0016CC6D /* SaveEpisodeToServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SaveEpisodeToServer.swift; sourceTree = "<group>"; };
 		EF1C35531D0378BF00F9BF8F /* Reachability.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Reachability.xcodeproj; path = lib/Reachability.swift/Reachability.xcodeproj; sourceTree = SOURCE_ROOT; };
 		EF1C35701D037B4100F9BF8F /* PVReachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVReachability.swift; sourceTree = "<group>"; };
 		EF3799D11BD4981E00211419 /* CustomFeedParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomFeedParser.swift; sourceTree = "<group>"; };
@@ -564,6 +566,7 @@
 			isa = PBXGroup;
 			children = (
 				EF3980011C545B9900C91753 /* SaveClipToServer.swift */,
+				E7ED92D61D63F27E0016CC6D /* SaveEpisodeToServer.swift */,
 				3027156F1D62D67B004D8789 /* GetAnonIdTokenAndUserIdFromServer.swift */,
 				3094FC951D04C6DE00501D13 /* GetClipsByUserIdFromServer.swift */,
 				EFFD86A01C7AB01E0005014B /* SavePlaylistToServer.swift */,
@@ -933,6 +936,7 @@
 				818615D21B1EB206006C9731 /* MediaPlayerViewController.swift in Sources */,
 				815A2E371B50D855002A21A7 /* FindSearchTableViewController.swift in Sources */,
 				818615D01B1EB144006C9731 /* ClipsTableViewController.swift in Sources */,
+				E7ED92D71D63F27E0016CC6D /* SaveEpisodeToServer.swift in Sources */,
 				81DDBE631B253C9200EF3B9C /* ClipsTableCell.swift in Sources */,
 				EF59CECF1BD07AB6002D9DDF /* String+RemoveHTMLCharacters.swift in Sources */,
 				3047AC531C5462A300F484D5 /* PVClipStreamer.swift in Sources */,

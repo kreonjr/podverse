@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="10174" systemVersion="15F34" minimumToolsVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="10171" systemVersion="15G31" minimumToolsVersion="Automatic">
     <entity name="Clip" representedClassName="Clip" syncable="YES">
         <attribute name="dateCreated" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="duration" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
@@ -43,6 +43,7 @@
         <attribute name="lastUpdated" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="ownerId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="podverseURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="sharePermission" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="clips" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Clip" inverseName="playlist" inverseEntity="Clip" syncable="YES"/>
         <relationship name="episodes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Episode" inverseName="playlist" inverseEntity="Episode" syncable="YES"/>
@@ -65,7 +66,7 @@
     <elements>
         <element name="Clip" positionX="-20" positionY="-387" width="128" height="210"/>
         <element name="Episode" positionX="-225" positionY="-675" width="128" height="345"/>
-        <element name="Playlist" positionX="-288" positionY="-265" width="128" height="195"/>
+        <element name="Playlist" positionX="-288" positionY="-265" width="128" height="210"/>
         <element name="Podcast" positionX="-398" positionY="-541" width="128" height="240"/>
     </elements>
 </model>

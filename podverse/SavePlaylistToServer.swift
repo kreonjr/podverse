@@ -48,7 +48,7 @@ class SavePlaylistToServer:WebService {
         addParamWithKey("isMyClips", value: playlist.isMyClips)
         
         if let mediaRefId = addMediaRefId {
-            addParamWithKey("mediaRefs", value: [mediaRefId])
+            addParamWithKey("playlistItems", value: [mediaRefId])
         }
         
 //        var playlistItems = [Dictionary<String,AnyObject>]()

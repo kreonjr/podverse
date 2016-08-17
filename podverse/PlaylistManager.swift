@@ -379,25 +379,26 @@ final class PlaylistManager {
     }
     
     func addItemToPlaylist(playlist: Playlist, clip: Clip?, episode: Episode?,  moc:NSManagedObjectContext?) {
-        
-        var mediaRefId: String?
-        
         if let c = clip {
             playlist.addClipObject(c)
-            mediaRefId = c.mediaRefId
+            savePlaylistToServer(playlist, mediaRefId: c.mediaRefId, moc: moc)
         }
-
-//        TODO: add mediaRefId somehow
-//        if let e = episode  {
-//            playlist.addEpisodeObject(e)
-//        }
-        
-        guard let mRefId = mediaRefId else {
-            return
+        else if let e = episode {
+            SaveEpisodeToServer(episode: e, completionBlock: { (response) in
+                guard let mRefId = response["id"] as? String else {
+                    return
+                }
+                
+                playlist.addEpisodeObject(e)
+                self.savePlaylistToServer(playlist, mediaRefId: mRefId, moc: moc)
+            }, errorBlock: { (error) in
+                print("Not saved to server. Error: ", error?.localizedDescription)
+            }).call()
         }
-        
-
-        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.id == nil), addMediaRefId: mRefId, completionBlock: { (response) -> Void in
+    }
+    
+    func savePlaylistToServer(playlist:Playlist, mediaRefId:String, moc:NSManagedObjectContext?) {
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.id == nil), addMediaRefId: mediaRefId, completionBlock: { (response) -> Void in
             if let managedObjectContext = moc {
                 var playlist = CoreDataHelper.fetchEntityWithID(playlist.objectID, moc: managedObjectContext) as! Playlist
                 guard let dictResponse = response as? Dictionary<String,AnyObject> else {
@@ -420,8 +421,7 @@ final class PlaylistManager {
         }) { (error) -> Void in
             print("Not saved to server. Error: ", error?.localizedDescription)
             CoreDataHelper.saveCoreData(moc, completionBlock: nil)
-            }.call()
-
+        }.call()
     }
     
     func savePlaylist(playlist: Playlist, moc:NSManagedObjectContext) {

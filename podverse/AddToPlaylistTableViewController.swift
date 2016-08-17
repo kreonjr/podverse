@@ -62,6 +62,11 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
                 
                 let playlist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
                 playlist.title = playlistTitle
+                
+//                TODO: Create UI for permission setting
+//                let permission:PlaylistSharePermission = .Public
+//                playlist.sharePermission = permission.value
+                
                 CoreDataHelper.saveCoreData(moc, completionBlock:nil)
                 self.playlistManager.savePlaylist(playlist, moc:moc)
             }

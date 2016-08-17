@@ -114,7 +114,7 @@ class PVClipperAddInfoViewController: UIViewController {
                 return
             }
             
-            if let mediaRefId = dictResponse["mediaRefId"] as? String {
+            if let mediaRefId = dictResponse["id"] as? String {
                 strongSelf.clip?.mediaRefId = mediaRefId
             }
             
