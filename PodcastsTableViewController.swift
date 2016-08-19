@@ -362,11 +362,14 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
             })
         } else {
             let playlist = playlists[indexPath.row]
+            
             cell.title?.text = playlist.title
+            
             cell.episodesDownloadedOrStarted?.text = "playlist creator's name here"
             
-            cell.lastPublishedDate?.text = "playlist last updated date"
-            //                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastBuildDate)
+            if let lastUpdated = playlist.lastUpdated {
+                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastUpdated)
+            }
             
             cell.totalClips?.text = "\(playlist.allItems.count) items"
             

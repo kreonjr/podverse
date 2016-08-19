@@ -29,12 +29,48 @@ class SaveClipToServer:WebService {
         if let endTime = clip.endTime {
             addParamWithKey("endTime", value: endTime)
         }
-
-        addParamWithKey("episode", value: [ "title": clip.episode.title ?? "",
-                                            "mediaURL": clip.episode.mediaURL ?? "",
-                                            "podcast": ["title": clip.episode.podcast.title ?? "",
-                                                        "feedURL": clip.episode.podcast.feedURL]
-                                          ])
+        
+        // TODO: this code is repeated on the episode obj in SaveEpisodeToServer,
+        // can we make this more DRY?
+        var lastBuildDateString: String?
+        var lastPubDateString: String?
+        var pubDateString: String?
+        
+        if let lastBuildDate = clip.episode.podcast.lastBuildDate {
+            lastBuildDateString = PVUtility.formatDateToString(lastBuildDate)
+        }
+        
+        if let lastPubDate = clip.episode.podcast.lastPubDate {
+            lastPubDateString = PVUtility.formatDateToString(lastPubDate)
+        }
+        
+        if let pubDate = clip.episode.pubDate {
+            pubDateString = PVUtility.formatDateToString(pubDate)
+        }
+        
+        var podcastAttrs = Dictionary<String,AnyObject>()
+        var episodeAttrs = Dictionary<String,AnyObject>()
+        
+        podcastAttrs["feedURL"] = clip.episode.podcast.feedURL ?? ""
+        podcastAttrs["imageURL"] = clip.episode.podcast.imageURL ?? ""
+        podcastAttrs["summary"] = clip.episode.podcast.summary ?? ""
+        podcastAttrs["title"] = clip.episode.podcast.title ?? ""
+        podcastAttrs["author"] = clip.episode.podcast.author ?? ""
+        podcastAttrs["lastBuildDate"] = lastBuildDateString ?? ""
+        podcastAttrs["lastPubDate"] = lastPubDateString ?? ""
+        
+        episodeAttrs["mediaURL"] = clip.episode.mediaURL ?? ""
+        episodeAttrs["title"] = clip.episode.title ?? ""
+        episodeAttrs["summary"] = clip.episode.summary ?? ""
+        episodeAttrs["duration"] = clip.episode.duration as? Int ?? ""
+        episodeAttrs["guid"] = clip.episode.guid ?? ""
+        episodeAttrs["link"] = clip.episode.link ?? ""
+        episodeAttrs["mediaBytes"] = clip.episode.mediaBytes as? Int ?? ""
+        episodeAttrs["mediaType"] = clip.episode.mediaType ?? ""
+        episodeAttrs["pubDate"] = pubDateString ?? ""
+        episodeAttrs["podcast"] = podcastAttrs
+        
+        addParamWithKey("episode", value: episodeAttrs)
         
     }
 }

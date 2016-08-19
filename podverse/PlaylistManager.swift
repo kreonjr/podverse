@@ -129,7 +129,7 @@ final class PlaylistManager {
             playlist.podverseURL = podverseURL
         }
         
-        if let playlistItems = JSONDict["playlistItems"] as? [Dictionary<String,AnyObject>] {
+        if let playlistItems = JSONDict["mediaRefs"] as? [Dictionary<String,AnyObject>] {
             if playlistItems.count != playlist.allItems.count {
                 
                 playlist.episodes = NSSet()
@@ -139,45 +139,91 @@ final class PlaylistManager {
                     var episode: Episode!
                     
                     // If the playlistItem has a zero startTime and no endTime, then handle as an episode
-                    if playlistItem["startTime"] as? Int == 0 && playlistItem["endTime"] == nil {
-//
-//                        if let podcastDict = playlistItem["podcast"] {
-//                            if let feedURLString = podcastDict["feedURL"] as? String {
-//                                podcast = CoreDataHelper.retrieveExistingOrCreateNewPodcast(feedURLString, moc:moc)
-//                                podcast.feedURL = feedURLString
-//                            } else {
-//                                break
-//                            }
-//
-//                            if let title = podcastDict["title"] as? String {
-//                                podcast.title = title
-//                            }
-//
-//                            if let imageURL = podcastDict["imageURL"] as? String {
-//                                if podcast.imageURL == nil {
-//                                    podcast.imageURL = imageURL
-//                                }
-//                            }
-//                        }
-//
-//                        if let mediaUrlString = playlistItem["mediaURL"] as? String {
-//                            episode = CoreDataHelper.retrieveExistingOrCreateNewEpisode(mediaUrlString, moc:moc)
-//                            episode.mediaURL = mediaUrlString
-//                        } else {
-//                            break
-//                        }
-//
-//                        if let title = playlistItem["title"] as? String {
-//                            episode.title = title
-//                        }
-//
-//                        if let duration = playlistItem["duration"] as? Int {
-//                            episode.duration = duration
-//                        }
-//
-//                        podcast.addEpisodeObject(episode)
-//
-//                        playlist.addEpisodeObject(episode)
+                    if playlistItem["startTime"] as? Int == 0 && playlistItem["endTime"] as? String == nil {
+                        
+                        guard let e = playlistItem["episode"] as? Dictionary<String,AnyObject> else {
+                            break
+                        }
+                        
+                        guard let p = e["podcast"] as? Dictionary<String,AnyObject> else {
+                            break
+                        }
+                        
+                        guard let mediaURL = e["mediaURL"] as? String else {
+                            break
+                        }
+                        
+                        guard let feedURL = p["feedURL"] as? String else {
+                            break
+                        }
+                        
+                        episode = CoreDataHelper.retrieveExistingOrCreateNewEpisode(mediaURL, moc:moc)
+                        
+                        episode.mediaURL = mediaURL
+                        
+                        if let title = e["title"] as? String {
+                            episode.title = title
+                        }
+                        
+                        if let summary = e["summary"] as? String {
+                            episode.summary = summary
+                        }
+                        
+                        if let duration = e["duration"] as? Int {
+                            episode.duration = duration
+                        }
+                        
+                        if let guid = e["guid"] as? String {
+                            episode.guid = guid
+                        }
+                        
+                        if let link = e["link"] as? String {
+                            episode.link = link
+                        }
+                        
+                        if let mediaBytes = e["mediaBytes"] as? Int {
+                            episode.mediaBytes = mediaBytes
+                        }
+                        
+                        if let mediaType = e["mediaType"] as? String {
+                            episode.mediaType = mediaType
+                        }
+                        
+                        if let pubDate = e["pubDate"] as? String {
+                            episode.pubDate = PVUtility.formatStringToDate(pubDate)
+                        }
+                        
+                        podcast = CoreDataHelper.retrieveExistingOrCreateNewPodcast(feedURL, moc:moc)
+
+                        podcast.feedURL = feedURL
+
+                        if let imageURL = p["imageURL"] as? String {
+                            podcast.imageURL = imageURL
+                        }
+                        
+                        if let summary = p["summary"] as? String {
+                            podcast.summary = summary
+                        }
+                        
+                        if let title = p["title"] as? String {
+                            podcast.title = title
+                        }
+                        
+                        if let author = p["author"] as? String {
+                            podcast.author = author
+                        }
+                        
+                        if let lastBuildDate = p["lastBuildDate"] as? String {
+                            podcast.lastBuildDate = PVUtility.formatStringToDate(lastBuildDate)
+                        }
+                        
+                        if let lastPubDate = p["lastPubDate"] as? String {
+                            podcast.lastPubDate = PVUtility.formatStringToDate(lastPubDate)
+                        }
+
+                        podcast.addEpisodeObject(episode)
+
+                        playlist.addEpisodeObject(episode)
                     }
                         
                     // Else handle playlistItem as a clip
@@ -266,53 +312,6 @@ final class PlaylistManager {
         }
         
         return playlist
-    }
-    
-    func clipToPlaylistItemJSON(clip:Clip) -> Dictionary<String,AnyObject> {
-        var JSONDict = Dictionary<String,AnyObject>()
-        
-        JSONDict["title"] = clip.title
-        JSONDict["duration"] = clip.duration
-        JSONDict["startTime"] = clip.startTime
-        JSONDict["endTime"] = clip.endTime
-        
-        var episodeDict = Dictionary<String,AnyObject>()
-        episodeDict["title"] = clip.episode.title
-        episodeDict["mediaURL"] = clip.episode.mediaURL
-        episodeDict["duration"] = clip.episode.duration
-        
-        if let pubDate = clip.episode.pubDate {
-            episodeDict["pubDate"] = PVUtility.formatDateToString(pubDate)
-        }
-        JSONDict["episode"] = episodeDict
-        
-        var podcastDict = Dictionary<String,AnyObject>()
-        podcastDict["title"] = clip.episode.podcast.title
-        podcastDict["imageURL"] = clip.episode.podcast.imageURL
-        podcastDict["feedURL"] = clip.episode.podcast.feedURL
-
-        JSONDict["podcast"] = podcastDict
-        
-        return JSONDict
-    }
-    
-    func episodeToPlaylistItemJSON(episode:Episode) -> Dictionary<String,AnyObject> {
-        var JSONDict = Dictionary<String,AnyObject>()
-        JSONDict["title"] = episode.title
-        JSONDict["duration"] = episode.duration
-        if let pubDate = episode.pubDate {
-            JSONDict["pubDate"] = PVUtility.formatDateToString(pubDate)
-        }
-        JSONDict["mediaURL"] = episode.mediaURL
-        
-        var podcastDict = Dictionary<String,AnyObject>()
-        podcastDict["title"] = episode.podcast.title
-        podcastDict["imageURL"] = episode.podcast.imageURL
-        podcastDict["feedURL"] = episode.podcast.feedURL
-        
-        JSONDict["podcast"] = podcastDict
-        
-        return JSONDict
     }
     
     func createDefaultPlaylists() {

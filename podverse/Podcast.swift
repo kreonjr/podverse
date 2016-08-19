@@ -16,7 +16,7 @@ class Podcast: NSManagedObject {
     @NSManaged var imageData: NSData?
     @NSManaged var imageThumbData: NSData?
     @NSManaged var imageURL: String?
-    @NSManaged var itunesAuthor: String?
+    @NSManaged var author: String?
     @NSManaged var itunesImage: NSData?
     @NSManaged var itunesImageURL: String?
     @NSManaged var lastBuildDate: NSDate?
