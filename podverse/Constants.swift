@@ -9,18 +9,20 @@ import UIKit
 import CoreData
 
 enum TabItems:Int {
-    case Podcasts = 0, Find, Downloads, Settings
+    case Podcasts = 0, Playlists, Find, Downloads, Settings
     
     func getIndex() -> Int {
         switch self {
         case .Podcasts:
             return 0
-        case .Find:
+        case .Playlists:
             return 1
-        case .Downloads:
+        case .Find:
             return 2
-        case .Settings:
+        case .Downloads:
             return 3
+        case .Settings:
+            return 4
         }
     }
 }

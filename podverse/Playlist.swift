@@ -29,6 +29,7 @@ class Playlist: NSManagedObject {
     @NSManaged var podverseURL: String?
     
     @NSManaged var ownerId:String
+    @NSManaged var ownerName:String?
     
     @NSManaged var title: String?
     

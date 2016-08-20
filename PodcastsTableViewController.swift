@@ -13,28 +13,13 @@ import Lock
 class PodcastsTableViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var segmentedControl: UISegmentedControl!
-    @IBAction func indexChanged(sender: UISegmentedControl) {
-        switch segmentedControl.selectedSegmentIndex
-        {
-        case 0:
-            showSubscribeToPodcastsIfNoneAreSubscribed()
-            self.tableView.reloadData()
-        case 1:
-            bottomButton.setTitle("Add Playlist by URL", forState: .Normal)
-            bottomButton.hidden = false
-            self.tableView.reloadData()
-        default:
-            break;
-        }
-    }
     
     @IBOutlet weak var bottomButton: UIButton!
-        
-    var playlistManager = PlaylistManager.sharedInstance
+    
     var managedObjectContext:NSManagedObjectContext!
     var podcastsArray = [Podcast]()
     let coreDataHelper = CoreDataHelper.sharedInstance
+    var playlistManager = PlaylistManager.sharedInstance
     let parsingPodcasts = ParsingPodcastsList.shared
     let reachability = PVReachability.manager
     var refreshControl: UIRefreshControl!
@@ -44,25 +29,6 @@ class PodcastsTableViewController: UIViewController {
     @IBOutlet weak var parsingActivityContainer: UIView!
     
     private let REFRESH_PODCAST_TIME:Double = 3600
-    
-    var playlists:[Playlist] {
-        get {
-            let moc = coreDataHelper.managedObjectContext
-            let unsortedPlaylists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: moc) as! [Playlist]
-            var sortedPlaylists = unsortedPlaylists.sort({ $0.title?.lowercaseString < $1.title?.lowercaseString })
-            
-            for (index, playlist) in sortedPlaylists.enumerate() {
-                if playlist.isMyClips {
-                    sortedPlaylists.removeAtIndex(index)
-                    sortedPlaylists.insert(playlist, atIndex: 0)
-                } else if playlist.isMyEpisodes {
-                    sortedPlaylists.removeAtIndex(index)
-                    sortedPlaylists.insert(playlist, atIndex: 0)
-                }
-            }
-            return sortedPlaylists
-        }
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -78,11 +44,11 @@ class PodcastsTableViewController: UIViewController {
             isFirstTimeAppOpened = true
         }
         
-        navigationItem.title = "Podverse"
+        navigationItem.title = "Podcasts"
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
 
         bottomButton.hidden = true
-        playlistManager.delegate = self
+        showSubscribeToPodcastsIfNoneAreSubscribed()
         
         refreshControl = UIRefreshControl()
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh all podcasts")
@@ -98,7 +64,6 @@ class PodcastsTableViewController: UIViewController {
         if isFirstTimeAppOpened != true {
             reloadPodcastData()
             refreshPodcastFeeds()
-            refreshPlaylists()
         }
 
         startCheckSubscriptionsForNewEpisodesTimer()
@@ -111,22 +76,12 @@ class PodcastsTableViewController: UIViewController {
     }
     
     func refreshData() {
-        if segmentedControl.selectedSegmentIndex == 0 {
-            if reachability.hasInternetConnection() == false && refreshControl.refreshing == true {
-                showInternetNeededAlert("Connect to WiFi or cellular data to parse podcast feeds.")
-                refreshControl.endRefreshing()
-                return
-            }
-            refreshPodcastFeeds()
+        if reachability.hasInternetConnection() == false && refreshControl.refreshing == true {
+            showInternetNeededAlert("Connect to WiFi or cellular data to parse podcast feeds.")
+            refreshControl.endRefreshing()
+            return
         }
-        else {
-            if reachability.hasInternetConnection() == false && refreshControl.refreshing == true {
-                showInternetNeededAlert("Connect to WiFi or cellular data to refresh playlists.")
-                refreshControl.endRefreshing()
-                return
-            }
-            refreshPlaylists()
-        }
+        refreshPodcastFeeds()
     }
     
     func unsubscribeFromPodcast(notification:NSNotification) {
@@ -145,13 +100,6 @@ class PodcastsTableViewController: UIViewController {
                     self.tableView.reloadData()
                 }
             }
-        }
-    }
-    
-    private func refreshPlaylists() {
-        PlaylistManager.sharedInstance.refreshPlaylists { () -> Void in
-            self.refreshControl.endRefreshing()
-            self.tableView.reloadData()
         }
     }
     
@@ -182,37 +130,12 @@ class PodcastsTableViewController: UIViewController {
     }
     
     private func showSubscribeToPodcastsIfNoneAreSubscribed() {
-        if podcastsArray.count == 0 && segmentedControl.selectedSegmentIndex == 0 {
+        if podcastsArray.count == 0 {
             bottomButton.setTitle("Subscribe to a podcast", forState: .Normal)
             bottomButton.hidden = false
-        } else if podcastsArray.count > 0 && segmentedControl.selectedSegmentIndex == 0 {
+        } else if podcastsArray.count > 0 {
             bottomButton.hidden = true
         }
-    }
-    
-    private func showAddPlaylistByURLAlert() {
-        if reachability.hasInternetConnection() == false {
-            showInternetNeededAlert("Connect to WiFi or cellular data to add a playlist by URL.")
-            return
-        }
-        
-        let addPlaylistByURLAlert = UIAlertController(title: "Add Playlist By URL", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
-        
-        addPlaylistByURLAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
-            textField.placeholder = "http://podverse.tv/playlist/..."
-        })
-        
-        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
-        
-        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
-            let textField = addPlaylistByURLAlert.textFields![0] as UITextField
-            if let urlString = textField.text {
-                self.playlistManager.addPlaylistByUrlString(urlString)
-            }
-            self.reloadPodcastData()
-        }))
-        
-        presentViewController(addPlaylistByURLAlert, animated: true, completion: nil)
     }
     
     // MARK: - Navigation
@@ -223,11 +146,6 @@ class PodcastsTableViewController: UIViewController {
                 episodesTableViewController.selectedPodcastId = podcastsArray[index.row].objectID
             }
             episodesTableViewController.showAllEpisodes = false
-        } else if segue.identifier == "Show Playlist" {
-            let playlistViewController = segue.destinationViewController as! PlaylistViewController
-            if let index = tableView.indexPathForSelectedRow {
-                playlistViewController.playlistObjectId = playlists[index.row].objectID
-            }
         } else if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
@@ -241,11 +159,7 @@ class PodcastsTableViewController: UIViewController {
     
     
     @IBAction func bottomButtonAction(sender: AnyObject) {
-        if segmentedControl.selectedSegmentIndex == 0 {
-            tabBarController?.selectedIndex = 1
-        } else if segmentedControl.selectedSegmentIndex == 1 {
-            showAddPlaylistByURLAlert()
-        }
+        tabBarController?.selectedIndex = 2
     }
     
     // This function runs once on app load, then runs in the background every 30 minutes.
@@ -302,107 +216,57 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        if segmentedControl.selectedSegmentIndex == 0 {
-            return "My Subscribed Podcasts"
-        } else {
-            return "My Playlists"
-        }
+        return "My Subscribed Podcasts"
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
-        if segmentedControl.selectedSegmentIndex == 1 && indexPath.row >= playlists.count {
-            return 60
-        } else {
-            return 100
-        }
+        return 100
     }
 
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if segmentedControl.selectedSegmentIndex == 0 {
-            return podcastsArray.count
-        }
-        
-        return playlists.count
+        return podcastsArray.count
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
 
-        if segmentedControl.selectedSegmentIndex == 0 {
-            let podcast = podcastsArray[indexPath.row]
-            cell.title?.text = podcast.title
+        let podcast = podcastsArray[indexPath.row]
+        cell.title?.text = podcast.title
 
-            let episodes = podcast.episodes.allObjects as! [Episode]
-            let episodesDownloaded = episodes.filter{ $0.fileName != nil }
-            cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
-            
-            cell.totalClips?.text = "\(podcast.totalClips) clips"
-            
-            cell.lastPublishedDate?.text = ""
-            if let lastPubDate = podcast.lastPubDate {
-                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
-            }
-            
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { 
-                var cellImage:UIImage?
-
-                if let imageData = podcast.imageThumbData, image = UIImage(data: imageData) {
-                    cellImage = image
-                }
-                else {
-                    cellImage = UIImage(named: "PodverseIcon")
-                }
-                
-                dispatch_async(dispatch_get_main_queue(), { 
-                    if let visibleRows = self.tableView.indexPathsForVisibleRows where visibleRows.contains(indexPath) {
-                        let existingCell = self.tableView.cellForRowAtIndexPath(indexPath) as! PodcastsTableCell
-                        existingCell.pvImage.image = cellImage
-                    }
-                })
-            })
-        } else {
-            let playlist = playlists[indexPath.row]
-            
-            cell.title?.text = playlist.title
-            
-            cell.episodesDownloadedOrStarted?.text = "playlist creator's name here"
-            
-            if let lastUpdated = playlist.lastUpdated {
-                cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastUpdated)
-            }
-            
-            cell.totalClips?.text = "\(playlist.allItems.count) items"
-            
-            cell.pvImage?.image = UIImage(named: "PodverseIcon")
-
-            for item in playlist.allItems {
-                if let episode = item as? Episode {
-                    if let imageData = episode.podcast.imageThumbData {
-                        if let image = UIImage(data: imageData) {
-                            cell.pvImage?.image = image
-                        }
-                    }
-                }
-                else if let clip = item as? Clip {
-                    if let imageData = clip.episode.podcast.imageThumbData {
-                        if let image = UIImage(data: imageData) {
-                            cell.pvImage?.image = image
-                        }
-                    }
-                }
-            }
-            
+        let episodes = podcast.episodes.allObjects as! [Episode]
+        let episodesDownloaded = episodes.filter{ $0.fileName != nil }
+        cell.episodesDownloadedOrStarted?.text = "\(episodesDownloaded.count) downloaded"
+        
+        cell.totalClips?.text = "\(podcast.totalClips) clips"
+        
+        cell.lastPublishedDate?.text = ""
+        if let lastPubDate = podcast.lastPubDate {
+            cell.lastPublishedDate?.text = PVUtility.formatDateToString(lastPubDate)
         }
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), { 
+            var cellImage:UIImage?
 
+            if let imageData = podcast.imageThumbData, image = UIImage(data: imageData) {
+                cellImage = image
+            }
+            else {
+                cellImage = UIImage(named: "PodverseIcon")
+            }
+            
+            dispatch_async(dispatch_get_main_queue(), { 
+                if let visibleRows = self.tableView.indexPathsForVisibleRows where visibleRows.contains(indexPath) {
+                    let existingCell = self.tableView.cellForRowAtIndexPath(indexPath) as! PodcastsTableCell
+                    existingCell.pvImage.image = cellImage
+                }
+            })
+        })
+        
         return cell
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        if segmentedControl.selectedSegmentIndex == 0 {
-            self.performSegueWithIdentifier("Show Episodes", sender: nil)
-        } else {
-            self.performSegueWithIdentifier("Show Playlist", sender: nil)
-        }
+        self.performSegueWithIdentifier("Show Episodes", sender: nil)
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
@@ -414,74 +278,37 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
     
     // Override to support editing the table view.
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if segmentedControl.selectedSegmentIndex == 0 {
-            if editingStyle == .Delete {
-                let podcastToRemove = podcastsArray[indexPath.row]
-                
-                // Remove Player button if the now playing episode was one of the podcast's episodes
-                let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
-                if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-                    if allPodcastEpisodes.contains(nowPlayingEpisode) {
-                        self.navigationItem.rightBarButtonItem = nil
-                    }
+        if editingStyle == .Delete {
+            let podcastToRemove = podcastsArray[indexPath.row]
+            
+            // Remove Player button if the now playing episode was one of the podcast's episodes
+            let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
+            if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
+                if allPodcastEpisodes.contains(nowPlayingEpisode) {
+                    self.navigationItem.rightBarButtonItem = nil
                 }
-                podcastsArray.removeAtIndex(indexPath.row)
-                self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-                
-                PVSubscriber.unsubscribeFromPodcast(podcastToRemove.objectID, completionBlock: nil)
-                
-                showSubscribeToPodcastsIfNoneAreSubscribed()
             }
-        } else {
-            if indexPath.row > 1 {
-                if editingStyle == .Delete {
-                    let playlistToRemove = playlists[indexPath.row]
-                    
-                    let deletePlaylistAlert = UIAlertController(title: "Delete Playlist", message: "Do you want to delete this playlist locally, or both locally and on podverse.fm?", preferredStyle: UIAlertControllerStyle.Alert)
-                    
-                    deletePlaylistAlert.addAction(UIAlertAction(title: "Locally", style: .Default, handler: { (action: UIAlertAction!) in
-                        PVDeleter.deletePlaylist(playlistToRemove, deleteFromServer: false)
-                        self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-                    }))
-                    
-                    deletePlaylistAlert.addAction(UIAlertAction(title: "Locally and Online", style: .Default, handler: { (action: UIAlertAction!) in
-                        PVDeleter.deletePlaylist(playlistToRemove, deleteFromServer: true)
-                        self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
-                    }))
-                    
-                    deletePlaylistAlert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: { (action: UIAlertAction!) in
-                        self.tableView.editing = false
-                        
-                    }))
-                    
-                    presentViewController(deletePlaylistAlert, animated: true, completion: nil)
-                }
-            } else {
-                let alert = UIAlertController(title: "Cannot Delete", message: "The \"My Episodes\" and \"My Clips\" playlists are required by default and cannot be deleted.", preferredStyle: UIAlertControllerStyle.Alert)
-                alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
-                    self.tableView.editing = false
-                    
-                }))
-                self.presentViewController(alert, animated: true, completion: nil)
-            }
+            podcastsArray.removeAtIndex(indexPath.row)
+            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            
+            PVSubscriber.unsubscribeFromPodcast(podcastToRemove.objectID, completionBlock: nil)
+            
+            showSubscribeToPodcastsIfNoneAreSubscribed()
         }
-        
     }
 }
 
 extension PodcastsTableViewController: PVFeedParserDelegate {
     func feedParsingComplete(feedURL:String?) {
-        if segmentedControl.selectedSegmentIndex == 0 {
-            if let url = feedURL, let index = self.podcastsArray.indexOf({ url == $0.feedURL }) {
-                let podcast = CoreDataHelper.fetchEntityWithID(self.podcastsArray[index].objectID, moc: self.managedObjectContext) as! Podcast
-                self.podcastsArray[index] = podcast
-                self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
-            }
-            else {
-                self.reloadPodcastData()
-            }
-            updateParsingActivity()
+        if let url = feedURL, let index = self.podcastsArray.indexOf({ url == $0.feedURL }) {
+            let podcast = CoreDataHelper.fetchEntityWithID(self.podcastsArray[index].objectID, moc: self.managedObjectContext) as! Podcast
+            self.podcastsArray[index] = podcast
+            self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
         }
+        else {
+            self.reloadPodcastData()
+        }
+        updateParsingActivity()
     }
     
     func feedParsingStarted() {
@@ -490,20 +317,6 @@ extension PodcastsTableViewController: PVFeedParserDelegate {
     
     func feedParserChannelParsed() {
         self.reloadPodcastData()
-    }
-}
-
-extension PodcastsTableViewController:PlaylistManagerDelegate {
-    func playlistAddedByUrl() {
-        refreshPlaylists()
-    }
-    
-    func itemAddedToPlaylist() {
-        refreshPlaylists()
-    }
-    
-    func didSavePlaylist() {
-        refreshPlaylists()
     }
 }
 

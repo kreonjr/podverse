@@ -122,4 +122,11 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
             tableView.deselectRowAtIndexPath(indexPath, animated: true)
         }
     }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
+        }
+    }
 }

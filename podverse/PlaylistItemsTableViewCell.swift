@@ -1,5 +1,5 @@
 //
-//  PlaylistTableViewCell.swift
+//  PlaylistItemsTableViewCell.swift
 //  podverse
 //
 //  Created by Mitchell Downey on 2/2/16.
@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PlaylistTableViewCell: UITableViewCell {
+class PlaylistItemsTableViewCell: UITableViewCell {
 
     @IBOutlet weak var pvImage: UIImageView!
     @IBOutlet weak var itemTitle: UILabel!
