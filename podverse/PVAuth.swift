@@ -41,12 +41,6 @@ class PVAuth: NSObject {
         }.call()
     }
     
-    func logOut () {
-        NSUserDefaults.standardUserDefaults().removeObjectForKey("idToken")
-        NSUserDefaults.standardUserDefaults().removeObjectForKey("userId")
-        loginAsAnon()
-    }
-    
     func showAuth0LockLoginVC (vc: UIViewController) {
         let lock = A0Lock.sharedLock()
         let controller = lock.newLockViewController()

@@ -132,7 +132,9 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
             if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") where userId.rangeOfString("auth0|") == nil {
                 PVAuth.sharedInstance.showAuth0LockLoginVC(self)
             } else {
-                PVAuth.sharedInstance.logOut()
+                let logOutAlert = UIAlertController(title: "Log Out", message: "Podverse is intended for one user per mobile device at a time. To log out please delete the app, then reinstall if you want to sign in as a new user.", preferredStyle: UIAlertControllerStyle.Alert)
+                logOutAlert.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+                presentViewController(logOutAlert, animated: true, completion: nil)
             }
         } else if indexPath.row == 1 {
             PVAuth.sharedInstance.showAuth0LockSignUpVC(self)
