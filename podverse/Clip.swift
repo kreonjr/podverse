@@ -14,7 +14,8 @@ class Clip: NSManagedObject {
     @NSManaged var mediaRefId: String
     @NSManaged var podverseURL: String?
     
-    @NSManaged var ownerId: String?
+    @NSManaged var ownerId: String
+    @NSManaged var ownerName: String?
 
     @NSManaged var title: String?
     @NSManaged var startTime: NSNumber

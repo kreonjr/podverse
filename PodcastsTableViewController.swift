@@ -324,26 +324,7 @@ extension PodcastsTableViewController:LoginModalDelegate {
     // TODO: what happens if a user logs into a different account through the app?
     
     func loginTapped() {
-        let lock = A0Lock.sharedLock()
-        let controller = lock.newLockViewController()
-        controller.closable = true
-        
-        controller.onAuthenticationBlock = {(profile, token) in
-            NSUserDefaults.standardUserDefaults().setObject(token?.idToken, forKey: "idToken")
-            NSUserDefaults.standardUserDefaults().setObject(profile?.userId, forKey: "userId")
-            
-            self.playlistManager.getMyPlaylistsFromServer({
-                self.playlistManager.createDefaultPlaylists()
-            })
-            
-            self.dismissViewControllerAnimated(true, completion: nil)
-        }
-        
-        controller.onUserDismissBlock = {() in
-            PVAuth.loginAsAnon()
-        }
-        
-        lock.presentLockController(controller, fromController: self, presentationStyle: .Custom)
+        PVAuth.sharedInstance.showAuth0LockLoginVC(self)
     }
 }
 

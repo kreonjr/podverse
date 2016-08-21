@@ -15,6 +15,7 @@
 		302F5E851CF2AC9E00775CEA /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302F5E841CF2AC9E00775CEA /* LoginViewController.swift */; };
 		302F5E8D1CF577AD00775CEA /* UITableViewController+MediaPlayerUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302F5E8C1CF577AD00775CEA /* UITableViewController+MediaPlayerUI.swift */; };
 		302F5E8F1CFCD8A200775CEA /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 302F5E8E1CFCD8A200775CEA /* SettingsViewController.swift */; };
+		303C71B91D6930D7008FF070 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = 303C71B81D6930D7008FF070 /* Auth0.plist */; };
 		3045E0971C658D4B006477B3 /* AddToPlaylistTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3045E0961C658D4B006477B3 /* AddToPlaylistTableViewCell.swift */; };
 		3047AC531C5462A300F484D5 /* PVClipStreamer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3047AC521C5462A300F484D5 /* PVClipStreamer.swift */; };
 		3048B6891C5F05FF00D1C2C7 /* Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3048B6881C5F05FF00D1C2C7 /* Playlist.swift */; };
@@ -64,7 +65,6 @@
 		81E357901B21624500D67634 /* PVUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81E3578F1B21624500D67634 /* PVUtility.swift */; };
 		81E4FE671B2E11D600A10A77 /* fontawesome-webfont.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */; };
 		B646167C20C69324688B0F40 /* Pods_podverse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2F5DF7821A8144906CE0807 /* Pods_podverse.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		E73AF68C1D5C1B390097FD87 /* Auth0.plist in Resources */ = {isa = PBXBuildFile; fileRef = E73AF68B1D5C1B390097FD87 /* Auth0.plist */; };
 		E7ED92D71D63F27E0016CC6D /* SaveEpisodeToServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7ED92D61D63F27E0016CC6D /* SaveEpisodeToServer.swift */; };
 		EF1C35711D037B4100F9BF8F /* PVReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF1C35701D037B4100F9BF8F /* PVReachability.swift */; };
 		EF3799D21BD4981E00211419 /* CustomFeedParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF3799D11BD4981E00211419 /* CustomFeedParser.swift */; };
@@ -237,6 +237,7 @@
 		302F5E841CF2AC9E00775CEA /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		302F5E8C1CF577AD00775CEA /* UITableViewController+MediaPlayerUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITableViewController+MediaPlayerUI.swift"; sourceTree = "<group>"; };
 		302F5E8E1CFCD8A200775CEA /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		303C71B81D6930D7008FF070 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = "<group>"; };
 		3045E0961C658D4B006477B3 /* AddToPlaylistTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddToPlaylistTableViewCell.swift; sourceTree = "<group>"; };
 		3047AC521C5462A300F484D5 /* PVClipStreamer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVClipStreamer.swift; sourceTree = "<group>"; };
 		3048B6881C5F05FF00D1C2C7 /* Playlist.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Playlist.swift; sourceTree = "<group>"; };
@@ -290,7 +291,6 @@
 		81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fontawesome-webfont.ttf"; sourceTree = "<group>"; };
 		D2F5DF7821A8144906CE0807 /* Pods_podverse.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_podverse.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DD7A4B4D2732F3B4E10AFB09 /* Pods-podverse.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-podverse.debug.xcconfig"; path = "Pods/Target Support Files/Pods-podverse/Pods-podverse.debug.xcconfig"; sourceTree = "<group>"; };
-		E73AF68B1D5C1B390097FD87 /* Auth0.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Auth0.plist; sourceTree = "<group>"; };
 		E7ED92D61D63F27E0016CC6D /* SaveEpisodeToServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SaveEpisodeToServer.swift; sourceTree = "<group>"; };
 		EF1C35531D0378BF00F9BF8F /* Reachability.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Reachability.xcodeproj; path = lib/Reachability.swift/Reachability.xcodeproj; sourceTree = SOURCE_ROOT; };
 		EF1C35701D037B4100F9BF8F /* PVReachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PVReachability.swift; sourceTree = "<group>"; };
@@ -412,7 +412,7 @@
 				EF397FFE1C5458A000C91753 /* BaseWebservice.swift */,
 				817C54071B4B6976007258F8 /* Constants.swift */,
 				81E4FE661B2E0C6A00A10A77 /* fontawesome-webfont.ttf */,
-				E73AF68B1D5C1B390097FD87 /* Auth0.plist */,
+				303C71B81D6930D7008FF070 /* Auth0.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -808,11 +808,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				812A094F1B42375F00E8F070 /* podverse.xcdatamodeld in Resources */,
+				303C71B91D6930D7008FF070 /* Auth0.plist in Resources */,
 				818615B91B1E85F6006C9731 /* README in Resources */,
 				8186159E1B1E84CF006C9731 /* Main.storyboard in Resources */,
 				81E4FE671B2E11D600A10A77 /* fontawesome-webfont.ttf in Resources */,
 				818615A01B1E84CF006C9731 /* Images.xcassets in Resources */,
-				E73AF68C1D5C1B390097FD87 /* Auth0.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1896,7 +1896,7 @@
         <!--Settings View Controller-->
         <scene sceneID="IRV-N6-cQ7">
             <objects>
-                <viewController id="L1c-eV-Ahr" customClass="SettingsViewController" customModule="podverse" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="L1c-eV-Ahr" customClass="SettingsViewController" customModule="podverse" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="h4c-Yq-4Nb"/>
                         <viewControllerLayoutGuide type="bottom" id="SKZ-vV-Xad"/>
@@ -1910,7 +1910,7 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="settingsCell" id="AZa-XQ-46y">
-                                        <rect key="frame" x="0.0" y="92" width="600" height="44"/>
+                                        <rect key="frame" x="0.0" y="28" width="600" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="AZa-XQ-46y" id="sT2-Hy-CCO">
                                             <rect key="frame" x="0.0" y="0.0" width="600" height="43.5"/>
@@ -2062,6 +2062,6 @@
         <image name="banner" width="337" height="61"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="CAr-w1-zrt"/>
+        <segue reference="Kfx-yx-QLg"/>
     </inferredMetricsTieBreakers>
 </document>

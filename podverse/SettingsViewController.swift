@@ -12,11 +12,14 @@ class SettingsViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationItem.title = "Podverse"
+        navigationItem.title = "Settings"
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        
+        PVAuth.sharedInstance.delegate = self
         
         // Do any additional setup after loading the view.
     }
@@ -101,16 +104,24 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 1
+        if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") where userId.rangeOfString("auth0|") != nil {
+            return 1
+        }
+        return 2
     }
+    
+    // TODO: probably this can be done in a cleaner way than how I'm doing it with prototype cells...
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("settingsCell", forIndexPath: indexPath)
-        
-        if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") where PVUtility.validateEmail(userId) {
-            cell.textLabel?.text = "Change my username"
-        } else {
-            cell.textLabel?.text = "Create new username"
+        if indexPath.row == 0 {
+            if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") where userId.rangeOfString("auth0|") != nil {
+                cell.textLabel?.text = "Log out"
+            } else {
+                cell.textLabel?.text = "Log in"
+            }
+        } else if indexPath.row == 1 {
+            cell.textLabel?.text = "Sign up"
         }
         
         return cell
@@ -118,9 +129,15 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         if indexPath.row == 0 {
-            showChangeUserIdAlert()
-            tableView.deselectRowAtIndexPath(indexPath, animated: true)
+            if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") where userId.rangeOfString("auth0|") == nil {
+                PVAuth.sharedInstance.showAuth0LockLoginVC(self)
+            } else {
+                PVAuth.sharedInstance.logOut()
+            }
+        } else if indexPath.row == 1 {
+            PVAuth.sharedInstance.showAuth0LockSignUpVC(self)
         }
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
@@ -128,5 +145,11 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
+    }
+}
+
+extension SettingsViewController:PVAuthDelegate {
+    func authFinished() {
+        self.tableView.reloadData()
     }
 }

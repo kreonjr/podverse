@@ -20,8 +20,14 @@ class SavePlaylistToServer:WebService {
     
         if newPlaylist {
             setHttpMethod(.METHOD_POST)
+            
+            if let ownerId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
+                addParamWithKey("ownerId", value: ownerId)
+            }
         } else {
             setHttpMethod(.METHOD_PUT)
+            
+            addParamWithKey("ownerId", value: playlist.ownerId)
         }
         
         addHeaderWithKey("Content-Type", value: "application/json")
@@ -29,9 +35,9 @@ class SavePlaylistToServer:WebService {
         if let idToken = NSUserDefaults.standardUserDefaults().stringForKey("idToken") {
             addHeaderWithKey("Authorization", value: idToken)
         }
-
-        if let ownerId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
-            addParamWithKey("ownerId", value: ownerId)
+        
+        if let ownerName = playlist.ownerName {
+            addParamWithKey("ownerName", value: ownerName)
         }
         
         if let title = playlist.title {
