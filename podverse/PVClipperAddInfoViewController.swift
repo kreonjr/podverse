@@ -105,7 +105,7 @@ class PVClipperAddInfoViewController: UIViewController {
     }
     
     final private func saveClip(clip:Clip) {
-        let saveClipWS = SaveClipToServer(clip: clip, completionBlock: {[weak self] (response) -> Void in
+        let saveClipWS = SaveClipToServer(clip: clip, newClip: true, completionBlock: {[weak self] (response) -> Void in
             guard let strongSelf = self else {
                 return
             }
@@ -149,6 +149,10 @@ class PVClipperAddInfoViewController: UIViewController {
             
             if let lastUpdated = dictResponse["lastUpdated"] as? String {
                 strongSelf.clip?.lastUpdated = PVUtility.formatStringToDate(lastUpdated)
+            }
+            
+            if let serverEpisodeId = dictResponse["episodeId"] as? NSNumber {
+                clip.serverEpisodeId = serverEpisodeId
             }
             
             CoreDataHelper.saveCoreData(strongSelf.moc, completionBlock:nil)

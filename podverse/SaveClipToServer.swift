@@ -9,20 +9,32 @@
 import UIKit
 
 class SaveClipToServer:WebService {
-    internal init(clip:Clip, completionBlock: (response: AnyObject) -> Void, errorBlock: (error: NSError?) -> Void) {
-        super.init(name:"clips", completionBlock: completionBlock, errorBlock: errorBlock)
+    internal init(clip:Clip, newClip:Bool = false, completionBlock: (response: AnyObject) -> Void, errorBlock: (error: NSError?) -> Void) {
         
-        setHttpMethod(.METHOD_POST)
+        var name = "clips"
+        if newClip != true {
+            name += "/\(clip.mediaRefId)"
+        }
+        
+        super.init(name:name, completionBlock: completionBlock, errorBlock: errorBlock)
+        
+        if newClip == true {
+            setHttpMethod(.METHOD_POST)
+            
+            if let ownerId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
+                addParamWithKey("ownerId", value: ownerId)
+            }
+        } else {
+            setHttpMethod(.METHOD_PUT)
+            
+            addParamWithKey("ownerId", value: clip.ownerId)
+            addParamWithKey("episodeId", value: clip.serverEpisodeId)
+        }
         
         addHeaderWithKey("Content-Type", value: "application/json")
         
         if let idToken = NSUserDefaults.standardUserDefaults().stringForKey("idToken") {
             addHeaderWithKey("Authorization", value: idToken)
-        }
-        
-        addParamWithKey("ownerId", value: clip.ownerId)
-        if let ownerId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
-            addParamWithKey("ownerId", value: ownerId)
         }
         
         if let ownerName = NSUserDefaults.standardUserDefaults().stringForKey("userName") {

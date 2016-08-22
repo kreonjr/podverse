@@ -27,6 +27,9 @@ class Clip: NSManagedObject {
     // TODO: how do we add this enumerator?
     // @NSManaged var sharePermission: NSEnumerator = ["isPublic", "isSharableWithLink", "isPrivate"]
     
+    // TODO: I'm not sure what to name this one
+    @NSManaged var serverEpisodeId: NSNumber
+    
     @NSManaged var episode: Episode
     @NSManaged var playlists: NSSet?
     

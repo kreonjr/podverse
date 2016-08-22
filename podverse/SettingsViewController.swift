@@ -148,8 +148,7 @@ extension SettingsViewController: UITableViewDelegate, UITableViewDataSource {
                 
                 setUserNameAlert.addAction(UIAlertAction(title: "Save", style: .Default, handler: { (action: UIAlertAction!) in
                     if let textField = setUserNameAlert.textFields?[0], username = textField.text {
-                        
-                        PVAuth.sharedInstance.setUserNameAndUpdatePlaylists(username)
+                        PVAuth.sharedInstance.setUserNameAndUpdateOwnedItems(username)
                     }
                 }))
                 

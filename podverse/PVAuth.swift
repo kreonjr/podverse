@@ -91,18 +91,19 @@ class PVAuth: NSObject {
     }
     
     func updateOwnedItemsThenSwitchToNewUser (idToken: String, userId: String, completionBlock: (() -> ())?) {
-        var ownedClipsPred = NSPredicate()
+        var ownedItemsPred = NSPredicate()
         if let prevUserId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
-            ownedClipsPred = NSPredicate(format: "ownerId == %@", prevUserId)
+            ownedItemsPred = NSPredicate(format: "ownerId == %@", prevUserId)
         }
         
         let moc = self.coreDataHelper.managedObjectContext
         
-        let ownedPlaylistsArray = CoreDataHelper.fetchEntities("Playlist", predicate: ownedClipsPred, moc:moc) as! [Playlist]
-        let ownedClipsArray = CoreDataHelper.fetchEntities("Clip", predicate: ownedClipsPred, moc:moc) as! [Clip]
+        let ownedPlaylistsArray = CoreDataHelper.fetchEntities("Playlist", predicate: ownedItemsPred, moc:moc) as! [Playlist]
+        let ownedClipsArray = CoreDataHelper.fetchEntities("Clip", predicate: ownedItemsPred, moc:moc) as! [Clip]
         
         let dispatchGroup = dispatch_group_create()
         
+        // TODO: We should create a batch update endpoint in the web app so we don't have to send a request for each individual playlist and clip
         for var playlist in ownedPlaylistsArray {
             dispatch_group_enter(dispatchGroup)
             
@@ -174,6 +175,10 @@ class PVAuth: NSObject {
                     clip.lastUpdated = PVUtility.formatStringToDate(lastUpdated)
                 }
                 
+                if let serverEpisodeId = dictResponse["episodeId"] as? NSNumber {
+                    clip.serverEpisodeId = serverEpisodeId
+                }
+                
                 CoreDataHelper.saveCoreData(moc, completionBlock: { (saved) in
                     dispatch_group_leave(dispatchGroup)
                 })
@@ -199,7 +204,7 @@ class PVAuth: NSObject {
         }
     }
     
-    func setUserNameAndUpdatePlaylists(userName: String?) {
+    func setUserNameAndUpdateOwnedItems(userName: String?) {
         guard let idToken = NSUserDefaults.standardUserDefaults().stringForKey("idToken") else {
             return
         }

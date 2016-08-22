@@ -9,6 +9,7 @@
         <attribute name="ownerId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="ownerName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="podverseURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="serverEpisodeId" optional="YES" attributeType="Double" defaultValueString="0" syncable="YES"/>
         <attribute name="startTime" optional="YES" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="episode" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Episode" inverseName="clips" inverseEntity="Episode" syncable="YES"/>
@@ -66,7 +67,7 @@
         <relationship name="episodes" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Episode" inverseName="podcast" inverseEntity="Episode" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Clip" positionX="-20" positionY="-387" width="128" height="225"/>
+        <element name="Clip" positionX="-20" positionY="-387" width="128" height="240"/>
         <element name="Episode" positionX="-225" positionY="-675" width="128" height="345"/>
         <element name="Playlist" positionX="-288" positionY="-265" width="128" height="225"/>
         <element name="Podcast" positionX="-398" positionY="-541" width="128" height="240"/>
