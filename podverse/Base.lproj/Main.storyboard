@@ -456,14 +456,6 @@
                                                     <color key="textColor" red="0.43529411759999997" green="0.4431372549" blue="0.47450980390000003" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zFh-vl-Jvv">
-                                                    <rect key="frame" x="542" y="24" width="50" height="50"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="50" id="Xpf-ip-aKJ"/>
-                                                        <constraint firstAttribute="width" constant="50" id="aCr-tX-aTc"/>
-                                                    </constraints>
-                                                    <state key="normal" title="Quick"/>
-                                                </button>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Duration" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1qV-Yq-q2Z">
                                                     <rect key="frame" x="274" y="75" width="52" height="16"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
@@ -475,13 +467,11 @@
                                                 <constraint firstAttribute="bottomMargin" secondItem="iWX-rt-k2P" secondAttribute="bottom" constant="0.5" id="2EB-Xf-IZ8"/>
                                                 <constraint firstAttribute="bottomMargin" secondItem="4mF-Wf-DLd" secondAttribute="bottom" constant="0.5" id="2Ny-l2-lSA"/>
                                                 <constraint firstAttribute="bottomMargin" secondItem="4mF-Wf-DLd" secondAttribute="bottom" constant="0.5" id="2zL-vE-CzZ"/>
-                                                <constraint firstItem="zFh-vl-Jvv" firstAttribute="top" secondItem="JI8-y3-Qzm" secondAttribute="topMargin" constant="16" id="4RH-IQ-Q1A"/>
                                                 <constraint firstItem="4mF-Wf-DLd" firstAttribute="leading" secondItem="JI8-y3-Qzm" secondAttribute="leadingMargin" constant="4" id="BVs-29-ShJ"/>
                                                 <constraint firstItem="4mF-Wf-DLd" firstAttribute="leading" secondItem="JI8-y3-Qzm" secondAttribute="leadingMargin" constant="4" id="Dfd-uO-X0u"/>
                                                 <constraint firstAttribute="trailingMargin" secondItem="T2U-xQ-A57" secondAttribute="trailing" constant="62" id="DuR-3x-Pb0"/>
                                                 <constraint firstAttribute="bottomMargin" secondItem="1qV-Yq-q2Z" secondAttribute="bottom" constant="0.5" id="I9k-Sf-gLE"/>
                                                 <constraint firstItem="T2U-xQ-A57" firstAttribute="leading" secondItem="JI8-y3-Qzm" secondAttribute="leadingMargin" constant="4" id="Q6Y-SV-4vV"/>
-                                                <constraint firstItem="zFh-vl-Jvv" firstAttribute="trailing" secondItem="JI8-y3-Qzm" secondAttribute="trailingMargin" id="RzQ-ST-Cgc"/>
                                                 <constraint firstItem="T2U-xQ-A57" firstAttribute="top" secondItem="JI8-y3-Qzm" secondAttribute="topMargin" id="cgl-EL-iEa"/>
                                                 <constraint firstItem="1qV-Yq-q2Z" firstAttribute="centerX" secondItem="JI8-y3-Qzm" secondAttribute="centerX" id="csJ-If-Nes"/>
                                                 <constraint firstItem="iWX-rt-k2P" firstAttribute="trailing" secondItem="JI8-y3-Qzm" secondAttribute="trailingMargin" id="oqC-i8-ZOV"/>
@@ -490,7 +480,6 @@
                                         <color key="backgroundColor" red="0.99215686270000003" green="0.99215686270000003" blue="0.99215686270000003" alpha="1" colorSpace="calibratedRGB"/>
                                         <connections>
                                             <outlet property="duration" destination="1qV-Yq-q2Z" id="UHo-7K-eru"/>
-                                            <outlet property="quickStart" destination="zFh-vl-Jvv" id="dgr-KQ-rbc"/>
                                             <outlet property="sharesTotal" destination="iWX-rt-k2P" id="nER-hE-jLL"/>
                                             <outlet property="startTimeEndTime" destination="4mF-Wf-DLd" id="V6j-F4-awo"/>
                                             <outlet property="title" destination="T2U-xQ-A57" id="5eg-oW-M4V"/>
@@ -2062,6 +2051,6 @@
         <image name="banner" width="337" height="61"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="Kfx-yx-QLg"/>
+        <segue reference="CAr-w1-zrt"/>
     </inferredMetricsTieBreakers>
 </document>

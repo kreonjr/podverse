@@ -25,9 +25,10 @@ class SaveClipToServer:WebService {
             addParamWithKey("ownerId", value: ownerId)
         }
         
-        if let ownerName = clip.ownerName {
+        if let ownerName = NSUserDefaults.standardUserDefaults().stringForKey("userName") {
             addParamWithKey("ownerName", value: ownerName)
         }
+        
         
         if let title = clip.title {
             addParamWithKey("title", value: title)

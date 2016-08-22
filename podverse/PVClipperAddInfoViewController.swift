@@ -114,6 +114,7 @@ class PVClipperAddInfoViewController: UIViewController {
                 return
             }
             
+            // TODO: this has a lot repeated code shared in PVAuth.swift
             if let mediaRefId = dictResponse["id"] as? String {
                 strongSelf.clip?.mediaRefId = mediaRefId
             }
@@ -124,6 +125,10 @@ class PVClipperAddInfoViewController: UIViewController {
             
             if let ownerId = dictResponse["ownerId"] as? String {
                 strongSelf.clip?.ownerId = ownerId
+            }
+            
+            if let ownerName = dictResponse["ownerName"] as? String {
+                strongSelf.clip?.ownerName = ownerName
             }
             
             if let title = dictResponse["title"] as? String {

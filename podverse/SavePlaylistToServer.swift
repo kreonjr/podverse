@@ -36,7 +36,7 @@ class SavePlaylistToServer:WebService {
             addHeaderWithKey("Authorization", value: idToken)
         }
         
-        if let ownerName = playlist.ownerName {
+        if let ownerName = NSUserDefaults.standardUserDefaults().stringForKey("userName") {
             addParamWithKey("ownerName", value: ownerName)
         }
         

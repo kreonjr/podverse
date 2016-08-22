@@ -117,4 +117,12 @@ class PVUtility: NSObject {
             print("Item does not exist on disk")
         }
     }
+    
+    static func isAnonymousUser () -> Bool {
+        if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") where userId.rangeOfString("auth0|") == nil {
+            return true
+        } else {
+            return false
+        }
+    }
 }

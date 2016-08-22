@@ -24,11 +24,13 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     
     var selectedPodcastId: NSManagedObjectID!
     
+    var selectedEpisode: Episode!
+    
     var episodesArray = [Episode]()
     
     var refreshControl: UIRefreshControl!
     
-    var showAllEpisodes: Bool!
+    var showAllEpisodes = false
     
     var pvMediaPlayer = PVMediaPlayer.sharedInstance
     
@@ -39,11 +41,11 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     func loadData() {
         
         // Clear the episodes array, then retrieve and sort the full episode or downloaded episode array
-        self.episodesArray = [Episode]()
+        self.episodesArray.removeAll()
         let unsortedEpisodes = NSMutableArray()
         
         var episodesArray: NSSet!
-        
+        CoreDataHelper.sharedInstance.managedObjectContext.refreshAllObjects()
         self.moc = CoreDataHelper.sharedInstance.managedObjectContext
         self.selectedPodcast = CoreDataHelper.fetchEntityWithID(self.selectedPodcastId, moc: moc) as! Podcast
         
@@ -118,6 +120,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         navigationItem.rightBarButtonItem = self.playerNavButton()
+        self.loadData()
     }
     
     override func viewDidLoad() {
@@ -134,8 +137,6 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         self.refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh episodes")
         self.refreshControl.addTarget(self, action: #selector(EpisodesTableViewController.refresh), forControlEvents: UIControlEvents.ValueChanged)
         self.tableView.addSubview(refreshControl)
-        
-        self.loadData()
     }
     
     // MARK: - Table view data source
@@ -228,22 +229,22 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         // If not the last item in the array, then perform selected episode actions
         if indexPath.row < episodesArray.count {
             
-            let selectedEpisode = episodesArray[indexPath.row]
+            var selectedEp = episodesArray[indexPath.row]
             
             let episodeActions = UIAlertController(title: "", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
             
-            if selectedEpisode.fileName != nil {
+            if selectedEp.fileName != nil {
                 episodeActions.addAction(UIAlertAction(title: "Play Episode", style: .Default, handler: { action in
-                    self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(selectedEpisode.objectID, paused: false)
+                    self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(selectedEp.objectID, paused: false)
                     self.segueToNowPlaying()
                 }))
             } else {
-                if selectedEpisode.taskIdentifier != nil {
+                if selectedEp.taskIdentifier != nil {
                     episodeActions.addAction(UIAlertAction(title: "Downloading Episode", style: .Default, handler: nil))
                 } else {
                     episodeActions.addAction(UIAlertAction(title: "Download Episode", style: .Default, handler: { action in
                         if self.reachability.hasInternetConnection() == true {
-                            PVDownloader.sharedInstance.startDownloadingEpisode(selectedEpisode)
+                            PVDownloader.sharedInstance.startDownloadingEpisode(selectedEp)
                             let cell = tableView.cellForRowAtIndexPath(indexPath) as! EpisodesTableCell
                             cell.downloadPlayButton.setTitle("DLing", forState: .Normal)
                         }
@@ -254,8 +255,9 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                 }
             }
             
-            let totalClips = String(selectedEpisode.clips.count)
+            let totalClips = String(selectedEp.clips.count)
             episodeActions.addAction(UIAlertAction(title: "Show Clips (\(totalClips))", style: .Default, handler: { action in
+                self.selectedEpisode = selectedEp
                 self.performSegueWithIdentifier("Show Clips", sender: self)
             }))
             
@@ -266,7 +268,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
                     self.showInternetNeededAlert("Connect to WiFi or cellular data to stream an episode.")
                     return
                 }
-                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(selectedEpisode.objectID, paused: false)
+                self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(selectedEp.objectID, paused: false)
                 self.segueToNowPlaying()
             }))
             
@@ -332,9 +334,8 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         } else if segue.identifier == "Show Clips" {
             let clipsTableViewController = segue.destinationViewController as! ClipsTableViewController
-            let index = self.tableView.indexPathForSelectedRow!
             clipsTableViewController.selectedPodcast = selectedPodcast
-            clipsTableViewController.selectedEpisode = episodesArray[index.row]
+            clipsTableViewController.selectedEpisode = selectedEpisode
         }
     }
     

@@ -73,6 +73,7 @@ class PodcastsTableViewController: UIViewController {
         super.viewWillAppear(animated)
         navigationItem.rightBarButtonItem = self.playerNavButton()
         showSubscribeToPodcastsIfNoneAreSubscribed()
+        self.tableView.reloadData()
     }
     
     func refreshData() {

@@ -455,6 +455,10 @@ final class PlaylistManager {
             playlist.id = id
         }
         
+        if let ownerName = dictResponse["ownerName"] as? String {
+            playlist.ownerName = ownerName
+        }
+        
         if let title = dictResponse["title"] as? String {
             playlist.title = title
         }

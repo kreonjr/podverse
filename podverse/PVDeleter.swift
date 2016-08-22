@@ -33,6 +33,8 @@ class PVDeleter {
         let moc = CoreDataHelper.sharedInstance.backgroundContext
         let episode = CoreDataHelper.fetchEntityWithID(episodeID, moc: moc) as! Episode
         
+        episode.playbackPosition = 0
+        
         // Get the downloadSession, and if there is a downloadSession with a matching taskIdentifier as episode's taskIdentifier, then cancel the downloadSession
         let episodePodcastFeedURL = episode.podcast.feedURL
         let downloadSession = PVDownloader.sharedInstance.downloadSession

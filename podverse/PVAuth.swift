@@ -55,7 +55,7 @@ class PVAuth: NSObject {
                 return
             }
             
-            self.handleOwnerIdSwitchThenSwitchToNewUser(idToken, userId: userId, vc: vc, completionBlock: { () in
+            self.updateOwnedItemsThenSwitchToNewUser(idToken, userId: userId, completionBlock: { () in
                     controller.dismissViewControllerAnimated(true, completion: nil)
                 })
             
@@ -82,7 +82,7 @@ class PVAuth: NSObject {
                 return
             }
             
-            self.handleOwnerIdSwitchThenSwitchToNewUser(idToken, userId: userId, vc: vc, completionBlock: { () in
+            self.updateOwnedItemsThenSwitchToNewUser(idToken, userId: userId, completionBlock: { () in
                 vc.navigationController?.popToRootViewControllerAnimated(true)
             })
         }
@@ -90,31 +90,98 @@ class PVAuth: NSObject {
         vc.navigationController?.pushViewController(controller, animated: true)
     }
     
-    func handleOwnerIdSwitchThenSwitchToNewUser (idToken: String, userId: String, vc: UIViewController, completionBlock: () -> Void) {
-        var ownedPlaylistsPred = NSPredicate()
+    func updateOwnedItemsThenSwitchToNewUser (idToken: String, userId: String, completionBlock: (() -> ())?) {
+        var ownedClipsPred = NSPredicate()
         if let prevUserId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
-            ownedPlaylistsPred = NSPredicate(format: "ownerId == %@", prevUserId)
+            ownedClipsPred = NSPredicate(format: "ownerId == %@", prevUserId)
         }
         
         let moc = self.coreDataHelper.managedObjectContext
         
-        let ownedPlaylistsArray = CoreDataHelper.fetchEntities("Playlist", predicate: ownedPlaylistsPred, moc:moc) as! [Playlist]
+        let ownedPlaylistsArray = CoreDataHelper.fetchEntities("Playlist", predicate: ownedClipsPred, moc:moc) as! [Playlist]
+        let ownedClipsArray = CoreDataHelper.fetchEntities("Clip", predicate: ownedClipsPred, moc:moc) as! [Clip]
         
         let dispatchGroup = dispatch_group_create()
         
-        for playlist in ownedPlaylistsArray {
+        for var playlist in ownedPlaylistsArray {
             dispatch_group_enter(dispatchGroup)
             
             playlist.ownerId = userId
             
             SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.id == nil), addMediaRefId: nil, completionBlock: { (response) -> Void in
-                CoreDataHelper.saveCoreData(moc, completionBlock: { (finished) in
+                
+                guard let dictResponse = response as? Dictionary<String,AnyObject> else {
+                    return
+                }
+                
+                playlist = PlaylistManager.sharedInstance.syncLocalPlaylistFieldsWithResponse(playlist, dictResponse: dictResponse)
+                
+                CoreDataHelper.saveCoreData(moc, completionBlock: { (saved) in
                     dispatch_group_leave(dispatchGroup)
                 })
             }) { (error) -> Void in
                 print("Not saved to server. Error: ", error?.localizedDescription)
                 CoreDataHelper.saveCoreData(moc, completionBlock: nil)
-                }.call()
+            }.call()
+        }
+        
+        for clip in ownedClipsArray {
+            dispatch_group_enter(dispatchGroup)
+            
+            clip.ownerId = userId
+            
+            SaveClipToServer(clip: clip, completionBlock: { (response) -> Void in
+                
+                guard let dictResponse = response as? Dictionary<String,AnyObject> else {
+                    return
+                }
+                
+                // TODO: this has a lot repeated code shared in PVClipperAddInfoController.swift
+                // Should be cleaned up!
+                if let mediaRefId = dictResponse["id"] as? String {
+                    clip.mediaRefId = mediaRefId
+                }
+                
+                if let podverseURL = dictResponse["podverseURL"] as? String {
+                    clip.podverseURL = podverseURL
+                }
+                
+                if let ownerId = dictResponse["ownerId"] as? String {
+                    clip.ownerId = ownerId
+                }
+                
+                if let ownerName = dictResponse["ownerName"] as? String {
+                    clip.ownerName = ownerName
+                }
+                
+                if let title = dictResponse["title"] as? String {
+                    clip.title = title
+                }
+                
+                if let startTime = dictResponse["startTime"] as? NSNumber {
+                    clip.startTime = startTime
+                }
+                
+                if let endTime = dictResponse["endTime"] as? NSNumber {
+                    clip.endTime = endTime
+                }
+                
+                if let dateCreated = dictResponse["dateCreated"] as? String {
+                    clip.dateCreated = PVUtility.formatStringToDate(dateCreated)
+                }
+                
+                if let lastUpdated = dictResponse["lastUpdated"] as? String {
+                    clip.lastUpdated = PVUtility.formatStringToDate(lastUpdated)
+                }
+                
+                CoreDataHelper.saveCoreData(moc, completionBlock: { (saved) in
+                    dispatch_group_leave(dispatchGroup)
+                })
+            }) { (error) -> Void in
+                print("Not saved to server. Error: ", error?.localizedDescription)
+                CoreDataHelper.saveCoreData(moc, completionBlock: nil)
+            }.call()
+            
         }
         
         dispatch_group_notify(dispatchGroup, dispatch_get_main_queue()) { () -> Void in
@@ -126,8 +193,24 @@ class PVAuth: NSObject {
             })
             
             self.delegate?.authFinished()
-            completionBlock()
+            if let cBlock = completionBlock {
+                cBlock()
+            }
         }
+    }
+    
+    func setUserNameAndUpdatePlaylists(userName: String?) {
+        guard let idToken = NSUserDefaults.standardUserDefaults().stringForKey("idToken") else {
+            return
+        }
+        
+        guard let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") else {
+            return
+        }
+        
+        NSUserDefaults.standardUserDefaults().setObject(userName, forKey: "userName")
+        
+        self.updateOwnedItemsThenSwitchToNewUser(idToken, userId: userId, completionBlock: nil)
     }
     
 }

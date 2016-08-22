@@ -141,11 +141,10 @@ extension PlaylistsTableViewController: UITableViewDelegate, UITableViewDataSour
             
             cell.title?.text = playlist.title
         
-            // TODO: enable user to set their owner name
             if let ownerName = playlist.ownerName {
-                cell.ownerName?.text = "playlist creator's name here"
+                cell.ownerName?.text = ownerName
             } else {
-                cell.ownerName?.text = "anonymous"
+                cell.ownerName?.text = ""
             }
             
             if let lastUpdated = playlist.lastUpdated {

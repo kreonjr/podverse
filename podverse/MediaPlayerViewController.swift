@@ -23,6 +23,8 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     let pvMediaPlayer = PVMediaPlayer.sharedInstance
     let reachability = PVReachability.manager
     
+    let managedObjectContext = CoreDataHelper.sharedInstance.managedObjectContext
+    
     var nowPlayingCurrentTimeTimer: NSTimer!
     var playerSpeedRate:PlayingSpeed = .Regular
     
@@ -84,7 +86,15 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         buttonAddToList.addTarget(self, action: #selector(MediaPlayerViewController.addNowPlayingToList), forControlEvents: .TouchUpInside)
         let rightBarButtonAddToList: UIBarButtonItem = UIBarButtonItem(customView: buttonAddToList)
         
-        self.navigationItem.setRightBarButtonItems([rightBarButtonMakeClip, rightBarButtonAddToList], animated: false)
+        var rightBarButtonArray = [UIBarButtonItem]()
+        
+        rightBarButtonArray.append(rightBarButtonAddToList)
+        
+        if pvMediaPlayer.nowPlayingClip == nil {
+            rightBarButtonArray.append(rightBarButtonMakeClip)
+        }
+        
+        self.navigationItem.setRightBarButtonItems(rightBarButtonArray, animated: false)
         
         // Populate the Media Player UI with the current episode's information
         if let imageData = pvMediaPlayer.nowPlayingEpisode.podcast.imageThumbData {
@@ -99,6 +109,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         }
         else {
             totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(pvMediaPlayer.nowPlayingEpisode.duration)
+            correctEpisodeDuration()
         }
         
         if let episodeSummary = pvMediaPlayer.nowPlayingEpisode.summary {
@@ -123,6 +134,31 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     func dismissKeyboard (){
         self.view.endEditing(true)
     }
+    
+    func correctEpisodeDuration () {
+        guard let mediaURLstring = pvMediaPlayer.nowPlayingEpisode.mediaURL else {
+            return
+        }
+        
+        guard let mediaURL = NSURL(string: mediaURLstring) else {
+            return
+        }
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
+            let calculateDurationAsset = AVURLAsset(URL: mediaURL, options: nil)
+            
+            var calculatedDuration = CMTimeGetSeconds(calculateDurationAsset.duration)
+            calculatedDuration = floor(calculatedDuration)
+            
+            dispatch_async(dispatch_get_main_queue(), {
+                if self.pvMediaPlayer.nowPlayingEpisode != nil {
+                    self.totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(NSNumber(double: calculatedDuration))
+                    self.clipper?.totalDuration = Int(calculatedDuration)
+                    self.pvMediaPlayer.nowPlayingEpisode.duration = NSNumber(double: calculatedDuration)
+                }
+            })
+        })
+    }
 
     @IBAction func sliderTimeChange(sender: UISlider) {
         let currentSliderValue = Float64(sender.value)
@@ -131,8 +167,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         if let clip = pvMediaPlayer.nowPlayingClip, let duration = clip.duration {
             totalTime = Float64(duration)
         } else {
-            if let duration = pvMediaPlayer.nowPlayingEpisode.duration {
-                totalTime = Float64(duration)
+            if pvMediaPlayer.nowPlayingEpisode != nil {
+                if let duration = pvMediaPlayer.nowPlayingEpisode.duration {
+                    totalTime = Float64(duration)
+                }
             }
         }
         
