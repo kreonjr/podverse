@@ -127,6 +127,19 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         }
     }
     
+    /// Whether view has laid out subviews at least once before.
+    var viewDidLayoutSubviewsAtLeastOnce = false
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if !viewDidLayoutSubviewsAtLeastOnce {
+            summary?.setContentOffset(CGPointZero, animated: false)
+        }
+        
+        viewDidLayoutSubviewsAtLeastOnce = true
+    }
+    
     private func updateSpeedLabel() {
         self.speedLabel.text = playerSpeedRate.speedText
     }
