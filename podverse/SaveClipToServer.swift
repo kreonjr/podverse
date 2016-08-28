@@ -49,7 +49,9 @@ class SaveClipToServer:WebService {
         addParamWithKey("startTime", value: clip.startTime)
         
         if let endTime = clip.endTime {
-            addParamWithKey("endTime", value: endTime)
+            if Int(endTime) > Int(clip.startTime) {
+                addParamWithKey("endTime", value: endTime)
+            }
         }
         
         // TODO: this code is repeated on the episode obj in SaveEpisodeToServer,

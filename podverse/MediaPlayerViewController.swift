@@ -31,6 +31,7 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     @IBOutlet weak var mediaPlayerImage: UIImageView!
     @IBOutlet weak var podcastTitle: UILabel!
     @IBOutlet weak var episodeTitle: UILabel!
+    @IBOutlet weak var episodePubDate: UILabel!
     @IBOutlet weak var currentTime: UILabel!
     @IBOutlet weak var totalTime: UILabel!
     @IBOutlet weak var summary: UITextView!
@@ -104,6 +105,10 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         podcastTitle?.text = pvMediaPlayer.nowPlayingEpisode.podcast.title
         episodeTitle?.text = pvMediaPlayer.nowPlayingEpisode.title
         
+        if let pubDate = pvMediaPlayer.nowPlayingEpisode.pubDate {
+            episodePubDate?.text = PVUtility.formatDateToString(pubDate)
+        }
+        
         if let nowPlayingClip = pvMediaPlayer.nowPlayingClip {
             totalTime?.text = PVUtility.convertNSNumberToHHMMSSString(nowPlayingClip.duration)
         }
@@ -112,12 +117,29 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
             correctEpisodeDuration()
         }
         
-        if let episodeSummary = pvMediaPlayer.nowPlayingEpisode.summary {
-            summary?.text = PVUtility.removeHTMLFromString(episodeSummary)
+        var summaryString = ""
+        if let clip = pvMediaPlayer.nowPlayingClip {
+            
+            summaryString += "Start: " + PVUtility.convertNSNumberToHHMMSSString(clip.startTime)
+            
+            if let endTime = clip.endTime {
+                summaryString += " – End: " + PVUtility.convertNSNumberToHHMMSSString(endTime)
+            }
+            
+            summaryString += "\n\n"
+            
+            if let clipTitle = clip.title {
+                summaryString += clipTitle + "\n\n"
+            }
+            
+            summaryString += "--- \n\n"
         }
-        else {
-            summary.text = ""
+        
+        if let episodeSummary = pvMediaPlayer.nowPlayingEpisode.summary, let cleanedEpisodeSummary = PVUtility.removeHTMLFromString(episodeSummary) {
+            summaryString += cleanedEpisodeSummary
         }
+        
+        summary?.text = summaryString
         
         setPlayPauseIcon()
         updateSpeedLabel()

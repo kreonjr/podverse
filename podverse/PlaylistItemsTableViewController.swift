@@ -116,14 +116,16 @@ class PlaylistItemsViewController: UIViewController, UITableViewDataSource, UITa
                 cell.pvImage?.image = UIImage(named: "PodverseIcon")
             }
             
-            let status = "played/unplayed"
-            cell.status?.text = status
-            
+            cell.startEndTime?.text = "Full Episode"
         }
         else if let clip = playlistItems[indexPath.row] as? Clip {
             
             if let clipTitle = clip.title {
                 cell.itemTitle?.text = clipTitle
+            } else if let episodeTitle = clip.episode.title {
+                cell.itemTitle?.text = episodeTitle
+            } else {
+                cell.itemTitle?.text = "untitled clip"
             }
             
             cell.podcastTitle?.text = clip.episode.podcast.title
@@ -139,14 +141,16 @@ class PlaylistItemsViewController: UIViewController, UITableViewDataSource, UITa
                 cell.itemPubDate?.text = PVUtility.formatDateToString(pubDate)
             }
         
-            if let duration = clip.episode.duration {
-                cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(duration)
+            cell.duration?.text = " "
+            
+            var startEndString = ""
+            if clip.endTime == nil {
+                startEndString += "Start: " + PVUtility.convertNSNumberToHHMMSSString(clip.startTime)
+            } else if let endTime = clip.endTime {
+                startEndString += PVUtility.convertNSNumberToHHMMSSString(clip.startTime) + " – " + PVUtility.convertNSNumberToHHMMSSString(endTime)
             }
-        
-            // TODO: add status property (whether or not a playlistItem has been listened to before,  ) to playlistItems
-            let status = "played/unplayed"
-            cell.status?.text = status
-        
+            cell.startEndTime?.text = startEndString
+            
         }
         
         return cell

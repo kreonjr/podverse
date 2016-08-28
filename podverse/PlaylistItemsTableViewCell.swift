@@ -14,7 +14,7 @@ class PlaylistItemsTableViewCell: UITableViewCell {
     @IBOutlet weak var itemTitle: UILabel!
     @IBOutlet weak var podcastTitle: UILabel!
     @IBOutlet weak var duration: UILabel!
-    @IBOutlet weak var status: UILabel!
+    @IBOutlet weak var startEndTime: UILabel!
     @IBOutlet weak var itemPubDate: UILabel!
     
     override func awakeFromNib() {

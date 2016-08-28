@@ -92,16 +92,6 @@ class PVClipperViewController: UIViewController, UITextFieldDelegate {
             timingAlert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
             
             self.presentViewController(timingAlert, animated: true, completion: nil)
-        } else if endTime == 0 {
-            let timingAlert = UIAlertController(title: "Clip End Time", message: "No End Time is set. Press OK to use the end of the episode as the End Time.", preferredStyle:.Alert)
-            timingAlert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { (alertAction) -> Void in
-                    self.endTime = 0
-                    self.performSegueWithIdentifier("show_add_clipTitle", sender: self)
-            }))
-            
-            timingAlert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-            
-            self.presentViewController(timingAlert, animated: true, completion: nil)
         } else {
             self.performSegueWithIdentifier("show_add_clipTitle", sender: self)
         }

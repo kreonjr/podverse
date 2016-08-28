@@ -60,11 +60,11 @@ class PVUtility: NSObject {
             hours = ""
         }
         var minutes = String((duration / 60) % 60) + ":"
-        if minutes.characters.count < 3 {
+        if minutes.characters.count < 3 && hours != "" {
             minutes = "0" + minutes
         }
         var seconds = String(duration % 60)
-        if seconds.characters.count < 2 {
+        if seconds.characters.count < 2 && (hours != "" || minutes != "") {
             seconds = "0" + seconds
         }
         

@@ -38,7 +38,9 @@ class Clip: NSManagedObject {
             var duration: NSNumber?
             
             if let eTime = endTime {
-                duration = NSNumber(integer: eTime.integerValue - startTime.integerValue)
+                if Int(eTime) > Int(startTime) {
+                    duration = NSNumber(integer: eTime.integerValue - startTime.integerValue)
+                }
             }
             
             return duration
