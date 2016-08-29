@@ -47,6 +47,8 @@ struct Constants {
     
     static let feedParsingQueue = dispatch_queue_create("FEED_PARSER_QUEUE", DISPATCH_QUEUE_SERIAL);
     
+    static let channelInfoFeedParsingQueue = dispatch_queue_create("CHANNEL_INFO_FEED_PARSER_QUEUE", DISPATCH_QUEUE_SERIAL);
+    
     static let kRefreshAddToPlaylistTableDataNotification = "refreshPodcastTableDataNotification"
     
     static let kItemAddedToPlaylistNotification = "itemAddedToPlaylistNotificiation"

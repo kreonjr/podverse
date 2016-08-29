@@ -149,7 +149,6 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         }
     }
     
-    /// Whether view has laid out subviews at least once before.
     var viewDidLayoutSubviewsAtLeastOnce = false
     
     override func viewDidLayoutSubviews() {

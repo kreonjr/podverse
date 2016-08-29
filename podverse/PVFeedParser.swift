@@ -22,26 +22,40 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     var onlyGetMostRecent: Bool
     var shouldSubscribeToPodcast: Bool
     var shouldDownloadMostRecentEpisode = false
+    var shouldParseChannel = false
     var latestEpisodePubDate:NSDate?
     var delegate:PVFeedParserDelegate?
     let moc = CoreDataHelper.sharedInstance.backgroundContext
     let parsingPodcasts = ParsingPodcastsList.shared
     
-    init(onlyGetMostRecentEpisode:Bool, shouldSubscribe:Bool) {
+    init(onlyGetMostRecentEpisode:Bool, shouldSubscribe:Bool, shouldParseChannelOnly:Bool) {
         onlyGetMostRecent = onlyGetMostRecentEpisode
         shouldSubscribeToPodcast = shouldSubscribe
+        shouldParseChannel = shouldParseChannelOnly
     }
     
     func parsePodcastFeed(feedURLString: String) {
-        dispatch_async(Constants.feedParsingQueue) { 
-            self.feedURL = feedURLString
-            let feedParser = CustomFeedParser(feedURL: feedURLString)
-            feedParser.delegate = self
-            feedParser.parsingType = .Full
-            feedParser.parse()
-            print("feedParser did start")
-            dispatch_async(dispatch_get_main_queue()) { () -> Void in
-                self.delegate?.feedParsingStarted?()
+        if shouldParseChannel {
+            dispatch_async(Constants.channelInfoFeedParsingQueue) {
+                self.feedURL = feedURLString
+                let feedParser = CustomFeedParser(feedURL: feedURLString)
+                feedParser.delegate = self
+                // This apparently does nothing. The 3rd party FeedParser automatically sets the parsingType to .Full...
+                feedParser.parsingType = .ChannelOnly
+                feedParser.parse()
+                print("feedParser did start")
+            }
+        } else {
+            dispatch_async(Constants.feedParsingQueue) {
+                self.feedURL = feedURLString
+                let feedParser = CustomFeedParser(feedURL: feedURLString)
+                feedParser.delegate = self
+                feedParser.parsingType = .Full
+                feedParser.parse()
+                print("feedParser did start")
+                dispatch_async(dispatch_get_main_queue()) { () -> Void in
+                    self.delegate?.feedParsingStarted?()
+                }
             }
         }
     }
@@ -72,6 +86,14 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             podcast.summary = summary
         }
         
+        if let iTunesAuthor = channel.channeliTunesAuthor {
+            podcast.author = iTunesAuthor
+        }
+        
+        if let podcastLink = channel.channelLink {
+            podcast.link = podcastLink
+        }
+        
         podcast.feedURL = feedURL
         
         //Look into maybe adding it in the library manually
@@ -100,6 +122,10 @@ class PVFeedParser: NSObject, FeedParserDelegate {
             podcast.lastPubDate = lastPubDate
         }
         
+        if let categories = channel.channelCategory {
+            podcast.categories = categories
+        }
+        
         if self.shouldSubscribeToPodcast {
             podcast.isSubscribed = true
         }
@@ -116,6 +142,11 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     }
     
     func feedParser(parser: FeedParser, didParseItem item: FeedItem) {
+        // This hack is put in to prevent parsing items unnecessarily. Ideally this would be handled by setting feedParser.parsingType to .ChannelOnly, but the 3rd party FeedParser does not let us override the .parsingType I think...
+        if self.shouldParseChannel {
+            return
+        }
+        
         guard let podcast = currentPodcast else {
             // If podcast is nil, then the RSS feed was invalid for the parser, and we should return out of successfullyParsedURL
             return

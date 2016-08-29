@@ -17,6 +17,7 @@ class Podcast: NSManagedObject {
     @NSManaged var imageThumbData: NSData?
     @NSManaged var imageURL: String?
     @NSManaged var author: String?
+    @NSManaged var link: String? // generally the home page
     @NSManaged var itunesImage: NSData?
     @NSManaged var itunesImageURL: String?
     @NSManaged var lastBuildDate: NSDate?
@@ -24,6 +25,7 @@ class Podcast: NSManagedObject {
     @NSManaged var summary: String?
     @NSManaged var title: String
     @NSManaged var isSubscribed: Bool
+    @NSManaged var categories: String?
     @NSManaged var episodes: NSSet
     var totalClips:Int {
         get {

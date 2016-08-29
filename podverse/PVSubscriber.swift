@@ -18,7 +18,7 @@ class PVSubscriber {
         }
         
         dispatch_async(Constants.feedParsingQueue) {
-            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe: true)
+            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe: true, shouldParseChannelOnly: false)
             feedParser.delegate = podcastTableDelegate
             feedParser.parsePodcastFeed(feedURLString)
         }

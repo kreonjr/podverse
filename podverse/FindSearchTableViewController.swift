@@ -18,6 +18,8 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     var iTunesSearchPodcastArray = [SearchResultPodcast]()
     var iTunesSearchPodcastFeedURLArray: [NSURL] = []
     
+    var podcast: Podcast?
+    
     let moc = CoreDataHelper.sharedInstance.managedObjectContext
     
     var podcastVC:PodcastsTableViewController? {
@@ -95,7 +97,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                                         searchResultPodcast.lastPubDate = dateFormatter.dateFromString(modifiedPubDateString)
                                     }
                                     
-                                    searchResultPodcast.primaryGenreName = podcastJSON["primaryGenreName"] as? String
+                                    searchResultPodcast.categories = podcastJSON["primaryGenreName"] as? String
                                     
                                     searchResultPodcast.title = podcastJSON["collectionName"] as? String
                                     
@@ -206,17 +208,18 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                 }
             }))
         }
-        
-        searchResultPodcastActions.addAction(UIAlertAction(title: "Show Episodes", style: .Default, handler: { action in
-            print("Show Episodes")
-        }))
-        
-        searchResultPodcastActions.addAction(UIAlertAction (title: "Show Clips", style: .Default, handler: { action in
-            print("Show Clips")
+
+        // TODO: add follow feature
+        searchResultPodcastActions.addAction(UIAlertAction(title: "Follow", style: .Default, handler: { action in
+            print("Follow")
         }))
         
         searchResultPodcastActions.addAction(UIAlertAction (title: "Show Profile", style: .Default, handler: { action in
-            self.performSegueWithIdentifier("Show Podcast Profile", sender: self)
+            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe:false, shouldParseChannelOnly: true)
+            feedParser.delegate = self
+            if let feedURLString = iTunesSearchPodcast.feedURL {
+                feedParser.parsePodcastFeed(feedURLString)
+            }
         }))
         
         searchResultPodcastActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
@@ -232,9 +235,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "Show Podcast Profile" {
             let podcastProfileViewController = segue.destinationViewController as! PodcastProfileViewController
-            if let index = self.tableView.indexPathForSelectedRow {
-                podcastProfileViewController.searchResultPodcast = iTunesSearchPodcastArray[index.row]
-            }
+            podcastProfileViewController.podcast = podcast
         }
         else if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
@@ -261,5 +262,14 @@ extension UIImage {
         }
         
         task.resume()
+    }
+}
+
+extension FindSearchTableViewController: PVFeedParserDelegate {
+    func feedParsingComplete(feedURL:String?) {
+        if let rssFeedURL = feedURL {
+            podcast = CoreDataHelper.retrieveExistingOrCreateNewPodcast(rssFeedURL, moc: moc)
+            self.performSegueWithIdentifier("Show Podcast Profile", sender: self)
+        }
     }
 }

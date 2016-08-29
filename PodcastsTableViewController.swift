@@ -46,6 +46,8 @@ class PodcastsTableViewController: UIViewController {
         
         navigationItem.title = "Podcasts"
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+        
+        tabBarController?.tabBar.translucent = false
 
         bottomButton.hidden = true
         showSubscribeToPodcastsIfNoneAreSubscribed()
@@ -114,7 +116,7 @@ class PodcastsTableViewController: UIViewController {
             let feedURL = NSURL(string:podcast.feedURL)
             
             dispatch_async(Constants.feedParsingQueue) {
-                let feedParser = PVFeedParser(onlyGetMostRecentEpisode: true, shouldSubscribe:false)
+                let feedParser = PVFeedParser(onlyGetMostRecentEpisode: true, shouldSubscribe:false, shouldParseChannelOnly: false)
                 feedParser.delegate = self
                 if let feedURLString = feedURL?.absoluteString {
                     feedParser.parsePodcastFeed(feedURLString)

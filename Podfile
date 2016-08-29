@@ -5,6 +5,7 @@ use_frameworks!
 target 'podverse' do
 
 pod "Lock", "~> 1.26"
+pod 'TTTAttributedLabel'
 
 end
 

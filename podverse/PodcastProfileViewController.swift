@@ -7,113 +7,80 @@
 //
 
 import UIKit
+import TTTAttributedLabel
 
-class PodcastProfileViewController: UIViewController {
+class PodcastProfileViewController: UIViewController, TTTAttributedLabelDelegate {
     
-    
-    
-    var searchResultPodcast: SearchResultPodcast?
     var podcast: Podcast?
     
-    @IBOutlet weak var searchResultImage: UIImageView!
-    @IBOutlet weak var searchResultTitle: UILabel!
-    @IBOutlet weak var searchResultTotalClips: UILabel!
-    @IBOutlet weak var searchResultLastPublishedDate: UILabel!
+    @IBOutlet weak var podcastImage: UIImageView!
+    @IBOutlet weak var podcastTitle: UILabel!
+    @IBOutlet weak var totalClips: UILabel!
+    @IBOutlet weak var lastPublishedDate: UILabel!
     
-    @IBOutlet weak var searchResultPrimaryGenreName: UILabel!
-    @IBOutlet weak var searchResultEpisodesTotal: UILabel!
-    @IBOutlet weak var searchResultFeedURL: UILabel!
-    
-    @IBOutlet weak var searchResultSummary: UITextView!
+    @IBOutlet weak var homePage: TTTAttributedLabel!
+    @IBOutlet weak var author: UILabel!
+    @IBOutlet weak var categories: UILabel!
+    @IBOutlet weak var summary: UITextView!
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         navigationItem.rightBarButtonItem = self.playerNavButton()
     }
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let searchPodcast = searchResultPodcast {
-            searchResultTitle.text = searchPodcast.title
+        if let coredataPodcast = podcast {
+            podcastTitle.text = coredataPodcast.title
             
-            searchResultTotalClips.text = "123 clips"
+            totalClips.text = "123 clips"
             
-            if let lastPubDate = searchPodcast.lastPubDate {
-                searchResultLastPublishedDate.text = PVUtility.formatDateToString(lastPubDate)
+            if let lastBuildDate = coredataPodcast.lastBuildDate {
+                lastPublishedDate.text = PVUtility.formatDateToString(lastBuildDate)
             }
             
-            if let genre = searchPodcast.primaryGenreName {
-                searchResultPrimaryGenreName.text = "Genre: " + genre
-            }
-
-            //
-            ////        searchResultEpisodesTotal.text = "Episodes Available: " + String(searchResultPodcast.episodesTotal!)
-            
-            //        searchResultFeedURL.text = "RSS Feed: " + searchResultPodcast.feedURL
-            
-            if let artistName = searchPodcast.artistName {
-                searchResultSummary.text = artistName
+            if let podcastAuthor = coredataPodcast.author {
+                author.text = podcastAuthor
             }
             
-            if let imageUrlString = searchPodcast.imageURL, let imageUrl = NSURL(string: imageUrlString) {
-                UIImage.downloadImageWithURL(imageUrl, completion: { [weak self] (completed, image) -> () in
-                    if completed {
-                        self?.searchResultImage?.image = image
-                    }
-                    else {
-                        if let itunesUrlString = searchPodcast.itunesImageURL, let itunesUrl = NSURL(string: itunesUrlString) {
-                            UIImage.downloadImageWithURL(itunesUrl, completion: { [weak self] (completed, iTunesImage) -> () in
-                                if completed {
-                                    self?.searchResultImage?.image = iTunesImage
-                                }
-                            })
-                        }
-                    }
-                })
-            }
-        } else if let coredataPodcast = podcast {
-            searchResultTitle.text = coredataPodcast.title
-            
-            searchResultTotalClips.text = "123 clips"
-            
-            if let lastPubDate = coredataPodcast.lastPubDate {
-                searchResultLastPublishedDate.text = PVUtility.formatDateToString(lastPubDate)
+            if let podcastCategories = coredataPodcast.categories {
+                categories.text = podcastCategories
             }
             
-//            if let genre = coredataPodcast.primaryGenreName {
-//                searchResultPrimaryGenreName.text = "Genre: " + genre
-//            }
-            
-            //
-            ////        searchResultEpisodesTotal.text = "Episodes Available: " + String(searchResultPodcast.episodesTotal!)
-            
-            //        searchResultFeedURL.text = "RSS Feed: " + searchResultPodcast.feedURL
-            
-            if let author = coredataPodcast.author {
-                searchResultSummary.text = author
+            if let link = coredataPodcast.link {
+                let range = NSRangeFromString(link)
+                homePage.enabledTextCheckingTypes = NSTextCheckingType.Link.rawValue
+                homePage.addLinkToURL(NSURL(string: link), withRange: range)
+                homePage.delegate = self
+                homePage.text = link
             }
             
-            if let imageUrlString = coredataPodcast.imageURL, let imageUrl = NSURL(string: imageUrlString) {
-                UIImage.downloadImageWithURL(imageUrl, completion: { [weak self] (completed, image) -> () in
-                    if completed {
-                        self?.searchResultImage?.image = image
-                    }
-                    else {
-                        if let itunesUrlString = coredataPodcast.itunesImageURL, let itunesUrl = NSURL(string: itunesUrlString) {
-                            UIImage.downloadImageWithURL(itunesUrl, completion: { [weak self] (completed, iTunesImage) -> () in
-                                if completed {
-                                    self?.searchResultImage?.image = iTunesImage
-                                }
-                            })
-                        }
-                    }
-                })
+            if let podcastSummary = coredataPodcast.summary, let cleanedSummary = PVUtility.removeHTMLFromString(podcastSummary) {
+                summary.text = cleanedSummary
+            }
+            
+            if let imageData = coredataPodcast.imageThumbData, image = UIImage(data: imageData) {
+                podcastImage.image = image
+            }
+            else {
+                podcastImage.image = UIImage(named: "PodverseIcon")
             }
 
         }
         
+    }
+    
+    var viewDidLayoutSubviewsAtLeastOnce = false
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        
+        if !viewDidLayoutSubviewsAtLeastOnce {
+            summary?.setContentOffset(CGPointZero, animated: false)
+        }
+        
+        viewDidLayoutSubviewsAtLeastOnce = true
     }
 
     override func didReceiveMemoryWarning() {
@@ -127,6 +94,10 @@ class PodcastProfileViewController: UIViewController {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
+    }
+    
+    func attributedLabel(label: TTTAttributedLabel!, didSelectLinkWithURL url: NSURL!) {
+        UIApplication.sharedApplication().openURL(url)
     }
 
 }
