@@ -214,7 +214,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
             print("Follow")
         }))
         
-        searchResultPodcastActions.addAction(UIAlertAction (title: "Show Profile", style: .Default, handler: { action in
+        searchResultPodcastActions.addAction(UIAlertAction (title: "Profile", style: .Default, handler: { action in
             let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe:false, shouldParseChannelOnly: true)
             feedParser.delegate = self
             if let feedURLString = iTunesSearchPodcast.feedURL {
@@ -223,8 +223,6 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         }))
         
         searchResultPodcastActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-        
-        dispatch_async(dispatch_get_main_queue(), {})
         
         self.presentViewController(searchResultPodcastActions, animated: false, completion: nil)
     }

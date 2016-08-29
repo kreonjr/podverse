@@ -47,6 +47,9 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
     @IBOutlet weak var makeClipContainerView: UIView!
     
     @IBOutlet weak var speedLabel: UILabel!
+    
+    @IBOutlet weak var profileHeader: UIView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -141,6 +144,9 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         
         summary?.text = summaryString
         
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(showPodcastProfile))
+        profileHeader.addGestureRecognizer(gesture)
+        
         setPlayPauseIcon()
         updateSpeedLabel()
         
@@ -159,6 +165,29 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         }
         
         viewDidLayoutSubviewsAtLeastOnce = true
+    }
+    
+    func showPodcastProfile() {
+        
+        let searchResultPodcastActions = UIAlertController(title: "Podcast Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
+        
+
+        searchResultPodcastActions.addAction(UIAlertAction(title: "Subscribe", style: .Default, handler: { action in
+            print("Subscribe")
+        }))
+        
+        // TODO: add follow feature
+        searchResultPodcastActions.addAction(UIAlertAction(title: "Follow", style: .Default, handler: { action in
+            print("Follow")
+        }))
+        
+        searchResultPodcastActions.addAction(UIAlertAction (title: "Profile", style: .Default, handler: { action in
+            self.performSegueWithIdentifier("Show Podcast Profile", sender: nil)
+        }))
+        
+        searchResultPodcastActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        
+        self.presentViewController(searchResultPodcastActions, animated: false, completion: nil)
     }
     
     private func updateSpeedLabel() {
@@ -418,4 +447,12 @@ class MediaPlayerViewController: UIViewController, PVMediaPlayerDelegate {
         
         nowPlayingSlider.value = Float(currentTime / (totalTime ?? 1))
     }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if segue.identifier == "Show Podcast Profile" {
+            let podcastProfileViewController = segue.destinationViewController as! PodcastProfileViewController
+            podcastProfileViewController.podcast = pvMediaPlayer.nowPlayingEpisode.podcast
+        }
+    }
+    
 }

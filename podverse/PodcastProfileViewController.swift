@@ -26,6 +26,7 @@ class PodcastProfileViewController: UIViewController, TTTAttributedLabelDelegate
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         navigationItem.rightBarButtonItem = self.playerNavButton()
+        self.navigationController?.navigationBar.barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)
     }
     
     override func viewDidLoad() {
