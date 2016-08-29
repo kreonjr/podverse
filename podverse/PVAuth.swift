@@ -91,7 +91,8 @@ class PVAuth: NSObject {
     }
     
     func updateOwnedItemsThenSwitchToNewUser (idToken: String, userId: String, completionBlock: (() -> ())?) {
-        var ownedItemsPred = NSPredicate()
+        // If logging in on first app launch, then a prevUserId will not be defined. In that case there also shouldn't be any clips or playlists created locally yet.
+        var ownedItemsPred = NSPredicate(format: "ownerId == %@", "")
         if let prevUserId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
             ownedItemsPred = NSPredicate(format: "ownerId == %@", prevUserId)
         }
@@ -187,6 +188,11 @@ class PVAuth: NSObject {
                 CoreDataHelper.saveCoreData(moc, completionBlock: nil)
             }.call()
             
+        }
+        
+        if ownedPlaylistsArray.count < 1 && ownedClipsArray.count < 1 {
+            dispatch_group_enter(dispatchGroup)
+            dispatch_group_leave(dispatchGroup)
         }
         
         dispatch_group_notify(dispatchGroup, dispatch_get_main_queue()) { () -> Void in
