@@ -173,6 +173,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         
         let iTunesSearchPodcast = iTunesSearchPodcastArray[indexPath.row]
         var isSubscribed = false
+        var isFollowed = false
         
         
         if let savedPodcasts = CoreDataHelper.fetchEntities("Podcast", predicate: nil, moc:moc) as? [Podcast] {
@@ -180,6 +181,9 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                 if iTunesSearchPodcast.feedURL == savedPodcast.feedURL {
                     if savedPodcast.isSubscribed == true {
                         isSubscribed = true
+                    }
+                    if savedPodcast.isFollowed == true {
+                        isFollowed = true
                     }
                 }
             }
@@ -208,14 +212,33 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                 }
             }))
         }
-
-        // TODO: add follow feature
-        searchResultPodcastActions.addAction(UIAlertAction(title: "Follow", style: .Default, handler: { action in
-            print("Follow")
-        }))
+        
+        if isSubscribed == true || isFollowed == false {
+            searchResultPodcastActions.addAction(UIAlertAction(title: "Follow", style: .Default, handler: { action in
+                if let feedURL = iTunesSearchPodcast.feedURL {
+                    PVFollower.followPodcast(feedURL, podcastTableDelegate: self.podcastVC)
+                }
+            }))
+        }
+        else {
+            searchResultPodcastActions.addAction(UIAlertAction(title: "Unfollow", style: .Default, handler: { action in
+                if let podcasts = CoreDataHelper.fetchEntities("Podcast", predicate: nil, moc:self.moc) as? [Podcast] {
+                    if let index = podcasts.indexOf({ $0.feedURL == iTunesSearchPodcast.feedURL }) {
+                        
+                        let unfollowedPodcastUserInfo:[NSObject:AnyObject] = ["feedURL":iTunesSearchPodcast.feedURL ?? ""]
+                        
+                        PVFollower.unfollowPodcast(podcasts[index].objectID, completionBlock: {
+                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kUnfollowPodcast, object: self, userInfo: unfollowedPodcastUserInfo)
+                            })
+                        })
+                    }
+                }
+            }))
+        }
         
         searchResultPodcastActions.addAction(UIAlertAction (title: "Profile", style: .Default, handler: { action in
-            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe:false, shouldParseChannelOnly: true)
+            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe:false, shouldFollow: false, shouldParseChannelOnly: true)
             feedParser.delegate = self
             if let feedURLString = iTunesSearchPodcast.feedURL {
                 feedParser.parsePodcastFeed(feedURLString)

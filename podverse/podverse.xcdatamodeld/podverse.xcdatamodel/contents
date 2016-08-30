@@ -58,6 +58,7 @@
         <attribute name="imageData" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="imageThumbData" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="imageURL" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="isFollowed" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="isSubscribed" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="itunesImage" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="itunesImageURL" optional="YES" attributeType="String" syncable="YES"/>
@@ -72,6 +73,6 @@
         <element name="Clip" positionX="-20" positionY="-387" width="128" height="240"/>
         <element name="Episode" positionX="-225" positionY="-675" width="128" height="345"/>
         <element name="Playlist" positionX="-288" positionY="-265" width="128" height="225"/>
-        <element name="Podcast" positionX="-398" positionY="-541" width="128" height="270"/>
+        <element name="Podcast" positionX="-398" positionY="-541" width="128" height="285"/>
     </elements>
 </model>

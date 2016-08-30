@@ -1,5 +1,5 @@
 //
-//  PVSubscriber.swift
+//  PVFollower.swift
 //  podverse
 //
 //  Created by Mitchell Downey on 7/19/15.
@@ -9,27 +9,28 @@
 import UIKit
 import CoreData
 
-class PVSubscriber {
-
-    static func subscribeToPodcast(feedURLString: String, podcastTableDelegate:PodcastsTableViewController?) {
+class PVFollower {
+    
+    static func followPodcast(feedURLString: String, podcastTableDelegate:PodcastsTableViewController?) {
         ParsingPodcastsList.shared.urls.append(feedURLString)
         if let ptd = podcastTableDelegate {
             ptd.updateParsingActivity()
         }
         
         dispatch_async(Constants.feedParsingQueue) {
-            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe: true, shouldFollow: false, shouldParseChannelOnly: false)
+            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe: false, shouldFollow: true, shouldParseChannelOnly: false)
             feedParser.delegate = podcastTableDelegate
             feedParser.parsePodcastFeed(feedURLString)
         }
     }
     
-    static func unsubscribeFromPodcast(podcastID:NSManagedObjectID, completionBlock:(()->Void)?) {
+    static func unfollowPodcast(podcastID:NSManagedObjectID, completionBlock:(()->Void)?) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
             let moc = CoreDataHelper.sharedInstance.backgroundContext
             let podcast = CoreDataHelper.fetchEntityWithID(podcastID, moc: moc) as! Podcast
-            let alsoDelete = PVDeleter.checkIfPodcastShouldBeRemoved(podcast, isUnsubscribing: true, isUnfollowing: false, moc:moc)
+            let alsoDelete = PVDeleter.checkIfPodcastShouldBeRemoved(podcast, isUnsubscribing: true, isUnfollowing: true, moc:moc)
             podcast.isSubscribed = false
+            podcast.isFollowed = false
             
             CoreDataHelper.saveCoreData(moc, completionBlock: { completed in
                 if alsoDelete {

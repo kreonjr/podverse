@@ -17,7 +17,8 @@ class PodcastsTableViewController: UIViewController {
     @IBOutlet weak var bottomButton: UIButton!
     
     var managedObjectContext:NSManagedObjectContext!
-    var podcastsArray = [Podcast]()
+    var subscribedPodcastsArray = [Podcast]()
+    var followedPodcastsArray = [Podcast]()
     let coreDataHelper = CoreDataHelper.sharedInstance
     var playlistManager = PlaylistManager.sharedInstance
     let parsingPodcasts = ParsingPodcastsList.shared
@@ -50,7 +51,7 @@ class PodcastsTableViewController: UIViewController {
         tabBarController?.tabBar.translucent = false
 
         bottomButton.hidden = true
-        showSubscribeToPodcastsIfNoneAreSubscribed()
+        showFindAPodcastIfNoneAreFollowed()
         
         refreshControl = UIRefreshControl()
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh all podcasts")
@@ -74,7 +75,7 @@ class PodcastsTableViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         navigationItem.rightBarButtonItem = self.playerNavButton()
-        showSubscribeToPodcastsIfNoneAreSubscribed()
+        showFindAPodcastIfNoneAreFollowed()
         self.tableView.reloadData()
     }
     
@@ -89,7 +90,7 @@ class PodcastsTableViewController: UIViewController {
     
     func unsubscribeFromPodcast(notification:NSNotification) {
         if let unsubscribedPodcastInfo = notification.userInfo {
-            for(index, podcast) in self.podcastsArray.enumerate() {
+            for(index, podcast) in self.subscribedPodcastsArray.enumerate() {
                 if podcast.feedURL == unsubscribedPodcastInfo["feedURL"] as? String {
                     //ATTENTION NOTE: Any additional view controllers pushed on this nav stack need to be checked and popped
                     if let topVC = self.navigationController?.topViewController as? EpisodesTableViewController where topVC.selectedPodcast.feedURL == podcast.feedURL {
@@ -99,7 +100,7 @@ class PodcastsTableViewController: UIViewController {
                         self.navigationController?.popToRootViewControllerAnimated(false)
                     }
                     
-                    podcastsArray.removeAtIndex(index)
+                    subscribedPodcastsArray.removeAtIndex(index)
                     self.tableView.reloadData()
                 }
             }
@@ -116,7 +117,7 @@ class PodcastsTableViewController: UIViewController {
             let feedURL = NSURL(string:podcast.feedURL)
             
             dispatch_async(Constants.feedParsingQueue) {
-                let feedParser = PVFeedParser(onlyGetMostRecentEpisode: true, shouldSubscribe:false, shouldParseChannelOnly: false)
+                let feedParser = PVFeedParser(onlyGetMostRecentEpisode: true, shouldSubscribe:false, shouldFollow: false, shouldParseChannelOnly: false)
                 feedParser.delegate = self
                 if let feedURLString = feedURL?.absoluteString {
                     feedParser.parsePodcastFeed(feedURLString)
@@ -127,16 +128,16 @@ class PodcastsTableViewController: UIViewController {
             }
         }
         
-        showSubscribeToPodcastsIfNoneAreSubscribed()
+        showFindAPodcastIfNoneAreFollowed()
         
         refreshControl.endRefreshing()
     }
     
-    private func showSubscribeToPodcastsIfNoneAreSubscribed() {
-        if podcastsArray.count == 0 {
-            bottomButton.setTitle("Subscribe to a podcast", forState: .Normal)
+    private func showFindAPodcastIfNoneAreFollowed() {
+        if subscribedPodcastsArray.count == 0 && followedPodcastsArray.count == 0 {
+            bottomButton.setTitle("Find a podcast", forState: .Normal)
             bottomButton.hidden = false
-        } else if podcastsArray.count > 0 {
+        } else {
             bottomButton.hidden = true
         }
     }
@@ -146,9 +147,27 @@ class PodcastsTableViewController: UIViewController {
         if segue.identifier == "Show Episodes" {
             let episodesTableViewController = segue.destinationViewController as! EpisodesTableViewController
             if let index = tableView.indexPathForSelectedRow {
-                episodesTableViewController.selectedPodcastId = podcastsArray[index.row].objectID
+                
+                // if there are no downloaded episodes, then showAllEpisodes
+                let downloadedEpisodesArrayPredicate = NSPredicate(format: "fileName != nil || taskIdentifier != nil", argumentArray: nil)
+                var downloadedEpisodesArray: NSSet!
+                
+                if index.section == 0 {
+                    episodesTableViewController.selectedPodcastId = subscribedPodcastsArray[index.row].objectID
+                    downloadedEpisodesArray = subscribedPodcastsArray[index.row].episodes.filteredSetUsingPredicate(downloadedEpisodesArrayPredicate)
+                } else {
+                    episodesTableViewController.selectedPodcastId = followedPodcastsArray[index.row].objectID
+                        downloadedEpisodesArray = followedPodcastsArray[index.row].episodes.filteredSetUsingPredicate(downloadedEpisodesArrayPredicate)
+                }
+                
+                
+                if downloadedEpisodesArray.count > 0 {
+                    episodesTableViewController.showAllEpisodes = false
+                } else {
+                    episodesTableViewController.showAllEpisodes = true
+                }
+                
             }
-            episodesTableViewController.showAllEpisodes = false
         } else if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
@@ -173,14 +192,28 @@ class PodcastsTableViewController: UIViewController {
     }
     
     func reloadPodcastData() {
-        let podcastsPredicate = NSPredicate(format: "isSubscribed == %@", true)
+        let subscribedPredicate = NSPredicate(format: "isSubscribed == %@", true)
         self.managedObjectContext = coreDataHelper.managedObjectContext
-        self.podcastsArray = CoreDataHelper.fetchEntities("Podcast", predicate: podcastsPredicate, moc:managedObjectContext) as! [Podcast]
+        self.subscribedPodcastsArray = CoreDataHelper.fetchEntities("Podcast", predicate: subscribedPredicate, moc:managedObjectContext) as! [Podcast]
 
+        self.subscribedPodcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+
+        for podcast in self.subscribedPodcastsArray {
+            let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
+            let mostRecentEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate, moc:managedObjectContext) as! [Episode]
+            if let mostRecentEpisodePubDate = mostRecentEpisodeArray.first?.pubDate {
+                podcast.lastPubDate = mostRecentEpisodePubDate
+            }
+        }
         
-        self.podcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
-
-        for podcast in self.podcastsArray {
+        let notSubscribedPredicate = NSPredicate(format: "isSubscribed == %@", false)
+        let followedPredicate = NSPredicate(format: "isFollowed == %@", true)
+        let compoundPredicate = NSCompoundPredicate.init(andPredicateWithSubpredicates: [notSubscribedPredicate, followedPredicate])
+        self.followedPodcastsArray = CoreDataHelper.fetchEntities("Podcast", predicate: compoundPredicate, moc:managedObjectContext) as! [Podcast]
+        
+        self.followedPodcastsArray.sortInPlace{ $0.title.removeArticles() < $1.title.removeArticles() }
+        
+        for podcast in self.followedPodcastsArray {
             let podcastPredicate = NSPredicate(format: "podcast == %@", podcast)
             let mostRecentEpisodeArray = CoreDataHelper.fetchOnlyEntityWithMostRecentPubDate("Episode", predicate: podcastPredicate, moc:managedObjectContext) as! [Episode]
             if let mostRecentEpisodePubDate = mostRecentEpisodeArray.first?.pubDate {
@@ -215,11 +248,15 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
     // MARK: - Table view data source
 
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
+        return 2
     }
     
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "My Subscribed Podcasts"
+        if section == 0 {
+            return "Subscribed"
+        } else {
+            return "Following"
+        }
     }
     
     func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
@@ -227,13 +264,24 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
     }
 
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return podcastsArray.count
+        if section == 0 {
+            return subscribedPodcastsArray.count
+        } else {
+            return followedPodcastsArray.count
+        }
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PodcastsTableCell
-
-        let podcast = podcastsArray[indexPath.row]
+        
+        let podcast: Podcast!
+        
+        if indexPath.section == 0 {
+            podcast = subscribedPodcastsArray[indexPath.row]
+        } else {
+            podcast = followedPodcastsArray[indexPath.row]
+        }
+        
         cell.title?.text = podcast.title
 
         let episodes = podcast.episodes.allObjects as! [Episode]
@@ -279,33 +327,68 @@ extension PodcastsTableViewController: UITableViewDelegate, UITableViewDataSourc
         return true
     }
     
-    // Override to support editing the table view.
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            let podcastToRemove = podcastsArray[indexPath.row]
+    func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
+        
+        let podcastToEdit: Podcast!
+        
+        if indexPath.section == 0 {
+            podcastToEdit = subscribedPodcastsArray[indexPath.row]
+        } else {
+            podcastToEdit = followedPodcastsArray[indexPath.row]
+        }
+        
+        var subscribeOrFollow = "Subscribe"
+        if podcastToEdit.isSubscribed == true {
+            subscribeOrFollow = "Follow"
+        }
+        
+        let subscribeOrFollowAction = UITableViewRowAction(style: .Default, title: subscribeOrFollow, handler: {action, indexpath in
+            if subscribeOrFollow == "Subscribe" {
+                PVSubscriber.subscribeToPodcast(podcastToEdit.feedURL, podcastTableDelegate: self)
+            } else {
+                PVFollower.followPodcast(podcastToEdit.feedURL, podcastTableDelegate: self)
+            }
+        })
+        
+        subscribeOrFollowAction.backgroundColor = UIColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0);
+        
+        let deleteAction = UITableViewRowAction(style: .Default, title: "Delete", handler: {action, indexpath in
             
             // Remove Player button if the now playing episode was one of the podcast's episodes
-            let allPodcastEpisodes = podcastToRemove.episodes.allObjects as! [Episode]
+            let allPodcastEpisodes = podcastToEdit.episodes.allObjects as! [Episode]
             if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
                 if allPodcastEpisodes.contains(nowPlayingEpisode) {
                     self.navigationItem.rightBarButtonItem = nil
                 }
             }
-            podcastsArray.removeAtIndex(indexPath.row)
+            
+            if indexPath.section == 0 {
+                self.subscribedPodcastsArray.removeAtIndex(indexPath.row)
+            } else {
+                self.followedPodcastsArray.removeAtIndex(indexPath.row)
+            }
+            
             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
             
-            PVSubscriber.unsubscribeFromPodcast(podcastToRemove.objectID, completionBlock: nil)
+            PVFollower.unfollowPodcast(podcastToEdit.objectID, completionBlock: nil)
             
-            showSubscribeToPodcastsIfNoneAreSubscribed()
-        }
+            self.showFindAPodcastIfNoneAreFollowed()
+        })
+        
+        return [deleteAction, subscribeOrFollowAction]
     }
+    
 }
 
 extension PodcastsTableViewController: PVFeedParserDelegate {
     func feedParsingComplete(feedURL:String?) {
-        if let url = feedURL, let index = self.podcastsArray.indexOf({ url == $0.feedURL }) {
-            let podcast = CoreDataHelper.fetchEntityWithID(self.podcastsArray[index].objectID, moc: self.managedObjectContext) as! Podcast
-            self.podcastsArray[index] = podcast
+        if let url = feedURL, let index = self.subscribedPodcastsArray.indexOf({ url == $0.feedURL }) {
+            let podcast = CoreDataHelper.fetchEntityWithID(self.subscribedPodcastsArray[index].objectID, moc: self.managedObjectContext) as! Podcast
+            self.subscribedPodcastsArray[index] = podcast
+            self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
+        } else if let url = feedURL, let index = self.followedPodcastsArray.indexOf({ url == $0.feedURL }) {
+            let podcast = CoreDataHelper.fetchEntityWithID(self.followedPodcastsArray[index].objectID, moc: self.managedObjectContext) as! Podcast
+            self.followedPodcastsArray[index] = podcast
             self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
         }
         else {

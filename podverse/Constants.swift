@@ -39,6 +39,8 @@ struct Constants {
     
     static let kUnsubscribeFromPodcast = "unsubscribeFromPodcast"
     
+    static let kUnfollowPodcast = "unfollowPodcast"
+    
     static let kUpdateDownloadsTable = "updateDownloadTable"
 
     static let kNowPlayingTimeHasChanged = "nowPlayingTimeHasChanged"

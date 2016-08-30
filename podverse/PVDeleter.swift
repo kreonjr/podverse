@@ -172,15 +172,15 @@ class PVDeleter {
         }.call()
     }
     
-    static func checkIfPodcastShouldBeRemoved(podcast: Podcast, isUnsubscribing: Bool, moc:NSManagedObjectContext?) -> Bool {
+    static func checkIfPodcastShouldBeRemoved(podcast: Podcast, isUnsubscribing: Bool, isUnfollowing: Bool, moc:NSManagedObjectContext?) -> Bool {
         guard let moc = moc else {
             return true
         }
         
         var alsoDelete = true
         
-        if isUnsubscribing != true {
-            if podcast.isSubscribed == true {
+        if isUnsubscribing == false || isUnfollowing == false {
+            if podcast.isSubscribed == true || podcast.isFollowed == true {
                 alsoDelete = false
                 return alsoDelete
             }
@@ -218,7 +218,7 @@ class PVDeleter {
         let moc = CoreDataHelper.sharedInstance.managedObjectContext
         var alsoDelete = true
         
-        if episode.podcast.isSubscribed == true {
+        if episode.podcast.isSubscribed == true || episode.podcast.isFollowed == true {
             alsoDelete = false
             return alsoDelete
         }

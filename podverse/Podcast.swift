@@ -25,6 +25,7 @@ class Podcast: NSManagedObject {
     @NSManaged var summary: String?
     @NSManaged var title: String
     @NSManaged var isSubscribed: Bool
+    @NSManaged var isFollowed: Bool
     @NSManaged var categories: String?
     @NSManaged var episodes: NSSet
     var totalClips:Int {

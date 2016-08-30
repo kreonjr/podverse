@@ -21,6 +21,7 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     
     var onlyGetMostRecent: Bool
     var shouldSubscribeToPodcast: Bool
+    var shouldFollowPodcast: Bool
     var shouldDownloadMostRecentEpisode = false
     var shouldParseChannel = false
     var latestEpisodePubDate:NSDate?
@@ -28,8 +29,9 @@ class PVFeedParser: NSObject, FeedParserDelegate {
     let moc = CoreDataHelper.sharedInstance.backgroundContext
     let parsingPodcasts = ParsingPodcastsList.shared
     
-    init(onlyGetMostRecentEpisode:Bool, shouldSubscribe:Bool, shouldParseChannelOnly:Bool) {
+    init(onlyGetMostRecentEpisode:Bool, shouldSubscribe:Bool, shouldFollow:Bool, shouldParseChannelOnly:Bool) {
         onlyGetMostRecent = onlyGetMostRecentEpisode
+        shouldFollowPodcast = shouldFollow
         shouldSubscribeToPodcast = shouldSubscribe
         shouldParseChannel = shouldParseChannelOnly
     }
@@ -128,7 +130,14 @@ class PVFeedParser: NSObject, FeedParserDelegate {
         
         if self.shouldSubscribeToPodcast {
             podcast.isSubscribed = true
+            podcast.isFollowed = true
         }
+        
+        if self.shouldFollowPodcast {
+            podcast.isSubscribed = false
+            podcast.isFollowed = true
+        }
+        
         currentPodcast = podcast
         
         CoreDataHelper.saveCoreData(moc, completionBlock: { completed in
