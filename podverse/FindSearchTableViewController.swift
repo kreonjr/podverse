@@ -203,11 +203,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                         
                         let unsubscribedPodcastUserInfo:[NSObject:AnyObject] = ["feedURL":iTunesSearchPodcast.feedURL ?? ""]
 
-                        PVSubscriber.unsubscribeFromPodcast(podcasts[index].objectID, completionBlock: {
-                            dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kUnsubscribeFromPodcast, object: self, userInfo: unsubscribedPodcastUserInfo)
-                            })
-                        })
+                        PVSubscriber.unsubscribeFromPodcast(podcasts[index].objectID, completionBlock: nil)
                     }
                 }
             }))

@@ -60,7 +60,6 @@ class PodcastsTableViewController: UIViewController {
                 
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(reloadPodcastData), name: Constants.kDownloadHasFinished, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(unsubscribeFromPodcast(_:)), name: Constants.kUnsubscribeFromPodcast, object: nil)
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(clearParsingActivity), name: Constants.kInternetIsUnreachable, object: nil)
         updateParsingActivity()
         
@@ -86,25 +85,6 @@ class PodcastsTableViewController: UIViewController {
             return
         }
         refreshPodcastFeeds()
-    }
-    
-    func unsubscribeFromPodcast(notification:NSNotification) {
-        if let unsubscribedPodcastInfo = notification.userInfo {
-            for(index, podcast) in self.subscribedPodcastsArray.enumerate() {
-                if podcast.feedURL == unsubscribedPodcastInfo["feedURL"] as? String {
-                    //ATTENTION NOTE: Any additional view controllers pushed on this nav stack need to be checked and popped
-                    if let topVC = self.navigationController?.topViewController as? EpisodesTableViewController where topVC.selectedPodcast.feedURL == podcast.feedURL {
-                        self.navigationController?.popToRootViewControllerAnimated(false)
-                    }
-                    else if let topVC = self.navigationController?.topViewController as? ClipsTableViewController where topVC.selectedPodcast.feedURL == podcast.feedURL {
-                        self.navigationController?.popToRootViewControllerAnimated(false)
-                    }
-                    
-                    subscribedPodcastsArray.removeAtIndex(index)
-                    self.tableView.reloadData()
-                }
-            }
-        }
     }
     
     private func refreshPodcastFeeds() {
@@ -389,7 +369,7 @@ extension PodcastsTableViewController: PVFeedParserDelegate {
         } else if let url = feedURL, let index = self.followedPodcastsArray.indexOf({ url == $0.feedURL }) {
             let podcast = CoreDataHelper.fetchEntityWithID(self.followedPodcastsArray[index].objectID, moc: self.managedObjectContext) as! Podcast
             self.followedPodcastsArray[index] = podcast
-            self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 0)], withRowAnimation: .None)
+            self.tableView.reloadRowsAtIndexPaths([NSIndexPath(forRow: index, inSection: 1)], withRowAnimation: .None)
         }
         else {
             self.reloadPodcastData()
