@@ -229,7 +229,7 @@ class EpisodesTableViewController: UIViewController, UITableViewDataSource, UITa
         // If not the last item in the array, then perform selected episode actions
         if indexPath.row < episodesArray.count {
             
-            var selectedEp = episodesArray[indexPath.row]
+            let selectedEp = episodesArray[indexPath.row]
             
             let episodeActions = UIAlertController(title: "", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
             
