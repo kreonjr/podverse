@@ -277,8 +277,15 @@ class PVMediaPlayer {
     }
     
     func loadEpisodeDownloadedMediaFileOrStream(episodeID: NSManagedObjectID, paused: Bool) {
+
+        // This moc.refreshAllObjects() call is necessary to prevent an issue where an episode does not play after you 1) download and play an episode, 2) after the episode finishes it is deleted and you pop back to root, 3) then download the episode and after it finishes try playing it again.
+        // If you do all that, and the line below is missing, then the media player will not play anything. Attempts to play any other episode will fail as well.
+        moc.refreshAllObjects()
+        
         nowPlayingEpisode = CoreDataHelper.fetchEntityWithID(episodeID, moc: moc) as! Episode
         nowPlayingClip = nil
+        
+        avPlayer.replaceCurrentItemWithPlayerItem(nil)
         
         if nowPlayingEpisode.fileName != nil {
             var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
@@ -317,9 +324,12 @@ class PVMediaPlayer {
     }
     
     func loadClipDownloadedMediaFileOrStreamAndPlay(clipID: NSManagedObjectID) {
+        moc.refreshAllObjects()
+        
         nowPlayingClip = CoreDataHelper.fetchEntityWithID(clipID, moc: moc) as! Clip
         nowPlayingEpisode = CoreDataHelper.fetchEntityWithID(nowPlayingClip.episode.objectID, moc: moc) as! Episode
         
+        avPlayer.replaceCurrentItemWithPlayerItem(nil)
 //        if nowPlayingEpisode.fileName != nil {
 //            var URLs = NSFileManager().URLsForDirectory(NSSearchPathDirectory.DocumentDirectory, inDomains: NSSearchPathDomainMask.UserDomainMask)
 //            self.docDirectoryURL = URLs[0]

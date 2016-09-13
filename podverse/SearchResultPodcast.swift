@@ -17,7 +17,7 @@ class SearchResultPodcast: NSObject {
     var itunesImageURL: String?
     var isSubscribed: Bool?
     var lastPubDate: NSDate?
-    var primaryGenreName: String?
+    var categories: String?
     var summary: String?
     var title: String?
     

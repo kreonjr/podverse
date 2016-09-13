@@ -18,7 +18,7 @@ class PVSubscriber {
         }
         
         dispatch_async(Constants.feedParsingQueue) {
-            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe: true)
+            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe: true, shouldFollow: false, shouldParseChannelOnly: false)
             feedParser.delegate = podcastTableDelegate
             feedParser.parsePodcastFeed(feedURLString)
         }
@@ -28,7 +28,7 @@ class PVSubscriber {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
             let moc = CoreDataHelper.sharedInstance.backgroundContext
             let podcast = CoreDataHelper.fetchEntityWithID(podcastID, moc: moc) as! Podcast
-            let alsoDelete = PVDeleter.checkIfPodcastShouldBeRemoved(podcast, isUnsubscribing: true, moc:moc)
+            let alsoDelete = PVDeleter.checkIfPodcastShouldBeRemoved(podcast, isUnsubscribing: true, isUnfollowing: false, moc:moc)
             podcast.isSubscribed = false
             
             CoreDataHelper.saveCoreData(moc, completionBlock: { completed in

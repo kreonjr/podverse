@@ -62,6 +62,11 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
                 
                 let playlist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
                 playlist.title = playlistTitle
+                
+//                TODO: Create UI for permission setting
+//                let permission:PlaylistSharePermission = .Public
+//                playlist.sharePermission = permission.value
+                
                 CoreDataHelper.saveCoreData(moc, completionBlock:nil)
                 self.playlistManager.savePlaylist(playlist, moc:moc)
             }
@@ -93,7 +98,7 @@ class AddToPlaylistTableViewController: UIViewController, UITableViewDataSource,
             }
         }
         
-        validPlaylists.sortInPlace({ $0.title.lowercaseString < $1.title.lowercaseString })
+        validPlaylists.sortInPlace({ $0.title?.lowercaseString < $1.title?.lowercaseString })
         for (index , playlist) in validPlaylists.enumerate() {
             if clip == nil {
                 if playlist.title == Constants.kMyEpisodesPlaylist {

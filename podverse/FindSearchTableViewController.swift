@@ -18,6 +18,8 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     var iTunesSearchPodcastArray = [SearchResultPodcast]()
     var iTunesSearchPodcastFeedURLArray: [NSURL] = []
     
+    var podcast: Podcast?
+    
     let moc = CoreDataHelper.sharedInstance.managedObjectContext
     
     var podcastVC:PodcastsTableViewController? {
@@ -95,7 +97,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                                         searchResultPodcast.lastPubDate = dateFormatter.dateFromString(modifiedPubDateString)
                                     }
                                     
-                                    searchResultPodcast.primaryGenreName = podcastJSON["primaryGenreName"] as? String
+                                    searchResultPodcast.categories = podcastJSON["primaryGenreName"] as? String
                                     
                                     searchResultPodcast.title = podcastJSON["collectionName"] as? String
                                     
@@ -171,6 +173,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
         
         let iTunesSearchPodcast = iTunesSearchPodcastArray[indexPath.row]
         var isSubscribed = false
+        var isFollowed = false
         
         
         if let savedPodcasts = CoreDataHelper.fetchEntities("Podcast", predicate: nil, moc:moc) as? [Podcast] {
@@ -178,6 +181,9 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                 if iTunesSearchPodcast.feedURL == savedPodcast.feedURL {
                     if savedPodcast.isSubscribed == true {
                         isSubscribed = true
+                    }
+                    if savedPodcast.isFollowed == true {
+                        isFollowed = true
                     }
                 }
             }
@@ -197,9 +203,29 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
                         
                         let unsubscribedPodcastUserInfo:[NSObject:AnyObject] = ["feedURL":iTunesSearchPodcast.feedURL ?? ""]
 
-                        PVSubscriber.unsubscribeFromPodcast(podcasts[index].objectID, completionBlock: {
+                        PVSubscriber.unsubscribeFromPodcast(podcasts[index].objectID, completionBlock: nil)
+                    }
+                }
+            }))
+        }
+        
+        if isSubscribed == true || isFollowed == false {
+            searchResultPodcastActions.addAction(UIAlertAction(title: "Follow", style: .Default, handler: { action in
+                if let feedURL = iTunesSearchPodcast.feedURL {
+                    PVFollower.followPodcast(feedURL, podcastTableDelegate: self.podcastVC)
+                }
+            }))
+        }
+        else {
+            searchResultPodcastActions.addAction(UIAlertAction(title: "Unfollow", style: .Default, handler: { action in
+                if let podcasts = CoreDataHelper.fetchEntities("Podcast", predicate: nil, moc:self.moc) as? [Podcast] {
+                    if let index = podcasts.indexOf({ $0.feedURL == iTunesSearchPodcast.feedURL }) {
+                        
+                        let unfollowedPodcastUserInfo:[NSObject:AnyObject] = ["feedURL":iTunesSearchPodcast.feedURL ?? ""]
+                        
+                        PVFollower.unfollowPodcast(podcasts[index].objectID, completionBlock: {
                             dispatch_async(dispatch_get_main_queue(), { () -> Void in
-                                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kUnsubscribeFromPodcast, object: self, userInfo: unsubscribedPodcastUserInfo)
+                                NSNotificationCenter.defaultCenter().postNotificationName(Constants.kUnfollowPodcast, object: self, userInfo: unfollowedPodcastUserInfo)
                             })
                         })
                     }
@@ -207,21 +233,15 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
             }))
         }
         
-        searchResultPodcastActions.addAction(UIAlertAction(title: "Show Episodes", style: .Default, handler: { action in
-            print("Show Episodes")
-        }))
-        
-        searchResultPodcastActions.addAction(UIAlertAction (title: "Show Clips", style: .Default, handler: { action in
-            print("Show Clips")
-        }))
-        
-        searchResultPodcastActions.addAction(UIAlertAction (title: "Show Profile", style: .Default, handler: { action in
-            self.performSegueWithIdentifier("Show Podcast Profile", sender: self)
+        searchResultPodcastActions.addAction(UIAlertAction (title: "Profile", style: .Default, handler: { action in
+            let feedParser = PVFeedParser(onlyGetMostRecentEpisode: false, shouldSubscribe:false, shouldFollow: false, shouldParseChannelOnly: true)
+            feedParser.delegate = self
+            if let feedURLString = iTunesSearchPodcast.feedURL {
+                feedParser.parsePodcastFeed(feedURLString)
+            }
         }))
         
         searchResultPodcastActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-        
-        dispatch_async(dispatch_get_main_queue(), {})
         
         self.presentViewController(searchResultPodcastActions, animated: false, completion: nil)
     }
@@ -232,9 +252,7 @@ class FindSearchTableViewController: UIViewController, UITableViewDataSource, UI
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "Show Podcast Profile" {
             let podcastProfileViewController = segue.destinationViewController as! PodcastProfileViewController
-            if let index = self.tableView.indexPathForSelectedRow {
-                podcastProfileViewController.searchResultPodcast = iTunesSearchPodcastArray[index.row]
-            }
+            podcastProfileViewController.podcast = podcast
         }
         else if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
@@ -261,5 +279,14 @@ extension UIImage {
         }
         
         task.resume()
+    }
+}
+
+extension FindSearchTableViewController: PVFeedParserDelegate {
+    func feedParsingComplete(feedURL:String?) {
+        if let rssFeedURL = feedURL {
+            podcast = CoreDataHelper.retrieveExistingOrCreateNewPodcast(rssFeedURL, moc: moc)
+            self.performSegueWithIdentifier("Show Podcast Profile", sender: self)
+        }
     }
 }

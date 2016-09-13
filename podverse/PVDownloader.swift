@@ -100,7 +100,13 @@ class PVDownloader: NSObject, NSURLSessionDelegate, NSURLSessionDownloadDelegate
                                 episode.taskIdentifier = nil
                             } else {
                                 episode.pausedWithoutResumeData = true
-                                self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Connect to WiFi")
+                                if self.reachability.hasWiFiConnection() == true {
+                                    episode.wasPausedByUser = true
+                                    self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Paused")
+                                }
+                                else {
+                                    self.postPauseOrResumeNotification(taskIdentifier, pauseOrResume: "Connect to WiFi")
+                                }
                             }
                         }
                     }

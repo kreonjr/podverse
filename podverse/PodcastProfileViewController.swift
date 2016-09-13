@@ -7,63 +7,81 @@
 //
 
 import UIKit
+import TTTAttributedLabel
 
-class PodcastProfileViewController: UIViewController {
-        
-    var searchResultPodcast: SearchResultPodcast!
+class PodcastProfileViewController: UIViewController, TTTAttributedLabelDelegate {
     
-    @IBOutlet weak var searchResultImage: UIImageView!
-    @IBOutlet weak var searchResultTitle: UILabel!
-    @IBOutlet weak var searchResultTotalClips: UILabel!
-    @IBOutlet weak var searchResultLastPublishedDate: UILabel!
+    var podcast: Podcast?
     
-    @IBOutlet weak var searchResultHeaderView: UIView!
+    @IBOutlet weak var podcastImage: UIImageView!
+    @IBOutlet weak var podcastTitle: UILabel!
+    @IBOutlet weak var totalClips: UILabel!
+    @IBOutlet weak var lastPublishedDate: UILabel!
     
-    @IBOutlet weak var searchResultPrimaryGenreName: UILabel!
-    @IBOutlet weak var searchResultEpisodesTotal: UILabel!
-    @IBOutlet weak var searchResultFeedURL: UILabel!
+    @IBOutlet weak var homePage: TTTAttributedLabel!
+    @IBOutlet weak var author: UILabel!
+    @IBOutlet weak var categories: UILabel!
+    @IBOutlet weak var summary: UITextView!
     
-    @IBOutlet weak var searchResultSummary: UITextView!
-    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationItem.rightBarButtonItem = self.playerNavButton()
+        self.navigationController?.navigationBar.barTintColor = UIColor(red: 41.0/255.0, green: 104.0/255.0, blue: 177.0/255.0, alpha: 1.0)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        searchResultHeaderView.layer.borderColor = UIColor.lightGrayColor().CGColor
-        searchResultHeaderView.layer.borderWidth = 0.5
-        
-        searchResultTitle.text = searchResultPodcast.title
-        
-        if let imageUrlString = searchResultPodcast.imageURL, let imageUrl = NSURL(string: imageUrlString) {
-            UIImage.downloadImageWithURL(imageUrl, completion: { (completed, image) -> () in
-                if completed {
-                   self.searchResultImage?.image = image
-                }
-                else {
-                    if let itunesUrlString = self.searchResultPodcast.itunesImageURL, let itunesUrl = NSURL(string: itunesUrlString) {
-                        UIImage.downloadImageWithURL(itunesUrl, completion: { (completed, iTunesImage) -> () in
-                            if completed {
-                                self.searchResultImage?.image = iTunesImage
-                            }
-                        })
-                    }
-                }
-            })
+        if let coredataPodcast = podcast {
+            podcastTitle.text = coredataPodcast.title
+            
+            totalClips.text = "123 clips"
+            
+            if let lastBuildDate = coredataPodcast.lastBuildDate {
+                lastPublishedDate.text = PVUtility.formatDateToString(lastBuildDate)
+            }
+            
+            if let podcastAuthor = coredataPodcast.author {
+                author.text = podcastAuthor
+            }
+            
+            if let podcastCategories = coredataPodcast.categories {
+                categories.text = podcastCategories
+            }
+            
+            if let link = coredataPodcast.link {
+                let range = NSRangeFromString(link)
+                homePage.enabledTextCheckingTypes = NSTextCheckingType.Link.rawValue
+                homePage.addLinkToURL(NSURL(string: link), withRange: range)
+                homePage.delegate = self
+                homePage.text = link
+            }
+            
+            if let podcastSummary = coredataPodcast.summary, let cleanedSummary = PVUtility.removeHTMLFromString(podcastSummary) {
+                summary.text = cleanedSummary
+            }
+            
+            if let imageData = coredataPodcast.imageThumbData, image = UIImage(data: imageData) {
+                podcastImage.image = image
+            }
+            else {
+                podcastImage.image = UIImage(named: "PodverseIcon")
+            }
+
         }
         
-        searchResultTotalClips.text = "123 clips"
+    }
+    
+    var viewDidLayoutSubviewsAtLeastOnce = false
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
         
-        searchResultLastPublishedDate.text = PVUtility.formatDateToString(searchResultPodcast.lastPubDate!)
-
-        searchResultPrimaryGenreName.text = "Genre: " + searchResultPodcast.primaryGenreName!
-//
-////        searchResultEpisodesTotal.text = "Episodes Available: " + String(searchResultPodcast.episodesTotal!)
+        if !viewDidLayoutSubviewsAtLeastOnce {
+            summary?.setContentOffset(CGPointZero, animated: false)
+        }
         
-//        searchResultFeedURL.text = "RSS Feed: " + searchResultPodcast.feedURL
-
-        searchResultSummary.text = searchResultPodcast.artistName!
-        
-        // Do any additional setup after loading the view.
+        viewDidLayoutSubviewsAtLeastOnce = true
     }
 
     override func didReceiveMemoryWarning() {
@@ -71,15 +89,16 @@ class PodcastProfileViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-
-    /*
     // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+        if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
+            let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
+            mediaPlayerViewController.hidesBottomBarWhenPushed = true
+        }
     }
-    */
+    
+    func attributedLabel(label: TTTAttributedLabel!, didSelectLinkWithURL url: NSURL!) {
+        UIApplication.sharedApplication().openURL(url)
+    }
 
 }

@@ -22,11 +22,6 @@ extension NSURL {
         let group = dispatch_group_create()
         dispatch_group_enter(group)
         NSURLSession.sharedSession().dataTaskWithRequest(request, completionHandler: { (data, response, error) -> Void in
-            if let httpResponse = response as? NSHTTPURLResponse {
-                if let contentType = httpResponse.allHeaderFields["Content-Length"] as? String {
-                    print(contentType)
-                }
-            }
             contentLength = response?.expectedContentLength ?? NSURLSessionTransferSizeUnknown
             dispatch_group_leave(group)
         }).resume()
@@ -34,6 +29,10 @@ extension NSURL {
         return contentLength
     }
 }
+
+//
+// NOTE - ClipStreamer can only work if the RSS server has the "Accept-Ranges: bytes" header
+//
 
 class PVClipStreamer: NSObject, AVAssetResourceLoaderDelegate, NSURLConnectionDataDelegate {
     
@@ -61,35 +60,37 @@ class PVClipStreamer: NSObject, AVAssetResourceLoaderDelegate, NSURLConnectionDa
         // Reset the connection to nil before streaming a new clip
         self.connection = nil
         
-        if let mediaURLString = clip.episode.mediaURL {
+        guard let mediaURLString = clip.episode.mediaURL else {
+            return
+        }
             
-            // Get remote file total bytes
-            guard let remoteFileSize = NSURL(string: mediaURLString)?.remoteSize else {
-                return
-            }
-            
-            guard let calcCustomMediaURL = self.mediaURLWithCustomScheme(mediaURLString, scheme: "http") else {
-                return
-            }
+        // Get remote file total bytes
+        guard let remoteFileSize = NSURL(string: mediaURLString)?.remoteSize else {
+            return
+        }
+        
+        guard let calcCustomMediaURL = self.mediaURLWithCustomScheme(mediaURLString, scheme: "http") else {
+            return
+        }
 
-            let calculateDurationAsset = AVURLAsset(URL: calcCustomMediaURL, options: nil)
-            
-            // If an episode.duration is availabe then use it. Else, calculate the episode duration.
-            if clip.episode.duration != nil {
-                episodeDuration = Double(clip.episode.duration!)
-            } else {
-                episodeDuration = CMTimeGetSeconds(calculateDurationAsset.duration)
-                episodeDuration = floor(episodeDuration!)
-            }
-            
-            // Since the calculated episodeDuration is sometimes different than the duration of the episode according to its RSS feed (see NPR TED Radio Hour; NPR Fresh Air; NPR etc.), override the episode.duration with the calculated episodeDuration and save
+        let calculateDurationAsset = AVURLAsset(URL: calcCustomMediaURL, options: nil)
+        
+        // If an episode.duration is availabe then use it. Else, calculate the episode duration.
+//        if clip.episode.duration != nil {
+//            episodeDuration = Double(clip.episode.duration!)
+//        } else {
+            episodeDuration = CMTimeGetSeconds(calculateDurationAsset.duration)
+            episodeDuration = floor(episodeDuration!)
+//        }
+        
+        // Since the calculated episodeDuration is sometimes different than the duration of the episode according to its RSS feed (see NPR TED Radio Hour; NPR Fresh Air; NPR etc.), override the episode.duration with the calculated episodeDuration and save
 //            clip.episode.duration = episodeDuration
 //            CoreDataHelper.saveCoreData(nil)
-            
-            // NOTE: if a media file has metadata in the beginning, the clip start/end times will be off. The following functions determine the mediadataBytesOffset based on the metadata, and adjusts the start/endByteRanges to include this offset.
-            let metadataList = calculateDurationAsset.metadata
-            var totalMetaDataBytes = 0
-            for item in metadataList {
+        
+        // NOTE: if a media file has metadata in the beginning, the clip start/end times will be off. The following functions determine the mediadataBytesOffset based on the metadata, and adjusts the start/endByteRanges to include this offset.
+        let metadataList = calculateDurationAsset.metadata
+        var totalMetaDataBytes = 0
+        for item in metadataList {
 //                print("start over")
 //                print(item.key)
 //                print(item.keySpace)
@@ -97,10 +98,10 @@ class PVClipStreamer: NSObject, AVAssetResourceLoaderDelegate, NSURLConnectionDa
 //                print(item.value)
 //                print(item.dataValue)
 //                print(item.extraAttributes)
-                if let dataValue = item.dataValue {
-                    totalMetaDataBytes += dataValue.length
-                }
-                if item.commonKey != nil && item.value != nil {
+            if let dataValue = item.dataValue {
+                totalMetaDataBytes += dataValue.length
+            }
+            if item.commonKey != nil && item.value != nil {
 //                    if item.commonKey  == "title" {
 //                        if let dataValue = item.dataValue {
 //                            totalMetaDataBytes += dataValue.length
@@ -126,31 +127,32 @@ class PVClipStreamer: NSObject, AVAssetResourceLoaderDelegate, NSURLConnectionDa
 //                            totalMetaDataBytes += dataValue.length
 //                        }
 //                    }
-                }
             }
-            metadataBytesOffset = totalMetaDataBytes
-            
-            // TODO: can we refine the startBytesRange and endBytesRange?
-            startBytesRange = metadataBytesOffset + Int((Double(clip.startTime) / episodeDuration) * Double(remoteFileSize - metadataBytesOffset))
-            
-            // If clip has a valid end time, then use it to determine the End Byte Range Request value. Else use the full episode file size as the End Byte Range Request value.
-            if clip.endTime != 0 {
-                endBytesRange = metadataBytesOffset + Int((Double(clip.endTime) / episodeDuration) * Double(remoteFileSize - metadataBytesOffset))
-            } else {
-                endBytesRange = Int(remoteFileSize)
-            }
-            
-            guard let customSchemeMediaURL = self.mediaURLWithCustomScheme(mediaURLString, scheme: "streaming") else {
-                return
-            }
-            
-            let asset = AVURLAsset(URL: customSchemeMediaURL, options: nil)
-            
-            asset.resourceLoader.setDelegate(self, queue: dispatch_get_main_queue())
-            self.pendingRequests = []
-            let playerItem = AVPlayerItem(asset: asset)
-            PVMediaPlayer.sharedInstance.avPlayer = AVPlayer(playerItem: playerItem)
         }
+        metadataBytesOffset = totalMetaDataBytes
+        
+        // TODO: can we refine the startBytesRange and endBytesRange?
+        startBytesRange = metadataBytesOffset + Int((Double(clip.startTime) / episodeDuration) * Double(remoteFileSize - metadataBytesOffset))
+        
+        // If clip has a valid end time, then use it to determine the End Byte Range Request value. Else use the full episode file size as the End Byte Range Request value.
+        if let endTime = clip.endTime {
+            endBytesRange = metadataBytesOffset + Int((Double(endTime) / episodeDuration) * Double(remoteFileSize - metadataBytesOffset))
+        } else {
+            endBytesRange = Int(remoteFileSize)
+        }
+        
+        guard let customSchemeMediaURL = self.mediaURLWithCustomScheme(mediaURLString, scheme: "streaming") else {
+            return
+        }
+        
+        let asset = AVURLAsset(URL: customSchemeMediaURL, options: nil)
+        
+        asset.resourceLoader.setDelegate(self, queue: dispatch_get_main_queue())
+        self.pendingRequests = []
+        
+        let playerItem = AVPlayerItem(asset: asset)
+        PVMediaPlayer.sharedInstance.avPlayer = AVPlayer(playerItem: playerItem)
+
     }
 
     

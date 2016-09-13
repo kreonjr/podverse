@@ -35,6 +35,9 @@ class CustomFeedParser:FeedParser {
                 self.currentFeedChannel?.channeliTunesLogoURL = channeliTunesLogoURL as? String
             }
         }
+        else if self.currentPath == "/rss/channel/itunes:author" {
+            self.currentFeedChannel?.channeliTunesAuthor = self.currentElementContent
+        }
         else if self.currentPath == "/rss/channel/item/itunes:duration" {
             // if the : is present, then the duration is in hh:mm:ss
             if self.currentElementContent.containsString(":") {
@@ -53,6 +56,23 @@ class CustomFeedParser:FeedParser {
         else if self.currentPath == "/rss/channel/pubDate" {
             self.currentFeedChannel?.channelLastPubDate = NSDate(fromString: self.currentElementContent, format: .RFC822)
         }
+        // category
+        else if self.currentPath == "/rss/channel/category" || self.currentPath == "/rss/channel/itunes:category" {
+            // This is very gross. Can it be cleaned up? If found myself sticking more and more if lets in there after unwrapped optional crashes...
+            let currentAttributes = self.currentElementAttributes
+            if currentAttributes != nil {
+                if let channelCategory = self.currentFeedChannel?.channelCategory {
+                    if let categoryText = currentAttributes["text"] {
+                        if let categoryTextString = categoryText as? String {
+                            self.currentFeedChannel?.channelCategory = channelCategory + ", " + categoryTextString
+                        }
+                    }
+                } else {
+                    self.currentFeedChannel?.channelCategory = currentAttributes["text"] as? String
+                }
+            }
+        }
+        
         
         
         

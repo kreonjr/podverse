@@ -9,18 +9,20 @@ import UIKit
 import CoreData
 
 enum TabItems:Int {
-    case Podcasts = 0, Find, Downloads, Settings
+    case Podcasts = 0, Playlists, Find, Downloads, Settings
     
     func getIndex() -> Int {
         switch self {
         case .Podcasts:
             return 0
-        case .Find:
+        case .Playlists:
             return 1
-        case .Downloads:
+        case .Find:
             return 2
-        case .Settings:
+        case .Downloads:
             return 3
+        case .Settings:
+            return 4
         }
     }
 }
@@ -35,7 +37,7 @@ struct Constants {
     
     static let kLastPlayingEpisodeURL = "lastPlayingEpisodeURL"
     
-    static let kUnsubscribeFromPodcast = "unsubscribeFromPodcast"
+    static let kUnfollowPodcast = "unfollowPodcast"
     
     static let kUpdateDownloadsTable = "updateDownloadTable"
 
@@ -44,6 +46,8 @@ struct Constants {
     static let kPlayerHasNoItem = "playerHasNoItem"
     
     static let feedParsingQueue = dispatch_queue_create("FEED_PARSER_QUEUE", DISPATCH_QUEUE_SERIAL);
+    
+    static let channelInfoFeedParsingQueue = dispatch_queue_create("CHANNEL_INFO_FEED_PARSER_QUEUE", DISPATCH_QUEUE_SERIAL);
     
     static let kRefreshAddToPlaylistTableDataNotification = "refreshPodcastTableDataNotification"
     
@@ -60,17 +64,6 @@ struct Constants {
     static let kWiFiIsUnreachable = "wiFiIsUnreachable"
     
     static let rootPath = NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory.DocumentDirectory, .UserDomainMask, true)[0]
-    
-    static var SERVER_AUTHORIZATION_KEY:String {
-        get {
-            if let plistPath = NSBundle.mainBundle().pathForResource("ServerKey", ofType: "plist"), let dict = NSDictionary(contentsOfFile: plistPath), key = dict["ServerKey"] as? String {
-                return key
-            }
-            else {
-                return ""
-            }
-        }
-    }
     
     static let TO_PLAYER_SEGUE_ID = "To Now Playing"
 }

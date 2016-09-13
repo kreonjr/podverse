@@ -33,6 +33,8 @@ class PVDeleter {
         let moc = CoreDataHelper.sharedInstance.backgroundContext
         let episode = CoreDataHelper.fetchEntityWithID(episodeID, moc: moc) as! Episode
         
+        episode.playbackPosition = 0
+        
         // Get the downloadSession, and if there is a downloadSession with a matching taskIdentifier as episode's taskIdentifier, then cancel the downloadSession
         let episodePodcastFeedURL = episode.podcast.feedURL
         let downloadSession = PVDownloader.sharedInstance.downloadSession
@@ -118,9 +120,9 @@ class PVDeleter {
         }
         
         if deleteFromServer == true {
-            SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
+            SavePlaylistToServer(playlist: playlist, addMediaRefId: nil, completionBlock: { (response) -> Void in
                 playlist.title = "This playlist has been deleted"
-                playlist.url = response["url"] as? String
+                playlist.podverseURL = response["podverseURL"] as? String
                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
                     CoreDataHelper.saveCoreData(playlist.managedObjectContext, completionBlock: nil)
                 })
@@ -160,8 +162,8 @@ class PVDeleter {
         
         playlist.removePlaylistItem(item)
         
-        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
-            playlist.url = response["url"] as? String
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.id == nil), addMediaRefId: nil, completionBlock: { (response) -> Void in
+            playlist.podverseURL = response["podverseURL"] as? String
             dispatch_async(dispatch_get_main_queue(), { () -> Void in
                 CoreDataHelper.saveCoreData(playlist.managedObjectContext, completionBlock: nil)
             })
@@ -170,15 +172,15 @@ class PVDeleter {
         }.call()
     }
     
-    static func checkIfPodcastShouldBeRemoved(podcast: Podcast, isUnsubscribing: Bool, moc:NSManagedObjectContext?) -> Bool {
+    static func checkIfPodcastShouldBeRemoved(podcast: Podcast, isUnsubscribing: Bool, isUnfollowing: Bool, moc:NSManagedObjectContext?) -> Bool {
         guard let moc = moc else {
             return true
         }
         
         var alsoDelete = true
         
-        if isUnsubscribing != true {
-            if podcast.isSubscribed == true {
+        if isUnsubscribing == false || isUnfollowing == false {
+            if podcast.isSubscribed == true || podcast.isFollowed == true {
                 alsoDelete = false
                 return alsoDelete
             }
@@ -216,7 +218,7 @@ class PVDeleter {
         let moc = CoreDataHelper.sharedInstance.managedObjectContext
         var alsoDelete = true
         
-        if episode.podcast.isSubscribed == true {
+        if episode.podcast.isSubscribed == true || episode.podcast.isFollowed == true {
             alsoDelete = false
             return alsoDelete
         }

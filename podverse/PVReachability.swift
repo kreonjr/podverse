@@ -27,7 +27,8 @@ class PVReachability {
             } else {
                 self.resumeDownloadingEpisodes()
             }
-            if NSUserDefaults.standardUserDefaults().boolForKey("DefaultPlaylistsCreated") == false {
+            
+            if NSUserDefaults.standardUserDefaults().objectForKey("ONE_TIME_LOGIN") != nil && NSUserDefaults.standardUserDefaults().boolForKey("DefaultPlaylistsCreated") == false {
                 let playlistManager = PlaylistManager.sharedInstance
                 playlistManager.getMyPlaylistsFromServer({
                     playlistManager.createDefaultPlaylists()

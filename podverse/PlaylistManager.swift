@@ -73,13 +73,13 @@ final class PlaylistManager {
             let managedObjectContext = CoreDataHelper.sharedInstance.backgroundContext
             let playlists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: managedObjectContext) as! [Playlist]
             for playlist in playlists {
-                if let playlistId = playlist.playlistId {
+                if let id = playlist.id {
                     dispatch_group_enter(dispatchGroup)
-                    GetPlaylistFromServer(playlistId: playlistId, completionBlock: { (response) -> Void in
+                    GetPlaylistFromServer(playlistId: id, completionBlock: { (response) -> Void in
                         guard let dictResponse = response as? Dictionary<String,AnyObject> else {
                             return
                         }
-                        var playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc:managedObjectContext)
+                        var playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(id, moc:managedObjectContext)
                         playlist = PlaylistManager.JSONToPlaylist(playlist, JSONDict: dictResponse, moc: managedObjectContext)
                         
                         CoreDataHelper.saveCoreData(managedObjectContext, completionBlock:{ (finished) in
@@ -99,33 +99,48 @@ final class PlaylistManager {
 
         })
     }
+
+// Retrieve the mediaRef for an episode, THEN add the mediaRefId to the playlist and save to the server
+//    static func retrieveEpisodeMediaRefId(episode:Episode, completionBlock:((mediaRefId: String)->Void)?) -> String {
+//        
+//    }
     
     static func JSONToPlaylist(playlist:Playlist, JSONDict:Dictionary<String,AnyObject>, moc:NSManagedObjectContext) -> Playlist {
-        if let title = JSONDict["playlistTitle"] as? String {
+        
+        if let id = JSONDict["id"] as? String {
+            playlist.id = id
+        }
+        
+        if let title = JSONDict["title"] as? String {
             playlist.title = title
         }
         
-        if let url = JSONDict["url"] as? String {
-            playlist.url = url
+        if let dateCreated = JSONDict["dateCreated"] as? String {
+            playlist.dateCreated = PVUtility.formatStringToDate(dateCreated)
         }
         
-        if let playlistId = JSONDict["_id"] as? String {
-            playlist.playlistId = playlistId
+        if let lastUpdated = JSONDict["lastUpdated"] as? String {
+            playlist.lastUpdated = PVUtility.formatStringToDate(lastUpdated)
         }
         
-        if let isPublic = JSONDict["isPublic"] {
-            playlist.isPublic = isPublic.boolValue
+        //        Save as enum somehow
+        //        if let sharePermission = JSONDict["sharePermission"] as? String {
+        //            playlist.sharePermission = sharePermission
+        //        }
+        
+        if let isMyEpisodes = JSONDict["isMyEpisodes"] as? Bool {
+            playlist.isMyEpisodes = isMyEpisodes
         }
         
-        if let isMyEpisodes = JSONDict["isMyEpisodes"] {
-            playlist.isMyEpisodes = isMyEpisodes.boolValue
+        if let isMyClips = JSONDict["isMyClips"] as? Bool {
+            playlist.isMyClips = isMyClips
         }
         
-        if let isMyClips = JSONDict["isMyClips"] {
-            playlist.isMyClips = isMyClips.boolValue
+        if let podverseURL = JSONDict["podverseURL"] as? String {
+            playlist.podverseURL = podverseURL
         }
         
-        if let playlistItems = JSONDict["playlistItems"] as? [Dictionary<String,AnyObject>] {
+        if let playlistItems = JSONDict["mediaRefs"] as? [Dictionary<String,AnyObject>] {
             if playlistItems.count != playlist.allItems.count {
                 
                 playlist.episodes = NSSet()
@@ -134,28 +149,119 @@ final class PlaylistManager {
                     var podcast: Podcast!
                     var episode: Episode!
                     
-                    // If the episode property has a value, then treat as a clip
-                    if playlistItem["episode"] != nil {
-                        if let podcastDict = playlistItem["podcast"] {
-                            if let feedURLString = podcastDict["feedURL"] as? String {
-                                podcast = CoreDataHelper.retrieveExistingOrCreateNewPodcast(feedURLString, moc:moc)
-                                podcast.feedURL = feedURLString
-                            } else {
-                                break
-                            }
-                            
-                            if let title = podcastDict["title"] as? String {
-                                podcast.title = title
-                            }
-                            
-                            if let imageURL = podcastDict["imageURL"] as? String {
-                                if podcast.imageURL == nil {
-                                    podcast.imageURL = imageURL
-                                }
-                            }
+                    // If the playlistItem has a zero startTime and no endTime, then handle as an episode
+                    if playlistItem["startTime"] as? Int == 0 && playlistItem["endTime"] as? String == nil {
+                        
+                        guard let e = playlistItem["episode"] as? Dictionary<String,AnyObject> else {
+                            break
                         }
                         
-                        if let episodeDict = playlistItem["episode"] {
+                        guard let p = e["podcast"] as? Dictionary<String,AnyObject> else {
+                            break
+                        }
+                        
+                        guard let mediaURL = e["mediaURL"] as? String else {
+                            break
+                        }
+                        
+                        guard let feedURL = p["feedURL"] as? String else {
+                            break
+                        }
+                        
+                        episode = CoreDataHelper.retrieveExistingOrCreateNewEpisode(mediaURL, moc:moc)
+                        
+                        episode.mediaURL = mediaURL
+                        
+                        if let title = e["title"] as? String {
+                            episode.title = title
+                        }
+                        
+                        if let summary = e["summary"] as? String {
+                            episode.summary = summary
+                        }
+                        
+                        if let duration = e["duration"] as? Int {
+                            episode.duration = duration
+                        }
+                        
+                        if let guid = e["guid"] as? String {
+                            episode.guid = guid
+                        }
+                        
+                        if let link = e["link"] as? String {
+                            episode.link = link
+                        }
+                        
+                        if let mediaBytes = e["mediaBytes"] as? Int {
+                            episode.mediaBytes = mediaBytes
+                        }
+                        
+                        if let mediaType = e["mediaType"] as? String {
+                            episode.mediaType = mediaType
+                        }
+                        
+                        if let pubDate = e["pubDate"] as? String {
+                            episode.pubDate = PVUtility.formatStringToDate(pubDate)
+                        }
+                        
+                        podcast = CoreDataHelper.retrieveExistingOrCreateNewPodcast(feedURL, moc:moc)
+
+                        podcast.feedURL = feedURL
+
+                        if let imageURL = p["imageURL"] as? String {
+                            podcast.imageURL = imageURL
+                        }
+                        
+                        if let summary = p["summary"] as? String {
+                            podcast.summary = summary
+                        }
+                        
+                        if let title = p["title"] as? String {
+                            podcast.title = title
+                        }
+                        
+                        if let author = p["author"] as? String {
+                            podcast.author = author
+                        }
+                        
+                        if let lastBuildDate = p["lastBuildDate"] as? String {
+                            podcast.lastBuildDate = PVUtility.formatStringToDate(lastBuildDate)
+                        }
+                        
+                        if let lastPubDate = p["lastPubDate"] as? String {
+                            podcast.lastPubDate = PVUtility.formatStringToDate(lastPubDate)
+                        }
+
+                        podcast.addEpisodeObject(episode)
+
+                        playlist.addEpisodeObject(episode)
+                    }
+                        
+                    // Else handle playlistItem as a clip
+                    else {
+                        
+                        if let episodeDict = playlistItem["episode"] as? Dictionary<String,AnyObject> {
+                            
+                            if let podcastDict = episodeDict["podcast"] as? Dictionary<String,AnyObject> {
+                                
+                                if let feedURLString = podcastDict["feedURL"] as? String {
+                                    podcast = CoreDataHelper.retrieveExistingOrCreateNewPodcast(feedURLString, moc:moc)
+                                    podcast.feedURL = feedURLString
+                                } else {
+                                    break
+                                }
+                                
+                                if let title = podcastDict["title"] as? String {
+                                    podcast.title = title
+                                }
+                                
+                                if let imageURL = podcastDict["imageURL"] as? String {
+                                    if podcast.imageURL == nil {
+                                        podcast.imageURL = imageURL
+                                    }
+                                }
+                            }
+                            
                             if let mediaUrlString = episodeDict["mediaURL"] as? String {
                                 episode = CoreDataHelper.retrieveExistingOrCreateNewEpisode(mediaUrlString, moc:moc)
                                 episode.mediaURL = mediaUrlString
@@ -172,124 +278,51 @@ final class PlaylistManager {
                             }
                             
                             podcast.addEpisodeObject(episode)
+                            
                         }
                         
-                        // TODO: add a retrieveExistingOrCreateNewClip function and use it below. We'll need to have a unique identifier for clips...
-                        let clip = CoreDataHelper.insertManagedObject("Clip", moc:moc) as! Clip
-                        
-                        if let title = playlistItem["title"] as? String {
-                            clip.title = title
-                        }
-                        
-                        if let duration = playlistItem["duration"] as? Int {
-                            clip.duration = duration
-                        }
-                        
-                        if let startTime = playlistItem["startTime"] as? Int {
-                            clip.startTime = startTime
-                        }
-                        
-                        if let endTime = playlistItem["endTime"] as? Int {
-                            clip.endTime = endTime
-                        }
-                        
-                        episode.addClipObject(clip)
-                        
-                        playlist.addClipObject(clip)
-                    }
-                        // Else treat as an episode
-                    else {
-                        if let podcastDict = playlistItem["podcast"] {
-                            if let feedURLString = podcastDict["feedURL"] as? String {
-                                podcast = CoreDataHelper.retrieveExistingOrCreateNewPodcast(feedURLString, moc:moc)
-                                podcast.feedURL = feedURLString
-                            } else {
-                                break
+                        if let mediaRefId = playlistItem["id"] as? String {
+                            
+                            let clip = CoreDataHelper.retrieveExistingOrCreateNewClip(mediaRefId, moc: moc)
+                            
+                            clip.mediaRefId = mediaRefId
+                            
+                            if let startTime = playlistItem["startTime"] as? Int {
+                                clip.startTime = startTime
                             }
                             
-                            if let title = podcastDict["title"] as? String {
-                                podcast.title = title
+                            if let endTime = playlistItem["endTime"] as? Int {
+                                clip.endTime = endTime
                             }
                             
-                            if let imageURL = podcastDict["imageURL"] as? String {
-                                if podcast.imageURL == nil {
-                                    podcast.imageURL = imageURL
-                                }
+                            if let title = playlistItem["title"] as? String {
+                                clip.title = title
                             }
+                            
+                            if let ownerId = playlistItem["ownerId"] as? String {
+                                clip.ownerId = ownerId
+                            }
+                            
+                            if let dateCreated = playlistItem["dateCreated"] as? String {
+                                clip.dateCreated = PVUtility.formatStringToDate(dateCreated)
+                            }
+                            
+                            if let lastUpdated = playlistItem["lastUpdated"] as? String {
+                                clip.lastUpdated = PVUtility.formatStringToDate(lastUpdated)
+                            }
+                            
+                            episode.addClipObject(clip)
+                            
+                            playlist.addClipObject(clip)
+                            
                         }
-                        
-                        if let mediaUrlString = playlistItem["mediaURL"] as? String {
-                            episode = CoreDataHelper.retrieveExistingOrCreateNewEpisode(mediaUrlString, moc:moc)
-                            episode.mediaURL = mediaUrlString
-                        } else {
-                            break
-                        }
-                        
-                        if let title = playlistItem["title"] as? String {
-                            episode.title = title
-                        }
-                        
-                        if let duration = playlistItem["duration"] as? Int {
-                            episode.duration = duration
-                        }
-                        
-                        podcast.addEpisodeObject(episode)
-                        
-                        playlist.addEpisodeObject(episode)
-                        
+                    
                     }
                 }
             }
         }
         
         return playlist
-    }
-    
-    func clipToPlaylistItemJSON(clip:Clip) -> Dictionary<String,AnyObject> {
-        var JSONDict = Dictionary<String,AnyObject>()
-        
-        JSONDict["title"] = clip.title
-        JSONDict["duration"] = clip.duration
-        JSONDict["startTime"] = clip.startTime
-        JSONDict["endTime"] = clip.endTime
-        
-        var episodeDict = Dictionary<String,AnyObject>()
-        episodeDict["title"] = clip.episode.title
-        episodeDict["mediaURL"] = clip.episode.mediaURL
-        episodeDict["duration"] = clip.episode.duration
-        
-        if let pubDate = clip.episode.pubDate {
-            episodeDict["pubDate"] = PVUtility.formatDateToString(pubDate)
-        }
-        JSONDict["episode"] = episodeDict
-        
-        var podcastDict = Dictionary<String,AnyObject>()
-        podcastDict["title"] = clip.episode.podcast.title
-        podcastDict["imageURL"] = clip.episode.podcast.imageURL
-        podcastDict["feedURL"] = clip.episode.podcast.feedURL
-
-        JSONDict["podcast"] = podcastDict
-        
-        return JSONDict
-    }
-    
-    func episodeToPlaylistItemJSON(episode:Episode) -> Dictionary<String,AnyObject> {
-        var JSONDict = Dictionary<String,AnyObject>()
-        JSONDict["title"] = episode.title
-        JSONDict["duration"] = episode.duration
-        if let pubDate = episode.pubDate {
-            JSONDict["pubDate"] = PVUtility.formatDateToString(pubDate)
-        }
-        JSONDict["mediaURL"] = episode.mediaURL
-        
-        var podcastDict = Dictionary<String,AnyObject>()
-        podcastDict["title"] = episode.podcast.title
-        podcastDict["imageURL"] = episode.podcast.imageURL
-        podcastDict["feedURL"] = episode.podcast.feedURL
-        
-        JSONDict["podcast"] = podcastDict
-        
-        return JSONDict
     }
     
     func createDefaultPlaylists() {
@@ -306,7 +339,7 @@ final class PlaylistManager {
                 let myEpisodesPlaylist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
                 myEpisodesPlaylist.title = Constants.kMyEpisodesPlaylist
                 myEpisodesPlaylist.isMyEpisodes = true
-                myEpisodesPlaylist.userId = userId
+                myEpisodesPlaylist.ownerId = userId
                 self.savePlaylist(myEpisodesPlaylist, moc:moc)
             }
             
@@ -316,7 +349,7 @@ final class PlaylistManager {
                 let myClipsPlaylist = CoreDataHelper.insertManagedObject("Playlist", moc:moc) as! Playlist
                 myClipsPlaylist.title = Constants.kMyClipsPlaylist
                 myClipsPlaylist.isMyClips = true
-                myClipsPlaylist.userId = userId
+                myClipsPlaylist.ownerId = userId
                 self.savePlaylist(myClipsPlaylist, moc:moc)
             }
             
@@ -325,52 +358,69 @@ final class PlaylistManager {
     }
     
     func getMyPlaylistsFromServer(completion:()->Void) {
+        // TODO
         if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
-            GetPlaylistsByUserIdFromServer(userId: userId, completionBlock: { (response) -> Void in
-                
-                let dispatchGroup = dispatch_group_create()
-                guard let playlistsArray = response as? [Dictionary<String,AnyObject>] else {
-                    return
-                }
-                
-                for playlistDict in playlistsArray {
-                    if let playlistId = playlistDict["_id"] as? String {
-                        dispatch_group_enter(dispatchGroup)
-                        let moc = CoreDataHelper.sharedInstance.backgroundContext
-                        var playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc: moc)
-                        playlist = PlaylistManager.JSONToPlaylist(playlist, JSONDict: playlistDict, moc: moc)
-                        CoreDataHelper.saveCoreData(moc, completionBlock:{ (finished) in
-                            dispatch_group_leave(dispatchGroup)
-                        })
-                    }
-                }
-                dispatch_group_notify(dispatchGroup, dispatch_get_main_queue()) { () -> Void in
-                    completion()
-                }
-            }) { (error) -> Void in
-                // TODO: add error handling
-                print(error)
-            }.call()
+    GetPlaylistsByUserIdFromServer(userId: userId, completionBlock: { (response) -> Void in
+        
+        let dispatchGroup = dispatch_group_create()
+        guard let playlistsArray = response as? [Dictionary<String,AnyObject>] else {
+            return
         }
+        
+        for playlistDict in playlistsArray {
+            if let playlistId = playlistDict["id"] as? String {
+                dispatch_group_enter(dispatchGroup)
+                let moc = CoreDataHelper.sharedInstance.backgroundContext
+                var playlist = CoreDataHelper.retrieveExistingOrCreateNewPlaylist(playlistId, moc: moc)
+                playlist = PlaylistManager.JSONToPlaylist(playlist, JSONDict: playlistDict, moc: moc)
+                CoreDataHelper.saveCoreData(moc, completionBlock:{ (finished) in
+                    dispatch_group_leave(dispatchGroup)
+                })
+            }
+        }
+        dispatch_group_notify(dispatchGroup, dispatch_get_main_queue()) { () -> Void in
+            completion()
+        }
+    }) { (error) -> Void in
+        // TODO: add error handling
+        print(error)
+    }.call()
+}
     }
     
     func addItemToPlaylist(playlist: Playlist, clip: Clip?, episode: Episode?,  moc:NSManagedObjectContext?) {
         if let c = clip {
             playlist.addClipObject(c)
+            savePlaylistToServer(playlist, mediaRefId: c.mediaRefId, moc: moc)
         }
-        
-        if let e = episode  {
-            playlist.addEpisodeObject(e)
+        else if let e = episode {
+            SaveEpisodeToServer(episode: e, completionBlock: { (response) in
+                guard let mRefId = response["id"] as? String else {
+                    return
+                }
+                
+                playlist.addEpisodeObject(e)
+                self.savePlaylistToServer(playlist, mediaRefId: mRefId, moc: moc)
+            }, errorBlock: { (error) in
+                print("Not saved to server. Error: ", error?.localizedDescription)
+            }).call()
         }
-        
-        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
+    }
+    
+    func savePlaylistToServer(playlist:Playlist, mediaRefId:String, moc:NSManagedObjectContext?) {
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.id == nil), addMediaRefId: mediaRefId, completionBlock: { (response) -> Void in
             if let managedObjectContext = moc {
-                let playlist = CoreDataHelper.fetchEntityWithID(playlist.objectID, moc: managedObjectContext) as! Playlist
+                var playlist = CoreDataHelper.fetchEntityWithID(playlist.objectID, moc: managedObjectContext) as! Playlist
                 guard let dictResponse = response as? Dictionary<String,AnyObject> else {
                     return
                 }
                 
-                playlist.url = dictResponse["url"] as? String
+                if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
+                    playlist.ownerId = userId
+                }
+                
+                playlist = self.syncLocalPlaylistFieldsWithResponse(playlist, dictResponse: dictResponse)
+                
                 CoreDataHelper.saveCoreData(managedObjectContext, completionBlock: { (saved) in
                     dispatch_async(dispatch_get_main_queue(), { () -> Void in
                         NSNotificationCenter.defaultCenter().postNotificationName(Constants.kItemAddedToPlaylistNotification, object: nil)
@@ -385,16 +435,17 @@ final class PlaylistManager {
     }
     
     func savePlaylist(playlist: Playlist, moc:NSManagedObjectContext) {
-        let playlist = playlist
-        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.playlistId == nil), completionBlock: { (response) -> Void in
+        var playlist = playlist
+        SavePlaylistToServer(playlist: playlist, newPlaylist:(playlist.id == nil), addMediaRefId: nil, completionBlock: { (response) -> Void in
             guard let dictResponse = response as? Dictionary<String,AnyObject> else {
                 return
             }
-            playlist.playlistId = dictResponse["_id"] as? String
-            playlist.url = dictResponse["url"] as? String
             
-            let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId")
-            playlist.userId = userId
+            if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
+                playlist.ownerId = userId
+            }
+            
+            playlist = self.syncLocalPlaylistFieldsWithResponse(playlist, dictResponse: dictResponse)
             
             CoreDataHelper.saveCoreData(moc, completionBlock: { (saved) -> Void in
                 dispatch_async(dispatch_get_main_queue(), { () -> Void in
@@ -405,6 +456,50 @@ final class PlaylistManager {
         }) { (error) -> Void in
             print("Not saved to server. Error: ", error?.localizedDescription)
         }.call()
+    }
+    
+    func syncLocalPlaylistFieldsWithResponse(playlist: Playlist, dictResponse: Dictionary<String,AnyObject>) -> Playlist {
+        
+        // Save all the response fields to the local playlist for good measure
+        
+        if let id = dictResponse["id"] as? String {
+            playlist.id = id
+        }
+        
+        if let ownerName = dictResponse["ownerName"] as? String {
+            playlist.ownerName = ownerName
+        }
+        
+        if let title = dictResponse["title"] as? String {
+            playlist.title = title
+        }
+
+        if let dateCreated = dictResponse["dateCreated"] as? String {
+            playlist.dateCreated = PVUtility.formatStringToDate(dateCreated)
+        }
+        
+        if let lastUpdated = dictResponse["lastUpdated"] as? String {
+            playlist.lastUpdated = PVUtility.formatStringToDate(lastUpdated)
+        }
+
+//        Save as enum somehow
+//        if let sharePermission = dictResponse["sharePermission"] as? String {
+//            playlist.sharePermission = sharePermission
+//        }
+        
+        if let isMyEpisodes = dictResponse["isMyEpisodes"] as? Bool {
+            playlist.isMyEpisodes = isMyEpisodes.boolValue
+        }
+
+        if let isMyClips = dictResponse["isMyClips"] as? Bool {
+            playlist.isMyClips = isMyClips.boolValue
+        }
+        
+        if let podverseURL = dictResponse["podverseURL"] as? String {
+            playlist.podverseURL = podverseURL
+        }
+        
+        return playlist
     }
     
     
