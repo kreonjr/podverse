@@ -19,6 +19,7 @@ class FeedChannel: NSObject {
     var channelLogo: UIImage?
     var channeliTunesLogoURL: String?
     var channeliTunesLogo: UIImage?
+    var channeliTunesAuthor: String?
     var channelLanguage: String?
     var channelLastBuildDate: NSDate?
     var channelLastPubDate: NSDate?

@@ -1,217 +1,185 @@
 //
-//  PlaylistViewController.swift
-//  podverse
-//
-//  Created by Mitchell Downey on 2/2/16.
-//  Copyright © 2016 Mitchell Downey. All rights reserved.
+//  PlaylistsTableViewController.swift
 //
 
 import UIKit
 import CoreData
+import Lock
 
-class PlaylistViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    
+class PlaylistsTableViewController: UIViewController {
+
     @IBOutlet weak var tableView: UITableView!
-    
-    private var playlist:Playlist!
-    var playlistObjectId:NSManagedObjectID!
-    private var moc = CoreDataHelper.sharedInstance.managedObjectContext
+    @IBOutlet weak var bottomButton: UIButton!
+        
+    var playlistManager = PlaylistManager.sharedInstance
+    var managedObjectContext:NSManagedObjectContext!
+    let coreDataHelper = CoreDataHelper.sharedInstance
     let reachability = PVReachability.manager
+    var refreshControl: UIRefreshControl!
     
-    var playlistItems = [AnyObject]()
-    
-    let pvMediaPlayer = PVMediaPlayer.sharedInstance
+    var playlists:[Playlist] {
+        get {
+            let moc = coreDataHelper.managedObjectContext
+            let unsortedPlaylists = CoreDataHelper.fetchEntities("Playlist", predicate: nil, moc: moc) as! [Playlist]
+            var sortedPlaylists = unsortedPlaylists.sort({ $0.title?.lowercaseString < $1.title?.lowercaseString })
+            
+            for (index, playlist) in sortedPlaylists.enumerate() {
+                if playlist.isMyClips {
+                    sortedPlaylists.removeAtIndex(index)
+                    sortedPlaylists.insert(playlist, atIndex: 0)
+                } else if playlist.isMyEpisodes {
+                    sortedPlaylists.removeAtIndex(index)
+                    sortedPlaylists.insert(playlist, atIndex: 0)
+                }
+            }
+            return sortedPlaylists
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.title = "Playlists"
         navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .Plain, target: nil, action: nil)
+
+        bottomButton.setTitle("Add Playlist by URL", forState: .Normal)
+        bottomButton.hidden = false
         
-        playlist = CoreDataHelper.fetchEntityWithID(playlistObjectId, moc: self.moc) as! Playlist
+        playlistManager.delegate = self
         
-        if let clips = playlist.clips {
-            for clip in clips {
-                playlistItems.append(clip)
-            }
-        }
+        refreshControl = UIRefreshControl()
+        refreshControl.attributedTitle = NSAttributedString(string: "Pull to refresh all playlists")
+        refreshControl.addTarget(self, action: #selector(refreshData), forControlEvents: UIControlEvents.ValueChanged)
+        tableView.addSubview(refreshControl)
+                
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButton), name: Constants.kPlayerHasNoItem, object: nil)
         
-        if let episodes = playlist.episodes {
-            for episode in episodes {
-                playlistItems.append(episode)
-            }
-        }
-        
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(removePlayerNavButtonAndReload), name: Constants.kPlayerHasNoItem, object: nil)
-        
-        tableView.reloadData()
-        
-        // Set navigation bar styles
-        navigationItem.title = "Playlist"
+        refreshPlaylists()
     }
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
-        let shareBarButton = UIBarButtonItem(title: "Share", style: .Plain, target: self, action: #selector(PlaylistViewController.showPlaylistShare(_:)))
-        let playerNavButton = self.playerNavButton()
-        if let playerNav = playerNavButton {
-            navigationItem.rightBarButtonItems = [playerNav, shareBarButton]
-        } else {
-            navigationItem.rightBarButtonItems = [shareBarButton]
-        }
-    }
-    
-    func removePlayerNavButtonAndReload() {
-        self.removePlayerNavButton()
+        navigationItem.rightBarButtonItem = self.playerNavButton()
         self.tableView.reloadData()
     }
     
-    func showPlaylistShare(sender: UIBarButtonItem) {
-        let playlistPageUrl = playlist.url!.stringByReplacingOccurrencesOfString("/pl/", withString: "/playlist/", options: NSStringCompareOptions.LiteralSearch, range: nil)
-        let alert = UIAlertController(title: "Link to Playlist Page", message: playlistPageUrl, preferredStyle: .Alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .Cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: "Copy", style: .Default, handler: { (action) -> Void in
-            UIPasteboard.generalPasteboard().string = playlistPageUrl ?? ""
-        }))
-        self.presentViewController(alert, animated: true, completion: nil)
+    func refreshData() {
+        if reachability.hasInternetConnection() == false && refreshControl.refreshing == true {
+            showInternetNeededAlert("Connect to WiFi or cellular data to refresh playlists.")
+            refreshControl.endRefreshing()
+            return
+        }
+        refreshPlaylists()
     }
     
-    // MARK: - Table view data source
+    private func refreshPlaylists() {
+        PlaylistManager.sharedInstance.refreshPlaylists { () -> Void in
+            self.refreshControl.endRefreshing()
+            self.tableView.reloadData()
+        }
+    }
     
+    private func showAddPlaylistByURLAlert() {
+        if reachability.hasInternetConnection() == false {
+            showInternetNeededAlert("Connect to WiFi or cellular data to add a playlist by URL.")
+            return
+        }
+        
+        let addPlaylistByURLAlert = UIAlertController(title: "Add Playlist By URL", message: nil, preferredStyle: UIAlertControllerStyle.Alert)
+        
+        addPlaylistByURLAlert.addTextFieldWithConfigurationHandler({(textField: UITextField!) in
+            textField.placeholder = "http://podverse.tv/playlist/..."
+        })
+        
+        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: nil))
+        
+        addPlaylistByURLAlert.addAction(UIAlertAction(title: "Add", style: .Default, handler: { (action: UIAlertAction!) in
+            let textField = addPlaylistByURLAlert.textFields![0] as UITextField
+            if let urlString = textField.text {
+                self.playlistManager.addPlaylistByUrlString(urlString)
+            }
+        }))
+        
+        presentViewController(addPlaylistByURLAlert, animated: true, completion: nil)
+    }
+    
+    @IBAction func bottomButtonAction(sender: AnyObject) {
+        showAddPlaylistByURLAlert()
+    }
+    
+    // TODO: add timers to check for new playlist items that were added to a playlist you're subscribed to, then present a red # notification on the playlist tab
+    
+}
+
+extension PlaylistsTableViewController: UITableViewDelegate, UITableViewDataSource {
+    // MARK: - Table view data source
+
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
     
     func tableView(tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return playlist.title
+        return "My Playlists"
     }
     
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        if indexPath.row >= playlists.count {
+            return 60
+        } else {
+            return 100
+        }
+    }
+
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return playlistItems.count
+        return playlists.count
     }
-    
+
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PlaylistTableViewCell
+        let cell = tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! PlaylistsTableViewCell
+
+            let playlist = playlists[indexPath.row]
+            
+            cell.title?.text = playlist.title
         
-        if let episode = playlistItems[indexPath.row] as? Episode {
-            
-            cell.podcastTitle?.text = episode.podcast.title
-            
-            if let episodeTitle = episode.title {
-                cell.itemTitle?.text = episodeTitle
+            if let ownerName = playlist.ownerName {
+                cell.ownerName?.text = ownerName
+            } else {
+                cell.ownerName?.text = ""
             }
             
-            if let episodeDuration = episode.duration {
-                cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(episodeDuration)
+            if let lastUpdated = playlist.lastUpdated {
+                cell.lastUpdatedDate?.text = PVUtility.formatDateToString(lastUpdated)
+            } else {
+                cell.lastUpdatedDate?.text = ""
             }
             
-            if let pubDate = episode.pubDate {
-                cell.itemPubDate?.text = PVUtility.formatDateToString(pubDate)
-            }
+            cell.totalItems?.text = "\(playlist.allItems.count) items"
             
-            if let imageData = episode.podcast.imageThumbData, image = UIImage(data: imageData) {
-                cell.pvImage?.image = image
+            cell.pvImage?.image = UIImage(named: "PodverseIcon")
+
+            for item in playlist.allItems {
+                if let episode = item as? Episode {
+                    if let imageData = episode.podcast.imageThumbData {
+                        if let image = UIImage(data: imageData) {
+                            cell.pvImage?.image = image
+                        }
+                    }
+                }
+                else if let clip = item as? Clip {
+                    if let imageData = clip.episode.podcast.imageThumbData {
+                        if let image = UIImage(data: imageData) {
+                            cell.pvImage?.image = image
+                        }
+                    }
+                }
             }
-            else {
-                cell.pvImage?.image = UIImage(named: "PodverseIcon")
-            }
-            
-            let status = "played/unplayed"
-            cell.status?.text = status
-            
-        }
-        else if let clip = playlistItems[indexPath.row] as? Clip {
-            
-            if let clipTitle = clip.title {
-                cell.itemTitle?.text = clipTitle
-            }
-            
-            cell.podcastTitle?.text = clip.episode.podcast.title
-            
-            if let imageData = clip.episode.podcast.imageThumbData, image = UIImage(data: imageData) {
-                cell.pvImage?.image = image
-            }
-            else {
-                cell.pvImage?.image = UIImage(named: "PodverseIcon")
-            }
-            
-            if let pubDate = clip.episode.pubDate {
-                cell.itemPubDate?.text = PVUtility.formatDateToString(pubDate)
-            }
-        
-            if let duration = clip.episode.duration {
-                cell.duration?.text = PVUtility.convertNSNumberToHHMMSSString(duration)
-            }
-        
-            // TODO: add status property (whether or not a playlistItem has been listened to before,  ) to playlistItems
-            let status = "played/unplayed"
-            cell.status?.text = status
-        
-        }
-        
+
         return cell
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        let playlistItemActions = UIAlertController(title: "Item Options", message: "", preferredStyle: UIAlertControllerStyle.ActionSheet)
-        
-        if let episode = playlistItems[indexPath.row] as? Episode {
-
-            if episode.fileName != nil {
-                playlistItemActions.addAction(UIAlertAction(title: "Play", style: .Default, handler: { action in
-                    self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(episode.objectID, paused: false)
-                    self.segueToNowPlaying()
-                }))
-            } else {
-                playlistItemActions.addAction(UIAlertAction(title: "Stream", style: .Default, handler: { action in
-                if !self.reachability.hasInternetConnection() {
-                    self.showInternetNeededAlert("Connect to WiFi or cellular data to stream an episode.")
-                    return
-                }
-                    self.pvMediaPlayer.loadEpisodeDownloadedMediaFileOrStream(episode.objectID, paused: false)
-                    self.segueToNowPlaying()
-                }))
-            }
-            
-            playlistItemActions.addAction(UIAlertAction (title: "Episode", style: .Default, handler: { action in
-                // TODO: add episode page
-            }))
-            
-            playlistItemActions.addAction(UIAlertAction (title: "Podcast", style: .Default, handler: { action in
-                // TODO: add podcast page
-            }))
-
-        } else if let clip = playlistItems[indexPath.row] as? Clip {
-            
-            if clip.episode.fileName != nil {
-                playlistItemActions.addAction(UIAlertAction(title: "Play", style: .Default, handler: { action in
-                    self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip.objectID)
-                    self.segueToNowPlaying()
-                }))
-            } else {
-                if !self.reachability.hasInternetConnection() {
-                    self.showInternetNeededAlert("Connect to WiFi or cellular data to stream a clip.")
-                    return
-                }
-                playlistItemActions.addAction(UIAlertAction(title: "Stream", style: .Default, handler: { action in
-                    
-                    self.pvMediaPlayer.loadClipDownloadedMediaFileOrStreamAndPlay(clip.objectID)
-                    self.segueToNowPlaying()
-                }))
-            }
-            
-            playlistItemActions.addAction(UIAlertAction (title: "Episode", style: .Default, handler: { action in
-                // TODO: add episode page
-            }))
-            
-            playlistItemActions.addAction(UIAlertAction (title: "Podcast", style: .Default, handler: { action in
-                // TODO: add podcast page
-            }))
-        }
-        
-        playlistItemActions.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-        
-        self.presentViewController(playlistItemActions, animated: true, completion: nil)
+        self.performSegueWithIdentifier("Show Playlist Items", sender: self)
+        tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
     
     // Override to support conditional editing of the table view.
@@ -222,36 +190,65 @@ class PlaylistViewController: UIViewController, UITableViewDataSource, UITableVi
     
     // Override to support editing the table view.
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        if editingStyle == .Delete {
-            let playlistItemToRemove = playlistItems[indexPath.row]
-            
-            // Remove Player button if the now playing item matches the playlistItem
-            if let nowPlayingEpisode = PVMediaPlayer.sharedInstance.nowPlayingEpisode {
-                if let episode = playlistItems[indexPath.row] as? Episode {
-                    if episode.mediaURL == nowPlayingEpisode.mediaURL  {
-                        self.navigationItem.rightBarButtonItem = nil
-                    }
-                }
-            } else if let nowPlayingClip = PVMediaPlayer.sharedInstance.nowPlayingClip {
-                if let clip = playlistItems[indexPath.row] as? Clip {
-                    if clip.episode.mediaURL == nowPlayingClip.episode.mediaURL  {
-                        self.navigationItem.rightBarButtonItem = nil
-                    }
-                }
+        
+        if indexPath.row > 1 {
+            if editingStyle == .Delete {
+                let playlistToRemove = playlists[indexPath.row]
+                
+                let deletePlaylistAlert = UIAlertController(title: "Delete Playlist", message: "Do you want to delete this playlist locally, or both locally and on podverse.fm?", preferredStyle: UIAlertControllerStyle.Alert)
+                
+                deletePlaylistAlert.addAction(UIAlertAction(title: "Locally", style: .Default, handler: { (action: UIAlertAction!) in
+                    PVDeleter.deletePlaylist(playlistToRemove, deleteFromServer: false)
+                    self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                }))
+                
+                deletePlaylistAlert.addAction(UIAlertAction(title: "Locally and Online", style: .Default, handler: { (action: UIAlertAction!) in
+                    PVDeleter.deletePlaylist(playlistToRemove, deleteFromServer: true)
+                    self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                }))
+                
+                deletePlaylistAlert.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: { (action: UIAlertAction!) in
+                    self.tableView.editing = false
+                    
+                }))
+                
+                presentViewController(deletePlaylistAlert, animated: true, completion: nil)
             }
+        } else {
+            let alert = UIAlertController(title: "Cannot Delete", message: "The \"My Episodes\" and \"My Clips\" playlists are required by default and cannot be deleted.", preferredStyle: UIAlertControllerStyle.Alert)
+            alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: { (action: UIAlertAction!) in
+                self.tableView.editing = false
+                
+            }))
             
-            PVDeleter.deletePlaylistItem(playlist, item: playlistItemToRemove)
-            self.playlistItems.removeAtIndex(indexPath.row)
-            
-            self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            self.presentViewController(alert, animated: true, completion: nil)
         }
     }
     
     // MARK: - Navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
+        if segue.identifier == "Show Playlist Items" {
+            let playlistItemsViewController = segue.destinationViewController as! PlaylistItemsViewController
+            if let index = tableView.indexPathForSelectedRow {
+                playlistItemsViewController.playlistObjectId = playlists[index.row].objectID
+            }
+        } else if segue.identifier == Constants.TO_PLAYER_SEGUE_ID {
             let mediaPlayerViewController = segue.destinationViewController as! MediaPlayerViewController
             mediaPlayerViewController.hidesBottomBarWhenPushed = true
         }
+    }
+}
+
+extension PlaylistsTableViewController:PlaylistManagerDelegate {
+    func playlistAddedByUrl() {
+        refreshPlaylists()
+    }
+    
+    func itemAddedToPlaylist() {
+        refreshPlaylists()
+    }
+    
+    func didSavePlaylist() {
+        refreshPlaylists()
     }
 }

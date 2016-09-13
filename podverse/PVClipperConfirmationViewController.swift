@@ -12,7 +12,8 @@ class PVClipperConfirmationViewController: UIViewController {
 
     @IBOutlet weak var clipTitleLabel: UILabel!
     @IBOutlet weak var clipDuration: UILabel!
-
+    @IBOutlet weak var clipStartEndTime: UILabel!
+    
     var clip:Clip?
     
     override func viewDidLoad() {
@@ -30,15 +31,32 @@ class PVClipperConfirmationViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         
-        if let duration = clip?.duration {
-            clipDuration.text = PVUtility.convertNSNumberToHHMMSSString(duration)
-            if clip?.endTime == 0 {
-                clipDuration.text = PVUtility.convertNSNumberToHHMMSSString(duration) + " (no end time provided)"
+        if let clipTitle = clip?.title {
+            clipTitleLabel.text = clipTitle
+        } else {
+            if let episodeTitle = clip?.episode.title {
+                clipTitleLabel.text = episodeTitle
             }
-
         }
         
-        clipTitleLabel.text = clip?.title
+        if let duration = clip?.duration {
+            clipDuration.text = PVUtility.convertNSNumberToHHMMSSString(duration)
+        } else {
+            clipDuration.text = ""
+        }
+        
+        if let startTime = clip?.startTime {
+            
+            var startEndTimeString = PVUtility.convertNSNumberToHHMMSSString(startTime)
+            if let endTime = clip?.endTime {
+                if Int(endTime) > Int(startTime) {
+                    startEndTimeString += " – " + PVUtility.convertNSNumberToHHMMSSString(endTime)
+                }
+            }
+            clipStartEndTime.text = startEndTimeString
+            
+        }
+        
     }
     
     func popToRoot() {
@@ -50,7 +68,11 @@ class PVClipperConfirmationViewController: UIViewController {
     }
     
     func shareClip() {
-        let textToShare = "Share clips somewhere"
+        var textToShare = ""
+        if let podverseURL = clip?.podverseURL {
+            textToShare = podverseURL
+        }
+        
         let objectsToShare = [textToShare]
         let activityVC = UIActivityViewController(activityItems: objectsToShare, applicationActivities: nil)
 

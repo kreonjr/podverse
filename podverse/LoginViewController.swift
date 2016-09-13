@@ -27,6 +27,7 @@ class LoginViewController: UIViewController {
     
     @IBAction func dismissView(sender: AnyObject) {
         self.dismissViewControllerAnimated(true, completion: nil)
+        PVAuth.sharedInstance.loginAsAnon()
     }
 
 }

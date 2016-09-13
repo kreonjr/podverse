@@ -4,21 +4,45 @@
 
 import Foundation
 import CoreData
+
+enum PlaylistSharePermission {
+    case Public, Private, LinkShared
+    
+    var value:String {
+        switch self {
+        case .Public:
+            return "isPublic"
+        case .Private:
+            return "isPrivate"
+        case .LinkShared:
+            return "isSharableWithLink"
+        }
+    }
+}
+
 @objc(Playlist)
 
-class Playlist: NSManagedObject {
-    @NSManaged var title: String
-    @NSManaged var url: String?
-    @NSManaged var isPublic: Bool
-    @NSManaged var lastUpdated: NSDate?
-    @NSManaged var playlistId:String?
-    @NSManaged var userId:String?
 
-    @NSManaged var episodes: NSSet?
-    @NSManaged var clips: NSSet?
+class Playlist: NSManagedObject {
+    
+    @NSManaged var id:String?
+    @NSManaged var podverseURL: String?
+    
+    @NSManaged var ownerId:String
+    @NSManaged var ownerName:String?
+    
+    @NSManaged var title: String?
+    
+    @NSManaged var dateCreated: NSDate?
+    @NSManaged var lastUpdated: NSDate?
+    
+    @NSManaged var sharePermission: String?
     
     @NSManaged var isMyEpisodes: Bool
     @NSManaged var isMyClips: Bool
+
+    @NSManaged var episodes: NSSet?
+    @NSManaged var clips: NSSet?
     
     var allItems: [AnyObject] {
         get {
@@ -49,7 +73,7 @@ class Playlist: NSManagedObject {
     private func removeEpisodeObject(episode: Episode) {
         self.mutableSetValueForKey("episodes").removeObject(episode)
         
-        let alsoDeletePodcast = PVDeleter.checkIfPodcastShouldBeRemoved(episode.podcast, isUnsubscribing: false, moc:episode.managedObjectContext)
+        let alsoDeletePodcast = PVDeleter.checkIfPodcastShouldBeRemoved(episode.podcast, isUnsubscribing: false, isUnfollowing: false, moc:episode.managedObjectContext)
         
         if alsoDeletePodcast {
             PVDeleter.deletePodcast(episode.podcast.objectID, completionBlock: nil)
@@ -60,7 +84,7 @@ class Playlist: NSManagedObject {
     private func removeClipObject(clip: Clip) {
         self.mutableSetValueForKey("clips").removeObject(clip)
         
-        let alsoDeletePodcast = PVDeleter.checkIfPodcastShouldBeRemoved(clip.episode.podcast, isUnsubscribing: false, moc:clip.managedObjectContext)
+        let alsoDeletePodcast = PVDeleter.checkIfPodcastShouldBeRemoved(clip.episode.podcast, isUnsubscribing: false, isUnfollowing: false, moc:clip.managedObjectContext)
         
         if alsoDeletePodcast {
             PVDeleter.deletePodcast(clip.episode.podcast.objectID, completionBlock: nil)
@@ -68,8 +92,6 @@ class Playlist: NSManagedObject {
     }
     
     func removePlaylistItem(value: AnyObject) {
-        
-        
         if let episode = value as? Episode {
             removeEpisodeObject(episode)
         }

@@ -60,11 +60,11 @@ class PVUtility: NSObject {
             hours = ""
         }
         var minutes = String((duration / 60) % 60) + ":"
-        if minutes.characters.count < 3 {
+        if minutes.characters.count < 3 && hours != "" {
             minutes = "0" + minutes
         }
         var seconds = String(duration % 60)
-        if seconds.characters.count < 2 {
+        if seconds.characters.count < 2 && (hours != "" || minutes != "") {
             seconds = "0" + seconds
         }
         
@@ -81,12 +81,24 @@ class PVUtility: NSObject {
         }
     }
     
+    static func encodePipeInString (string: String) -> (String) {
+        let s = string.stringByReplacingOccurrencesOfString("|", withString: "%7C", options: .LiteralSearch, range: nil)
+        return s
+    }
+    
     static func formatDateToString (date: NSDate) -> String {
         let dateFormatter = NSDateFormatter()
         dateFormatter.dateStyle = NSDateFormatterStyle.ShortStyle
         let dateString = dateFormatter.stringFromDate(date)
         
         return dateString
+    }
+    
+    static func formatStringToDate (string: String) -> NSDate? {
+        let dateFormatter = NSDateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd hh:mm:ss.SSSSxxx"
+        let date = dateFormatter.dateFromString(string)
+        return date
     }
     
     static func validateEmail(enteredEmail:String) -> Bool {
@@ -103,6 +115,14 @@ class PVUtility: NSObject {
             try NSFileManager().removeItemAtURL(destinationURL!)
         } catch {
             print("Item does not exist on disk")
+        }
+    }
+    
+    static func isAnonymousUser () -> Bool {
+        if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") where userId.rangeOfString("auth0|") == nil {
+            return true
+        } else {
+            return false
         }
     }
 }

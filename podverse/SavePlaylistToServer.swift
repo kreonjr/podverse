@@ -9,10 +9,10 @@
 import Foundation
 
 class SavePlaylistToServer:WebService {
-    internal init(playlist:Playlist, newPlaylist:Bool = false, completionBlock: (response: AnyObject) -> Void, errorBlock: (error: NSError?) -> Void) {
+    internal init(playlist:Playlist, newPlaylist:Bool = false, addMediaRefId: String?, completionBlock: (response: AnyObject) -> Void, errorBlock: (error: NSError?) -> Void) {
         
-        var name = "pl"
-        if let id = playlist.playlistId where newPlaylist == false {
+        var name = "playlists"
+        if let id = playlist.id where newPlaylist == false {
             name += "/\(id)"
         }
         
@@ -20,47 +20,42 @@ class SavePlaylistToServer:WebService {
     
         if newPlaylist {
             setHttpMethod(.METHOD_POST)
+            
+            if let ownerId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
+                addParamWithKey("ownerId", value: ownerId)
+            }
         } else {
             setHttpMethod(.METHOD_PUT)
+            
+            addParamWithKey("ownerId", value: playlist.ownerId)
         }
         
         addHeaderWithKey("Content-Type", value: "application/json")
         
-        addParamWithKey("playlistTitle", value: playlist.title)
-        
-        var playlistItems = [Dictionary<String,AnyObject>]()
-        
-        if let episodes = playlist.episodes {
-            for episode in episodes {
-                let episodeJSON = PlaylistManager.sharedInstance.episodeToPlaylistItemJSON(episode as! Episode)
-                playlistItems.append(episodeJSON)
-                
-            }
+        if let idToken = NSUserDefaults.standardUserDefaults().stringForKey("idToken") {
+            addHeaderWithKey("Authorization", value: idToken)
         }
         
-        if let clips = playlist.clips {
-            for clip in clips {
-                let clipJSON = PlaylistManager.sharedInstance.clipToPlaylistItemJSON(clip as! Clip)
-                playlistItems.append(clipJSON)
-                
-            }
+        if let ownerName = NSUserDefaults.standardUserDefaults().stringForKey("userName") {
+            addParamWithKey("ownerName", value: ownerName)
         }
         
-        if playlistItems.count > 0 {
-            addParamWithKey("playlistItems", value: playlistItems)
+        if let title = playlist.title {
+            addParamWithKey("title", value: title)   
         }
+
+//        Pass enum to servier
+//        if let sharePermission = playlist.sharePermission {
+//            addParamWithKey("")
+//        }
         
-        if let userId = NSUserDefaults.standardUserDefaults().stringForKey("userId") {
-            addParamWithKey("userId", value: userId)
+        addParamWithKey("isMyEpisodes", value: playlist.isMyEpisodes)
+        
+        addParamWithKey("isMyClips", value: playlist.isMyClips)
+        
+        if let mediaRefId = addMediaRefId {
+            addParamWithKey("playlistItems", value: [mediaRefId])
         }
-        
-        if playlist.isMyEpisodes {
-            addParamWithKey("isMyEpisodes", value: playlist.isMyEpisodes)
-        }
-        
-        if playlist.isMyClips {
-            addParamWithKey("isMyClips", value: playlist.isMyClips)
-        }
-        
+
     }
 }

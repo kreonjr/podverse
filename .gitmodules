@@ -7,3 +7,6 @@
 [submodule "lib/Reachability.swift"]
 	path = lib/Reachability.swift
 	url = https://github.com/ashleymills/Reachability.swift
+[submodule "lib/Auth0"]
+	path = lib/Auth0
+	url = git@github.com:auth0/Auth0.swift.git

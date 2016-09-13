@@ -404,14 +404,15 @@ class FeedParser: NSObject, NSXMLParserDelegate {
                 self.currentFeedItem?.feedEnclosures.append(feedEnclosure)
             }
         }
-            
+        
+        // Use the CustomFeedParser's category parser instead
         // category
-        else if self.currentPath == "/rss/channel/category" {
-            self.currentFeedChannel?.channelCategory = self.currentElementContent
-        }
-        else if self.currentPath == "/rss/channel/item/category" {
-            self.currentFeedItem?.feedCategories?.append(self.currentElementContent)
-        }
+//        else if self.currentPath == "/rss/channel/category" {
+//            self.currentFeedChannel?.channelCategory = self.currentElementContent
+//        }
+//        else if self.currentPath == "/rss/channel/item/category" {
+//            self.currentFeedItem?.feedCategories?.append(self.currentElementContent)
+//        }
             
         // author (feeds only)
         else if self.currentPath == "/rss/channel/item/author" || self.currentPath == "/rss/channel/item/dc:creator" {
